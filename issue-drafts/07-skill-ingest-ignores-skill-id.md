@@ -6,6 +6,8 @@
 
 `openminion skill ingest --file <dir>/SKILL.md` derives the id from the file name. The `skill_id` declared in the file's Metadata section is ignored. Every skill that follows the documented `SKILL.md` naming is stored as `skill_id: "skill"`, `name: "SKILL"`, so two unrelated skills become two *versions of the same skill*. The ingested skill stays in `draft` (`admission.pending`): `skill list` (even `--status draft`) prints "No skills found." and `skill show skill` returns `NOT_FOUND`, although ingest reported `"ok": true`.
 
+Scope, from a second independent check on 0.1.8 (21/10): when the front matter has a conforming `name` (e.g. `name: Alpha` with `skill_id: verify.alpha`), the id is derived from `name` (`alpha`). The declared `skill_id` is still ignored, but there's no collision. The `skill` collision above happens when `name` is missing or non-conforming (`parse.warning:agent_skills_name_nonconforming`), as in `examples/skills/hello`. `skill list` was empty ("No skills found.") in both cases.
+
 ## Environment
 
 - openminion 0.1.8 (PyPI) and `dev` at `b642697`
