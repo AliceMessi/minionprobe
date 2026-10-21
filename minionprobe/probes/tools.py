@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ..core import ProbeContext, probe
+from ..core import ProbeContext, probe, has
 
 
 @probe("tools", "@tool result reaches the model and the final answer")
@@ -37,7 +37,7 @@ def decorated_tool(ctx: ProbeContext) -> str:
     if result is None:
         ctx.check("turn completed without exception", False, record.error)
         return record.error
-    final_ok = code in result.text
+    final_ok = has(result.text, code)
     ctx.check("final answer quotes the tool result", final_ok, f"text={result.text[:240]!r}")
     if model_used_it and not final_ok:
         ctx.observe(

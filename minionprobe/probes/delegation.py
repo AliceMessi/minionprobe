@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..core import ProbeContext, probe
+from ..core import ProbeContext, probe, has
 
 
 @probe("delegation", "subagent(parent, ...) runs a bounded child with its own instructions")
@@ -25,14 +25,14 @@ def subagent_run(ctx: ProbeContext) -> str:
     if result is None:
         ctx.check("subagent turn completed without exception", False, record.error)
         return record.error
-    ctx.check("child followed its own instructions (marker present)", marker in result.text, f"text={result.text[:200]!r}")
+    ctx.check("child followed its own instructions (marker present)", has(result.text, marker), f"text={result.text[:200]!r}")
     # documented-but-unbound parameter: memory_posture
     try:
         subagent(parent, name="reader", memory_posture="read_only_bounded")
         ctx.observe("subagent_memory_posture", accepted=True)
     except ValueError as exc:
         ctx.observe("subagent_memory_posture", accepted=False, error=str(exc))
-    return f"marker_present={marker in result.text}"
+    return f"marker_present={has(result.text, marker)}"
 
 
 @probe("delegation", "Handoff(target=...) transfers the turn to a peer agent")
@@ -81,8 +81,8 @@ def handoff(ctx: ProbeContext) -> str:
         return record.error
     ctx.check(
         "peer agent produced the answer (marker present)",
-        marker in result.text,
+        has(result.text, marker),
         f"text={result.text[:200]!r} transfer_called_on_wire={called} peer_answer_on_wire={peer_answered}",
     )
     ctx.check("handoff did not require a risk confirmation", not transfer_asks, f"approvals={asked}")
-    return f"marker_present={marker in result.text} approvals={asked}"
+    return f"marker_present={has(result.text, marker)} approvals={asked}"

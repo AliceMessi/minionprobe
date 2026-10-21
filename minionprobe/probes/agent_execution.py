@@ -6,7 +6,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from ..core import ProbeContext, probe
+from ..core import ProbeContext, probe, has
 
 STATS_KEYS = ("input_tokens", "output_tokens", "llm_calls", "tool_calls", "duration_ms")
 
@@ -22,7 +22,7 @@ def basic_turn(ctx: ProbeContext) -> str:
         ctx.check("turn completed without exception", False, record.error)
         return record.error
     ctx.check("run_state is completed", result.run_state == "completed", f"run_state={result.run_state}")
-    ctx.check("reply contains the exact token", token in result.text, f"text={result.text[:200]!r}")
+    ctx.check("reply contains the exact token", has(result.text, token), f"text={result.text[:200]!r}")
     missing = [k for k in STATS_KEYS if k not in result.stats]
     ctx.check("result.stats has the documented keys", not missing, f"missing={missing}")
     hidden = record.http.get("by_kind", {}).get("control", 0)

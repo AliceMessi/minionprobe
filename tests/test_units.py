@@ -142,3 +142,11 @@ def test_rule_triage_maps_blocked_known_and_verified():
     assert known.category == "known_issue" and known.known_ref == "#284"
     verified = rule_triage(base | {"probe": "sessions.followup_not_replayed", "status": "FAIL"})
     assert verified.category == "openminion_bug" and "02-followup" in verified.rationale
+
+
+def test_marker_check_ignores_model_typography():
+    from minionprobe.core import has
+
+    # gpt-oss-20b on Groq wrote the nonce with a non-breaking hyphen and narrow spaces
+    assert has("The pickup code for order A‑104 is “ZEBRA‑34E2CE”.", "ZEBRA-34E2CE")
+    assert not has("The pickup code is ZEBRA-000000.", "ZEBRA-34E2CE")

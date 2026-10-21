@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ..core import ProbeContext, ProbeSkipped, probe
+from ..core import ProbeContext, ProbeSkipped, probe, has
 
 
 @probe("sessions", "Same session_id remembers; a different session_id is isolated", cost_turns=3)
@@ -14,7 +14,7 @@ def continuity_isolation(ctx: ProbeContext) -> str:
     result, record = ctx.turn(
         agent, "What is the launch code word? Reply with the word only.", label="recall-same", session_id=shared
     )
-    same_ok = result is not None and word in result.text
+    same_ok = result is not None and has(result.text, word)
     ctx.check("same session recalls the word", same_ok, f"text={getattr(result, 'text', record.error)[:160]!r}")
     isolated, record3 = ctx.turn(
         agent,
@@ -22,7 +22,7 @@ def continuity_isolation(ctx: ProbeContext) -> str:
         label="recall-isolated",
         session_id=ctx.session("isolated"),
     )
-    leaked = isolated is not None and word in isolated.text
+    leaked = isolated is not None and has(isolated.text, word)
     ctx.check(
         "different session does not see the word",
         not leaked,
@@ -55,5 +55,5 @@ def followup_not_replayed(ctx: ProbeContext) -> str:
         text = getattr(result, "text", record.error)
         outcomes.append((word, calls, text))
         ctx.check(f"follow-up {index} reached the provider", calls > 0, f"provider requests={calls}")
-        ctx.check(f"follow-up {index} answers the new message", word in text, f"text={text[:160]!r}")
+        ctx.check(f"follow-up {index} answers the new message", has(text, word), f"text={text[:160]!r}")
     return "; ".join(f"{w}: calls={c} text={t[:60]!r}" for w, c, t in outcomes)

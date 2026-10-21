@@ -8,7 +8,7 @@ The runner prepares each home in two ways (see runner._prepare_model_home):
 
 from __future__ import annotations
 
-from ..core import ProbeContext, ProbeSkipped, probe
+from ..core import ProbeContext, ProbeSkipped, probe, has
 
 
 @probe("skills", "Ingested SKILL.md keeps its skill_id, is admitted and applied")
@@ -33,7 +33,7 @@ def ingested_skill_applied(ctx: ProbeContext) -> str:
     if result is None:
         ctx.check("turn completed without exception", False, record.error)
         return record.error
-    applied = info["codename"] in result.text
+    applied = has(result.text, info["codename"])
     ctx.check("reply contains the codename that only the skill knows", applied, f"text={result.text[:200]!r}")
     ctx.observe("skill_turn", purposes=record.purposes, http_requests=record.http.get("requests"))
     return f"default_skill_id={info['default_skill_id']} admitted={info['admit_ok']} codename_in_reply={applied}"

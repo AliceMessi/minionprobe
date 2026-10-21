@@ -37,6 +37,20 @@ RETRY_IN_RE = re.compile(r"try again in ([0-9.]+(?:ms|s|m))", re.IGNORECASE)
 RATE_LIMIT_CODES = {"RATE_LIMITED", "QUOTA_EXCEEDED", "PROVIDER_RATE_LIMITED"}
 
 
+_DASHES = dict.fromkeys(map(ord, "‐‑‒–—―−"), "-")
+_SPACES = dict.fromkeys(map(ord, "    "), " ")
+
+
+def norm(text: str) -> str:
+    """Normalise typography models like to add (non-breaking hyphens, narrow
+    spaces) so nonce checks compare content, not glyphs."""
+    return str(text or "").translate(_DASHES).translate(_SPACES).lower()
+
+
+def has(text: str, token: str) -> bool:
+    return norm(token) in norm(text)
+
+
 class ProbeBlocked(Exception):
     """The provider (not OpenMinion) prevented the probe from running."""
 

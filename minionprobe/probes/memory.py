@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ..core import ProbeContext, probe
+from ..core import ProbeContext, probe, has
 
 
 @probe("memory", "Durable fact captured in session A is recalled in session B", cost_turns=2)
@@ -35,6 +35,6 @@ def cross_session_recall(ctx: ProbeContext) -> str:
         label="recall",
         session_id=ctx.session("mem-b"),
     )
-    ok = recall is not None and tool_name in recall.text.lower()
+    ok = recall is not None and has(recall.text, tool_name)
     ctx.check("new session recalls the fact", ok, f"text={getattr(recall, 'text', record2.error)[:160]!r}")
     return f"capture_state={record.memory_capture_state} recalled={ok}"
