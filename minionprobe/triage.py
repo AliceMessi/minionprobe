@@ -26,7 +26,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
-from .env import PACKAGE_DIR, PROVIDERS, REPO_ROOT, ingest_skill, isolation_env, new_home, setup_agent
+from .env import PACKAGE_DIR, PROVIDERS, REPO_ROOT, ingest_and_admit, isolation_env, new_home, setup_agent
 from .redact import redact
 
 RUBRIC = PACKAGE_DIR / "skills" / "triage-rubric" / "SKILL.md"
@@ -159,9 +159,9 @@ def _model_triage(
     spec = PROVIDERS[provider]
     home = new_home(REPO_ROOT / ".probe-home", f"triage-{uuid.uuid4().hex[:6]}")
     setup_agent(home, spec.agent_id, spec)
-    ingest = ingest_skill(home, RUBRIC)
+    rubric = ingest_and_admit(home, RUBRIC, "minionprobe.triage_rubric")
     os.environ.update(isolation_env(home))
-    notes = [f"rubric skill ingest exit code {ingest.returncode}"]
+    notes = [f"rubric skill {rubric['skill_id']}: ingested={rubric['ingest_ok']} admitted={rubric['admit_ok']}"]
 
     @tool
     def list_failures() -> dict:

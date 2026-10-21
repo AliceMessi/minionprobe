@@ -234,6 +234,34 @@ def ingest_skill(home: ProbeHome, skill_file: Path, agent_id: str | None = None)
     return home.cli(*args)
 
 
+def json_tail(text: str) -> dict[str, Any]:
+    """CLI commands print one JSON document, possibly after log lines."""
+    text = text.strip()
+    start = 0 if text.startswith("{") else text.find(chr(10) + "{") + 1
+    try:
+        data = json.loads(text[start:]) if text else {}
+    except ValueError:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def ingest_and_admit(home: ProbeHome, skill_file: Path, name: str) -> dict[str, Any]:
+    """The skill flow that works on 0.1.8 (see issue-drafts/07): ingest with an
+    explicit --name, then admit the version as verified. The first admission
+    needs the literal 'none' as the expected active version hash."""
+    named = json_tail(home.cli("skill", "ingest", "--file", str(skill_file), "--name", name, "--trust", "trusted_local").stdout)
+    admit: dict[str, Any] = {}
+    if named.get("ok"):
+        admit = json_tail(
+            home.cli(
+                "skill", "admit", "--skill-id", str(named.get("skill_id")), "--version-hash", str(named.get("version_hash")),
+                "--expected-active-version-hash", "none", "--target-status", "verified", "--reason", "minionprobe",
+                "--verification-check", "minionprobe", "--verification-result", "passed", "--verification-evidence-ref", "minionprobe",
+            ).stdout
+        )
+    return {"skill_id": named.get("skill_id"), "ingest_ok": bool(named.get("ok")), "admit_ok": bool(admit.get("ok")), "admit_error": str(admit.get("error", ""))[:200]}
+
+
 def new_home(base: Path, name: str) -> ProbeHome:
     root = base / name
     if root.exists():

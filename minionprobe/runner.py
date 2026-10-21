@@ -20,8 +20,10 @@ from .env import (
     REPO_ROOT,
     ProbeHome,
     ProviderSpec,
+    ingest_and_admit,
     ingest_skill,
     isolation_env,
+    json_tail,
     new_home,
     provider_available,
     setup_agent,
@@ -92,42 +94,22 @@ def _prepare_model_home(base: Path, spec: ProviderSpec, codename: str) -> tuple[
     skill_file.parent.mkdir(parents=True)
     skill_file.write_text(SKILL_TEMPLATE.format(codename=codename), encoding="utf-8")
     # 1) the documented default: ingest the file as-is
-    default = _json_tail(ingest_skill(home, skill_file).stdout)
+    default = json_tail(ingest_skill(home, skill_file).stdout)
     # 2) the working path we found: explicit --name, then admit as verified
-    named = _json_tail(home.cli("skill", "ingest", "--file", str(skill_file), "--name", "minionprobe.release_codename", "--trust", "trusted_local").stdout)
-    admit = {}
-    if named.get("ok"):
-        admit = _json_tail(
-            home.cli(
-                "skill", "admit", "--skill-id", str(named.get("skill_id")), "--version-hash", str(named.get("version_hash")),
-                "--expected-active-version-hash", "none", "--target-status", "verified", "--reason", "minionprobe probe skill",
-                "--verification-check", "minionprobe", "--verification-result", "passed", "--verification-evidence-ref", "minionprobe",
-            ).stdout
-        )
+    admitted = ingest_and_admit(home, skill_file, "minionprobe.release_codename")
     listing = home.cli("skill", "list")
     skill_info = {
         "codename": codename,
         "default_ok": bool(default.get("ok")),
         "default_skill_id": default.get("skill_id"),
         "default_warnings": default.get("warnings", []),
-        "named_skill_id": named.get("skill_id"),
-        "admit_ok": bool(admit.get("ok")),
-        "admit_error": str(admit.get("error", ""))[:200],
+        "named_skill_id": admitted["skill_id"],
+        "admit_ok": admitted["admit_ok"],
+        "admit_error": admitted["admit_error"],
         "listed": "release_codename" in listing.stdout,
         "list_output": listing.stdout.strip()[-300:],
     }
     return home, skill_info
-
-
-def _json_tail(text: str) -> dict[str, Any]:
-    """CLI commands print one JSON document, possibly after log lines."""
-    text = text.strip()
-    start = 0 if text.startswith("{") else text.find("\n{") + 1
-    try:
-        data = json.loads(text[start:]) if text else {}
-    except ValueError:
-        return {}
-    return data if isinstance(data, dict) else {}
 
 
 def _prepare_local_home(base: Path, fake: FakeProvider) -> ProbeHome:
