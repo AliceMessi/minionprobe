@@ -36,6 +36,8 @@ class ProviderSpec:
     base_url: str | None = None
     kind: str = "model"  # model | local
     note: str = ""
+    # dotted config keys applied to agents.json after setup, e.g. a lean profile
+    config_overrides: tuple[tuple[str, Any], ...] = ()
 
     @property
     def agent_id(self) -> str:
@@ -52,6 +54,17 @@ PROVIDERS: dict[str, ProviderSpec] = {
         pacing="groq_headers",
         min_interval_s=4.0,
         note="Groq free tier: 8K tokens/min, 1K requests/day per model",
+    ),
+    "groq-lean": ProviderSpec(
+        name="groq-lean",
+        preset="groq",
+        model=os.environ.get("MINIONPROBE_GROQ_MODEL", "openai/gpt-oss-120b"),
+        key_env="GROQ_API_KEY",
+        host="api.groq.com",
+        pacing="groq_headers",
+        min_interval_s=4.0,
+        config_overrides=(("runtime.memory_enabled", False),),
+        note="Groq with runtime.memory_enabled=false (NOT the default): drops the memory-capture calls that Groq rejects",
     ),
     "gemini": ProviderSpec(
         name="gemini",
@@ -202,6 +215,15 @@ def setup_agent(
         # them so the fake provider only ever sees a dummy MinionProbe key.
         text = home.config_path.read_text(encoding="utf-8")
         home.config_path.write_text(text.replace('"OPENAI_COMPATIBLE_API_KEY"', f'"{FAKE_KEY_ENV}"'), encoding="utf-8")
+    if spec.config_overrides:
+        data = home.load_config()
+        for dotted, value in spec.config_overrides:
+            node = data
+            *parents, leaf = dotted.split(".")
+            for key in parents:
+                node = node.setdefault(key, {})
+            node[leaf] = value
+        home.save_config(data)
     home.agents.append(agent_id)
 
 
