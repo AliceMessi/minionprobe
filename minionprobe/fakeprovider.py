@@ -23,6 +23,7 @@ Behaviour, per request:
 from __future__ import annotations
 
 import json
+import re
 import threading
 import time
 from dataclasses import dataclass, field
@@ -139,6 +140,17 @@ def _last(messages: list[dict[str, Any]], role: str) -> str:
     return ""
 
 
+_ACTION_SUMMARY = re.compile(r"action_summary: (FAKE-ANSWER[^\n]*)")
+
+
+def _action_summary(messages: list[dict[str, Any]]) -> str:
+    for message in messages:
+        match = _ACTION_SUMMARY.search(str(message.get("content") or ""))
+        if match:
+            return match.group(1).strip()
+    return ""
+
+
 class FakeProvider:
     def __init__(self, script: FakeScript | None = None, host: str = "127.0.0.1", port: int = 0) -> None:
         self.script = script or FakeScript()
@@ -231,9 +243,11 @@ class FakeProvider:
         if is_control:
             spec = next((t for t in tools if t.get("name") == "submit_output"), {})
             overrides: dict[str, Any] = {}
-            # the closure judge only sees the user's request, so echo it: that
-            # keeps every turn's final answer distinct and easy to assert on
-            answer = self.script.final_answer or f"FAKE-ANSWER({model}): {_last(messages, 'user')[-200:]}"
+            # behave like a well-grounded judge: repeat the agent loop's answer
+            # (OpenMinion passes it as "action_summary" in the judge context);
+            # otherwise echo the user's request so every turn stays distinct
+            summary = _action_summary(messages)
+            answer = self.script.final_answer or summary or f"FAKE-ANSWER({model}): {_last(messages, 'user')[-200:]}"
             overrides["final_answer"] = answer
             args = fill_from_schema(spec.get("parameters") or {}, overrides=overrides)
             return 200, self._tool_call_completion(model, "submit_output", args), {}
