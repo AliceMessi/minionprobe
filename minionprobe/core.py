@@ -172,6 +172,8 @@ class ProbeContext:
         from openminion import Agent
 
         kwargs.setdefault("agent_id", self.provider.agent_id)
+        if self.provider.lean_tools and "tools" not in kwargs:
+            kwargs["tools"] = []
         return Agent(runtime=self.runtime, **kwargs)
 
     # -- pacing -----------------------------------------------------------------------

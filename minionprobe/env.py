@@ -38,6 +38,8 @@ class ProviderSpec:
     note: str = ""
     # dotted config keys applied to agents.json after setup, e.g. a lean profile
     config_overrides: tuple[tuple[str, Any], ...] = ()
+    # lean: agents that do not need tools get tools=[] (no default tool catalog in the prompt)
+    lean_tools: bool = False
 
     @property
     def agent_id(self) -> str:
@@ -64,7 +66,8 @@ PROVIDERS: dict[str, ProviderSpec] = {
         pacing="groq_headers",
         min_interval_s=4.0,
         config_overrides=(("runtime.memory_enabled", False),),
-        note="Groq with runtime.memory_enabled=false (NOT the default): drops the memory-capture calls that Groq rejects",
+        lean_tools=True,
+        note="Groq, NOT the default: runtime.memory_enabled=false and tools=[] for tool-less probes (fits the 8K TPM free tier)",
     ),
     "gemini": ProviderSpec(
         name="gemini",
