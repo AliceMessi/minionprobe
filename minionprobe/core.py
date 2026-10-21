@@ -194,7 +194,9 @@ class ProbeContext:
         match = RETRY_IN_RE.search(message or "")
         if match:
             return min(65.0, parse_duration(match.group(1)) + 2.0)
-        return 45.0 if self.provider.pacing == "interval" else 30.0
+        # Groq's TPM window is one minute and OpenMinion truncates the provider
+        # message before "try again in", so wait for a full window by default
+        return 62.0 if self.provider.pacing == "groq_headers" else 45.0
 
     # -- the turn helper ------------------------------------------------------------
     def turn(
