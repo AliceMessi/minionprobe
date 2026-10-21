@@ -22,6 +22,20 @@ Seven reproducible OpenMinion bugs, each with a reviewed draft in [`issue-drafts
 
 The matrix and the full notes are in [`reports/BUILDING_BLOCKS_TESTED.md`](reports/BUILDING_BLOCKS_TESTED.md) and [`reports/WHAT_WE_LEARNED.md`](reports/WHAT_WE_LEARNED.md). Raw runs are in [`results/`](results/).
 
+## Fix PRs (bug-fix bonus)
+
+The maintainers confirmed all seven reports. Fix PRs against `dev`, each with regression tests and validation results:
+
+| Issue | Fix PR |
+|---|---|
+| [#323](https://github.com/openminion/openminion/issues/323) identity.db outside runtime roots | [#335](https://github.com/openminion/openminion/pull/335) |
+| [#324](https://github.com/openminion/openminion/issues/324) same-session follow-up replays the first reply | [#334](https://github.com/openminion/openminion/pull/334) |
+| [#325](https://github.com/openminion/openminion/issues/325) explicit agent ignored on an existing session | [#336](https://github.com/openminion/openminion/pull/336) |
+| [#326](https://github.com/openminion/openminion/issues/326) post-tool 429 returned as completed text | [#338](https://github.com/openminion/openminion/pull/338) |
+| [#327](https://github.com/openminion/openminion/issues/327) Windows cron without tzdata | [#341](https://github.com/openminion/openminion/pull/341) |
+| [#328](https://github.com/openminion/openminion/issues/328) closure judge vs. grounded answer | [#337](https://github.com/openminion/openminion/pull/337) (context fix; Gemini evidence in [`evidence/openminion-328`](evidence/openminion-328)) |
+| [#329](https://github.com/openminion/openminion/issues/329) skill ingest identity and pending versions | [#339](https://github.com/openminion/openminion/pull/339) |
+
 ## Quick start
 
 Requirements: Python ≥ 3.11 and [uv](https://docs.astral.sh/uv/) (plain `pip` works too).
