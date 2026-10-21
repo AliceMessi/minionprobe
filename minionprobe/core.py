@@ -311,6 +311,7 @@ def execute(defn: ProbeDef, ctx: ProbeContext) -> ProbeResult:
     except Exception as exc:  # noqa: BLE001
         status = ERROR
         error = f"{type(exc).__name__}: {exc}\n" + "".join(traceback.format_exc(limit=6))
+    ctx.shared.setdefault("all_turns", []).extend(ctx.turns)
     all_events: list[dict[str, Any]] = [e for t in ctx.turns for e in t.http.get("events", [])]
     return ProbeResult(
         probe=defn.id,

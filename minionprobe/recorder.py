@@ -49,6 +49,8 @@ class HttpEvent:
     error: str = ""
     rate: dict[str, str] = field(default_factory=dict)
     duration_ms: int = 0
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
     # Kept in memory only (never serialized): used by probes that need to
     # assert on request content such as tool results reaching the model.
     _messages: list[dict[str, Any]] | None = field(default=None, repr=False)
@@ -151,6 +153,12 @@ class HttpRecorder:
             for name in _RATE_HEADERS
             if response.headers.get(name)
         }
+        usage: dict[str, Any] = {}
+        if response.status_code < 400 and response_text:
+            try:
+                usage = dict(json.loads(response_text).get("usage") or {})
+            except (ValueError, AttributeError):
+                usage = {}
         with self._lock:
             event = HttpEvent(
                 seq=len(self.events),
@@ -167,6 +175,8 @@ class HttpRecorder:
                 error=error,
                 rate=rate,
                 duration_ms=int((time.time() - started) * 1000),
+                prompt_tokens=int(usage.get("prompt_tokens") or 0),
+                completion_tokens=int(usage.get("completion_tokens") or 0),
                 _messages=messages,
                 _response_text=redact(response_text[:6000]),
             )
@@ -218,6 +228,8 @@ def summarize(events: list[HttpEvent]) -> dict[str, Any]:
         "requests": len(events),
         "by_status": by_status,
         "by_kind": by_kind,
+        "prompt_tokens": sum(e.prompt_tokens for e in events),
+        "completion_tokens": sum(e.completion_tokens for e in events),
         "hosts": sorted({e.host for e in events}),
         "models": sorted({str(e.model) for e in events if e.model}),
         "errors": [

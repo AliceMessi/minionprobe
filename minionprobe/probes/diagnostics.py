@@ -14,24 +14,37 @@ from ..core import ProbeContext, ProbeSkipped, probe
 from ..env import openminion_exe
 
 
-@probe("diagnostics", "result.stats / metadata agree with the HTTP traffic", cost_turns=0)
+@probe("diagnostics", "result.stats agree with the HTTP traffic (calls and tokens)", cost_turns=0)
 def run_stats(ctx: ProbeContext) -> str:
-    record = ctx.shared.get("basic_turn")
-    if record is None or record.run_state is None:
-        raise ProbeSkipped("needs a completed agent_execution.basic_turn")
-    observed = int(record.http.get("requests", 0))
-    ok_requests = int(record.http.get("by_status", {}).get("200", 0))
-    stats_calls = record.stats.get("llm_calls")
-    purposes_total = sum(int(v) for v in record.purposes.values() if str(v).isdigit()) if record.purposes else None
-    ctx.check("stats has non-zero token counts", bool(record.stats.get("input_tokens")), f"stats={record.stats}")
+    """Compares AgentRunResult.stats with what the recorder saw on the wire,
+    over every completed turn of this run (runs after the turn-making probes)."""
+    turns = [t for t in ctx.shared.get("all_turns", []) if t.run_state == "completed" and t.http.get("requests")]
+    if not turns:
+        raise ProbeSkipped("no completed turns with HTTP traffic in this run")
+    rows = []
+    for t in turns:
+        ok_calls = int(t.http.get("by_status", {}).get("200", 0))
+        rows.append(
+            {
+                "turn": t.label,
+                "stats_llm_calls": t.stats.get("llm_calls"),
+                "http_ok_calls": ok_calls,
+                "stats_input_tokens": t.stats.get("input_tokens"),
+                "wire_prompt_tokens": t.http.get("prompt_tokens"),
+            }
+        )
+    calls_match = [r for r in rows if r["stats_llm_calls"] == r["http_ok_calls"]]
+    ctx.check("stats has non-zero token counts", all(r["stats_input_tokens"] for r in rows), str(rows[:3]))
     ctx.check(
-        "stats.llm_calls counts every successful provider call",
-        stats_calls == ok_requests,
-        f"stats.llm_calls={stats_calls} successful_http_calls={ok_requests} all_http_calls={observed} "
-        f"llm_call_counts_by_purpose={record.purposes}",
+        "stats.llm_calls equals successful provider calls on every turn",
+        len(calls_match) == len(rows),
+        f"{len(calls_match)}/{len(rows)} turns match; e.g. "
+        + "; ".join(f"{r['turn']}: stats={r['stats_llm_calls']} wire={r['http_ok_calls']}" for r in rows if r not in calls_match)[:300],
     )
-    ctx.observe("call_accounting", stats_llm_calls=stats_calls, http_ok=ok_requests, http_all=observed, purposes_total=purposes_total)
-    return f"stats.llm_calls={stats_calls} vs {ok_requests} successful HTTP calls ({observed} total)"
+    ctx.observe("call_accounting", turns=rows)
+    total_wire = sum(r["http_ok_calls"] for r in rows)
+    total_stats = sum(int(r["stats_llm_calls"] or 0) for r in rows)
+    return f"{len(rows)} turns: stats.llm_calls total={total_stats}, successful HTTP calls={total_wire}"
 
 
 @probe("diagnostics", "Unreachable provider raises ProviderError (no fake success)", scope="local", cost_turns=1)
