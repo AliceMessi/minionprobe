@@ -10,7 +10,7 @@ After the first successful `Agent.run` in a session, every later `Agent.run` wit
 
 - openminion 0.1.8 (PyPI), 0.1.4 (PyPI) and `dev` at `b642697` (2026-10-20): same result on all three
 - Windows 11 Pro 10.0.22631, Python 3.12.11
-- Providers: built-in `echo` (offline), a local OpenAI-compatible fake server, and Gemini (`gemini-3.1-flash-lite`)
+- Providers: built-in `echo` (offline), a local OpenAI-compatible fake server, Gemini (`gemini-3.1-flash-lite`) and Groq (`openai/gpt-oss-20b`)
 
 ## Steps to reproduce (offline, echo provider)
 
@@ -54,7 +54,7 @@ shared second: official-demo: fake: FAKE-ANSWER(fake-model): Remember that the l
 isolated:      sdk-isolated-session: fake: FAKE-ANSWER(fake-model): What is the launch color?
 ```
 
-On Gemini (real model), MinionProbe's `sessions.continuity_isolation` recorded the same behaviour. The follow-up "What is the launch code word?" made 0 HTTP requests and returned the previous reply `noted.`.
+On Gemini and on Groq (real models), MinionProbe's `sessions.continuity_isolation` recorded the same behaviour. The follow-up "What is the launch code word?" made 0 HTTP requests and returned the previous reply `noted.`.
 
 ## Analysis (from reading 0.1.8)
 
