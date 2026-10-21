@@ -8,7 +8,7 @@ Built for [Cortensor Hackathon #5](https://dorahacks.io/hackathon/2418/detail). 
 
 ## What it found (v0.1)
 
-Seven reproducible OpenMinion bugs, each with a ready-to-review draft in [`issue-drafts/`](issue-drafts/README.md). Five of them reproduce offline in seconds with the built-in echo provider, MinionProbe's local fake provider, or the CLI alone:
+Seven reproducible OpenMinion bugs, each with a ready-to-review draft in [`issue-drafts/`](issue-drafts/README.md). Six of them reproduce offline in seconds with the built-in echo provider, MinionProbe's local fake provider, or the CLI alone (the closure-judge one needs Gemini):
 
 1. The SDK writes `~/.openminion/identity/identity.db` even with explicit `home_root`/`data_root`.
 2. **A follow-up `Agent.run` on the same `session_id` replays the first reply** without calling the model. This also affects the official `examples/sdk/sessions.py` (0.1.4, 0.1.8 and dev).
