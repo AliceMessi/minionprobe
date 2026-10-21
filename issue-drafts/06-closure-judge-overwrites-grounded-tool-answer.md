@@ -55,7 +55,7 @@ The HTTP trace of the turn (6 calls, redacted) shows what happened:
 
 - Silent loss of a correct, tool-grounded answer. `run_state=completed`, `tool_calls=1`, no error.
 - It hits exactly the SDK's headline use case: an application tool (`lookup_order` is the quickstart example) answering a user question.
-- It depends on the model. The same probe passes on Groq `openai/gpt-oss-120b` (see MinionProbe matrix), but nothing in the runtime protects the grounded answer.
+- It depends on the model. The same probe passes on Groq `openai/gpt-oss-20b` (MinionProbe `groq-lean` column), but nothing in the runtime protects the grounded answer.
 
 ## Possible directions
 
