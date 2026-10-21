@@ -1,4 +1,4 @@
-<!-- DRAFT, NOT FILED. Review and re-run before filing. -->
+<!-- Filed upstream on 2026-10-21 as https://github.com/openminion/openminion/issues/325 -->
 
 # [0.1.8] `Agent(agent_id="b")` silently runs on agent "a"'s provider when the session was first used by "a"
 

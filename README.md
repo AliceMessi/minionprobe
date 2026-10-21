@@ -8,7 +8,7 @@ Built for [Cortensor Hackathon #5](https://dorahacks.io/hackathon/2418/detail). 
 
 ## What it found (v0.1)
 
-Seven reproducible OpenMinion bugs, each with a ready-to-review draft in [`issue-drafts/`](issue-drafts/README.md). Six of them reproduce offline in seconds with the built-in echo provider, MinionProbe's local fake provider, or the CLI alone (the closure-judge one needs Gemini):
+Seven reproducible OpenMinion bugs, each with a reviewed draft in [`issue-drafts/`](issue-drafts/README.md), filed upstream after human review as [#323](https://github.com/openminion/openminion/issues/323), [#324](https://github.com/openminion/openminion/issues/324), [#325](https://github.com/openminion/openminion/issues/325), [#326](https://github.com/openminion/openminion/issues/326), [#327](https://github.com/openminion/openminion/issues/327), [#328](https://github.com/openminion/openminion/issues/328), [#329](https://github.com/openminion/openminion/issues/329). Six of them reproduce offline in seconds with the built-in echo provider, MinionProbe's local fake provider, or the CLI alone (the closure-judge one needs Gemini):
 
 1. The SDK writes `~/.openminion/identity/identity.db` even with explicit `home_root`/`data_root`.
 2. **A follow-up `Agent.run` on the same `session_id` replays the first reply** without calling the model. This also affects the official `examples/sdk/sessions.py` (0.1.4, 0.1.8 and dev).
@@ -110,7 +110,7 @@ Probe design rules:
 
 - API keys are read from environment variables only. OpenMinion's `setup` stores the variable *name*, never the value.
 - Every string written to `results/` and `issue-drafts/` goes through [`minionprobe/redact.py`](minionprobe/redact.py), which removes key-shaped strings, literal key values from the environment, and Groq organization ids. Request headers are never read.
-- MinionProbe never files issues, opens PRs or posts anything. Drafts carry a "NOT FILED" banner.
+- MinionProbe never files issues, opens PRs or posts anything. Drafts carry a "NOT FILED" banner until a human files them by hand.
 - The fake provider binds to `127.0.0.1` only and receives a dummy key.
 
 ## Dependencies and disclosure

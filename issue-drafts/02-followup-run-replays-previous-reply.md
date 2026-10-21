@@ -1,4 +1,4 @@
-<!-- DRAFT, NOT FILED. Review and re-run before filing. -->
+<!-- Filed upstream on 2026-10-21 as https://github.com/openminion/openminion/issues/324 -->
 
 # [0.1.4–0.1.8] A follow-up `Agent.run` on the same `session_id` replays the first reply instead of running a new turn
 

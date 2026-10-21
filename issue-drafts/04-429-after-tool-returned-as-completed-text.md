@@ -1,4 +1,4 @@
-<!-- DRAFT, NOT FILED. Review and re-run before filing. -->
+<!-- Filed upstream on 2026-10-21 as https://github.com/openminion/openminion/issues/326 -->
 
 # [0.1.8] Rate limit (429) during a turn is still returned as reply text with `run_state=completed` (#251 fix incomplete)
 

@@ -1,4 +1,4 @@
-<!-- DRAFT, NOT FILED. Review and re-run before filing. -->
+<!-- Filed upstream on 2026-10-21 as https://github.com/openminion/openminion/issues/328 -->
 
 # [0.1.8] Closure judge replaces a correct, tool-grounded answer with a refusal ("I do not have access to ...")
 

@@ -1,4 +1,4 @@
-<!-- DRAFT, NOT FILED. Review and re-run before filing. -->
+<!-- Filed upstream on 2026-10-21 as https://github.com/openminion/openminion/issues/323 -->
 
 # [0.1.8] SDK writes `~/.openminion/identity/identity.db` even with explicit `home_root`/`data_root`
 

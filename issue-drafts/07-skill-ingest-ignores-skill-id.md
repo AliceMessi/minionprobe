@@ -1,4 +1,4 @@
-<!-- DRAFT, NOT FILED. Review and re-run before filing. -->
+<!-- Filed upstream on 2026-10-21 as https://github.com/openminion/openminion/issues/329 -->
 
 # [0.1.8] `skill ingest` ignores the declared `skill_id`: every `SKILL.md` becomes `skill`, and the result is invisible to `skill list`/`show`
 
