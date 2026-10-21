@@ -40,11 +40,11 @@ def session_agent_binding(ctx: ProbeContext) -> str:
     # the follow-up-replay bug (sessions.followup_not_replayed) would replay
     fake.script.faults = [Fault(status=500, when="always", message="upstream unavailable")]
     try:
-        ctx.turn(ctx.agent(agent_id="fake-a"), "hello from agent a", label="agent-a (provider down)", session_id=session)
+        ctx.turn(ctx.agent(agent_id="fake-a", tools=[]), "hello from agent a", label="agent-a (provider down)", session_id=session)
     finally:
         fake.script.faults = []
     mark = len(fake.requests)
-    second = ctx.agent(agent_id="fake-b")
+    second = ctx.agent(agent_id="fake-b", tools=[])
     result, record = ctx.turn(second, "hello from agent b", label="agent-b", session_id=session)
     models = sorted({r["model"] for r in fake.requests[mark:]})
     ctx.check(

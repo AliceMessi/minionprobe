@@ -63,10 +63,15 @@ def handoff(ctx: ProbeContext) -> str:
         session_id=ctx.session("handoff"),
         approval_callback=approve,
     )
-    handoff_called = any(
-        "transfer_to_researcher" in e.tools for e in ctx.last_events
+    offered = any("transfer_to_researcher" in e.tools for e in ctx.last_events)
+    called = any(
+        "tool_calls" in e._response_text and "transfer_to_researcher" in e._response_text
+        for e in ctx.last_events
+        if e.kind == "agent_loop"
     )
-    ctx.check("transfer_to_researcher was offered to the model", handoff_called, "")
+    peer_answered = any(marker in e._response_text for e in ctx.last_events if e.kind == "agent_loop")
+    ctx.check("transfer_to_researcher was offered to the model", offered, "")
+    ctx.observe("handoff_wire", transfer_called=called, peer_answer_on_wire=peer_answered)
     transfer_asks = [a for a in asked if "transfer_to" in a["tool"]]
     if transfer_asks:
         ctx.known_issue("#284")
@@ -74,6 +79,10 @@ def handoff(ctx: ProbeContext) -> str:
     if result is None:
         ctx.check("handoff turn completed without exception", False, record.error)
         return record.error
-    ctx.check("peer agent produced the answer (marker present)", marker in result.text, f"text={result.text[:200]!r}")
+    ctx.check(
+        "peer agent produced the answer (marker present)",
+        marker in result.text,
+        f"text={result.text[:200]!r} transfer_called_on_wire={called} peer_answer_on_wire={peer_answered}",
+    )
     ctx.check("handoff did not require a risk confirmation", not transfer_asks, f"approvals={asked}")
     return f"marker_present={marker in result.text} approvals={asked}"

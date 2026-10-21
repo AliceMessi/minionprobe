@@ -44,7 +44,7 @@ def followup_not_replayed(ctx: ProbeContext) -> str:
     fake = ctx.extras.get("fake")
     if fake is None:
         raise ProbeSkipped("needs the local fake provider")
-    agent = ctx.agent(agent_id="local")
+    agent = ctx.agent(agent_id="local", tools=[])  # no default tool catalog: keeps the fake echo clean
     session = ctx.session("followup")
     ctx.turn(agent, "first message ALPHA", label="first", session_id=session)
     outcomes = []
