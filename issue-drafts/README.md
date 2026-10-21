@@ -11,7 +11,7 @@ Each draft was reproduced by hand on Windows 11 with Python 3.12.11 against `ope
 | 03 | [`Agent(agent_id=...)` is ignored for an existing session](03-agent-id-ignored-for-existing-session.md) | models / sessions | local fake provider (offline) | yes | yes |
 | 04 | [A 429 after a tool call comes back as reply text with `run_state=completed`](04-429-after-tool-returned-as-completed-text.md) | diagnostics / errors | local fake provider (offline); also seen on Groq and Gemini | yes | yes |
 | 05 | [Every `cron create --cron` fails on Windows: `unknown timezone: UTC`](05-cron-unknown-timezone-on-windows-tzdata.md) | tasks | CLI only (offline) | yes | yes |
-| 06 | [The closure judge overwrites a correct tool-grounded answer](06-closure-judge-overwrites-grounded-tool-answer.md) | tools / agent execution | Gemini API (free tier) | yes, 3 of 3 runs | yes, 2 of 2 runs |
+| 06 | [The closure judge overwrites a correct tool-grounded answer](06-closure-judge-overwrites-grounded-tool-answer.md) | tools / agent execution | Gemini API (free tier) | yes, 4 of 4 runs | yes, 2 of 2 runs |
 | 07 | [`skill ingest` ignores the declared `skill_id`: every `SKILL.md` becomes `skill`](07-skill-ingest-ignores-skill-id.md) | skills | CLI only (offline) | yes | yes |
 
 Not drafted on purpose:

@@ -8,7 +8,7 @@ A decorated `@tool` runs and its string result reaches the model. The model's ag
 
 ## Environment
 
-- openminion 0.1.8 (PyPI): 3 of 3 runs on 2026-10-21. `dev` at `b642697`: 2 of 2 runs.
+- openminion 0.1.8 (PyPI): 4 of 4 runs on 2026-10-21. `dev` at `b642697`: 2 of 2 runs.
 - Provider: `gemini` preset, model `gemini-3.1-flash-lite` (Gemini API OpenAI-compatible endpoint, free tier)
 - Windows 11 Pro 10.0.22631, Python 3.12.11
 
@@ -61,6 +61,10 @@ The HTTP trace of the turn (6 calls, redacted) shows what happened:
 
 - Let a successful tool result count as the "live data/source" that satisfies the freshness obligations.
 - Do not let the closure judge's `final_answer` replace an agent-loop answer that already completed (`confident_complete`), unless it adds information; or include the tool outputs explicitly in the judge context.
+
+## Related observation (handoff)
+
+The same "final text rewritten after the work is done" effect showed up in `delegation.handoff` on Gemini. `transfer_to_researcher` was called and the peer agent's answer, starting with the requested marker, is visible on the wire. Yet `result.text` is a re-synthesized answer without the marker. That case is benign in content, but it shows that the peer's or tool's output is not what reaches the caller.
 
 ## Notes
 
