@@ -7,6 +7,7 @@ from typing import Any
 from .core import BLOCK_TITLES, BLOCKS
 
 STATUS_ORDER = ["PASS", "FAIL", "ERROR", "BLOCKED", "SKIP"]
+PROVIDER_ORDER = ["local", "groq", "groq-lean", "gemini", "gemma", "lmstudio"]
 
 
 def _cell(result: dict[str, Any] | None) -> str:
@@ -25,15 +26,14 @@ def _failed_checks(result: dict[str, Any]) -> list[str]:
 
 def render_matrix(payload: dict[str, Any]) -> str:
     results = payload.get("results", [])
-    providers = [p for p in payload.get("providers", {}) if any(r["provider"] == p for r in results)]
+    present = [p for p in payload.get("providers", {}) if any(r["provider"] == p for r in results)]
+    providers = sorted(present, key=lambda p: (PROVIDER_ORDER.index(p) if p in PROVIDER_ORDER else 99, p))
     by_key = {(r["provider"], r["probe"]): r for r in results}
-    probe_ids: list[tuple[str, str, str]] = []
-    for result in results:
-        key = (result["block"], result["probe"], result["title"])
-        if key not in probe_ids:
-            probe_ids.append(key)
+    titles: dict[str, tuple[str, str]] = {}
+    for result in results:  # one row per probe id; the last title seen wins
+        titles[result["probe"]] = (result["block"], result["title"])
     block_rank = {b: i for i, (b, _) in enumerate(BLOCKS)}
-    probe_ids.sort(key=lambda k: (block_rank.get(k[0], 99), k[1]))
+    probe_ids = sorted(((b, pid, t) for pid, (b, t) in titles.items()), key=lambda k: (block_rank.get(k[0], 99), k[1]))
 
     lines = [
         "# MinionProbe matrix",
