@@ -1,0 +1,1368 @@
+{
+  "tool": "minionprobe",
+  "run_id": "ca0f79",
+  "started": "2026-10-21T08:23:16+02:00",
+  "finished": "2026-10-21T08:24:55+02:00",
+  "openminion_version": "0.1.8",
+  "python": "3.12.11",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "providers": {
+    "local": {
+      "model": "fake-model",
+      "host": "127.0.0.1",
+      "note": "MinionProbe's scripted fake provider (offline, deterministic)",
+      "available": true,
+      "reason": ""
+    }
+  },
+  "results": [
+    {
+      "probe": "diagnostics.provider_unreachable",
+      "block": "diagnostics",
+      "provider": "local",
+      "status": "PASS",
+      "title": "Unreachable provider raises ProviderError (no fake success)",
+      "summary": "ProviderError PROVIDER_ERROR: The configured model provider failed before it could return a decision (openai request failed: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente ",
+      "latency_s": 27.45,
+      "checks": [
+        {
+          "name": "ProviderError raised for a closed port",
+          "ok": true,
+          "detail": "ProviderError PROVIDER_ERROR: The configured model provider failed before it could return a decision (openai request failed: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione). Please retry or switch models."
+        }
+      ],
+      "observations": [],
+      "known_issues": [],
+      "turns": [
+        {
+          "label": "closed-port",
+          "session_id": "mp-ca0f79-local-broken-ed7b",
+          "attempts": 1,
+          "latency_s": 22.51,
+          "run_state": null,
+          "text": "",
+          "stats": {},
+          "purposes": {},
+          "provider": null,
+          "model": null,
+          "agent": null,
+          "memory_capture_state": null,
+          "error": "ProviderError PROVIDER_ERROR: The configured model provider failed before it could return a decision (openai request failed: [WinError 10061] Impossibile stabilire la connessione. Rifiuto persistente del computer di destinazione). Please retry or switch models.",
+          "error_code": "PROVIDER_ERROR",
+          "http": {
+            "requests": 0,
+            "by_status": {},
+            "by_kind": {},
+            "hosts": [],
+            "models": [],
+            "errors": [],
+            "events": []
+          }
+        }
+      ],
+      "http": {
+        "requests": 0,
+        "by_status": {},
+        "by_kind": {}
+      },
+      "error": ""
+    },
+    {
+      "probe": "diagnostics.rate_limit_after_tool",
+      "block": "diagnostics",
+      "provider": "local",
+      "status": "FAIL",
+      "title": "429 on the call after a tool runs raises ProviderError",
+      "summary": "run_state=completed text='local: RATE_LIMITED: openai rate limited: Rate limit reached for model fake-model. Please try again in 1s.'",
+      "latency_s": 1.64,
+      "checks": [
+        {
+          "name": "tool executed before the fault",
+          "ok": true,
+          "detail": "calls=['fake']"
+        },
+        {
+          "name": "fault was injected",
+          "ok": true,
+          "detail": "429 responses served=3"
+        },
+        {
+          "name": "ProviderError(RATE_LIMITED) raised",
+          "ok": false,
+          "detail": "run_state=completed text='local: RATE_LIMITED: openai rate limited: Rate limit reached for model fake-model. Please try again in 1s.'"
+        }
+      ],
+      "observations": [
+        {
+          "kind": "provider_error_returned_as_text",
+          "label": "429-after-tool",
+          "code": "RATE_LIMITED",
+          "run_state": "completed",
+          "text": "local: RATE_LIMITED: openai rate limited: Rate limit reached for model fake-model. Please try again in 1s."
+        }
+      ],
+      "known_issues": [],
+      "turns": [
+        {
+          "label": "429-after-tool",
+          "session_id": "mp-ca0f79-local-rl-ddf9",
+          "attempts": 1,
+          "latency_s": 1.63,
+          "run_state": "completed",
+          "text": "local: RATE_LIMITED: openai rate limited: Rate limit reached for model fake-model. Please try again in 1s.",
+          "stats": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "cache_read_tokens": 0,
+            "llm_calls": 1,
+            "tool_calls": 1,
+            "tool_errors": 0,
+            "duration_ms": 1432
+          },
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "local",
+          "memory_capture_state": "succeeded_no_output",
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 6,
+            "by_status": {
+              "200": 3,
+              "429": 3
+            },
+            "by_kind": {
+              "control": 2,
+              "agent_loop": 4
+            },
+            "hosts": [
+              "127.0.0.1"
+            ],
+            "models": [
+              "fake-model"
+            ],
+            "errors": [
+              {
+                "status": 429,
+                "kind": "agent_loop",
+                "error": "{\"error\": {\"message\": \"Rate limit reached for model fake-model. Please try again in 1s.\", \"type\": \"tokens\", \"code\": \"rate_limit_exceeded\"}}"
+              },
+              {
+                "status": 429,
+                "kind": "agent_loop",
+                "error": "{\"error\": {\"message\": \"Rate limit reached for model fake-model. Please try again in 1s.\", \"type\": \"tokens\", \"code\": \"rate_limit_exceeded\"}}"
+              },
+              {
+                "status": 429,
+                "kind": "agent_loop",
+                "error": "{\"error\": {\"message\": \"Rate limit reached for model fake-model. Please try again in 1s.\", \"type\": \"tokens\", \"code\": \"rate_limit_exceeded\"}}"
+              }
+            ],
+            "events": [
+              {
+                "seq": 0,
+                "ts": 1792563848.2697995,
+                "status": 200,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "fake-model",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 16
+              },
+              {
+                "seq": 1,
+                "ts": 1792563848.411403,
+                "status": 200,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "fake-model",
+                "tools": [
+                  "lookup_order"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 2
+              },
+              {
+                "seq": 2,
+                "ts": 1792563848.4230025,
+                "status": 200,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "fake-model",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 21
+              },
+              {
+                "seq": 3,
+                "ts": 1792563848.618212,
+                "status": 429,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "fake-model",
+                "tools": [
+                  "lookup_order"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 6,
+                "has_tool_result": true,
+                "kind": "agent_loop",
+                "error": "{\"error\": {\"message\": \"Rate limit reached for model fake-model. Please try again in 1s.\", \"type\": \"tokens\", \"code\": \"rate_limit_exceeded\"}}",
+                "rate": {
+                  "retry-after": "1"
+                },
+                "duration_ms": 2
+              },
+              {
+                "seq": 4,
+                "ts": 1792563848.9217737,
+                "status": 429,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "fake-model",
+                "tools": [
+                  "lookup_order"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 6,
+                "has_tool_result": true,
+                "kind": "agent_loop",
+                "error": "{\"error\": {\"message\": \"Rate limit reached for model fake-model. Please try again in 1s.\", \"type\": \"tokens\", \"code\": \"rate_limit_exceeded\"}}",
+                "rate": {
+                  "retry-after": "1"
+                },
+                "duration_ms": 17
+              },
+              {
+                "seq": 5,
+                "ts": 1792563849.5413144,
+                "status": 429,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "fake-model",
+                "tools": [
+                  "lookup_order"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 6,
+                "has_tool_result": true,
+                "kind": "agent_loop",
+                "error": "{\"error\": {\"message\": \"Rate limit reached for model fake-model. Please try again in 1s.\", \"type\": \"tokens\", \"code\": \"rate_limit_exceeded\"}}",
+                "rate": {
+                  "retry-after": "1"
+                },
+                "duration_ms": 18
+              }
+            ]
+          }
+        }
+      ],
+      "http": {
+        "requests": 6,
+        "by_status": {
+          "200": 3,
+          "429": 3
+        },
+        "by_kind": {
+          "control": 2,
+          "agent_loop": 4
+        }
+      },
+      "error": ""
+    },
+    {
+      "probe": "models.session_agent_binding",
+      "block": "models",
+      "provider": "local",
+      "status": "FAIL",
+      "title": "Explicit agent_id wins over an existing session's agent",
+      "summary": "shared-session turn hit ['model-a']; fresh-session turn hit ['model-b']",
+      "latency_s": 6.46,
+      "checks": [
+        {
+          "name": "turn with agent_id=fake-b used model-b",
+          "ok": false,
+          "detail": "models requested=['model-a'] metadata.agent=fake-a"
+        },
+        {
+          "name": "result metadata reports agent fake-b",
+          "ok": false,
+          "detail": "metadata.agent=fake-a"
+        },
+        {
+          "name": "control: fresh session for fake-b uses model-b",
+          "ok": true,
+          "detail": "models=['model-b']"
+        }
+      ],
+      "observations": [],
+      "known_issues": [],
+      "turns": [
+        {
+          "label": "agent-a (provider down)",
+          "session_id": "mp-ca0f79-local-shared-b45e",
+          "attempts": 1,
+          "latency_s": 5.08,
+          "run_state": null,
+          "text": "",
+          "stats": {},
+          "purposes": {},
+          "provider": null,
+          "model": null,
+          "agent": null,
+          "memory_capture_state": null,
+          "error": "ProviderError PROVIDER_ERROR: The configured model provider failed before it could return a decision (openai request failed with HTTP 500: upstream unavailable). Please retry or switch models.",
+          "error_code": "PROVIDER_ERROR",
+          "http": {
+            "requests": 12,
+            "by_status": {
+              "500": 12
+            },
+            "by_kind": {
+              "control": 3,
+              "agent_loop": 9
+            },
+            "hosts": [
+              "127.0.0.1"
+            ],
+            "models": [
+              "model-a"
+            ],
+            "errors": [
+              {
+                "status": 500,
+                "kind": "control",
+                "error": "{\"error\": {\"message\": \"upstream unavailable\", \"type\": \"tokens\", \"code\": \"server_error\"}}"
+              },
+              {
+                "status": 500,
+                "kind": "control",
+                "error": "{\"error\": {\"message\": \"upstream unavailable\", \"type\": \"tokens\", \"code\": \"server_error\"}}"
+              },
+              {
+                "status": 500,
+                "kind": "control",
+                "error": "{\"error\": {\"message\": \"upstream unavailable\", \"type\": \"tokens\", \"code\": \"server_error\"}}"
+              },
+              {
+                "status": 500,
+                "kind": "agent_loop",
+                "error": "{\"error\": {\"message\": \"upstream unavailable\", \"type\": \"tokens\", \"code\": \"server_error\"}}"
+              },
+              {
+                "status": 500,
+                "kind": "agent_loop",
+                "error": "{\"error\": {\"message\": \"upstream unavailable\", \"type\": \"tokens\", \"code\": \"server_error\"}}"
+              },
+              {
+                "status": 500,
+                "kind": "agent_loop",
+                "error": "{\"error\": {\"message\": \"upstream unavailable\", \"type\": \"tokens\", \"code\": \"server_error\"}}"
+              }
+            ],
+            "events": [
+              {
+                "seq": 6,
+                "ts": 1792563849.8587565,
+                "status": 500,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "model-a",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "{\"error\": {\"message\": \"upstream unavailable\", \"type\": \"tokens\", \"code\": \"server_error\"}}",
+                "rate": {},
+                "duration_ms": 13
+              },
+              {
+                "seq": 7,
+                "ts": 1792563850.17313,
+                "status": 500,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "model-a",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "{\"error\": {\"message\": \"upstream unavailable\", \"type\": \"tokens\", \"code\": \"server_error\"}}",
+                "rate": {},
+                "duration_ms": 28
+              },
+              {
+                "seq": 8,
+                "ts": 1792563850.8062522,
+                "status": 500,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "model-a",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "{\"error\": {\"message\": \"upstream unavailable\", \"type\": \"tokens\", \"code\": \"server_error\"}}",
+                "rate": {},
+                "duration_ms": 17
+              },
+              {
+                "seq": 9,
+                "ts": 1792563850.9645827,
+                "status": 500,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "model-a",
+                "tools": [
+                  "tool_request",
+                  "respond",
+                  "coding",
+                  "plan",
+                  "research",
+                  "decompose",
+                  "clarify",
+                  "review_diff"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "{\"error\": {\"message\": \"upstream unavailable\", \"type\": \"tokens\", \"code\": \"server_error\"}}",
+                "rate": {},
+                "duration_ms": 12
+              },
+              {
+                "seq": 10,
+                "ts": 1792563851.2826707,
+                "status": 500,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "model-a",
+                "tools": [
+                  "tool_request",
+                  "respond",
+                  "coding",
+                  "plan",
+                  "research",
+                  "decompose",
+                  "clarify",
+                  "review_diff"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "{\"error\": {\"message\": \"upstream unavailable\", \"type\": \"tokens\", \"code\": \"server_error\"}}",
+                "rate": {},
+                "duration_ms": 18
+              },
+              {
+                "seq": 11,
+                "ts": 1792563851.9044802,
+                "status": 500,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "model-a",
+                "tools": [
+                  "tool_request",
+                  "respond",
+                  "coding",
+                  "plan",
+                  "research",
+                  "decompose",
+                  "clarify",
+                  "review_diff"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "{\"error\": {\"message\": \"upstream unavailable\", \"type\": \"tokens\", \"code\": \"server_error\"}}",
+                "rate": {},
+                "duration_ms": 22
+              },
+              {
+                "seq": 12,
+                "ts": 1792563852.2307599,
+                "status": 500,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "model-a",
+                "tools": [
+                  "tool_request",
+                  "respond",
+                  "coding",
+                  "plan",
+                  "research",
+                  "decompose",
+                  "clarify",
+                  "review_diff"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "{\"error\": {\"message\": \"upstream unavailable\", \"type\": \"tokens\", \"code\": \"server_error\"}}",
+                "rate": {},
+                "duration_ms": 17
+              },
+              {
+                "seq": 13,
+                "ts": 1792563852.554785,
+                "status": 500,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "model-a",
+                "tools": [
+                  "tool_request",
+                  "respond",
+                  "coding",
+                  "plan",
+                  "research",
+                  "decompose",
+                  "clarify",
+                  "review_diff"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "{\"error\": {\"message\": \"upstream unavailable\", \"type\": \"tokens\", \"code\": \"server_error\"}}",
+                "rate": {},
+                "duration_ms": 17
+              },
+              {
+                "seq": 14,
+                "ts": 1792563853.1743636,
+                "status": 500,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "model-a",
+                "tools": [
+                  "tool_request",
+                  "respond",
+                  "coding",
+                  "plan",
+                  "research",
+                  "decompose",
+                  "clarify",
+                  "review_diff"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "{\"error\": {\"message\": \"upstream unavailable\", \"type\": \"tokens\", \"code\": \"server_error\"}}",
+                "rate": {},
+                "duration_ms": 16
+              },
+              {
+                "seq": 15,
+                "ts": 1792563853.7122936,
+                "status": 500,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "model-a",
+                "tools": [
+                  "tool_request",
+                  "respond",
+                  "coding",
+                  "plan",
+                  "research",
+                  "decompose",
+                  "clarify",
+                  "review_diff"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "{\"error\": {\"message\": \"upstream unavailable\", \"type\": \"tokens\", \"code\": \"server_error\"}}",
+                "rate": {},
+                "duration_ms": 13
+              },
+              {
+                "seq": 16,
+                "ts": 1792563854.027787,
+                "status": 500,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "model-a",
+                "tools": [
+                  "tool_request",
+                  "respond",
+                  "coding",
+                  "plan",
+                  "research",
+                  "decompose",
+                  "clarify",
+                  "review_diff"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "{\"error\": {\"message\": \"upstream unavailable\", \"type\": \"tokens\", \"code\": \"server_error\"}}",
+                "rate": {},
+                "duration_ms": 24
+              },
+              {
+                "seq": 17,
+                "ts": 1792563854.6535296,
+                "status": 500,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "model-a",
+                "tools": [
+                  "tool_request",
+                  "respond",
+                  "coding",
+                  "plan",
+                  "research",
+                  "decompose",
+                  "clarify",
+                  "review_diff"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "{\"error\": {\"message\": \"upstream unavailable\", \"type\": \"tokens\", \"code\": \"server_error\"}}",
+                "rate": {},
+                "duration_ms": 18
+              }
+            ]
+          }
+        },
+        {
+          "label": "agent-b",
+          "session_id": "mp-ca0f79-local-shared-b45e",
+          "attempts": 1,
+          "latency_s": 0.63,
+          "run_state": "completed",
+          "text": "fake-a: FAKE-ANSWER(model-a): hello from agent b",
+          "stats": {
+            "input_tokens": 20,
+            "output_tokens": 10,
+            "cache_read_tokens": 0,
+            "llm_calls": 1,
+            "tool_calls": 0,
+            "tool_errors": 0,
+            "duration_ms": 557
+          },
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "fake-a",
+          "memory_capture_state": "succeeded_no_output",
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 4,
+            "by_status": {
+              "200": 4
+            },
+            "by_kind": {
+              "control": 2,
+              "agent_loop": 2
+            },
+            "hosts": [
+              "127.0.0.1"
+            ],
+            "models": [
+              "model-a"
+            ],
+            "errors": [],
+            "events": [
+              {
+                "seq": 18,
+                "ts": 1792563854.8181596,
+                "status": 200,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "model-a",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 1
+              },
+              {
+                "seq": 19,
+                "ts": 1792563854.9646888,
+                "status": 200,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "model-a",
+                "tools": [
+                  "tool_request",
+                  "respond",
+                  "coding",
+                  "plan",
+                  "research",
+                  "decompose",
+                  "clarify",
+                  "review_diff"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 18
+              },
+              {
+                "seq": 20,
+                "ts": 1792563855.1073458,
+                "status": 200,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "model-a",
+                "tools": [
+                  "decompose",
+                  "tool_request",
+                  "plan"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 6,
+                "has_tool_result": true,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 15
+              },
+              {
+                "seq": 21,
+                "ts": 1792563855.2052107,
+                "status": 200,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "model-a",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 25
+              }
+            ]
+          }
+        },
+        {
+          "label": "agent-b-fresh",
+          "session_id": "mp-ca0f79-local-fresh-a0aa",
+          "attempts": 1,
+          "latency_s": 0.74,
+          "run_state": "completed",
+          "text": "fake-b: FAKE-ANSWER(model-b): hello again",
+          "stats": {
+            "input_tokens": 20,
+            "output_tokens": 10,
+            "cache_read_tokens": 0,
+            "llm_calls": 1,
+            "tool_calls": 0,
+            "tool_errors": 0,
+            "duration_ms": 562
+          },
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "fake-b",
+          "memory_capture_state": "succeeded_no_output",
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 4,
+            "by_status": {
+              "200": 4
+            },
+            "by_kind": {
+              "control": 2,
+              "agent_loop": 2
+            },
+            "hosts": [
+              "127.0.0.1"
+            ],
+            "models": [
+              "model-b"
+            ],
+            "errors": [],
+            "events": [
+              {
+                "seq": 22,
+                "ts": 1792563855.5677178,
+                "status": 200,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "model-b",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 22
+              },
+              {
+                "seq": 23,
+                "ts": 1792563855.7252595,
+                "status": 200,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "model-b",
+                "tools": [
+                  "tool_request",
+                  "respond",
+                  "coding",
+                  "plan",
+                  "research",
+                  "decompose",
+                  "clarify",
+                  "review_diff"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 23
+              },
+              {
+                "seq": 24,
+                "ts": 1792563855.9066324,
+                "status": 200,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "model-b",
+                "tools": [
+                  "decompose",
+                  "tool_request",
+                  "plan"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 6,
+                "has_tool_result": true,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 1
+              },
+              {
+                "seq": 25,
+                "ts": 1792563855.9886322,
+                "status": 200,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "model-b",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 1
+              }
+            ]
+          }
+        }
+      ],
+      "http": {
+        "requests": 20,
+        "by_status": {
+          "500": 12,
+          "200": 8
+        },
+        "by_kind": {
+          "control": 7,
+          "agent_loop": 13
+        }
+      },
+      "error": ""
+    },
+    {
+      "probe": "sessions.followup_not_replayed",
+      "block": "sessions",
+      "provider": "local",
+      "status": "FAIL",
+      "title": "Follow-up Agent.run on the same session runs a new turn (no replay)",
+      "summary": "BRAVO: calls=0 text='local: FAKE-ANSWER(fake-model): first message ALPHA'; CHARLIE: calls=0 text='local: FAKE-ANSWER(fake-model): first message ALPHA'",
+      "latency_s": 0.68,
+      "checks": [
+        {
+          "name": "follow-up 2 reached the provider",
+          "ok": false,
+          "detail": "provider requests=0"
+        },
+        {
+          "name": "follow-up 2 answers the new message",
+          "ok": false,
+          "detail": "text='local: FAKE-ANSWER(fake-model): first message ALPHA'"
+        },
+        {
+          "name": "follow-up 3 reached the provider",
+          "ok": false,
+          "detail": "provider requests=0"
+        },
+        {
+          "name": "follow-up 3 answers the new message",
+          "ok": false,
+          "detail": "text='local: FAKE-ANSWER(fake-model): first message ALPHA'"
+        }
+      ],
+      "observations": [],
+      "known_issues": [],
+      "turns": [
+        {
+          "label": "first",
+          "session_id": "mp-ca0f79-local-followup-837e",
+          "attempts": 1,
+          "latency_s": 0.65,
+          "run_state": "completed",
+          "text": "local: FAKE-ANSWER(fake-model): first message ALPHA",
+          "stats": {
+            "input_tokens": 20,
+            "output_tokens": 10,
+            "cache_read_tokens": 0,
+            "llm_calls": 1,
+            "tool_calls": 0,
+            "tool_errors": 0,
+            "duration_ms": 565
+          },
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "local",
+          "memory_capture_state": "succeeded_no_output",
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 4,
+            "by_status": {
+              "200": 4
+            },
+            "by_kind": {
+              "control": 2,
+              "agent_loop": 2
+            },
+            "hosts": [
+              "127.0.0.1"
+            ],
+            "models": [
+              "fake-model"
+            ],
+            "errors": [],
+            "events": [
+              {
+                "seq": 26,
+                "ts": 1792563856.2415574,
+                "status": 200,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "fake-model",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 2
+              },
+              {
+                "seq": 27,
+                "ts": 1792563856.3961859,
+                "status": 200,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "fake-model",
+                "tools": [
+                  "tool_request",
+                  "respond",
+                  "coding",
+                  "plan",
+                  "research",
+                  "decompose",
+                  "clarify",
+                  "review_diff"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 21
+              },
+              {
+                "seq": 28,
+                "ts": 1792563856.5251005,
+                "status": 200,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "fake-model",
+                "tools": [
+                  "decompose",
+                  "tool_request",
+                  "plan"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 6,
+                "has_tool_result": true,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 3
+              },
+              {
+                "seq": 29,
+                "ts": 1792563856.6383498,
+                "status": 200,
+                "host": "127.0.0.1",
+                "path": "/v1/chat/completions",
+                "model": "fake-model",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 14
+              }
+            ]
+          }
+        },
+        {
+          "label": "followup-2",
+          "session_id": "mp-ca0f79-local-followup-837e",
+          "attempts": 1,
+          "latency_s": 0.02,
+          "run_state": "completed",
+          "text": "local: FAKE-ANSWER(fake-model): first message ALPHA",
+          "stats": {},
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "local",
+          "memory_capture_state": null,
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 0,
+            "by_status": {},
+            "by_kind": {},
+            "hosts": [],
+            "models": [],
+            "errors": [],
+            "events": []
+          }
+        },
+        {
+          "label": "followup-3",
+          "session_id": "mp-ca0f79-local-followup-837e",
+          "attempts": 1,
+          "latency_s": 0.01,
+          "run_state": "completed",
+          "text": "local: FAKE-ANSWER(fake-model): first message ALPHA",
+          "stats": {},
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "local",
+          "memory_capture_state": null,
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 0,
+            "by_status": {},
+            "by_kind": {},
+            "hosts": [],
+            "models": [],
+            "errors": [],
+            "events": []
+          }
+        }
+      ],
+      "http": {
+        "requests": 4,
+        "by_status": {
+          "200": 4
+        },
+        "by_kind": {
+          "control": 2,
+          "agent_loop": 2
+        }
+      },
+      "error": ""
+    },
+    {
+      "probe": "diagnostics.home_isolation",
+      "block": "diagnostics",
+      "provider": "local",
+      "status": "FAIL",
+      "title": "Explicit home_root/data_root keep all state out of ~/.openminion",
+      "summary": "files written under fake home: ['.openminion\\\\identity\\\\identity.db']",
+      "latency_s": 6.44,
+      "checks": [
+        {
+          "name": "echo config initialised in the project root",
+          "ok": true,
+          "detail": "tialized config at C:\\Users\\User\\AppData\\Local\\Temp\\mp-iso-jhqgen15\\project\\.openminion\\agents.json (storage: C:\\Users\\User\\AppData\\Local\\Temp\\mp-iso-jhqgen15\\project\\.openminion\\state\\openminion.db)\n"
+        },
+        {
+          "name": "echo turn completed",
+          "ok": true,
+          "detail": "RUN_STATE=completed\n"
+        },
+        {
+          "name": "nothing written under the user's home",
+          "ok": false,
+          "detail": "[\".openminion\\\\identity\\\\identity.db\"]"
+        }
+      ],
+      "observations": [
+        {
+          "kind": "files_written_to_home",
+          "files": [
+            ".openminion\\identity\\identity.db"
+          ]
+        }
+      ],
+      "known_issues": [],
+      "turns": [],
+      "http": {
+        "requests": 0,
+        "by_status": {},
+        "by_kind": {}
+      },
+      "error": ""
+    },
+    {
+      "probe": "tasks.cron_schedules",
+      "block": "tasks",
+      "provider": "local",
+      "status": "FAIL",
+      "title": "`openminion cron create` accepts cron/at schedules and timezones",
+      "summary": "one-shot --at: ok; --cron without --tz (default UTC): Invalid schedule: unknown timezone: UTC; --cron --tz UTC: Invalid schedule: unknown timezone: UTC; --cron --tz Europe/Rome: Invalid schedule: unknown timezone: Europe/Rome",
+      "latency_s": 31.89,
+      "checks": [
+        {
+          "name": "cron create one-shot --at",
+          "ok": true,
+          "detail": "ok"
+        },
+        {
+          "name": "cron create --cron without --tz (default UTC)",
+          "ok": false,
+          "detail": "Invalid schedule: unknown timezone: UTC"
+        },
+        {
+          "name": "cron create --cron --tz UTC",
+          "ok": false,
+          "detail": "Invalid schedule: unknown timezone: UTC"
+        },
+        {
+          "name": "cron create --cron --tz Europe/Rome",
+          "ok": false,
+          "detail": "Invalid schedule: unknown timezone: Europe/Rome"
+        }
+      ],
+      "observations": [
+        {
+          "kind": "tzdata_installed",
+          "value": false
+        },
+        {
+          "kind": "cron_status",
+          "output": "Scheduler Status\n================\nState: unreachable\nReason: daemon_unreachable\nCheck: openminion service status cron"
+        }
+      ],
+      "known_issues": [],
+      "turns": [],
+      "http": {
+        "requests": 0,
+        "by_status": {},
+        "by_kind": {}
+      },
+      "error": ""
+    }
+  ]
+}

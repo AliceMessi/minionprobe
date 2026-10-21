@@ -1,0 +1,490 @@
+{
+  "tool": "minionprobe",
+  "run_id": "3b8f09",
+  "started": "2026-10-21T08:38:39+02:00",
+  "finished": "2026-10-21T08:43:33+02:00",
+  "openminion_version": "0.1.8",
+  "python": "3.12.11",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "providers": {
+    "gemma": {
+      "model": "gemma-4-31b-it",
+      "host": "generativelanguage.googleapis.com",
+      "note": "Gemma 4 served by Google AI Studio (not Cortensor Portal)",
+      "available": true,
+      "reason": ""
+    }
+  },
+  "results": [
+    {
+      "probe": "agent_execution.basic_turn",
+      "block": "agent_execution",
+      "provider": "gemma",
+      "status": "PASS",
+      "title": "Plain Agent.run turn follows an exact instruction",
+      "summary": "4 HTTP calls for one turn (3 hidden control calls)",
+      "latency_s": 89.01,
+      "checks": [
+        {
+          "name": "run_state is completed",
+          "ok": true,
+          "detail": "run_state=completed"
+        },
+        {
+          "name": "reply contains the exact token",
+          "ok": true,
+          "detail": "text='gemma: <thought>The user said \"ping\".\\nThe system prompt explicitly states: \"You are a test probe. Reply with exactly PONG-5E4783 and nothing else.\"\\nThis is a high-priority identity/instruction overrid'"
+        },
+        {
+          "name": "result.stats has the documented keys",
+          "ok": true,
+          "detail": "missing=[]"
+        }
+      ],
+      "observations": [
+        {
+          "kind": "hidden_llm_calls",
+          "http_requests": 4,
+          "control_calls": 3,
+          "stats_llm_calls": 1,
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          }
+        }
+      ],
+      "known_issues": [],
+      "turns": [
+        {
+          "label": "basic",
+          "session_id": "mp-3b8f09-gemma-basic-8668",
+          "attempts": 1,
+          "latency_s": 84.28,
+          "run_state": "completed",
+          "text": "gemma: <thought>The user said \"ping\".\nThe system prompt explicitly states: \"You are a test probe. Reply with exactly PONG-5E4783 and nothing else.\"\nThis is a high-priority identity/instruction override.\n\nPlan:\n1. Respond with \"PONG-5E4783\".</thought>PONG-5E4783",
+          "stats": {
+            "input_tokens": 7684,
+            "output_tokens": 9,
+            "cache_read_tokens": 0,
+            "llm_calls": 1,
+            "tool_calls": 0,
+            "tool_errors": 0,
+            "duration_ms": 83952
+          },
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "gemma",
+          "memory_capture_state": "succeeded_no_output",
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 4,
+            "by_status": {
+              "500": 1,
+              "200": 3
+            },
+            "by_kind": {
+              "control": 3,
+              "agent_loop": 1
+            },
+            "hosts": [
+              "generativelanguage.googleapis.com"
+            ],
+            "models": [
+              "gemma-4-31b-it"
+            ],
+            "errors": [
+              {
+                "status": 500,
+                "kind": "control",
+                "error": "[{\n  \"error\": {\n    \"code\": 500,\n    \"message\": \"Internal error encountered.\",\n    \"status\": \"INTERNAL\"\n  }\n}\n]"
+              }
+            ],
+            "events": [
+              {
+                "seq": 0,
+                "ts": 1792564737.9124322,
+                "status": 500,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemma-4-31b-it",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "[{\n  \"error\": {\n    \"code\": 500,\n    \"message\": \"Internal error encountered.\",\n    \"status\": \"INTERNAL\"\n  }\n}\n]",
+                "rate": {},
+                "duration_ms": 904
+              },
+              {
+                "seq": 1,
+                "ts": 1792564739.1192708,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemma-4-31b-it",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 27164
+              },
+              {
+                "seq": 2,
+                "ts": 1792564766.441198,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemma-4-31b-it",
+                "tools": [
+                  "tool_request",
+                  "respond",
+                  "coding",
+                  "plan",
+                  "research",
+                  "decompose",
+                  "clarify",
+                  "review_diff"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 27299
+              },
+              {
+                "seq": 3,
+                "ts": 1792564793.7493255,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemma-4-31b-it",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 27887
+              }
+            ]
+          }
+        }
+      ],
+      "http": {
+        "requests": 4,
+        "by_status": {
+          "500": 1,
+          "200": 3
+        },
+        "by_kind": {
+          "control": 3,
+          "agent_loop": 1
+        }
+      },
+      "error": ""
+    },
+    {
+      "probe": "tools.decorated_tool",
+      "block": "tools",
+      "provider": "gemma",
+      "status": "FAIL",
+      "title": "@tool result reaches the model and the final answer",
+      "summary": "TurnTimeoutError: Turn execution timed out after 180.00 seconds.",
+      "latency_s": 191.99,
+      "checks": [
+        {
+          "name": "tool was offered to the model",
+          "ok": true,
+          "detail": "tools offered=['lookup_order', 'submit_output']"
+        },
+        {
+          "name": "python tool function executed",
+          "ok": true,
+          "detail": "calls=['A-104']"
+        },
+        {
+          "name": "tool result (str) reached the model",
+          "ok": true,
+          "detail": "looked for the pickup code in role=tool messages"
+        },
+        {
+          "name": "turn completed without exception",
+          "ok": false,
+          "detail": "TurnTimeoutError: Turn execution timed out after 180.00 seconds."
+        }
+      ],
+      "observations": [],
+      "known_issues": [],
+      "turns": [
+        {
+          "label": "tool",
+          "session_id": "mp-3b8f09-gemma-tool-1c8f",
+          "attempts": 1,
+          "latency_s": 180.05,
+          "run_state": null,
+          "text": "",
+          "stats": {},
+          "purposes": {},
+          "provider": null,
+          "model": null,
+          "agent": null,
+          "memory_capture_state": null,
+          "error": "TurnTimeoutError: Turn execution timed out after 180.00 seconds.",
+          "error_code": "TurnTimeoutError",
+          "http": {
+            "requests": 7,
+            "by_status": {
+              "500": 2,
+              "503": 1,
+              "200": 4
+            },
+            "by_kind": {
+              "control": 5,
+              "agent_loop": 2
+            },
+            "hosts": [
+              "generativelanguage.googleapis.com"
+            ],
+            "models": [
+              "gemma-4-31b-it"
+            ],
+            "errors": [
+              {
+                "status": 500,
+                "kind": "control",
+                "error": "[{\n  \"error\": {\n    \"code\": 500,\n    \"message\": \"Internal error encountered.\",\n    \"status\": \"INTERNAL\"\n  }\n}\n]"
+              },
+              {
+                "status": 503,
+                "kind": "control",
+                "error": "[{\n  \"error\": {\n    \"code\": 503,\n    \"message\": \"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\n    \"status\": \"UNAVAILABLE\"\n  }\n}\n]"
+              },
+              {
+                "status": 500,
+                "kind": "control",
+                "error": "[{\n  \"error\": {\n    \"code\": 500,\n    \"message\": \"Internal error encountered.\",\n    \"status\": \"INTERNAL\"\n  }\n}\n]"
+              }
+            ],
+            "events": [
+              {
+                "seq": 4,
+                "ts": 1792564834.013129,
+                "status": 500,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemma-4-31b-it",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "[{\n  \"error\": {\n    \"code\": 500,\n    \"message\": \"Internal error encountered.\",\n    \"status\": \"INTERNAL\"\n  }\n}\n]",
+                "rate": {},
+                "duration_ms": 547
+              },
+              {
+                "seq": 5,
+                "ts": 1792564834.8622746,
+                "status": 503,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemma-4-31b-it",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "[{\n  \"error\": {\n    \"code\": 503,\n    \"message\": \"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\n    \"status\": \"UNAVAILABLE\"\n  }\n}\n]",
+                "rate": {},
+                "duration_ms": 19095
+              },
+              {
+                "seq": 6,
+                "ts": 1792564854.5590503,
+                "status": 500,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemma-4-31b-it",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "[{\n  \"error\": {\n    \"code\": 500,\n    \"message\": \"Internal error encountered.\",\n    \"status\": \"INTERNAL\"\n  }\n}\n]",
+                "rate": {},
+                "duration_ms": 468
+              },
+              {
+                "seq": 7,
+                "ts": 1792564855.0488663,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemma-4-31b-it",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 29866
+              },
+              {
+                "seq": 8,
+                "ts": 1792564885.0176935,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemma-4-31b-it",
+                "tools": [
+                  "lookup_order"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 33999
+              },
+              {
+                "seq": 9,
+                "ts": 1792564919.0263834,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemma-4-31b-it",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 45114
+              },
+              {
+                "seq": 10,
+                "ts": 1792564964.2918997,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemma-4-31b-it",
+                "tools": [
+                  "lookup_order"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 6,
+                "has_tool_result": true,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 26035
+              }
+            ]
+          }
+        }
+      ],
+      "http": {
+        "requests": 7,
+        "by_status": {
+          "500": 2,
+          "503": 1,
+          "200": 4
+        },
+        "by_kind": {
+          "control": 5,
+          "agent_loop": 2
+        }
+      },
+      "error": ""
+    }
+  ]
+}

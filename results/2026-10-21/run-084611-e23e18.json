@@ -1,0 +1,2968 @@
+{
+  "tool": "minionprobe",
+  "run_id": "e23e18",
+  "started": "2026-10-21T08:46:11+02:00",
+  "finished": "2026-10-21T08:57:10+02:00",
+  "openminion_version": "0.1.8",
+  "python": "3.12.11",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "providers": {
+    "gemini": {
+      "model": "gemini-3.1-flash-lite",
+      "host": "generativelanguage.googleapis.com",
+      "note": "Gemini API free tier via the OpenAI-compatible endpoint",
+      "available": true,
+      "reason": ""
+    }
+  },
+  "results": [
+    {
+      "probe": "agent_execution.basic_turn",
+      "block": "agent_execution",
+      "provider": "gemini",
+      "status": "PASS",
+      "title": "Plain Agent.run turn follows an exact instruction",
+      "summary": "2 HTTP calls for one turn (1 hidden control calls)",
+      "latency_s": 44.11,
+      "checks": [
+        {
+          "name": "run_state is completed",
+          "ok": true,
+          "detail": "run_state=completed"
+        },
+        {
+          "name": "reply contains the exact token",
+          "ok": true,
+          "detail": "text='gemini: PONG-21A2FC'"
+        },
+        {
+          "name": "result.stats has the documented keys",
+          "ok": true,
+          "detail": "missing=[]"
+        }
+      ],
+      "observations": [
+        {
+          "kind": "hidden_llm_calls",
+          "http_requests": 2,
+          "control_calls": 1,
+          "stats_llm_calls": 1,
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          }
+        }
+      ],
+      "known_issues": [],
+      "turns": [
+        {
+          "label": "basic",
+          "session_id": "mp-e23e18-gemini-basic-483b",
+          "attempts": 1,
+          "latency_s": 39.27,
+          "run_state": "completed",
+          "text": "gemini: PONG-21A2FC",
+          "stats": {
+            "input_tokens": 7683,
+            "output_tokens": 68,
+            "cache_read_tokens": 0,
+            "llm_calls": 1,
+            "tool_calls": 0,
+            "tool_errors": 0,
+            "duration_ms": 38993
+          },
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "gemini",
+          "memory_capture_state": "succeeded_no_output",
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 2,
+            "by_status": {
+              "200": 2
+            },
+            "by_kind": {
+              "control": 1,
+              "agent_loop": 1
+            },
+            "prompt_tokens": 8067,
+            "completion_tokens": 95,
+            "hosts": [
+              "generativelanguage.googleapis.com"
+            ],
+            "models": [
+              "gemini-3.1-flash-lite"
+            ],
+            "errors": [],
+            "events": [
+              {
+                "seq": 0,
+                "ts": 1792565190.4903505,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 667,
+                "prompt_tokens": 384,
+                "completion_tokens": 27
+              },
+              {
+                "seq": 1,
+                "ts": 1792565191.3567417,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "tool_request",
+                  "respond",
+                  "coding",
+                  "plan",
+                  "research",
+                  "decompose",
+                  "clarify",
+                  "review_diff"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 37938,
+                "prompt_tokens": 7683,
+                "completion_tokens": 68
+              }
+            ]
+          }
+        }
+      ],
+      "http": {
+        "requests": 2,
+        "by_status": {
+          "200": 2
+        },
+        "by_kind": {
+          "control": 1,
+          "agent_loop": 1
+        }
+      },
+      "error": ""
+    },
+    {
+      "probe": "agent_execution.structured_output",
+      "block": "agent_execution",
+      "provider": "gemini",
+      "status": "PASS",
+      "title": "Structured output with output_type=PydanticModel",
+      "summary": "output=IssueLabel(label='bug', confidence=1.0)",
+      "latency_s": 15.69,
+      "checks": [
+        {
+          "name": "result.output is an IssueLabel instance",
+          "ok": true,
+          "detail": "type=IssueLabel"
+        },
+        {
+          "name": "label is 'bug'",
+          "ok": true,
+          "detail": "output=IssueLabel(label='bug', confidence=1.0)"
+        }
+      ],
+      "observations": [],
+      "known_issues": [],
+      "turns": [
+        {
+          "label": "structured",
+          "session_id": "mp-e23e18-gemini-structured-05f9",
+          "attempts": 1,
+          "latency_s": 3.72,
+          "run_state": "completed",
+          "text": "gemini: {\n  \"label\": \"bug\",\n  \"confidence\": 1.0\n}",
+          "stats": {
+            "input_tokens": 7703,
+            "output_tokens": 80,
+            "cache_read_tokens": 0,
+            "llm_calls": 1,
+            "tool_calls": 0,
+            "tool_errors": 0,
+            "duration_ms": 3519
+          },
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "gemini",
+          "memory_capture_state": "succeeded",
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 3,
+            "by_status": {
+              "200": 3
+            },
+            "by_kind": {
+              "control": 2,
+              "agent_loop": 1
+            },
+            "prompt_tokens": 8560,
+            "completion_tokens": 209,
+            "hosts": [
+              "generativelanguage.googleapis.com"
+            ],
+            "models": [
+              "gemini-3.1-flash-lite"
+            ],
+            "errors": [],
+            "events": [
+              {
+                "seq": 2,
+                "ts": 1792565241.6679335,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 1458,
+                "prompt_tokens": 455,
+                "completion_tokens": 91
+              },
+              {
+                "seq": 3,
+                "ts": 1792565243.1447904,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 987,
+                "prompt_tokens": 402,
+                "completion_tokens": 38
+              },
+              {
+                "seq": 4,
+                "ts": 1792565244.2630794,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "tool_request",
+                  "respond",
+                  "coding",
+                  "plan",
+                  "research",
+                  "decompose",
+                  "clarify",
+                  "review_diff"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 752,
+                "prompt_tokens": 7703,
+                "completion_tokens": 80
+              }
+            ]
+          }
+        }
+      ],
+      "http": {
+        "requests": 3,
+        "by_status": {
+          "200": 3
+        },
+        "by_kind": {
+          "control": 2,
+          "agent_loop": 1
+        }
+      },
+      "error": ""
+    },
+    {
+      "probe": "delegation.handoff",
+      "block": "delegation",
+      "provider": "gemini",
+      "status": "FAIL",
+      "title": "Handoff(target=...) transfers the turn to a peer agent",
+      "summary": "marker_present=False approvals=[]",
+      "latency_s": 84.51,
+      "checks": [
+        {
+          "name": "transfer_to_researcher was offered to the model",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "name": "peer agent produced the answer (marker present)",
+          "ok": false,
+          "detail": "text='gemini: An HTTP 429 status code stands for \"Too Many Requests.\" It is a response sent by a server to indicate that a client has sent too many requests in a given amount of time (rate limiting). \\n\\nKey '"
+        },
+        {
+          "name": "handoff did not require a risk confirmation",
+          "ok": true,
+          "detail": "approvals=[]"
+        }
+      ],
+      "observations": [],
+      "known_issues": [],
+      "turns": [
+        {
+          "label": "handoff",
+          "session_id": "mp-e23e18-gemini-handoff-98b7",
+          "attempts": 1,
+          "latency_s": 72.51,
+          "run_state": "completed",
+          "text": "gemini: An HTTP 429 status code stands for \"Too Many Requests.\" It is a response sent by a server to indicate that a client has sent too many requests in a given amount of time (rate limiting). \n\nKey details about this status code include:\n- **Purpose**: It is used to protect servers from being overwhelmed by too much traffic, whether intentional (such as a DoS attack) or unintentional (such as a misconfigured script).\n- **Header Information**: Servers often include a `Retry-After` response header, which tells the client how long to wait before making another request.\n- **RFC Definition**: ...",
+          "stats": {
+            "input_tokens": 3677,
+            "output_tokens": 259,
+            "cache_read_tokens": 0,
+            "llm_calls": 1,
+            "tool_calls": 1,
+            "tool_errors": 0,
+            "duration_ms": 72328
+          },
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "gemini",
+          "memory_capture_state": "succeeded",
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 12,
+            "by_status": {
+              "200": 12
+            },
+            "by_kind": {
+              "control": 8,
+              "agent_loop": 4
+            },
+            "prompt_tokens": 11522,
+            "completion_tokens": 1100,
+            "hosts": [
+              "generativelanguage.googleapis.com"
+            ],
+            "models": [
+              "gemini-3.1-flash-lite"
+            ],
+            "errors": [],
+            "events": [
+              {
+                "seq": 5,
+                "ts": 1792565257.373247,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 1055,
+                "prompt_tokens": 450,
+                "completion_tokens": 94
+              },
+              {
+                "seq": 6,
+                "ts": 1792565258.4527583,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 1681,
+                "prompt_tokens": 397,
+                "completion_tokens": 43
+              },
+              {
+                "seq": 7,
+                "ts": 1792565260.2362294,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "transfer_to_researcher"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 1668,
+                "prompt_tokens": 1985,
+                "completion_tokens": 50
+              },
+              {
+                "seq": 8,
+                "ts": 1792565261.9131124,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 13763,
+                "prompt_tokens": 419,
+                "completion_tokens": 99
+              },
+              {
+                "seq": 9,
+                "ts": 1792565276.0358555,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 991,
+                "prompt_tokens": 467,
+                "completion_tokens": 86
+              },
+              {
+                "seq": 10,
+                "ts": 1792565277.0464196,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 1266,
+                "prompt_tokens": 415,
+                "completion_tokens": 42
+              },
+              {
+                "seq": 11,
+                "ts": 1792565278.4214563,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "transfer_to_researcher"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 985,
+                "prompt_tokens": 2023,
+                "completion_tokens": 43
+              },
+              {
+                "seq": 12,
+                "ts": 1792565279.4174488,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 8918,
+                "prompt_tokens": 437,
+                "completion_tokens": 102
+              },
+              {
+                "seq": 13,
+                "ts": 1792565288.4482431,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "transfer_to_researcher"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 4320,
+                "prompt_tokens": 1260,
+                "completion_tokens": 87
+              },
+              {
+                "seq": 14,
+                "ts": 1792565292.9148235,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 805,
+                "prompt_tokens": 997,
+                "completion_tokens": 88
+              },
+              {
+                "seq": 15,
+                "ts": 1792565293.8268936,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "transfer_to_researcher"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 6,
+                "has_tool_result": true,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 1363,
+                "prompt_tokens": 1692,
+                "completion_tokens": 209
+              },
+              {
+                "seq": 16,
+                "ts": 1792565295.2856507,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 34259,
+                "prompt_tokens": 980,
+                "completion_tokens": 157
+              }
+            ]
+          }
+        }
+      ],
+      "http": {
+        "requests": 12,
+        "by_status": {
+          "200": 12
+        },
+        "by_kind": {
+          "control": 8,
+          "agent_loop": 4
+        }
+      },
+      "error": ""
+    },
+    {
+      "probe": "delegation.subagent_run",
+      "block": "delegation",
+      "provider": "gemini",
+      "status": "PASS",
+      "title": "subagent(parent, ...) runs a bounded child with its own instructions",
+      "summary": "marker_present=True",
+      "latency_s": 22.12,
+      "checks": [
+        {
+          "name": "child followed its own instructions (marker present)",
+          "ok": true,
+          "detail": "text='gemini: REVIEW-FCD207: Shipping a release without running the test suite is an unsafe practice that poses a significant risk to system stability and integrity, and I cannot support or execute this pla'"
+        }
+      ],
+      "observations": [
+        {
+          "kind": "subagent_memory_posture",
+          "accepted": false,
+          "error": "developer subagent memory grants are not bound in v1"
+        }
+      ],
+      "known_issues": [],
+      "turns": [
+        {
+          "label": "subagent",
+          "session_id": "mp-e23e18-gemini-sub-d008",
+          "attempts": 1,
+          "latency_s": 10.12,
+          "run_state": "completed",
+          "text": "gemini: REVIEW-FCD207: Shipping a release without running the test suite is an unsafe practice that poses a significant risk to system stability and integrity, and I cannot support or execute this plan.",
+          "stats": {
+            "input_tokens": 1809,
+            "output_tokens": 40,
+            "cache_read_tokens": 0,
+            "llm_calls": 1,
+            "tool_calls": 0,
+            "tool_errors": 0,
+            "duration_ms": 9931
+          },
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "gemini",
+          "memory_capture_state": "succeeded",
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 4,
+            "by_status": {
+              "200": 4
+            },
+            "by_kind": {
+              "control": 3,
+              "agent_loop": 1
+            },
+            "prompt_tokens": 3069,
+            "completion_tokens": 294,
+            "hosts": [
+              "generativelanguage.googleapis.com"
+            ],
+            "models": [
+              "gemini-3.1-flash-lite"
+            ],
+            "errors": [],
+            "events": [
+              {
+                "seq": 17,
+                "ts": 1792565341.9042287,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 4448,
+                "prompt_tokens": 448,
+                "completion_tokens": 81
+              },
+              {
+                "seq": 18,
+                "ts": 1792565346.3995647,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 625,
+                "prompt_tokens": 395,
+                "completion_tokens": 42
+              },
+              {
+                "seq": 19,
+                "ts": 1792565347.1257875,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [],
+                "tool_choice": null,
+                "n_messages": 2,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 1953,
+                "prompt_tokens": 1809,
+                "completion_tokens": 40
+              },
+              {
+                "seq": 20,
+                "ts": 1792565349.0874276,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 2535,
+                "prompt_tokens": 417,
+                "completion_tokens": 131
+              }
+            ]
+          }
+        }
+      ],
+      "http": {
+        "requests": 4,
+        "by_status": {
+          "200": 4
+        },
+        "by_kind": {
+          "control": 3,
+          "agent_loop": 1
+        }
+      },
+      "error": ""
+    },
+    {
+      "probe": "memory.cross_session_recall",
+      "block": "memory",
+      "provider": "gemini",
+      "status": "FAIL",
+      "title": "Durable fact captured in session A is recalled in session B",
+      "summary": "capture_state=succeeded recalled=False",
+      "latency_s": 72.17,
+      "checks": [
+        {
+          "name": "memory capture did not fail or get rejected",
+          "ok": true,
+          "detail": "memory_capture_state=succeeded control_errors=0"
+        },
+        {
+          "name": "new session recalls the fact",
+          "ok": false,
+          "detail": "text='gemini: UNKNOWN'"
+        }
+      ],
+      "observations": [
+        {
+          "kind": "memory_capture",
+          "state": "succeeded",
+          "control_call_errors": [],
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          }
+        }
+      ],
+      "known_issues": [],
+      "turns": [
+        {
+          "label": "capture",
+          "session_id": "mp-e23e18-gemini-mem-a-5080",
+          "attempts": 1,
+          "latency_s": 9.91,
+          "run_state": "completed",
+          "text": "gemini: I have noted that your favourite build tool is buildy-f2b112 and will remember this permanently.",
+          "stats": {
+            "input_tokens": 7713,
+            "output_tokens": 84,
+            "cache_read_tokens": 0,
+            "llm_calls": 1,
+            "tool_calls": 0,
+            "tool_errors": 0,
+            "duration_ms": 9715
+          },
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "gemini",
+          "memory_capture_state": "succeeded",
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 3,
+            "by_status": {
+              "200": 3
+            },
+            "by_kind": {
+              "control": 2,
+              "agent_loop": 1
+            },
+            "prompt_tokens": 8576,
+            "completion_tokens": 185,
+            "hosts": [
+              "generativelanguage.googleapis.com"
+            ],
+            "models": [
+              "gemini-3.1-flash-lite"
+            ],
+            "errors": [],
+            "events": [
+              {
+                "seq": 21,
+                "ts": 1792565364.0321786,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 808,
+                "prompt_tokens": 458,
+                "completion_tokens": 68
+              },
+              {
+                "seq": 22,
+                "ts": 1792565364.8604887,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 577,
+                "prompt_tokens": 405,
+                "completion_tokens": 33
+              },
+              {
+                "seq": 23,
+                "ts": 1792565365.5927334,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "tool_request",
+                  "respond",
+                  "coding",
+                  "plan",
+                  "research",
+                  "decompose",
+                  "clarify",
+                  "review_diff"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 7970,
+                "prompt_tokens": 7713,
+                "completion_tokens": 84
+              }
+            ]
+          }
+        },
+        {
+          "label": "recall",
+          "session_id": "mp-e23e18-gemini-mem-b-e7af",
+          "attempts": 1,
+          "latency_s": 38.26,
+          "run_state": "completed",
+          "text": "gemini: UNKNOWN",
+          "stats": {
+            "input_tokens": 12871,
+            "output_tokens": 132,
+            "cache_read_tokens": 0,
+            "llm_calls": 1,
+            "tool_calls": 1,
+            "tool_errors": 0,
+            "duration_ms": 38171
+          },
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "gemini",
+          "memory_capture_state": "succeeded",
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 5,
+            "by_status": {
+              "200": 5
+            },
+            "by_kind": {
+              "control": 3,
+              "agent_loop": 2
+            },
+            "prompt_tokens": 14707,
+            "completion_tokens": 247,
+            "hosts": [
+              "generativelanguage.googleapis.com"
+            ],
+            "models": [
+              "gemini-3.1-flash-lite"
+            ],
+            "errors": [],
+            "events": [
+              {
+                "seq": 24,
+                "ts": 1792565385.8064327,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 15864,
+                "prompt_tokens": 453,
+                "completion_tokens": 59
+              },
+              {
+                "seq": 25,
+                "ts": 1792565401.6929579,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 627,
+                "prompt_tokens": 400,
+                "completion_tokens": 38
+              },
+              {
+                "seq": 26,
+                "ts": 1792565402.4595997,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "tool_request",
+                  "respond",
+                  "coding",
+                  "plan",
+                  "research",
+                  "decompose",
+                  "clarify",
+                  "review_diff"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 4582,
+                "prompt_tokens": 7697,
+                "completion_tokens": 66
+              },
+              {
+                "seq": 27,
+                "ts": 1792565407.2104123,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "memory_search",
+                  "decompose",
+                  "tool_request",
+                  "plan"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 6,
+                "has_tool_result": true,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 4130,
+                "prompt_tokens": 5174,
+                "completion_tokens": 66
+              },
+              {
+                "seq": 28,
+                "ts": 1792565411.4319055,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 12428,
+                "prompt_tokens": 983,
+                "completion_tokens": 18
+              }
+            ]
+          }
+        }
+      ],
+      "http": {
+        "requests": 8,
+        "by_status": {
+          "200": 8
+        },
+        "by_kind": {
+          "control": 5,
+          "agent_loop": 3
+        }
+      },
+      "error": ""
+    },
+    {
+      "probe": "permissions.dangerous_tool_approval",
+      "block": "permissions",
+      "provider": "gemini",
+      "status": "PASS",
+      "title": "dangerous=True tool asks approval_callback; deny blocks, allow runs",
+      "summary": "asked=2 executed=['weekly'] deny_reply='gemini: Tool execution denied by operator'",
+      "latency_s": 107.48,
+      "checks": [
+        {
+          "name": "deny: approval_callback was invoked",
+          "ok": true,
+          "detail": "asked=[{'tool': 'purge_cache', 'args': {'scope': 'nightly'}, 'decision': False}]"
+        },
+        {
+          "name": "deny: tool did NOT execute",
+          "ok": true,
+          "detail": "executed=[]"
+        },
+        {
+          "name": "allow: approval_callback was invoked",
+          "ok": true,
+          "detail": "asked=[{'tool': 'purge_cache', 'args': {'scope': 'nightly'}, 'decision': False}, {'tool': 'purge_cache', 'args': {'scope': 'weekly'}, 'decision': True}]"
+        },
+        {
+          "name": "allow: tool executed after approval",
+          "ok": true,
+          "detail": "executed=['weekly']"
+        }
+      ],
+      "observations": [],
+      "known_issues": [],
+      "turns": [
+        {
+          "label": "deny",
+          "session_id": "mp-e23e18-gemini-deny-29f2",
+          "attempts": 1,
+          "latency_s": 65.96,
+          "run_state": "completed",
+          "text": "gemini: Tool execution denied by operator",
+          "stats": {
+            "input_tokens": 1951,
+            "output_tokens": 17,
+            "cache_read_tokens": 0,
+            "llm_calls": 1,
+            "tool_calls": 0,
+            "tool_errors": 0,
+            "duration_ms": 65774
+          },
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "gemini",
+          "memory_capture_state": "succeeded",
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 6,
+            "by_status": {
+              "200": 6
+            },
+            "by_kind": {
+              "control": 5,
+              "agent_loop": 1
+            },
+            "prompt_tokens": 4484,
+            "completion_tokens": 415,
+            "hosts": [
+              "generativelanguage.googleapis.com"
+            ],
+            "models": [
+              "gemini-3.1-flash-lite"
+            ],
+            "errors": [],
+            "events": [
+              {
+                "seq": 29,
+                "ts": 1792565436.1871672,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 1378,
+                "prompt_tokens": 445,
+                "completion_tokens": 69
+              },
+              {
+                "seq": 30,
+                "ts": 1792565437.5904748,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 5382,
+                "prompt_tokens": 392,
+                "completion_tokens": 38
+              },
+              {
+                "seq": 31,
+                "ts": 1792565443.0765657,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "purge_cache"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 2601,
+                "prompt_tokens": 1951,
+                "completion_tokens": 17
+              },
+              {
+                "seq": 32,
+                "ts": 1792565445.691209,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 44273,
+                "prompt_tokens": 414,
+                "completion_tokens": 119
+              },
+              {
+                "seq": 33,
+                "ts": 1792565490.2186642,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 9241,
+                "prompt_tokens": 641,
+                "completion_tokens": 82
+              },
+              {
+                "seq": 34,
+                "ts": 1792565499.4750452,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 2331,
+                "prompt_tokens": 641,
+                "completion_tokens": 90
+              }
+            ]
+          }
+        },
+        {
+          "label": "allow",
+          "session_id": "mp-e23e18-gemini-allow-48b5",
+          "attempts": 1,
+          "latency_s": 17.52,
+          "run_state": "completed",
+          "text": "gemini: The cache for scope 'weekly' has been purged.",
+          "stats": {
+            "input_tokens": 3321,
+            "output_tokens": 126,
+            "cache_read_tokens": 0,
+            "llm_calls": 1,
+            "tool_calls": 1,
+            "tool_errors": 0,
+            "duration_ms": 17432
+          },
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "gemini",
+          "memory_capture_state": "succeeded",
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 6,
+            "by_status": {
+              "200": 6
+            },
+            "by_kind": {
+              "control": 4,
+              "agent_loop": 2
+            },
+            "prompt_tokens": 5543,
+            "completion_tokens": 349,
+            "hosts": [
+              "generativelanguage.googleapis.com"
+            ],
+            "models": [
+              "gemini-3.1-flash-lite"
+            ],
+            "errors": [],
+            "events": [
+              {
+                "seq": 35,
+                "ts": 1792565514.0227375,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 8425,
+                "prompt_tokens": 444,
+                "completion_tokens": 60
+              },
+              {
+                "seq": 36,
+                "ts": 1792565522.4758804,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 2221,
+                "prompt_tokens": 391,
+                "completion_tokens": 35
+              },
+              {
+                "seq": 37,
+                "ts": 1792565524.8034737,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "purge_cache"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 1365,
+                "prompt_tokens": 1950,
+                "completion_tokens": 16
+              },
+              {
+                "seq": 38,
+                "ts": 1792565526.177036,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 2675,
+                "prompt_tokens": 413,
+                "completion_tokens": 100
+              },
+              {
+                "seq": 39,
+                "ts": 1792565529.0248704,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "purge_cache"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 6,
+                "has_tool_result": true,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 1534,
+                "prompt_tokens": 1371,
+                "completion_tokens": 110
+              },
+              {
+                "seq": 40,
+                "ts": 1792565530.6541874,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 655,
+                "prompt_tokens": 974,
+                "completion_tokens": 28
+              }
+            ]
+          }
+        }
+      ],
+      "http": {
+        "requests": 12,
+        "by_status": {
+          "200": 12
+        },
+        "by_kind": {
+          "control": 9,
+          "agent_loop": 3
+        }
+      },
+      "error": ""
+    },
+    {
+      "probe": "sessions.continuity_isolation",
+      "block": "sessions",
+      "provider": "gemini",
+      "status": "FAIL",
+      "title": "Same session_id remembers; a different session_id is isolated",
+      "summary": "same=False isolated_leak=False",
+      "latency_s": 113.11,
+      "checks": [
+        {
+          "name": "same session recalls the word",
+          "ok": false,
+          "detail": "text='gemini: noted.'"
+        },
+        {
+          "name": "different session does not see the word",
+          "ok": true,
+          "detail": "text='gemini: CODENAME-086B33'"
+        }
+      ],
+      "observations": [
+        {
+          "kind": "followup_replayed",
+          "label": "recall-same",
+          "text": "gemini: noted."
+        }
+      ],
+      "known_issues": [],
+      "turns": [
+        {
+          "label": "set",
+          "session_id": "mp-e23e18-gemini-shared-e5db",
+          "attempts": 1,
+          "latency_s": 35.5,
+          "run_state": "completed",
+          "text": "gemini: noted.",
+          "stats": {
+            "input_tokens": 7716,
+            "output_tokens": 63,
+            "cache_read_tokens": 0,
+            "llm_calls": 1,
+            "tool_calls": 0,
+            "tool_errors": 0,
+            "duration_ms": 35321
+          },
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "gemini",
+          "memory_capture_state": "succeeded",
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 3,
+            "by_status": {
+              "200": 3
+            },
+            "by_kind": {
+              "control": 2,
+              "agent_loop": 1
+            },
+            "prompt_tokens": 8583,
+            "completion_tokens": 163,
+            "hosts": [
+              "generativelanguage.googleapis.com"
+            ],
+            "models": [
+              "gemini-3.1-flash-lite"
+            ],
+            "errors": [],
+            "events": [
+              {
+                "seq": 41,
+                "ts": 1792565543.6834779,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 2641,
+                "prompt_tokens": 460,
+                "completion_tokens": 70
+              },
+              {
+                "seq": 42,
+                "ts": 1792565546.348913,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 680,
+                "prompt_tokens": 407,
+                "completion_tokens": 30
+              },
+              {
+                "seq": 43,
+                "ts": 1792565547.180644,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "tool_request",
+                  "respond",
+                  "coding",
+                  "plan",
+                  "research",
+                  "decompose",
+                  "clarify",
+                  "review_diff"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 31614,
+                "prompt_tokens": 7716,
+                "completion_tokens": 63
+              }
+            ]
+          }
+        },
+        {
+          "label": "recall-same",
+          "session_id": "mp-e23e18-gemini-shared-e5db",
+          "attempts": 1,
+          "latency_s": 0.02,
+          "run_state": "completed",
+          "text": "gemini: noted.",
+          "stats": {},
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "gemini",
+          "memory_capture_state": null,
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 0,
+            "by_status": {},
+            "by_kind": {},
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "hosts": [],
+            "models": [],
+            "errors": [],
+            "events": []
+          }
+        },
+        {
+          "label": "recall-isolated",
+          "session_id": "mp-e23e18-gemini-isolated-6b03",
+          "attempts": 1,
+          "latency_s": 41.59,
+          "run_state": "completed",
+          "text": "gemini: CODENAME-086B33",
+          "stats": {
+            "input_tokens": 7784,
+            "output_tokens": 70,
+            "cache_read_tokens": 0,
+            "llm_calls": 1,
+            "tool_calls": 0,
+            "tool_errors": 0,
+            "duration_ms": 41504
+          },
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "gemini",
+          "memory_capture_state": "succeeded",
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 3,
+            "by_status": {
+              "200": 3
+            },
+            "by_kind": {
+              "control": 2,
+              "agent_loop": 1
+            },
+            "prompt_tokens": 8635,
+            "completion_tokens": 169,
+            "hosts": [
+              "generativelanguage.googleapis.com"
+            ],
+            "models": [
+              "gemini-3.1-flash-lite"
+            ],
+            "errors": [],
+            "events": [
+              {
+                "seq": 44,
+                "ts": 1792565603.0844405,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 693,
+                "prompt_tokens": 452,
+                "completion_tokens": 59
+              },
+              {
+                "seq": 45,
+                "ts": 1792565603.7955787,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 23960,
+                "prompt_tokens": 399,
+                "completion_tokens": 40
+              },
+              {
+                "seq": 46,
+                "ts": 1792565627.8938518,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "tool_request",
+                  "respond",
+                  "coding",
+                  "plan",
+                  "research",
+                  "decompose",
+                  "clarify",
+                  "review_diff"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 16536,
+                "prompt_tokens": 7784,
+                "completion_tokens": 70
+              }
+            ]
+          }
+        }
+      ],
+      "http": {
+        "requests": 6,
+        "by_status": {
+          "200": 6
+        },
+        "by_kind": {
+          "control": 4,
+          "agent_loop": 2
+        }
+      },
+      "error": ""
+    },
+    {
+      "probe": "skills.ingested_skill_applied",
+      "block": "skills",
+      "provider": "gemini",
+      "status": "FAIL",
+      "title": "Ingested SKILL.md keeps its skill_id, is admitted and applied",
+      "summary": "default_skill_id=skill admitted=True codename_in_reply=True",
+      "latency_s": 35.24,
+      "checks": [
+        {
+          "name": "default ingest keeps the skill_id declared in the file",
+          "ok": false,
+          "detail": "skill_id='skill' warnings=['parse.warning:companion_metadata_unavailable', 'admission.pending']"
+        },
+        {
+          "name": "ingest --name + admit (verified) succeeds",
+          "ok": true,
+          "detail": "skill_id=minionprobe_release_codename"
+        },
+        {
+          "name": "admitted skill appears in `openminion skill list`",
+          "ok": true,
+          "detail": "minionprobe_release_codename | minionprobe.release_codename | verified | c6f6020823fb..."
+        },
+        {
+          "name": "reply contains the codename that only the skill knows",
+          "ok": true,
+          "detail": "text='gemini: The MinionProbe release codename is CODENAME-086B33.'"
+        }
+      ],
+      "observations": [
+        {
+          "kind": "skill_turn",
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "http_requests": 2
+        }
+      ],
+      "known_issues": [],
+      "turns": [
+        {
+          "label": "skill",
+          "session_id": "mp-e23e18-gemini-skill-8d62",
+          "attempts": 1,
+          "latency_s": 23.25,
+          "run_state": "completed",
+          "text": "gemini: The MinionProbe release codename is CODENAME-086B33.",
+          "stats": {
+            "input_tokens": 7796,
+            "output_tokens": 79,
+            "cache_read_tokens": 0,
+            "llm_calls": 1,
+            "tool_calls": 0,
+            "tool_errors": 0,
+            "duration_ms": 23042
+          },
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "gemini",
+          "memory_capture_state": "succeeded",
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 2,
+            "by_status": {
+              "200": 2
+            },
+            "by_kind": {
+              "control": 1,
+              "agent_loop": 1
+            },
+            "prompt_tokens": 8251,
+            "completion_tokens": 142,
+            "hosts": [
+              "generativelanguage.googleapis.com"
+            ],
+            "models": [
+              "gemini-3.1-flash-lite"
+            ],
+            "errors": [],
+            "events": [
+              {
+                "seq": 47,
+                "ts": 1792565656.8345225,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 21030,
+                "prompt_tokens": 455,
+                "completion_tokens": 63
+              },
+              {
+                "seq": 48,
+                "ts": 1792565678.0100605,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "tool_request",
+                  "respond",
+                  "coding",
+                  "plan",
+                  "research",
+                  "decompose",
+                  "clarify",
+                  "review_diff"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 1650,
+                "prompt_tokens": 7796,
+                "completion_tokens": 79
+              }
+            ]
+          }
+        }
+      ],
+      "http": {
+        "requests": 2,
+        "by_status": {
+          "200": 2
+        },
+        "by_kind": {
+          "control": 1,
+          "agent_loop": 1
+        }
+      },
+      "error": ""
+    },
+    {
+      "probe": "tasks.task_schedule_tool",
+      "block": "tasks",
+      "provider": "gemini",
+      "status": "PASS",
+      "title": "Model schedules a one-shot job through the task.schedule tool",
+      "summary": "scheduled=True approvals=[] reply='gemini: I have successfully scheduled your job, **mp-reminder-d8096e**, for December 31, 2026, at 09:00:00 UTC.\\n\\nPlease '",
+      "latency_s": 55.34,
+      "checks": [
+        {
+          "name": "task.schedule tool ran and reported a task id",
+          "ok": true,
+          "detail": "{\"outputs\":{\"deduped\":false,\"delete_after_run\":false,\"enabled\":true,\"name\":\"mp-reminder-d8096e\",\"next_due_at\":\"2026-12-31T09:00:00+00:00\",\"ok\":true,\"schedule\":{\"at\":\"2026-12-31T09:00:00+00:00\",\"kind\":\"at\"},\"scheduler\":{\"check_command\":\"openminion service status cron\",\"hosted_by\":\"daemon\",\"reason\":\"d"
+        },
+        {
+          "name": "job is visible to `openminion tasks list`",
+          "ok": true,
+          "detail": "Tasks\n=====\nscheduler: unreachable\nscheduler_check: openminion service status cron\n[active] 4bff34f5bfdf49b0bc508ad5209fd19c: mp-reminder-d8096e type=scheduled_once schedule=at:2026-12-31T09:00:00+00:00 next=2026-12-31T09:00:00+00:00 last=-"
+        }
+      ],
+      "observations": [],
+      "known_issues": [],
+      "turns": [
+        {
+          "label": "task.schedule",
+          "session_id": "mp-e23e18-gemini-task-3826",
+          "attempts": 1,
+          "latency_s": 35.6,
+          "run_state": "completed",
+          "text": "gemini: I have successfully scheduled your job, **mp-reminder-d8096e**, for December 31, 2026, at 09:00:00 UTC.\n\nPlease note that the task is currently scheduled, but it will only execute if the OpenMinion daemon is running at that time. You can ensure it runs by starting the daemon with `openminion daemon start`.\n\n<confident_complete />\n<session_work_summary>\n- Scheduled a one-time task named \"mp-reminder-d8096e\" using the 'at' schedule kind for 2026-12-31T09:00:00Z.\n- Confirmed the task is registered with ID 4bff34f5bfdf49b0bc508ad5209fd19c.\n</session_work_summary>",
+          "stats": {
+            "input_tokens": 5850,
+            "output_tokens": 269,
+            "cache_read_tokens": 0,
+            "llm_calls": 2,
+            "tool_calls": 1,
+            "tool_errors": 0,
+            "duration_ms": 35402
+          },
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 2,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "gemini",
+          "memory_capture_state": "succeeded",
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 7,
+            "by_status": {
+              "200": 7
+            },
+            "by_kind": {
+              "control": 4,
+              "agent_loop": 3
+            },
+            "prompt_tokens": 10492,
+            "completion_tokens": 842,
+            "hosts": [
+              "generativelanguage.googleapis.com"
+            ],
+            "models": [
+              "gemini-3.1-flash-lite"
+            ],
+            "errors": [],
+            "events": [
+              {
+                "seq": 49,
+                "ts": 1792565692.0524976,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 5047,
+                "prompt_tokens": 492,
+                "completion_tokens": 124
+              },
+              {
+                "seq": 50,
+                "ts": 1792565697.116534,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 11910,
+                "prompt_tokens": 439,
+                "completion_tokens": 62
+              },
+              {
+                "seq": 51,
+                "ts": 1792565709.1288774,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "task_schedule"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 5147,
+                "prompt_tokens": 2444,
+                "completion_tokens": 70
+              },
+              {
+                "seq": 52,
+                "ts": 1792565714.2891493,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 3776,
+                "prompt_tokens": 461,
+                "completion_tokens": 104
+              },
+              {
+                "seq": 53,
+                "ts": 1792565719.8713326,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "task_schedule"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 6,
+                "has_tool_result": true,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 1389,
+                "prompt_tokens": 2228,
+                "completion_tokens": 207
+              },
+              {
+                "seq": 54,
+                "ts": 1792565721.3537502,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 4736,
+                "prompt_tokens": 1022,
+                "completion_tokens": 76
+              },
+              {
+                "seq": 55,
+                "ts": 1792565726.2186236,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "task_schedule"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 6,
+                "has_tool_result": true,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 1031,
+                "prompt_tokens": 3406,
+                "completion_tokens": 199
+              }
+            ]
+          }
+        }
+      ],
+      "http": {
+        "requests": 7,
+        "by_status": {
+          "200": 7
+        },
+        "by_kind": {
+          "control": 4,
+          "agent_loop": 3
+        }
+      },
+      "error": ""
+    },
+    {
+      "probe": "tools.decorated_tool",
+      "block": "tools",
+      "provider": "gemini",
+      "status": "FAIL",
+      "title": "@tool result reaches the model and the final answer",
+      "summary": "calls=['A-104'] model_used_result=True final_ok=False",
+      "latency_s": 95.57,
+      "checks": [
+        {
+          "name": "tool was offered to the model",
+          "ok": true,
+          "detail": "tools offered=['lookup_order', 'submit_output']"
+        },
+        {
+          "name": "python tool function executed",
+          "ok": true,
+          "detail": "calls=['A-104']"
+        },
+        {
+          "name": "tool result (str) reached the model",
+          "ok": true,
+          "detail": "looked for the pickup code in role=tool messages"
+        },
+        {
+          "name": "final answer quotes the tool result",
+          "ok": false,
+          "detail": "text='gemini: Order A-104 is currently in processing. It is scheduled to be shipped by the end of the week.'"
+        }
+      ],
+      "observations": [
+        {
+          "kind": "grounded_answer_replaced",
+          "detail": "the agent-loop response contained the tool result, but result.text does not",
+          "final_text": "gemini: Order A-104 is currently in processing. It is scheduled to be shipped by the end of the week.",
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          }
+        }
+      ],
+      "known_issues": [],
+      "turns": [
+        {
+          "label": "tool",
+          "session_id": "mp-e23e18-gemini-tool-f168",
+          "attempts": 1,
+          "latency_s": 91.32,
+          "run_state": "completed",
+          "text": "gemini: Order A-104 is currently in processing. It is scheduled to be shipped by the end of the week.",
+          "stats": {
+            "input_tokens": 3340,
+            "output_tokens": 92,
+            "cache_read_tokens": 0,
+            "llm_calls": 1,
+            "tool_calls": 1,
+            "tool_errors": 0,
+            "duration_ms": 91131
+          },
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "openai",
+          "model": "brain-orchestrator",
+          "agent": "gemini",
+          "memory_capture_state": "succeeded",
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 7,
+            "by_status": {
+              "200": 6,
+              "503": 1
+            },
+            "by_kind": {
+              "control": 4,
+              "agent_loop": 3
+            },
+            "prompt_tokens": 5556,
+            "completion_tokens": 346,
+            "hosts": [
+              "generativelanguage.googleapis.com"
+            ],
+            "models": [
+              "gemini-3.1-flash-lite"
+            ],
+            "errors": [
+              {
+                "status": 503,
+                "kind": "agent_loop",
+                "error": "[{\n  \"error\": {\n    \"code\": 503,\n    \"message\": \"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\n    \"status\": \"UNAVAILABLE\"\n  }\n}\n]"
+              }
+            ],
+            "events": [
+              {
+                "seq": 56,
+                "ts": 1792565739.630727,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 2288,
+                "prompt_tokens": 442,
+                "completion_tokens": 86
+              },
+              {
+                "seq": 57,
+                "ts": 1792565741.954805,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 581,
+                "prompt_tokens": 390,
+                "completion_tokens": 44
+              },
+              {
+                "seq": 58,
+                "ts": 1792565742.7417502,
+                "status": 503,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "lookup_order"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "[{\n  \"error\": {\n    \"code\": 503,\n    \"message\": \"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\n    \"status\": \"UNAVAILABLE\"\n  }\n}\n]",
+                "rate": {},
+                "duration_ms": 4262,
+                "prompt_tokens": 0,
+                "completion_tokens": 0
+              },
+              {
+                "seq": 59,
+                "ts": 1792565747.3061686,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "lookup_order"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 26679,
+                "prompt_tokens": 1965,
+                "completion_tokens": 22
+              },
+              {
+                "seq": 60,
+                "ts": 1792565773.994675,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 4643,
+                "prompt_tokens": 412,
+                "completion_tokens": 83
+              },
+              {
+                "seq": 61,
+                "ts": 1792565778.7777257,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "lookup_order"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 6,
+                "has_tool_result": true,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {},
+                "duration_ms": 5871,
+                "prompt_tokens": 1375,
+                "completion_tokens": 70
+              },
+              {
+                "seq": 62,
+                "ts": 1792565784.737677,
+                "status": 200,
+                "host": "generativelanguage.googleapis.com",
+                "path": "/v1beta/openai/chat/completions",
+                "model": "gemini-3.1-flash-lite",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {},
+                "duration_ms": 45884,
+                "prompt_tokens": 972,
+                "completion_tokens": 41
+              }
+            ]
+          }
+        }
+      ],
+      "http": {
+        "requests": 7,
+        "by_status": {
+          "200": 6,
+          "503": 1
+        },
+        "by_kind": {
+          "control": 4,
+          "agent_loop": 3
+        }
+      },
+      "error": ""
+    },
+    {
+      "probe": "diagnostics.run_stats",
+      "block": "diagnostics",
+      "provider": "gemini",
+      "status": "FAIL",
+      "title": "result.stats agree with the HTTP traffic (calls and tokens)",
+      "summary": "13 turns: stats.llm_calls total=14, successful HTTP calls=62",
+      "latency_s": 0.0,
+      "checks": [
+        {
+          "name": "stats has non-zero token counts",
+          "ok": true,
+          "detail": "[{'turn': 'basic', 'stats_llm_calls': 1, 'http_ok_calls': 2, 'stats_input_tokens': 7683, 'wire_prompt_tokens': 8067}, {'turn': 'structured', 'stats_llm_calls': 1, 'http_ok_calls': 3, 'stats_input_tokens': 7703, 'wire_prompt_tokens': 8560}, {'turn': 'handoff', 'stats_llm_calls': 1, 'http_ok_calls': 12, 'stats_input_tokens': 3677, 'wire_prompt_tokens': 11522}]"
+        },
+        {
+          "name": "stats.llm_calls equals successful provider calls on every turn",
+          "ok": false,
+          "detail": "0/13 turns match; e.g. basic: stats=1 wire=2; structured: stats=1 wire=3; handoff: stats=1 wire=12; subagent: stats=1 wire=4; capture: stats=1 wire=3; recall: stats=1 wire=5; deny: stats=1 wire=6; allow: stats=1 wire=6; set: stats=1 wire=3; recall-isolated: stats=1 wire=3; skill: stats=1 wire=2; task.schedule: stats=2 wir"
+        }
+      ],
+      "observations": [
+        {
+          "kind": "call_accounting",
+          "turns": [
+            {
+              "turn": "basic",
+              "stats_llm_calls": 1,
+              "http_ok_calls": 2,
+              "stats_input_tokens": 7683,
+              "wire_prompt_tokens": 8067
+            },
+            {
+              "turn": "structured",
+              "stats_llm_calls": 1,
+              "http_ok_calls": 3,
+              "stats_input_tokens": 7703,
+              "wire_prompt_tokens": 8560
+            },
+            {
+              "turn": "handoff",
+              "stats_llm_calls": 1,
+              "http_ok_calls": 12,
+              "stats_input_tokens": 3677,
+              "wire_prompt_tokens": 11522
+            },
+            {
+              "turn": "subagent",
+              "stats_llm_calls": 1,
+              "http_ok_calls": 4,
+              "stats_input_tokens": 1809,
+              "wire_prompt_tokens": 3069
+            },
+            {
+              "turn": "capture",
+              "stats_llm_calls": 1,
+              "http_ok_calls": 3,
+              "stats_input_tokens": 7713,
+              "wire_prompt_tokens": 8576
+            },
+            {
+              "turn": "recall",
+              "stats_llm_calls": 1,
+              "http_ok_calls": 5,
+              "stats_input_tokens": 12871,
+              "wire_prompt_tokens": 14707
+            },
+            {
+              "turn": "deny",
+              "stats_llm_calls": 1,
+              "http_ok_calls": 6,
+              "stats_input_tokens": 1951,
+              "wire_prompt_tokens": 4484
+            },
+            {
+              "turn": "allow",
+              "stats_llm_calls": 1,
+              "http_ok_calls": 6,
+              "stats_input_tokens": 3321,
+              "wire_prompt_tokens": 5543
+            },
+            {
+              "turn": "set",
+              "stats_llm_calls": 1,
+              "http_ok_calls": 3,
+              "stats_input_tokens": 7716,
+              "wire_prompt_tokens": 8583
+            },
+            {
+              "turn": "recall-isolated",
+              "stats_llm_calls": 1,
+              "http_ok_calls": 3,
+              "stats_input_tokens": 7784,
+              "wire_prompt_tokens": 8635
+            },
+            {
+              "turn": "skill",
+              "stats_llm_calls": 1,
+              "http_ok_calls": 2,
+              "stats_input_tokens": 7796,
+              "wire_prompt_tokens": 8251
+            },
+            {
+              "turn": "task.schedule",
+              "stats_llm_calls": 2,
+              "http_ok_calls": 7,
+              "stats_input_tokens": 5850,
+              "wire_prompt_tokens": 10492
+            },
+            {
+              "turn": "tool",
+              "stats_llm_calls": 1,
+              "http_ok_calls": 6,
+              "stats_input_tokens": 3340,
+              "wire_prompt_tokens": 5556
+            }
+          ]
+        }
+      ],
+      "known_issues": [],
+      "turns": [],
+      "http": {
+        "requests": 0,
+        "by_status": {},
+        "by_kind": {}
+      },
+      "error": ""
+    },
+    {
+      "probe": "models.provider_routing",
+      "block": "models",
+      "provider": "gemini",
+      "status": "PASS",
+      "title": "Requests reach the configured provider host and model",
+      "summary": "hosts=['generativelanguage.googleapis.com'] models=['gemini-3.1-flash-lite']",
+      "latency_s": 0.0,
+      "checks": [
+        {
+          "name": "all LLM requests went to the configured host",
+          "ok": true,
+          "detail": "hosts=['generativelanguage.googleapis.com']"
+        },
+        {
+          "name": "all LLM requests used the configured model",
+          "ok": true,
+          "detail": "models=['gemini-3.1-flash-lite']"
+        },
+        {
+          "name": "result metadata names the configured agent",
+          "ok": true,
+          "detail": "metadata.agent=gemini provider=openai model=brain-orchestrator"
+        }
+      ],
+      "observations": [],
+      "known_issues": [],
+      "turns": [],
+      "http": {
+        "requests": 0,
+        "by_status": {},
+        "by_kind": {}
+      },
+      "error": ""
+    }
+  ]
+}

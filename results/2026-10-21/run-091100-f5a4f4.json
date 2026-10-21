@@ -1,0 +1,307 @@
+{
+  "tool": "minionprobe",
+  "run_id": "f5a4f4",
+  "started": "2026-10-21T09:11:00+02:00",
+  "finished": "2026-10-21T09:11:22+02:00",
+  "openminion_version": "0.1.8",
+  "python": "3.12.11",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "providers": {
+    "groq-lean": {
+      "model": "openai/gpt-oss-20b",
+      "host": "api.groq.com",
+      "note": "Groq, NOT the default: runtime.memory_enabled=false and tools=[] for tool-less probes (fits the 8K TPM free tier)",
+      "available": true,
+      "reason": ""
+    }
+  },
+  "results": [
+    {
+      "probe": "tools.decorated_tool",
+      "block": "tools",
+      "provider": "groq-lean",
+      "status": "PASS",
+      "title": "@tool result reaches the model and the final answer",
+      "summary": "calls=['A-104'] model_used_result=True final_ok=True",
+      "latency_s": 9.44,
+      "checks": [
+        {
+          "name": "tool was offered to the model",
+          "ok": true,
+          "detail": "tools offered=['lookup_order', 'submit_output']"
+        },
+        {
+          "name": "python tool function executed",
+          "ok": true,
+          "detail": "calls=['A-104']"
+        },
+        {
+          "name": "tool result (str) reached the model",
+          "ok": true,
+          "detail": "looked for the pickup code in role=tool messages"
+        },
+        {
+          "name": "final answer quotes the tool result",
+          "ok": true,
+          "detail": "text='groq-lean: Your order **A-104** is ready for pickup. **Pickup code:** `ZEBRA-54F2C7`.'"
+        }
+      ],
+      "observations": [],
+      "known_issues": [],
+      "turns": [
+        {
+          "label": "tool",
+          "session_id": "mp-f5a4f4-groq-lean-tool-505b",
+          "attempts": 1,
+          "latency_s": 4.67,
+          "run_state": "completed",
+          "text": "groq-lean: Your order **A-104** is ready for pickup. **Pickup code:** `ZEBRA-54F2C7`.",
+          "stats": {
+            "input_tokens": 3278,
+            "output_tokens": 523,
+            "cache_read_tokens": 0,
+            "llm_calls": 1,
+            "tool_calls": 1,
+            "tool_errors": 0,
+            "duration_ms": 4431
+          },
+          "purposes": {
+            "act": 0,
+            "decide": 0,
+            "entry": 1,
+            "follow_up": 0,
+            "judge": 0,
+            "plan": 0,
+            "reflect": 0,
+            "self_compaction": 0,
+            "skill_selection": 0,
+            "summarize": 0,
+            "tool_shortlist": 0
+          },
+          "provider": "groq",
+          "model": "brain-orchestrator",
+          "agent": "groq-lean",
+          "memory_capture_state": "rejected",
+          "error": "",
+          "error_code": "",
+          "http": {
+            "requests": 6,
+            "by_status": {
+              "200": 5,
+              "400": 1
+            },
+            "by_kind": {
+              "control": 4,
+              "agent_loop": 2
+            },
+            "prompt_tokens": 6276,
+            "completion_tokens": 1390,
+            "hosts": [
+              "api.groq.com"
+            ],
+            "models": [
+              "openai/gpt-oss-20b"
+            ],
+            "errors": [
+              {
+                "status": 400,
+                "kind": "control",
+                "error": "{\"error\":{\"message\":\"Tool call validation failed: tool call validation failed: parameters for tool submit_output did not match schema: errors: [`/domain`: value must be one of 'general', 'finance', 'news', 'weather', 'regulation', 'shopping', 'sports', 'other']\",\"type\":\"invalid_request_error\",\"co..."
+              }
+            ],
+            "events": [
+              {
+                "seq": 0,
+                "ts": 1792566678.1373012,
+                "status": 200,
+                "host": "api.groq.com",
+                "path": "/openai/v1/chat/completions",
+                "model": "openai/gpt-oss-20b",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {
+                  "x-ratelimit-remaining-tokens": "7031",
+                  "x-ratelimit-reset-tokens": "7.267s",
+                  "x-ratelimit-remaining-requests": "915",
+                  "x-ratelimit-reset-requests": "2h2m24s",
+                  "x-ratelimit-limit-tokens": "8000"
+                },
+                "duration_ms": 658,
+                "prompt_tokens": 516,
+                "completion_tokens": 284
+              },
+              {
+                "seq": 1,
+                "ts": 1792566678.918907,
+                "status": 200,
+                "host": "api.groq.com",
+                "path": "/openai/v1/chat/completions",
+                "model": "openai/gpt-oss-20b",
+                "tools": [
+                  "lookup_order"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {
+                  "x-ratelimit-remaining-tokens": "5275",
+                  "x-ratelimit-reset-tokens": "20.437s",
+                  "x-ratelimit-remaining-requests": "914",
+                  "x-ratelimit-reset-requests": "2h3m50.4s",
+                  "x-ratelimit-limit-tokens": "8000"
+                },
+                "duration_ms": 449,
+                "prompt_tokens": 1820,
+                "completion_tokens": 211
+              },
+              {
+                "seq": 2,
+                "ts": 1792566679.38138,
+                "status": 400,
+                "host": "api.groq.com",
+                "path": "/openai/v1/chat/completions",
+                "model": "openai/gpt-oss-20b",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "{\"error\":{\"message\":\"Tool call validation failed: tool call validation failed: parameters for tool submit_output did not match schema: errors: [`/domain`: value must be one of 'general', 'finance', 'news', 'weather', 'regulation', 'shopping', 'sports', 'other']\",\"type\":\"invalid_request_error\",\"code\":\"tool_use_failed\",\"failed_generation\":\"{\\\"name\\\": \\\"submit_output\\\", \\\"arguments\\\": {\\\"answer_mode\\\":\\\"browse_then_answer\\\",\\\"confidence\\\":1,\\\"domain\\\":\\\"e-commerce\\\",\\\"intent\\\":\\\"check_order_status\\\",\\\"needs_exact_date\\\":false,\\\"needs_live_data\\\":true,\\\"needs_sources\\\":false,\\\"reason\\\":\\\"The request asks for the status of a specific order, which requires current information and is time-sensitive.\\\",\\\"time_sensitive\\\":true}}\"}}\n",
+                "rate": {
+                  "x-ratelimit-remaining-tokens": "4610",
+                  "x-ratelimit-reset-tokens": "25.425s",
+                  "x-ratelimit-remaining-requests": "913",
+                  "x-ratelimit-reset-requests": "2h5m16.799s",
+                  "x-ratelimit-limit-tokens": "8000"
+                },
+                "duration_ms": 517,
+                "prompt_tokens": 0,
+                "completion_tokens": 0
+              },
+              {
+                "seq": 3,
+                "ts": 1792566680.2013052,
+                "status": 200,
+                "host": "api.groq.com",
+                "path": "/openai/v1/chat/completions",
+                "model": "openai/gpt-oss-20b",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {
+                  "x-ratelimit-remaining-tokens": "4009",
+                  "x-ratelimit-reset-tokens": "29.932s",
+                  "x-ratelimit-remaining-requests": "912",
+                  "x-ratelimit-reset-requests": "2h6m43.2s",
+                  "x-ratelimit-limit-tokens": "8000"
+                },
+                "duration_ms": 439,
+                "prompt_tokens": 513,
+                "completion_tokens": 225
+              },
+              {
+                "seq": 4,
+                "ts": 1792566680.7625008,
+                "status": 200,
+                "host": "api.groq.com",
+                "path": "/openai/v1/chat/completions",
+                "model": "openai/gpt-oss-20b",
+                "tools": [
+                  "lookup_order"
+                ],
+                "tool_choice": "auto",
+                "n_messages": 6,
+                "has_tool_result": true,
+                "kind": "agent_loop",
+                "error": "",
+                "rate": {
+                  "x-ratelimit-remaining-tokens": "2121",
+                  "x-ratelimit-reset-tokens": "44.092s",
+                  "x-ratelimit-remaining-requests": "911",
+                  "x-ratelimit-reset-requests": "2h8m9.599s",
+                  "x-ratelimit-limit-tokens": "8000"
+                },
+                "duration_ms": 640,
+                "prompt_tokens": 1458,
+                "completion_tokens": 312
+              },
+              {
+                "seq": 5,
+                "ts": 1792566681.4942153,
+                "status": 200,
+                "host": "api.groq.com",
+                "path": "/openai/v1/chat/completions",
+                "model": "openai/gpt-oss-20b",
+                "tools": [
+                  "submit_output"
+                ],
+                "tool_choice": {
+                  "type": "function",
+                  "function": {
+                    "name": "submit_output"
+                  }
+                },
+                "n_messages": 3,
+                "has_tool_result": false,
+                "kind": "control",
+                "error": "",
+                "rate": {
+                  "x-ratelimit-remaining-tokens": "216",
+                  "x-ratelimit-reset-tokens": "58.379s",
+                  "x-ratelimit-remaining-requests": "910",
+                  "x-ratelimit-reset-requests": "2h9m36s",
+                  "x-ratelimit-limit-tokens": "8000"
+                },
+                "duration_ms": 899,
+                "prompt_tokens": 1969,
+                "completion_tokens": 358
+              }
+            ]
+          }
+        }
+      ],
+      "http": {
+        "requests": 6,
+        "by_status": {
+          "200": 5,
+          "400": 1
+        },
+        "by_kind": {
+          "control": 4,
+          "agent_loop": 2
+        }
+      },
+      "error": ""
+    }
+  ]
+}
