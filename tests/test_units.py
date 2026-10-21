@@ -131,3 +131,14 @@ def test_summarize_counts_status_and_kind():
     assert summary["by_status"] == {"200": 1, "429": 1}
     assert summary["by_kind"] == {"control": 1, "agent_loop": 1}
     assert summary["errors"][0]["error"] == "slow down"
+
+
+def test_rule_triage_maps_blocked_known_and_verified():
+    from minionprobe.triage import rule_triage
+
+    base = {"provider": "groq", "title": "t", "checks": [], "error": "", "known_issues": []}
+    assert rule_triage(base | {"probe": "tools.decorated_tool", "status": "BLOCKED"}).category == "provider_limitation"
+    known = rule_triage(base | {"probe": "delegation.handoff", "status": "FAIL", "known_issues": ["#284"]})
+    assert known.category == "known_issue" and known.known_ref == "#284"
+    verified = rule_triage(base | {"probe": "sessions.followup_not_replayed", "status": "FAIL"})
+    assert verified.category == "openminion_bug" and "02-followup" in verified.rationale

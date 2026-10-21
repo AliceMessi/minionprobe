@@ -41,6 +41,15 @@ VERIFIED_DRAFTS = {
     "diagnostics.rate_limit_after_tool": "issue-drafts/04-429-after-tool-returned-as-completed-text.md",
     "tasks.cron_schedules": "issue-drafts/05-cron-unknown-timezone-on-windows-tzdata.md",
     "tools.decorated_tool": "issue-drafts/06-closure-judge-overwrites-grounded-tool-answer.md",
+    "skills.ingested_skill_applied": "issue-drafts/07-skill-ingest-ignores-skill-id.md",
+}
+
+# Findings that are real but deliberately not drafted as issues (see reports/WHAT_WE_LEARNED.md).
+RULE_HINTS = {
+    "diagnostics.run_stats": ("openminion_bug", "stats.llm_calls counts loop steps, not provider calls; product feedback, not drafted"),
+    "delegation.handoff": ("model_behavior", "peer answered on the wire but the final text was re-synthesized (same mechanism as draft 06); needs more runs"),
+    "memory.cross_session_recall": ("model_behavior", "capture succeeded, recall failed; may need memory_dynamic_retrieval_enabled; needs investigation"),
+    "agent_execution.structured_output": ("model_behavior", "the model's JSON did not validate against output_type"),
 }
 
 Category = Literal["known_issue", "openminion_bug", "model_behavior", "provider_limitation", "probe_bug"]
@@ -91,6 +100,9 @@ def rule_triage(result: dict[str, Any]) -> TriageItem:
         return TriageItem(key=key, category="known_issue", known_ref=ref, confidence=0.8, rationale=f"matches upstream {ref}")
     if result["probe"] in VERIFIED_DRAFTS:
         return TriageItem(key=key, category="openminion_bug", confidence=0.7, rationale=f"matches verified draft {VERIFIED_DRAFTS[result['probe']]}")
+    if result["probe"] in RULE_HINTS:
+        category, why = RULE_HINTS[result["probe"]]
+        return TriageItem(key=key, category=category, confidence=0.5, rationale=why)
     return TriageItem(key=key, category="model_behavior", confidence=0.4, rationale="no runtime-level signal; needs human review")
 
 
@@ -102,6 +114,7 @@ Keep it under 350 words. Start with a one-line title prefixed by "TITLE: "."""
 
 
 def triage(results_path: Path, *, provider: str = "gemini", max_drafts: int = 3, offline: bool = False) -> Path:
+    results_path = results_path.resolve()
     payload = json.loads(results_path.read_text(encoding="utf-8"))
     failures = _failures(payload)
     by_key = {_key(r): r for r in failures}
@@ -132,7 +145,7 @@ def triage(results_path: Path, *, provider: str = "gemini", max_drafts: int = 3,
         agent = model_items.get(key)
         agent_cell = f"{agent.category}{' ' + agent.known_ref if agent and agent.known_ref else ''} ({agent.confidence:.1f})" if agent else "-"
         lines.append(
-            f"| `{key}` | {rule.category}{' ' + rule.known_ref if rule.known_ref else ''} | {agent_cell} | {redact(agent.rationale)[:200] if agent else ''} |"
+            f"| `{key}` | {rule.category}{' ' + rule.known_ref if rule.known_ref else ''}: {rule.rationale[:110]} | {agent_cell} | {redact(agent.rationale)[:200] if agent else ''} |"
         )
     if drafted:
         lines += ["", "## Agent-drafted issues (unreviewed)", ""] + [f"- `{p}`" for p in drafted]
@@ -200,19 +213,26 @@ def _model_triage(
             forced_tools=["list_failures"],
             output_type=TriageReport,
         )
-        try:
-            # one fresh session per run: follow-up runs on a session replay (issue-drafts/02)
-            result = triager.run(
-                "Triage every MinionProbe failure. Return the TriageReport JSON only.",
-                session_id=f"triage-{uuid.uuid4().hex[:8]}",
-                timeout_seconds=240,
-            )
-            items = {i.key: i for i in result.output.items if i.key in by_key}
-            notes.append(f"triage agent classified {len(items)}/{len(by_key)} failures; stats={result.stats}")
-        except AgentOutputValidationError as exc:
-            notes.append(f"triage output did not validate (AgentOutputValidationError): {redact(exc.raw_text[:200])!r}")
-        except ProviderError as exc:
-            notes.append(f"triage agent provider error {exc.code}: {redact(exc.message[:200])}")
+        schema = json.dumps(TriageReport.model_json_schema())
+        prompt = (
+            "Triage every MinionProbe failure using your tools. Then reply with ONLY one JSON object "
+            f"that validates against this JSON schema (no prose, no markdown fences):\n{schema}\n"
+            'Example: {"items": [{"key": "gemini/tools.decorated_tool", "category": "openminion_bug", '
+            '"known_ref": null, "confidence": 0.7, "rationale": "..."}]}'
+        )
+        for attempt in (1, 2):
+            try:
+                # a fresh session per run: follow-up runs on one session replay (issue-drafts/02)
+                result = triager.run(prompt, session_id=f"triage-{uuid.uuid4().hex[:8]}", timeout_seconds=240)
+                items = {i.key: i for i in result.output.items if i.key in by_key}
+                notes.append(f"attempt {attempt}: triage agent classified {len(items)}/{len(by_key)} failures; stats={result.stats}")
+                break
+            except AgentOutputValidationError as exc:
+                notes.append(f"attempt {attempt}: output did not validate (AgentOutputValidationError): {redact(exc.raw_text[:160])!r}")
+                prompt += f"\nYour previous reply did not validate: {str(exc)[:300]}. Use exactly the keys of the schema."
+            except ProviderError as exc:
+                notes.append(f"attempt {attempt}: provider error {exc.code}: {redact(exc.message[:200])}")
+                break
 
         candidates = [k for k, i in items.items() if i.category == "openminion_bug" and not i.known_ref][:max_drafts]
         writer = subagent(triager, name="issue-writer", instructions=ISSUE_WRITER, timeout_seconds=180)
