@@ -1,0 +1,407 @@
+{
+  "openminion_version": "0.1.9",
+  "provider": "gemini",
+  "model": "gemini-3.1-flash-lite",
+  "tool_executions": [
+    "A-104"
+  ],
+  "result_text": "",
+  "result_meta": {},
+  "error": "TurnTimeoutError: Turn execution timed out after 90.00 seconds.",
+  "agent_loop_answers": [],
+  "agent_loop_answer_contains_code": false,
+  "result_text_contains_code": false,
+  "judge_call_count": 0,
+  "judge_context_lines": [],
+  "judge_action_summary_contains_code": false,
+  "judge_action_outputs_line_present": false,
+  "judge_action_outputs_contains_code": false,
+  "wire": [
+    {
+      "seq": 0,
+      "host": "generativelanguage.googleapis.com",
+      "path": "/v1beta/openai/chat/completions",
+      "status": 200,
+      "duration_ms": 19844,
+      "request_body": {
+        "model": "gemini-3.1-flash-lite",
+        "messages": [
+          {
+            "role": "system",
+            "content": "[SYSTEM SAFETY]\nFollow safety policies. Refuse unsafe or disallowed operations.\n\n[IDENTITY]\nUse lookup_order, then answer in one sentence that quotes the pickup code.\n\n## Runtime Grounding\nfacts:\n- cwd: <ISOLATED_TMP_HOME>\n- workspace_root: <ISOLATED_TMP_HOME>\n- enabled_tools: agent.get, agent.list, browser, code.grep, code.patch, code.repo_index, code.repo_map, code.symbol_find, exec.clear, exec.kill, exec.list, exec.paste, exec.poll, exec.run, exec.send_keys, exec.submit, file.edit, file.find, file.list_dir, file.read, file.read_range, file.search, file.trash, file.write, git.add, git.blame, git.branch, git.checkout, git.commit, git.diff, git.fetch, git.log, git.reflog, git.reset, git.show, git.stash, git.status, github.commit_files, github.fetch_checks, github.fetch_comments, github.fetch_diff, github.fetch_pr, github.list_prs, github.open_pr, github.post_pr_comment, github.po\n...[truncated]\n\nYou are the agent described above. Apply this persona to all responses — voice, tone, and name — unconditionally. Do not describe yourself using information outside this profile.\n\n[TOOL RESULT FORMAT]\nWhen presenting tool results, apply your identity tone and style.\nSurface only what the user needs. Never expose raw JSON, provider metadata,\nsource URLs, or license information in your response. Specific guidance:\n- weather: temperature, condition, and location only\n- time: time and timezone in one sentence\n- web.search: brief summary, cite the source\n- file/exec: confirm the action or surface the output directly\n- Default: respond naturally in your established voice\n\n[TASK HEADER]\npurpose: reflect\nquery: Check order A-104\ncurrent_datetime: 2026-10-21T15:47:40.330348+02:00\nstyle_overrides: {\"auto_fact_extraction_contract\": \"Extract at most 5 candidate facts, user preferences, or tasks from the user's message. Return UserMessageCandidateReport with an `items` list; do NOT emit `session_id` or `agent_id`; those are runtime-owned transport fields and will be injected after your response. Only extract things the user explicitly stated or requested do not infer or paraphrase. For each item, provide a bounded normalized_key of the form '<kind>:<slug>' where kind is one of: fact, user_preference, task. Example keys: 'fact:user_name', 'user_preference:response_style', 'task:deploy_auth_service'. Keep title under 200 chars and content under 600 chars. If nothing worth extracting, return an empty items list.\"}\n\nActive state: {\"state_ref\":null,\"task_id\":null,\"task_description\":null,\"status\":\"active\",\"last_result\":null,\"open_questions\":[],\"declared_sub_intents\":[],\"intent_execution_states\":[],\"plan_progress\":null,\"metadata\":{\"active_goal_id\":null,\"active_mode_name\":null,\"active_skill_id\":null,\"active_skill_ids\":[],\"active_skill_version_hash\":null,\"active_workflow_kind\":null,\"active_workflow_name\":null,\"adaptive_satisfied_intent_ids\":[],\"agent_id\":\"gemini\",\"awaiting_continuation_reply\":false,\"budgets_remaining\":{\"a2a_calls\":2,\"ticks\":100,\"time_ms\":300000,\"tokens\":100000,\"tool_calls\":100},\"capture_event_id\":\"turn.outcome:c158c8fd242ca2086599103a3e4cd2dbeee8c5293fd594be8b09d61c1abc02cf\",\"capture_id\":\"capture:c158c8fd242ca2086599103a3e4cd2dbeee8c5293fd594be8b09d61c1abc02cf\",\"child_task_order\":[],\"child_tasks\":{},\"clarify_resume_cursor\":null,\"consecutive_step_failures\":0,\"constraints\":[],\"continuation_guard_command_signature\":null,\"continuation_guard_reason\":\"\",\"decision_capability_category\":null,\"decision_context_pack_version\":null,\"decision_context_recorded_at\":null,\"decision_feasibility_report\":null,\"decision_feasibility_state\":{},\"decision_memory_refs\":[],\"decision_rationale\":\"\",\"decision_reason_code\":\"\",\"decision_success_criteria\":{},\"delegation_goal\":\"\",\"delegation_job_id\":null,\"delegation_synthesize_result\":false,\"delegation_target_agent_id\":null,\"delegation_task_id\":null,\"freshness_contract\":null,\"freshness_diagnostics\":null,\"freshness_obligations\":null,\"gateway_system_context\":\"\",\"goal\":null,\"idempotency_cache\":{},\"last_adaptive_revision_checkpoint\":null,\"last_checkpoint_cursor\":-1,\"last_command_id\":null,\"last_progress_checkpoint\":null,\"last_step_risk_assessment\":null,\"last_user_input\":\"\",\"llm_calls_max\":32,\"llm_calls_used\":0,\"local_confirmation_command_ids\":[],\"memory_candidates\":[],\"memory_capture_report\":{\"items\":[]},\"memory_capture_report_root_turn_id\":\"b850fd7f4ea34402a29d8b23fffd1551\",\"meta_logs\":[],\"meta_state\":\"NORMAL\",\"mission\":null,\"mode\":\"guided\",\"module_state\":{},\"pending_\n\n[CONSTRAINTS & POLICY]\nRespond directly and stay within requested purpose.\nDo not invent unavailable facts; cite uncertainty when needed.\n\n[BUDGET TELEMETRY]\n{\n  \"budget_envelope_status\": \"comfortable\",\n  \"iteration_max\": 100,\n  \"iteration_remaining\": 100,\n  \"iteration_used\": 0,\n  \"tool_calls_max\": 100,\n  \"tool_calls_remaining\": 100,\n  \"tool_calls_used\": 0\n}"
+          },
+          {
+            "role": "system",
+            "content": "Tool-calling contract:\n1. If a tool is required, return a valid JSON object in this exact shape:\n{\"tool_calls\":[{\"name\":\"<tool_name>\",\"arguments\":{}}]}\n2. Do not invent tool names. Use only the tools listed below.\n3. You MUST call `submit_output`. Plain text responses are not valid.\nAvailable tools:\n- submit_output: Submit the structured output"
+          },
+          {
+            "role": "user",
+            "content": "Check order A-104"
+          }
+        ],
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "submit_output",
+              "description": "Submit the structured output",
+              "parameters": {
+                "$defs": {
+                  "UserMessageCandidateItem": {
+                    "additionalProperties": false,
+                    "description": "A typed fact, preference, or task candidate extracted from a user message.",
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "fact",
+                          "user_preference",
+                          "task"
+                        ],
+                        "title": "Kind",
+                        "type": "string"
+                      },
+                      "normalized_key": {
+                        "description": "Deterministic identity key for same-key reinforcement, e.g. 'fact:user_name', 'user_preference:response_style', 'task:deploy_auth_service'. Validated against the bounded category set by runtime.",
+                        "maxLength": 128,
+                        "minLength": 1,
+                        "title": "Normalized Key",
+                        "type": "string"
+                      },
+                      "title": {
+                        "maxLength": 200,
+                        "minLength": 1,
+                        "title": "Title",
+                        "type": "string"
+                      },
+                      "content": {
+                        "maxLength": 600,
+                        "minLength": 1,
+                        "title": "Content",
+                        "type": "string"
+                      },
+                      "tags": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "title": "Tags",
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "normalized_key",
+                      "title",
+                      "content"
+                    ],
+                    "title": "UserMessageCandidateItem",
+                    "type": "object"
+                  }
+                },
+                "additionalProperties": false,
+                "description": "Bounded schema for AFE extraction output.",
+                "properties": {
+                  "session_id": {
+                    "type": "string",
+                    "title": "Session Id"
+                  },
+                  "agent_id": {
+                    "type": "string",
+                    "title": "Agent Id"
+                  },
+                  "items": {
+                    "items": {
+                      "$ref": "#/$defs/UserMessageCandidateItem"
+                    },
+                    "title": "Items",
+                    "type": "array"
+                  }
+                },
+                "title": "UserMessageCandidateReport",
+                "type": "object"
+              }
+            }
+          }
+        ],
+        "tool_choice": {
+          "type": "function",
+          "function": {
+            "name": "submit_output"
+          }
+        }
+      },
+      "response_body": {
+        "choices": [
+          {
+            "finish_reason": "tool_calls",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "tool_calls": [
+                {
+                  "extra_content": {
+                    "google": {
+                      "thought_signature": "EnMKcQFpFH0TUJEsICb5O34CDvc2Ypozvqqnuf1rctPMvUk09+Cp3ztNwzQSGWSbV2dW0ZzApJDrh8HO3z8Nwis0dSdOKqQ91PrQDUF9VsDMrtH1rBCNTafPM4ZwybiOjVwFQ00K3wWBwnqR/pMJsFe0Gn+H"
+                    }
+                  },
+                  "function": {
+                    "arguments": "{\"items\":[{\"normalized_key\":\"task:check_order_status_a104\",\"content\":\"The user is requesting information about the status of order A-104.\",\"title\":\"Check order A-104 status\",\"kind\":\"task\",\"tags\":[\"order_tracking\"]}]}",
+                    "name": "submit_output"
+                  },
+                  "id": "call_1398997",
+                  "type": "function"
+                }
+              ]
+            }
+          }
+        ],
+        "created": 1792590479,
+        "id": "fMLYau7kGan6vdIPm-K08As",
+        "model": "gemini-3.1-flash-lite",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 80,
+          "prompt_tokens": 442,
+          "total_tokens": 522
+        }
+      },
+      "kind": "control_reflect"
+    },
+    {
+      "seq": 1,
+      "host": "generativelanguage.googleapis.com",
+      "path": "/v1beta/openai/chat/completions",
+      "status": 200,
+      "duration_ms": 47246,
+      "request_body": {
+        "model": "gemini-3.1-flash-lite",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Tool-calling contract:\n1. If a tool is required, return a valid JSON object in this exact shape:\n{\"tool_calls\":[{\"name\":\"<tool_name>\",\"arguments\":{}}]}\n2. Do not invent tool names. Use only the tools listed below.\n3. If no tool is required, return a normal assistant text response.\nAvailable tools:\n- lookup_order: Return the current status and pickup code for one order."
+          },
+          {
+            "role": "system",
+            "content": "[SYSTEM SAFETY]\nFollow safety policies. Refuse unsafe or disallowed operations.\n\n[IDENTITY]\nUse lookup_order, then answer in one sentence that quotes the pickup code.\n\n## Runtime Grounding\nfacts:\n- cwd: <ISOLATED_TMP_HOME>\n- workspace_root: <ISOLATED_TMP_HOME>\n- enabled_tools: agent.get, agent.list, browser, code.grep, code.patch, code.repo_index, code.repo_map, code.symbol_find, exec.clear, exec.kill, exec.list, exec.paste, exec.poll, exec.run, exec.send_keys, exec.submit, file.edit, file.find, file.list_dir, file.read, file.read_range, file.search, file.trash, file.write, git.add, git.blame, git.branch, git.checkout, git.commit, git.diff, git\n...[truncated]\n\nYou are the agent described above. Apply this persona to all responses — voice, tone, and name — unconditionally. Do not describe yourself using information outside this profile.\n\n[TOOL SCHEMAS]\n- lookup_order: {\"agent_visibility\":\"local\",\"capability_tags\":[],\"description\":\"Return the current status and pickup code for one order.\",\"feasibility_descriptors\":[],\"metadata_complete\":false,\"metadata_warnings\":[\"missing_capability_tags\",\"missing_feasibility_descriptors\"],\"parameters\":{\"additionalProperties\":false,\"properties\":{\"order_id\":{\"type\":\"string\"}},\"required\":[\"order_id\"],\"type\":\"object\"}}\n\n[TOOL RESULT FORMAT]\nWhen presenting tool results, apply your identity tone and style.\nSurface only what the user needs. Never expose raw JSON, provider metadata,\nsource URLs, or license information in your response. Specific guidance:\n- weather: temperature, condition, and location only\n- time: time and timezone in one sentence\n- web.search: brief summary, cite the source\n- file/exec: confirm the action or surface the output directly\n- Default: respond naturally in your established voice\n\n[TASK HEADER]\npurpose: decide\nquery: Check order A-104\ncurrent_datetime: 2026-10-21T15:48:00.954815+02:00\nstyle_overrides: {\"entry_clarify_rule\": \"Use the clarify tool only when a required detail blocks meaningful progress and no available tool or documented default can resolve it. Do not clarify for optional tool arguments or information an available tool can discover. Do not ask blocking clarifying questions in plain text when clarify(question=...) is available.\", \"entry_coding_profile_rule\": \"For a single software task that needs iterative file edits, project scaffolding, tests, command execution, and final verification before answering, call the entry coding control tool instead of doing the whole workflow as direct one-shot file/tool calls.\", \"entry_no_routing_metadata_rule\": \"Do not emit submit_output, mode labels, act_profile, execution_target, reason_code, confidence, or other decide metadata. Runtime owns routing defaults and workflow state.\", \"entry_response_rule\": \"This is the unified entry call. Return one visible entry control or execution tool call. Default to the current foreground loop, even for multi-step research, calculations, code, file output, and verification. Do not treat complexity, step count, mixed tools, or the ordinary word project as a reason to create a durable project. Use project_handoff only when the user explicitly requests durable or background work, or the work must persist across execution cycles or process restarts. In that case, first call coding or research with project_handoff, sub_intents, and an executable verifier such as `test -f report.md`, not a prose criterion. Do not call plan, tool.request, or an execution tool in that entry response or before approval. An explicit typed or durable project handoff request needs no repository inspection before this proposal. Otherwise start the work directly. Use respond(answer=..., freshness=...) for a direct answer; include freshness in every entry control call.\", \"entry_skill_binding_rule\": \"When multiple active skills are visible and a plan step or command should use one, set skill_id to an exact active skill id. Do not invent skill ids or encode skill choice in prose only.\", \"entry_text_answer_rule\": \"If no execution tool is needed and no blocking detail is missing, call respond with the complete answer and typed freshness assessment.\", \"entry_tool_rule\": \"If execution is already authorized and a visible tool can help, call the tool directly in this response instead of describing it.\"}\n\nActive state: {\"state_ref\":null,\"task_id\":null,\"task_description\":null,\"status\":\"active\",\"last_result\":null,\"open_questions\":[],\"declared_sub_intents\":[],\"intent_execution_states\":[],\"plan_progress\":null,\"metadata\":{\"active_goal_id\":null,\"active_mode_name\":null,\"active_skill_id\":null,\"active_skill_ids\":[],\"active_skill_version_hash\":null,\"active_workflow_kind\":null,\"active_workflow_name\":null,\"adaptive_satisfied_intent_ids\":[],\"agent_id\":\"gemini\",\"awaiting_continuation_reply\":false,\"budgets_remaining\":{\"a2a_calls\":2,\"ticks\":100,\"time_ms\":300000,\"tokens\":100000,\"tool_calls\":100},\"capture_event_id\":\"turn.outcome:c158c8fd242ca2086599103a3e4cd2dbeee8c5293fd594be8b09d61c1abc02cf\",\"capture_id\":\"capture:c158c8fd242ca2086599103a3e4cd2dbeee8c5293fd594be8b09d61c1abc02cf\",\"child_task_order\":[],\"child_tasks\":{},\"clarify_resume_cursor\":null,\"consecutive_step_failures\":0,\"constraints\":[],\"continuation_guard_command_signature\":null,\"continuation_guard_reason\":\"\",\"decision_capability_category\":null,\"decision_context_pack_version\":null,\"decision_context_recorded_at\":null,\"decision_feasibility_report\":null,\"decision_feasibility_state\":{},\"decision_memory_refs\":[],\"decision_rationale\":\"\",\"decision_reason_code\":\"\",\"decision_success_criteria\":{},\"delegation_goal\":\"\",\"delegation_job_id\":null,\"delegation_synthesize_result\":false,\"delegation_target_agent_id\":null,\"delegation_task_id\":null,\"freshness_contract\":null,\"freshness_diagnostics\":null,\"freshness_obligations\":null,\"gateway_system_context\":\"\",\"goal\":null,\"idempotency_cache\":{},\"last_adaptive_revision_checkpoint\":null,\"last_checkpoint_cursor\":-1,\"last_command_id\":null,\"last_progress_checkpoint\":null,\"last_step_risk_assessment\":null,\"last_user_input\":\"\",\"llm_calls_max\":32,\"llm_calls_used\":0,\"local_confirmation_command_ids\":[],\"memory_candidates\":[],\"memory_capture_report\":{\"items\":[]},\"memory_capture_report_root_turn_id\":\"b850fd7f4ea34402a29d8b23fffd1551\",\"meta_logs\":[],\"meta_state\":\"NORMAL\",\"mission\":null,\"mode\":\"guided\",\"module_state\":{},\"pending_\n\n[CONSTRAINTS & POLICY]\nRespond directly and stay within requested purpose.\nDo not invent unavailable facts; cite uncertainty when needed.\n\n[BUDGET TELEMETRY]\n{\n  \"budget_envelope_status\": \"comfortable\",\n  \"iteration_max\": 100,\n  \"iteration_remaining\": 98,\n  \"iteration_used\": 2,\n  \"tool_calls_max\": 100,\n  \"tool_calls_remaining\": 100,\n  \"tool_calls_used\": 0\n}"
+          },
+          {
+            "role": "user",
+            "content": "Check order A-104"
+          }
+        ],
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "lookup_order",
+              "description": "Return the current status and pickup code for one order.",
+              "parameters": {
+                "additionalProperties": false,
+                "properties": {
+                  "order_id": {
+                    "title": "Order Id",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "order_id"
+                ],
+                "title": "lookup_orderArgs",
+                "type": "object"
+              }
+            }
+          }
+        ],
+        "tool_choice": "auto"
+      },
+      "response_body": {
+        "choices": [
+          {
+            "finish_reason": "tool_calls",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "tool_calls": [
+                {
+                  "extra_content": {
+                    "google": {
+                      "thought_signature": "EnMKcQFpFH0TcBUMGtxuxJptG5u+eiHCJU86+d3eWsUvNaJYVBB68UCKNN6JJWpL4NN42pVH0dyCmL9AunQH4K2giNkK+O2rwlVyr1y/f8Oy4wEVG0ZfO+iNy1tJKuYVdWxYo1EYNaqQlsbElI9lCLIlS4lz"
+                    }
+                  },
+                  "function": {
+                    "arguments": "{\"order_id\":\"A-104\"}",
+                    "name": "lookup_order"
+                  },
+                  "id": "call_1325379",
+                  "type": "function"
+                }
+              ]
+            }
+          }
+        ],
+        "created": 1792590527,
+        "id": "kMLYar_eI6u9vdIP8NfCwAo",
+        "model": "gemini-3.1-flash-lite",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 22,
+          "prompt_tokens": 1945,
+          "total_tokens": 1967
+        }
+      },
+      "kind": "agent_loop"
+    },
+    {
+      "seq": 2,
+      "host": "generativelanguage.googleapis.com",
+      "path": "/v1beta/openai/chat/completions",
+      "status": 200,
+      "duration_ms": 15431,
+      "request_body": {
+        "model": "gemini-3.1-flash-lite",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are an internal freshness-routing classifier. Decide whether the user request depends on current or rapidly changing facts. Return JSON only with fields: intent, domain, time_sensitive, needs_live_data, needs_sources, needs_exact_date, answer_mode, reason, confidence. Use answer_mode='browse_then_answer' when live evidence is required before answering. Use answer_mode='local_only' when the request can be answered without live verification. Set needs_exact_date=true whenever stale calendar assumptions would materially degrade the answer quality, including requests for latest/current/recent news, market-sensitive research, live stock baskets, or any answer that must be anchored to today's date rather than an assumed month or year."
+          },
+          {
+            "role": "system",
+            "content": "Tool-calling contract:\n1. If a tool is required, return a valid JSON object in this exact shape:\n{\"tool_calls\":[{\"name\":\"<tool_name>\",\"arguments\":{}}]}\n2. Do not invent tool names. Use only the tools listed below.\n3. You MUST call `submit_output`. Plain text responses are not valid.\nAvailable tools:\n- submit_output: Submit the structured output"
+          },
+          {
+            "role": "user",
+            "content": "User message: \"Check order A-104\"\n\nClassify freshness sensitivity semantically. Do not rely on keyword lists. Return a JSON object only."
+          }
+        ],
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "submit_output",
+              "description": "Submit the structured output",
+              "parameters": {
+                "$defs": {
+                  "FreshnessAnswerMode": {
+                    "enum": [
+                      "local_only",
+                      "browse_then_answer"
+                    ],
+                    "title": "FreshnessAnswerMode",
+                    "type": "string"
+                  },
+                  "FreshnessDomain": {
+                    "enum": [
+                      "general",
+                      "finance",
+                      "news",
+                      "weather",
+                      "regulation",
+                      "shopping",
+                      "sports",
+                      "other"
+                    ],
+                    "title": "FreshnessDomain",
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "properties": {
+                  "intent": {
+                    "default": "",
+                    "title": "Intent",
+                    "type": "string"
+                  },
+                  "domain": {
+                    "$ref": "#/$defs/FreshnessDomain",
+                    "default": "general"
+                  },
+                  "time_sensitive": {
+                    "default": false,
+                    "title": "Time Sensitive",
+                    "type": "boolean"
+                  },
+                  "needs_live_data": {
+                    "default": false,
+                    "title": "Needs Live Data",
+                    "type": "boolean"
+                  },
+                  "needs_sources": {
+                    "default": false,
+                    "title": "Needs Sources",
+                    "type": "boolean"
+                  },
+                  "needs_exact_date": {
+                    "default": false,
+                    "title": "Needs Exact Date",
+                    "type": "boolean"
+                  },
+                  "answer_mode": {
+                    "$ref": "#/$defs/FreshnessAnswerMode",
+                    "default": "local_only"
+                  },
+                  "reason": {
+                    "default": "",
+                    "title": "Reason",
+                    "type": "string"
+                  },
+                  "confidence": {
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "type": "number",
+                    "title": "Confidence"
+                  }
+                },
+                "title": "FreshnessContract",
+                "type": "object"
+              }
+            }
+          }
+        ],
+        "tool_choice": {
+          "type": "function",
+          "function": {
+            "name": "submit_output"
+          }
+        }
+      },
+      "response_body": {
+        "choices": [
+          {
+            "finish_reason": "tool_calls",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "tool_calls": [
+                {
+                  "extra_content": {
+                    "google": {
+                      "thought_signature": "EnMKcQFpFH0TSxF6/Lo8HXs058BdmLmShOIvESUxRXpDzFOceJZAy8V26tpdGuuYR7rCnWCotk/o/JyzKzmAWmX4zv7mPHvbwje1aUjCjni6+9KD/sY938AE0Bz5JEuKOsk/qfqZrYjKvRNLtwjpbyxrCCy+"
+                    }
+                  },
+                  "function": {
+                    "arguments": "{\"needs_live_data\":true,\"needs_sources\":true,\"answer_mode\":\"browse_then_answer\",\"needs_exact_date\":false,\"reason\":\"Checking the status of an order is highly time-sensitive as information changes as the order progresses.\",\"confidence\":1,\"time_sensitive\":true,\"domain\":\"general\",\"intent\":\"check_order_status\"}",
+                    "name": "submit_output"
+                  },
+                  "id": "call_1667918",
+                  "type": "function"
+                }
+              ]
+            }
+          }
+        ],
+        "created": 1792590542,
+        "id": "v8LYarTcLbOjxN8PztvEgQg",
+        "model": "gemini-3.1-flash-lite",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 94,
+          "prompt_tokens": 412,
+          "total_tokens": 506
+        }
+      },
+      "kind": "control_other"
+    }
+  ],
+  "started": "2026-10-21T15:46:24+02:00",
+  "run_index": 0,
+  "pickup_code": "ZEBRA-42"
+}
