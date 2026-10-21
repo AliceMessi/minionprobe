@@ -4,6 +4,8 @@
 
 Built for [Cortensor Hackathon #5](https://dorahacks.io/hackathon/2418/detail). MinionProbe is a QA helper for builders who want to know which OpenMinion features work on *their* provider before they build on them.
 
+▶ **Demo video (2:10):** https://youtu.be/5aBN0y6YQeA. It shows an offline run, the matrix, bug #324 reproduced live, the triage agent and the filed issues. Terminal scenes are replays of real captured runs.
+
 > Status: v0.1 (2026-10-21). Tested on Windows 11, Python 3.12, `openminion==0.1.8` (latest PyPI release) and the `dev` branch at `b642697`.
 
 ## What it found (v0.1)
