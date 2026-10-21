@@ -91,16 +91,43 @@ def _prepare_model_home(base: Path, spec: ProviderSpec, codename: str) -> tuple[
     skill_file = home.root / "skills" / "release-codename" / "SKILL.md"
     skill_file.parent.mkdir(parents=True)
     skill_file.write_text(SKILL_TEMPLATE.format(codename=codename), encoding="utf-8")
-    ingest = ingest_skill(home, skill_file)
+    # 1) the documented default: ingest the file as-is
+    default = _json_tail(ingest_skill(home, skill_file).stdout)
+    # 2) the working path we found: explicit --name, then admit as verified
+    named = _json_tail(home.cli("skill", "ingest", "--file", str(skill_file), "--name", "minionprobe.release_codename", "--trust", "trusted_local").stdout)
+    admit = {}
+    if named.get("ok"):
+        admit = _json_tail(
+            home.cli(
+                "skill", "admit", "--skill-id", str(named.get("skill_id")), "--version-hash", str(named.get("version_hash")),
+                "--expected-active-version-hash", "none", "--target-status", "verified", "--reason", "minionprobe probe skill",
+                "--verification-check", "minionprobe", "--verification-result", "passed", "--verification-evidence-ref", "minionprobe",
+            ).stdout
+        )
     listing = home.cli("skill", "list")
     skill_info = {
         "codename": codename,
-        "ingest_ok": ingest.returncode == 0,
-        "ingest_output": (ingest.stdout + ingest.stderr).strip()[-300:],
-        "listed": "release_codename" in listing.stdout or "release-codename" in listing.stdout,
+        "default_ok": bool(default.get("ok")),
+        "default_skill_id": default.get("skill_id"),
+        "default_warnings": default.get("warnings", []),
+        "named_skill_id": named.get("skill_id"),
+        "admit_ok": bool(admit.get("ok")),
+        "admit_error": str(admit.get("error", ""))[:200],
+        "listed": "release_codename" in listing.stdout,
         "list_output": listing.stdout.strip()[-300:],
     }
     return home, skill_info
+
+
+def _json_tail(text: str) -> dict[str, Any]:
+    """CLI commands print one JSON document, possibly after log lines."""
+    text = text.strip()
+    start = 0 if text.startswith("{") else text.find("\n{") + 1
+    try:
+        data = json.loads(text[start:]) if text else {}
+    except ValueError:
+        return {}
+    return data if isinstance(data, dict) else {}
 
 
 def _prepare_local_home(base: Path, fake: FakeProvider) -> ProbeHome:
