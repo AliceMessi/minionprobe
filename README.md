@@ -33,7 +33,7 @@ The maintainers confirmed all seven reports. Every fix PR below was reviewed and
 | [#325](https://github.com/openminion/openminion/issues/325) explicit agent ignored on an existing session | [#336](https://github.com/openminion/openminion/pull/336) |
 | [#326](https://github.com/openminion/openminion/issues/326) post-tool 429 returned as completed text | [#338](https://github.com/openminion/openminion/pull/338) |
 | [#327](https://github.com/openminion/openminion/issues/327) Windows cron without tzdata | [#341](https://github.com/openminion/openminion/pull/341) |
-| [#328](https://github.com/openminion/openminion/issues/328) closure judge vs. grounded answer | [#337](https://github.com/openminion/openminion/pull/337) context fix + [#343](https://github.com/openminion/openminion/pull/343) required verdict fields (evidence: [`openminion-328`](evidence/openminion-328), [`openminion-328b`](evidence/openminion-328b)) |
+| [#328](https://github.com/openminion/openminion/issues/328) closure judge vs. grounded answer | [#337](https://github.com/openminion/openminion/pull/337) context fix + [#343](https://github.com/openminion/openminion/pull/343) required verdict fields (evidence: [`openminion-328`](evidence/openminion-328), [`openminion-328b`](evidence/openminion-328b)). The live Gemini retest on merged `dev` still replaces the grounded answer, so this one is not solved yet: [`openminion-328-live`](evidence/openminion-328-live) |
 | [#329](https://github.com/openminion/openminion/issues/329) skill ingest identity and pending versions | [#339](https://github.com/openminion/openminion/pull/339) |
 
 ## Quick start
