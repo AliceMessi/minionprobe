@@ -1,0 +1,73 @@
+{
+  "note": "Three direct requests to the Gemini OpenAI-compatible /chat/completions endpoint (gemini-3.1-flash-lite, temperature 0) with the same fact in different system-message positions. Request headers were never recorded.",
+  "cases": [
+    {
+      "case": "fact_first_of_two_systems",
+      "status": 200,
+      "request_messages": [
+        {
+          "role": "system",
+          "content": "The pickup code for order A-104 is ZEBRA-777."
+        },
+        {
+          "role": "system",
+          "content": "Answer in one short sentence. If you do not know, say UNKNOWN."
+        },
+        {
+          "role": "user",
+          "content": "What is the pickup code for order A-104?"
+        }
+      ],
+      "answer": "UNKNOWN.",
+      "usage": {
+        "completion_tokens": 2,
+        "prompt_tokens": 31,
+        "total_tokens": 33
+      }
+    },
+    {
+      "case": "fact_last_of_two_systems",
+      "status": 200,
+      "request_messages": [
+        {
+          "role": "system",
+          "content": "Answer in one short sentence. If you do not know, say UNKNOWN."
+        },
+        {
+          "role": "system",
+          "content": "The pickup code for order A-104 is ZEBRA-777."
+        },
+        {
+          "role": "user",
+          "content": "What is the pickup code for order A-104?"
+        }
+      ],
+      "answer": "The pickup code for order A-104 is ZEBRA-777.",
+      "usage": {
+        "completion_tokens": 19,
+        "prompt_tokens": 34,
+        "total_tokens": 53
+      }
+    },
+    {
+      "case": "single_merged_system",
+      "status": 200,
+      "request_messages": [
+        {
+          "role": "system",
+          "content": "The pickup code for order A-104 is ZEBRA-777.\n\nAnswer in one short sentence. If you do not know, say UNKNOWN."
+        },
+        {
+          "role": "user",
+          "content": "What is the pickup code for order A-104?"
+        }
+      ],
+      "answer": "The pickup code for order A-104 is ZEBRA-777.",
+      "usage": {
+        "completion_tokens": 19,
+        "prompt_tokens": 51,
+        "total_tokens": 70
+      }
+    }
+  ]
+}
