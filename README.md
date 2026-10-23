@@ -24,7 +24,7 @@ The matrix and the full notes are in [`reports/BUILDING_BLOCKS_TESTED.md`](repor
 
 ## Fix PRs (bug-fix bonus)
 
-The maintainers confirmed all seven reports, and every fix PR below was reviewed and **merged into `dev`**. Issues stay open until release verification, per the project's policy. Follow-up reports found while fixing (#342, #345, #347, #349) were also confirmed, assigned to us and fixed:
+The maintainers confirmed all seven reports, and every fix PR below was reviewed and **merged**. Follow-up reports found while fixing (#342, #345, #347, #349) were also confirmed, assigned to us and fixed. **OpenMinion 0.1.10 (23 Oct 2026) ships these fixes.** We ran the installed-package release verification ([`openminion-0.1.10-verification`](evidence/openminion-0.1.10-verification)), including a live Gemini retest. On that basis the maintainers closed #328, #342, #345, #347 and #349 as *fixed and verified in 0.1.10*:
 
 | Issue | Fix PR |
 |---|---|
