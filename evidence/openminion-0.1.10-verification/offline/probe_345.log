@@ -1,0 +1,35 @@
+{
+  "probe": "probe_345",
+  "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+  "openminion.__version__": "0.1.10",
+  "python": "3.12.11",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "cwd": "<VERIFY_DIR>\\work\\final\\cwd-345",
+  "imported_from_site_packages": true
+}
+PASS owner: ascending list_events = insertion ids | observed=[1, 2, 3, 4, 5]
+PASS owner: stored created_at returned as written (not reordered)
+PASS owner: descending list_events = reversed insertion ids | observed=[5, 4, 3, 2, 1]
+PASS owner: limit=2 oldest / newest by insertion | observed={'oldest': [1, 2], 'newest': [5, 4]}
+PASS owner: newest event is the high water | observed={'newest': 5, 'high_water': 5}
+PASS owner: list_events_after_id / before_id pages equal list_events asc / desc
+PASS owner: event_type_prefix filter keeps insertion order (asc, newest 1, oldest 2) | observed={'prefix': [6, 8, 9], 'newest1': [9], 'oldest2': [6, 8], 'inserted_run_ids': [6, 8, 9]}
+PASS run status: list_session_run_events lists ids in insertion order | observed=[1, 2, 3]
+PASS run status: states queued, running, failed | observed=['queued', 'running', 'failed']
+PASS run status: limit=1 returns the failed event | observed=['turn.failed']
+PASS run status: list_session_runs reads failed / turn.failed | observed=('failed', 'turn.failed')
+PASS run status: started_at / ended_at keep stored timestamps (ended_at < started_at) | observed=('2026-10-21T17:16:59.564721+00:00', '2026-10-21T17:16:58.715677+00:00')
+PASS invocation lookup: latest run is run-2 (running, awaiting) | observed=('run-2', 'running', 'awaiting_response')
+PASS invocation lookup: invocation is the second one, from its run.queued event | observed=('invocation-run-2', 3)
+PASS invocation lookup: latest_event_id / updated_at = last inserted event | observed=(4, '2026-10-21T17:16:59.200000+00:00')
+PASS context slice: last_event_id = last inserted event = high water | observed=('2', 2)
+PASS context slice: recent tool events in insertion order | observed=['web.search', 'web.fetch']
+PASS SDK echo turn (reversed clock): result run_state completed | observed='completed'
+PASS SDK echo turn (reversed clock): run reads completed | observed=[('completed', 'turn.completed')]
+PASS SDK echo turn (reversed clock): run events listed by ascending id, first queued, last completed | observed=[(2, 'queued', 'turn.accepted'), (8, 'running', 'agent.generate'), (11, 'responding', 'channel.send'), (14, 'completed', 'turn.completed')]
+PASS SDK echo turn (reversed clock): stored created_at strictly descending (clock really stepped back) | observed=['2026-10-23T07:41:00.633988+00:00', '2026-10-23T07:41:00.627988+00:00', '2026-10-23T07:41:00.622988+00:00', '2026-10-23T07:41:00.619988+00:00']
+PASS SDK provider-401 turn (reversed clock): turn failed | observed={'run_state': '', 'error': 'ProviderError'}
+PASS SDK provider-401 turn (reversed clock): run reads failed / turn.failed | observed=[('failed', 'turn.failed')]
+PASS SDK provider-401 turn (reversed clock): events queued/turn.accepted, running/agent.generate, failed/turn.failed | observed=[('queued', 'turn.accepted'), ('running', 'agent.generate'), ('failed', 'turn.failed')]
+PASS SDK provider-401 turn (reversed clock): stored created_at descending | observed=['2026-10-23T07:41:07.718179+00:00', '2026-10-23T07:41:07.712179+00:00', '2026-10-23T07:41:07.709179+00:00']
+ALL PASS

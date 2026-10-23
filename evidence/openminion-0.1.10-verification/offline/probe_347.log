@@ -1,0 +1,35 @@
+{
+  "probe": "probe_347",
+  "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+  "openminion.__version__": "0.1.10",
+  "python": "3.12.11",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "cwd": "<VERIFY_DIR>\\work\\final\\cwd-347",
+  "imported_from_site_packages": true
+}
+PASS A1 Google endpoint identity -> gemini_openai_compat profile, only collapse_system_messages differs from default | observed={'identity': {'transport_adapter': 'openai_chat', 'wire_protocol_family': 'openai_chat_completions', 'service_vendor': 'gemini', 'model_family': 'gemini'}, 'profile_id': 'gemini_openai_compat'}
+PASS A1 gemini model behind gateway -> openai_default (unchanged) | observed='openai_default'
+PASS A1 lookalike host -> openai_default (unchanged) | observed='openai_default'
+PASS A1 openrouter gemini model -> openai_default (unchanged) | observed='openai_default'
+PASS A1 no identity -> openai_default (unchanged) | observed='openai_default'
+PASS A2 gemini-preset: POST to generativelanguage.googleapis.com, profile gemini_openai_compat | observed=('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', 'gemini_openai_compat')
+PASS A2 gemini-preset: ONE system message = gateway's system messages joined in order, user turn and all other fields unchanged | observed=['system', 'user']
+PASS A2 gemini-custom-name: POST to generativelanguage.googleapis.com, profile gemini_openai_compat | observed=('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', 'gemini_openai_compat')
+PASS A2 gemini-custom-name: ONE system message = gateway's system messages joined in order, user turn and all other fields unchanged | observed=['system', 'user']
+PASS A2 gemini-identity-from-base-url: POST to generativelanguage.googleapis.com, profile gemini_openai_compat | observed=('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', 'gemini_openai_compat')
+PASS A2 gemini-identity-from-base-url: ONE system message = gateway's system messages joined in order, user turn and all other fields unchanged | observed=['system', 'user']
+PASS A2 gemini-model-behind-gateway: keeps profile openai_default and roles ['system', 'system', 'user'] | observed={'profile': 'openai_default', 'roles': ['system', 'system', 'user']}
+PASS A2 openai: keeps profile openai_default and roles ['system', 'system', 'user'] | observed={'profile': 'openai_default', 'roles': ['system', 'system', 'user']}
+PASS A2 minimax: keeps profile minimax_openai_compat and roles ['system', 'user'] | observed={'profile': 'minimax_openai_compat', 'roles': ['system', 'user']}
+PASS A2 cortensor-portal: keeps profile cortensor_portal and roles ['system', 'system', 'user'] | observed={'profile': 'cortensor_portal', 'roles': ['system', 'system', 'user']}
+PASS A3 gateway complete keeps several system messages (contract, agent prompt, later note) | observed=['system', 'system', 'user', 'assistant', 'tool', 'system']
+PASS A3 Gemini complete: one leading system message (gateway's systems joined in order), user/assistant tool_calls/tool unchanged, tools/tool_choice unchanged | observed=['system', 'user', 'assistant', 'tool']
+PASS A3 Gemini stream: one leading system message, turns unchanged, other stream fields equal the gateway's | observed=['system', 'user', 'assistant', 'tool']
+PASS B gemini preset SDK turn: requests go to the Google host, tool ran, turn completed | observed={'hosts': ['generativelanguage.googleapis.com'], 'tool': ['A-104'], 'error': ''}
+PASS B gemini preset SDK turn: EVERY request has exactly one system message, first | observed=[['system', 'user'], ['system', 'user'], ['system', 'user'], ['system', 'user', 'assistant', 'tool', 'user'], ['system', 'user', 'assistant', 'tool', 'user'], ['system', 'user'], ['system', 'user'], ['system', 'user']]
+PASS B gemini preset SDK turn: the closure judge's single system message holds [JUDGE CONTEXT] with the tool output ahead of the Tool-calling contract | observed={'judge_calls': 2, 'system_messages_in_judge': 1}
+PASS B gemini-model-behind-gateway SDK turn: control/judge calls keep [system, system, user] | observed={'roles': [['system', 'system', 'user'], ['system', 'system', 'user'], ['system', 'system', 'user'], ['system', 'system', 'user', 'assistant', 'tool', 'user'], ['system', 'system', 'user', 'assistant', 'tool', 'user'], ['system', 'system', 'user'], ['system', 'system', 'user'], ['system', 'system', 'user']], 'error': ''}
+PASS B openai SDK turn: control/judge calls keep [system, system, user] | observed={'roles': [['system', 'system', 'user'], ['system', 'system', 'user'], ['system', 'system', 'user'], ['system', 'system', 'user', 'assistant', 'tool', 'user'], ['system', 'system', 'user', 'assistant', 'tool', 'user'], ['system', 'system', 'user'], ['system', 'system', 'user'], ['system', 'system', 'user']], 'error': ''}
+PASS B minimax SDK turn: keeps its own single-system-message shape (minimax_openai_compat) | observed={'roles': [['system', 'user'], ['system', 'user'], ['system', 'user'], ['system', 'user', 'assistant', 'tool', 'user'], ['system', 'user', 'assistant', 'tool', 'user'], ['system', 'user'], ['system', 'user'], ['system', 'user']], 'error': ''}
+PASS no outbound network connection was attempted past the mock | observed=[]
+ALL PASS

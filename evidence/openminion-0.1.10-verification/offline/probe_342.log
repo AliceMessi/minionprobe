@@ -1,0 +1,25 @@
+{
+  "probe": "probe_342",
+  "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+  "openminion.__version__": "0.1.10",
+  "python": "3.12.11",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "cwd": "<VERIFY_DIR>\\work\\final\\cwd-342",
+  "imported_from_site_packages": true
+}
+PASS runtime a: echo turn completed | observed='completed'
+PASS runtime a: unrelated cwd/home alias 'shared-note' not visible before writing | observed='None'
+PASS runtime a: reads back only its own artifact under the shared alias | observed='ROOT_a_ARTIFACT'
+PASS runtime b: echo turn completed | observed='completed'
+PASS runtime b: unrelated cwd/home alias 'shared-note' not visible before writing | observed='None'
+PASS runtime b: reads back only its own artifact under the shared alias | observed='ROOT_b_ARTIFACT'
+PASS runtime a: lists its own artifact, not the other runtime's nor the unrelated stores' | observed={'own': True, 'other': False, 'unrelated': []}
+PASS runtime b: lists its own artifact, not the other runtime's nor the unrelated stores' | observed={'own': True, 'other': False, 'unrelated': []}
+PASS every ArtifactCtl opened by the runtimes uses an index under its own data root | observed=['<VERIFY_DIR>\\work\\final\\w342\\root-a\\.openminion\\artifact\\index.db', '<VERIFY_DIR>\\work\\final\\w342\\root-b\\.openminion\\artifact\\index.db']
+PASS runtime a: all construction sites during the turn open <root>/.openminion/artifact/index.db (3 instances) | observed=['modules/brain/adapters/factory/artifactctl.py::resolve_artifactctl', 'services/runtime/bootstrap.py::build_brain_runner_bundle', 'services/runtime/memory.py::_runtime_artifactctl']
+PASS runtime a: index exists at <root>/.openminion/artifact/index.db
+PASS runtime b: all construction sites during the turn open <root>/.openminion/artifact/index.db (3 instances) | observed=['modules/brain/adapters/factory/artifactctl.py::resolve_artifactctl', 'services/runtime/bootstrap.py::build_brain_runner_bundle', 'services/runtime/memory.py::_runtime_artifactctl']
+PASS runtime b: index exists at <root>/.openminion/artifact/index.db
+PASS unrelated home store byte-for-byte unchanged, nothing new written under home | observed=['.openminion/artifact/artifacts/sha256/b3/b33a1a9cdd1d79485cbfbb874f45c954a1e3b42e7fc704248422f86cafa789d3', '.openminion/artifact/artifacts/sha256/b3/b33a1a9cdd1d79485cbfbb874f45c954a1e3b42e7fc704248422f86cafa789d3.meta.json', '.openminion/artifact/artifacts/sha256/d7/d7e5dba77f08b570d3b9b2ab33f98d7b006c9188f4c82c6b3ec9d04c0bad8abd', '.openminion/artifact/artifacts/sha256/d7/d7e5dba77f08b570d3b9b2ab33f98d7b006c9188f4c82c6b3ec9d04c0bad8abd.meta.json', '.openminion/artifact/index.db']
+PASS process cwd store byte-for-byte unchanged, nothing new written under cwd | observed=['.openminion/artifact/artifacts/sha256/17/17e0d4470df8e69f8772136a5f75e624312a25303be040fc84033b1f42394b75', '.openminion/artifact/artifacts/sha256/17/17e0d4470df8e69f8772136a5f75e624312a25303be040fc84033b1f42394b75.meta.json', '.openminion/artifact/artifacts/sha256/e7/e7fb24a2732d2e1f17a8c69052787ee01886b9c030ec9cd9c47b1d42ddee49b3', '.openminion/artifact/artifacts/sha256/e7/e7fb24a2732d2e1f17a8c69052787ee01886b9c030ec9cd9c47b1d42ddee49b3.meta.json', '.openminion/artifact/index.db']
+ALL PASS

@@ -1,0 +1,220 @@
+{
+  "probe": "probe_349",
+  "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+  "openminion.__version__": "0.1.10",
+  "python": "3.12.11",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "cwd": "<VERIFY_DIR>\\work\\final\\cwd-349",
+  "imported_from_site_packages": true,
+  "observed": {
+    "A_sdk": {
+      "run_state": "completed",
+      "artifactctl_instances": 3,
+      "memory_assembly_instance_index": 0,
+      "close_counts_after_two_runtime_close": [
+        1,
+        1,
+        1
+      ],
+      "close_counts_after_third_runtime_close": [
+        1,
+        1,
+        1
+      ],
+      "ingest_bytes_on_memory_controller_after_shutdown": "ProgrammingError: Cannot operate on a closed database."
+    },
+    "B_factory": {
+      "recorded_is_factory_result": true,
+      "first": "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+      "second_is_first": true,
+      "close_count": 1
+    },
+    "C_default": {
+      "recorded": "ArtifactCtl",
+      "created_during_build": 1,
+      "first": "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+      "second_is_first": true,
+      "close_count": 1
+    },
+    "D_scheduler_factory": {
+      "blocked": "RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')",
+      "blocked_again": "RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')",
+      "controller_closes_while_blocked": 0,
+      "service_closes_while_blocked": 0,
+      "controller_write_while_blocked": "accepted",
+      "after_stop": "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+      "repeat_is_same": true,
+      "controller_closes_after": 1,
+      "service_closes_after": 1,
+      "scheduler_stop_calls": 3
+    },
+    "D_scheduler_default": {
+      "blocked": "RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')",
+      "blocked_again": "RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')",
+      "controller_closes_while_blocked": 0,
+      "service_closes_while_blocked": 0,
+      "controller_write_while_blocked": "accepted",
+      "after_stop": "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+      "repeat_is_same": true,
+      "controller_closes_after": 1,
+      "service_closes_after": 1,
+      "scheduler_stop_calls": 3
+    },
+    "E_factory_returns None": {
+      "artifactctl": "None"
+    },
+    "E_factory_raises": {
+      "artifactctl": "None"
+    }
+  },
+  "checks": [
+    {
+      "check": "A SDK: echo turn completed with memory_v2",
+      "pass": true,
+      "observed": "completed"
+    },
+    {
+      "check": "A SDK: exactly one controller obtained by the memory assembly, the first created",
+      "pass": true,
+      "observed": 0
+    },
+    {
+      "check": "A SDK: close counts [1, 1, 1] after runtime.close() twice",
+      "pass": true,
+      "observed": [
+        1,
+        1,
+        1
+      ],
+      "expected": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "check": "A SDK: a third runtime.close() closes nothing again",
+      "pass": true,
+      "observed": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "check": "B factory: the assembly records the factory's controller",
+      "pass": true
+    },
+    {
+      "check": "B factory: close() twice -> closed, same result, controller closed exactly once",
+      "pass": true,
+      "observed": {
+        "recorded_is_factory_result": true,
+        "first": "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+        "second_is_first": true,
+        "close_count": 1
+      }
+    },
+    {
+      "check": "C default: the assembly records the controller it created",
+      "pass": true
+    },
+    {
+      "check": "C default: close() twice -> closed, same result, controller closed exactly once",
+      "pass": true,
+      "observed": {
+        "recorded": "ArtifactCtl",
+        "created_during_build": 1,
+        "first": "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+        "second_is_first": true,
+        "close_count": 1
+      }
+    },
+    {
+      "check": "D scheduler (factory): close() while live -> closed=False scheduler_still_running, twice",
+      "pass": true,
+      "observed": [
+        "scheduler_still_running",
+        "scheduler_still_running"
+      ]
+    },
+    {
+      "check": "D scheduler (factory): controller and memory service stay open while live (0 closes, controller still accepts writes)",
+      "pass": true,
+      "observed": {
+        "closes": [
+          0,
+          0
+        ],
+        "write": "accepted"
+      }
+    },
+    {
+      "check": "D scheduler (factory): after the scheduler stops, close() closes service then controller once; repeat is a no-op",
+      "pass": true,
+      "observed": {
+        "closes": [
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "check": "D scheduler (default): close() while live -> closed=False scheduler_still_running, twice",
+      "pass": true,
+      "observed": [
+        "scheduler_still_running",
+        "scheduler_still_running"
+      ]
+    },
+    {
+      "check": "D scheduler (default): controller and memory service stay open while live (0 closes, controller still accepts writes)",
+      "pass": true,
+      "observed": {
+        "closes": [
+          0,
+          0
+        ],
+        "write": "accepted"
+      }
+    },
+    {
+      "check": "D scheduler (default): after the scheduler stops, close() closes service then controller once; repeat is a no-op",
+      "pass": true,
+      "observed": {
+        "closes": [
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "check": "E factory returns None: assembly owns no controller, close() succeeds",
+      "pass": true,
+      "observed": "None"
+    },
+    {
+      "check": "E factory raises: assembly owns no controller, close() succeeds",
+      "pass": true,
+      "observed": "None"
+    },
+    {
+      "check": "E disabled assembly: owns no controller, close() succeeds",
+      "pass": true
+    },
+    {
+      "check": "E smoke assembly: owns no controller, close() succeeds",
+      "pass": true
+    },
+    {
+      "check": "E backend-none assembly: owns no controller, close() succeeds",
+      "pass": true
+    },
+    {
+      "check": "E disabled/smoke/backend-none: the default controller factory is never called",
+      "pass": true,
+      "observed": 0
+    }
+  ],
+  "all_pass": true
+}

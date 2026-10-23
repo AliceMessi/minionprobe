@@ -1,0 +1,206 @@
+{
+  "probe": "probe_342",
+  "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+  "openminion.__version__": "0.1.10",
+  "python": "3.12.11",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "cwd": "<WORK>/cwd",
+  "imported_from_site_packages": true,
+  "work_dir": "<WORK>",
+  "store_under_test": {
+    "a": "runtime.agent.artifactctl",
+    "b": "runtime.agent.artifactctl"
+  },
+  "artifactctl_instances": [
+    {
+      "runtime": "a",
+      "site": "services/runtime/memory.py::_runtime_artifactctl",
+      "index": "<WORK>\\root-a\\.openminion\\artifact\\index.db"
+    },
+    {
+      "runtime": "a",
+      "site": "modules/brain/adapters/factory/artifactctl.py::resolve_artifactctl",
+      "index": "<WORK>\\root-a\\.openminion\\artifact\\index.db"
+    },
+    {
+      "runtime": "a",
+      "site": "services/runtime/bootstrap.py::build_brain_runner_bundle",
+      "index": "<WORK>\\root-a\\.openminion\\artifact\\index.db"
+    },
+    {
+      "runtime": "b",
+      "site": "services/runtime/memory.py::_runtime_artifactctl",
+      "index": "<WORK>\\root-b\\.openminion\\artifact\\index.db"
+    },
+    {
+      "runtime": "b",
+      "site": "modules/brain/adapters/factory/artifactctl.py::resolve_artifactctl",
+      "index": "<WORK>\\root-b\\.openminion\\artifact\\index.db"
+    },
+    {
+      "runtime": "b",
+      "site": "services/runtime/bootstrap.py::build_brain_runner_bundle",
+      "index": "<WORK>\\root-b\\.openminion\\artifact\\index.db"
+    }
+  ],
+  "all_opened_indexes": [
+    "<WORK>\\root-a\\.openminion\\artifact\\index.db",
+    "<WORK>\\root-b\\.openminion\\artifact\\index.db"
+  ],
+  "unrelated_store_files": {
+    "home": [
+      ".openminion/artifact/artifacts/sha256/b3/b33a1a9cdd1d79485cbfbb874f45c954a1e3b42e7fc704248422f86cafa789d3",
+      ".openminion/artifact/artifacts/sha256/b3/b33a1a9cdd1d79485cbfbb874f45c954a1e3b42e7fc704248422f86cafa789d3.meta.json",
+      ".openminion/artifact/artifacts/sha256/d7/d7e5dba77f08b570d3b9b2ab33f98d7b006c9188f4c82c6b3ec9d04c0bad8abd",
+      ".openminion/artifact/artifacts/sha256/d7/d7e5dba77f08b570d3b9b2ab33f98d7b006c9188f4c82c6b3ec9d04c0bad8abd.meta.json",
+      ".openminion/artifact/index.db"
+    ],
+    "cwd": [
+      ".openminion/artifact/artifacts/sha256/17/17e0d4470df8e69f8772136a5f75e624312a25303be040fc84033b1f42394b75",
+      ".openminion/artifact/artifacts/sha256/17/17e0d4470df8e69f8772136a5f75e624312a25303be040fc84033b1f42394b75.meta.json",
+      ".openminion/artifact/artifacts/sha256/e7/e7fb24a2732d2e1f17a8c69052787ee01886b9c030ec9cd9c47b1d42ddee49b3",
+      ".openminion/artifact/artifacts/sha256/e7/e7fb24a2732d2e1f17a8c69052787ee01886b9c030ec9cd9c47b1d42ddee49b3.meta.json",
+      ".openminion/artifact/index.db"
+    ]
+  },
+  "informational_new_directories": {
+    "note": "Not part of the #342 check (ArtifactCtl/artifact index). Empty directories created by the runtime under cwd/home, listed for completeness.",
+    "after_runtime_a_construction": {
+      "home": [],
+      "cwd": [
+        ".openminion/browser-playwright",
+        ".openminion/browser-playwright/artifacts",
+        ".openminion/browser-playwright/artifacts/pdf",
+        ".openminion/browser-playwright/artifacts/screenshots",
+        ".openminion/browser-playwright/artifacts/traces",
+        ".openminion/browser-playwright/downloads"
+      ]
+    },
+    "after_both_runtimes_closed": {
+      "home": [],
+      "cwd": [
+        ".openminion/browser-playwright",
+        ".openminion/browser-playwright/artifacts",
+        ".openminion/browser-playwright/artifacts/pdf",
+        ".openminion/browser-playwright/artifacts/screenshots",
+        ".openminion/browser-playwright/artifacts/traces",
+        ".openminion/browser-playwright/downloads"
+      ]
+    },
+    "files_inside_new_directories": {
+      "home": [],
+      "cwd": []
+    }
+  },
+  "checks": [
+    {
+      "check": "runtime a: echo turn completed",
+      "pass": true,
+      "observed": "completed"
+    },
+    {
+      "check": "runtime a: unrelated cwd/home alias 'shared-note' not visible before writing",
+      "pass": true,
+      "observed": "None"
+    },
+    {
+      "check": "runtime a: reads back only its own artifact under the shared alias",
+      "pass": true,
+      "observed": "ROOT_a_ARTIFACT"
+    },
+    {
+      "check": "runtime b: echo turn completed",
+      "pass": true,
+      "observed": "completed"
+    },
+    {
+      "check": "runtime b: unrelated cwd/home alias 'shared-note' not visible before writing",
+      "pass": true,
+      "observed": "None"
+    },
+    {
+      "check": "runtime b: reads back only its own artifact under the shared alias",
+      "pass": true,
+      "observed": "ROOT_b_ARTIFACT"
+    },
+    {
+      "check": "runtime a: lists its own artifact, not the other runtime's nor the unrelated stores'",
+      "pass": true,
+      "observed": {
+        "own": true,
+        "other": false,
+        "unrelated": []
+      }
+    },
+    {
+      "check": "runtime b: lists its own artifact, not the other runtime's nor the unrelated stores'",
+      "pass": true,
+      "observed": {
+        "own": true,
+        "other": false,
+        "unrelated": []
+      }
+    },
+    {
+      "check": "every ArtifactCtl opened by the runtimes uses an index under its own data root",
+      "pass": true,
+      "observed": [
+        "<VERIFY_DIR>\\work\\final\\w342\\root-a\\.openminion\\artifact\\index.db",
+        "<VERIFY_DIR>\\work\\final\\w342\\root-b\\.openminion\\artifact\\index.db"
+      ],
+      "expected": [
+        "<VERIFY_DIR>\\work\\final\\w342\\root-a\\.openminion\\artifact\\index.db",
+        "<VERIFY_DIR>\\work\\final\\w342\\root-b\\.openminion\\artifact\\index.db"
+      ]
+    },
+    {
+      "check": "runtime a: all construction sites during the turn open <root>/.openminion/artifact/index.db (3 instances)",
+      "pass": true,
+      "observed": [
+        "modules/brain/adapters/factory/artifactctl.py::resolve_artifactctl",
+        "services/runtime/bootstrap.py::build_brain_runner_bundle",
+        "services/runtime/memory.py::_runtime_artifactctl"
+      ]
+    },
+    {
+      "check": "runtime a: index exists at <root>/.openminion/artifact/index.db",
+      "pass": true
+    },
+    {
+      "check": "runtime b: all construction sites during the turn open <root>/.openminion/artifact/index.db (3 instances)",
+      "pass": true,
+      "observed": [
+        "modules/brain/adapters/factory/artifactctl.py::resolve_artifactctl",
+        "services/runtime/bootstrap.py::build_brain_runner_bundle",
+        "services/runtime/memory.py::_runtime_artifactctl"
+      ]
+    },
+    {
+      "check": "runtime b: index exists at <root>/.openminion/artifact/index.db",
+      "pass": true
+    },
+    {
+      "check": "unrelated home store byte-for-byte unchanged, nothing new written under home",
+      "pass": true,
+      "observed": [
+        ".openminion/artifact/artifacts/sha256/b3/b33a1a9cdd1d79485cbfbb874f45c954a1e3b42e7fc704248422f86cafa789d3",
+        ".openminion/artifact/artifacts/sha256/b3/b33a1a9cdd1d79485cbfbb874f45c954a1e3b42e7fc704248422f86cafa789d3.meta.json",
+        ".openminion/artifact/artifacts/sha256/d7/d7e5dba77f08b570d3b9b2ab33f98d7b006c9188f4c82c6b3ec9d04c0bad8abd",
+        ".openminion/artifact/artifacts/sha256/d7/d7e5dba77f08b570d3b9b2ab33f98d7b006c9188f4c82c6b3ec9d04c0bad8abd.meta.json",
+        ".openminion/artifact/index.db"
+      ]
+    },
+    {
+      "check": "process cwd store byte-for-byte unchanged, nothing new written under cwd",
+      "pass": true,
+      "observed": [
+        ".openminion/artifact/artifacts/sha256/17/17e0d4470df8e69f8772136a5f75e624312a25303be040fc84033b1f42394b75",
+        ".openminion/artifact/artifacts/sha256/17/17e0d4470df8e69f8772136a5f75e624312a25303be040fc84033b1f42394b75.meta.json",
+        ".openminion/artifact/artifacts/sha256/e7/e7fb24a2732d2e1f17a8c69052787ee01886b9c030ec9cd9c47b1d42ddee49b3",
+        ".openminion/artifact/artifacts/sha256/e7/e7fb24a2732d2e1f17a8c69052787ee01886b9c030ec9cd9c47b1d42ddee49b3.meta.json",
+        ".openminion/artifact/index.db"
+      ]
+    }
+  ],
+  "all_pass": true
+}
