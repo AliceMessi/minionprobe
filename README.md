@@ -24,7 +24,7 @@ The matrix and the full notes are in [`reports/BUILDING_BLOCKS_TESTED.md`](repor
 
 ## Fix PRs (bug-fix bonus)
 
-The maintainers confirmed all seven reports. Every fix PR below was reviewed and **merged into `dev` on 2026-10-22** (issues stay open until release verification, per the project's policy). A follow-up report found while fixing (#342) was confirmed and assigned to us; its fix PR is in review:
+The maintainers confirmed all seven reports, and every fix PR below was reviewed and **merged into `dev`**. Issues stay open until release verification, per the project's policy. Follow-up reports found while fixing (#342, #345, #347) were also confirmed, assigned to us and fixed:
 
 | Issue | Fix PR |
 |---|---|
@@ -33,9 +33,11 @@ The maintainers confirmed all seven reports. Every fix PR below was reviewed and
 | [#325](https://github.com/openminion/openminion/issues/325) explicit agent ignored on an existing session | [#336](https://github.com/openminion/openminion/pull/336) |
 | [#326](https://github.com/openminion/openminion/issues/326) post-tool 429 returned as completed text | [#338](https://github.com/openminion/openminion/pull/338) |
 | [#327](https://github.com/openminion/openminion/issues/327) Windows cron without tzdata | [#341](https://github.com/openminion/openminion/pull/341) |
-| [#328](https://github.com/openminion/openminion/issues/328) closure judge vs. grounded answer | [#337](https://github.com/openminion/openminion/pull/337) context fix + [#343](https://github.com/openminion/openminion/pull/343) required verdict fields (evidence: [`openminion-328`](evidence/openminion-328), [`openminion-328b`](evidence/openminion-328b)). The live Gemini retest on merged `dev` still replaces the grounded answer, so this one is not solved yet: [`openminion-328-live`](evidence/openminion-328-live) |
+| [#328](https://github.com/openminion/openminion/issues/328) closure judge vs. grounded answer | [#337](https://github.com/openminion/openminion/pull/337) context fix + [#343](https://github.com/openminion/openminion/pull/343) required verdict fields + [#351](https://github.com/openminion/openminion/pull/351) (the root cause on Gemini, #347). Evidence: [`openminion-328`](evidence/openminion-328), [`openminion-328b`](evidence/openminion-328b), [`openminion-328-live`](evidence/openminion-328-live), [`openminion-347`](evidence/openminion-347) |
 | [#329](https://github.com/openminion/openminion/issues/329) skill ingest identity and pending versions | [#339](https://github.com/openminion/openminion/pull/339) |
-| [#342](https://github.com/openminion/openminion/issues/342) SDK artifact store outside runtime roots (found while fixing) | [#346](https://github.com/openminion/openminion/pull/346) (open, in review) |
+| [#342](https://github.com/openminion/openminion/issues/342) SDK artifact store outside runtime roots (found while fixing) | [#346](https://github.com/openminion/openminion/pull/346) |
+| [#345](https://github.com/openminion/openminion/issues/345) run state read by wall-clock event order (found while fixing #326) | [#350](https://github.com/openminion/openminion/pull/350) |
+| [#347](https://github.com/openminion/openminion/issues/347) Gemini's OpenAI-compatible endpoint reads only the last system message (root cause of #328 on Gemini) | [#351](https://github.com/openminion/openminion/pull/351), with live evidence in [`openminion-347`](evidence/openminion-347) |
 
 ## Quick start
 
