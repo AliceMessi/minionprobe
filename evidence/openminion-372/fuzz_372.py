@@ -113,6 +113,12 @@ def _main() -> None:
                     ):
                         if rng.random() < 0.7:
                             payload[key] = value(rng, words)
+                    # Values that are not JSON, or not text in Postgres.
+                    odd = [float("nan"), float("inf"), float("-inf"), "bin" + chr(0), "a" + chr(92) + "u0000b"]
+                    if rng.random() < 0.3:
+                        payload["extra"] = rng.choice([*odd, 1.5, "loss: NaN, retry"])
+                    if rng.random() < 0.1:
+                        payload[rng.choice(["error", "step"])] = rng.choice([*odd, "loss: NaN, retry"])
                     sessions.append_event(
                         session_id=session.id, event_type=rng.choice(EVENT_TYPES), payload=payload
                     )
