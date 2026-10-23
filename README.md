@@ -39,6 +39,8 @@ The maintainers confirmed all seven reports, and every fix PR below was reviewed
 | [#345](https://github.com/openminion/openminion/issues/345) run state read by wall-clock event order (found while fixing #326) | [#350](https://github.com/openminion/openminion/pull/350) |
 | [#347](https://github.com/openminion/openminion/issues/347) Gemini's OpenAI-compatible endpoint reads only the last system message (root cause of #328 on Gemini) | [#351](https://github.com/openminion/openminion/pull/351), with live evidence in [`openminion-347`](evidence/openminion-347) |
 | [#349](https://github.com/openminion/openminion/issues/349) runtime memory artifact store never closed on shutdown (found in review of #346) | [#356](https://github.com/openminion/openminion/pull/356) |
+| [#353](https://github.com/openminion/openminion/issues/353) messages with identical timestamps read in reverse append order (found in review of #350) | [#363](https://github.com/openminion/openminion/pull/363) |
+| [#361](https://github.com/openminion/openminion/issues/361) runtime memory audit database left open after shutdown (found while fixing #349) | [#366](https://github.com/openminion/openminion/pull/366) |
 
 ## Quick start
 
