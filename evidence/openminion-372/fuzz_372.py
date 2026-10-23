@@ -101,24 +101,21 @@ def _main() -> None:
                 for _ in range(rng.randint(5, 60)):
                     payload = {}
                     for key, words in (
-                        ("run_id", ["r1", "r2", "r3"]),
+                        ("run_id", ["r1", "r2", "r3", "trace: NaN", "trace: 1e999", "[NaN]"]),
                         ("state", STATES),
                         ("step", ["step-a", "step-b"]),
                         ("error", ["boom", "late"]),
                         ("conversation_id", ["conv", session.id]),
-                        ("thread_id", ["t1", "t2"]),
+                        ("thread_id", ["t1", "t2", "trace, Infinity"]),
                         ("invocation_id", ["inv-1", "inv-2"]),
                         ("attach_id", ["a1", "a2"]),
                         ("attach_role", ["writer", "observer", "WRITER"]),
                     ):
                         if rng.random() < 0.7:
                             payload[key] = value(rng, words)
-                    # Values that are not JSON, or not text in Postgres.
-                    odd = [float("nan"), float("inf"), float("-inf"), "bin" + chr(0), "a" + chr(92) + "u0000b"]
+                    # Text that looks like JSON tokens or escapes, anywhere.
                     if rng.random() < 0.3:
-                        payload["extra"] = rng.choice([*odd, 1.5, "loss: NaN, retry"])
-                    if rng.random() < 0.1:
-                        payload[rng.choice(["error", "step"])] = rng.choice([*odd, "loss: NaN, retry"])
+                        payload["extra"] = rng.choice(["loss: NaN, retry", "[Infinity]", "a" + chr(92) + "u0000b", 1.5])
                     sessions.append_event(
                         session_id=session.id, event_type=rng.choice(EVENT_TYPES), payload=payload
                     )
@@ -128,11 +125,11 @@ def _main() -> None:
                 ]
                 events = {
                     run_id: [e.id for e in list_session_run_events(sessions, session_id=session.id, run_id=run_id)]
-                    for run_id in ("r1", "r2", "r3", "7", "None", "True", "[]", "{}")
+                    for run_id in ("r1", "r2", "r3", "7", "None", "True", "[]", "{}", "trace: NaN", "trace: 1e999", "[NaN]")
                 }
                 threads = {}
                 for conversation_id in ("conv", session.id, ""):
-                    for thread_id in ("t1", "t2"):
+                    for thread_id in ("t1", "t2", "trace, Infinity"):
                         p = resolve_thread_lifecycle(
                             sessions, session_id=session.id, conversation_id=conversation_id, thread_id=thread_id
                         )
