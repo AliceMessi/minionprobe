@@ -24,7 +24,7 @@ The matrix and the full notes are in [`reports/BUILDING_BLOCKS_TESTED.md`](repor
 
 ## Fix PRs (bug-fix bonus)
 
-The maintainers confirmed all seven reports, and every fix PR below was reviewed and **merged into `dev`**. Issues stay open until release verification, per the project's policy. Follow-up reports found while fixing (#342, #345, #347) were also confirmed, assigned to us and fixed:
+The maintainers confirmed all seven reports, and every fix PR below was reviewed and **merged into `dev`**. Issues stay open until release verification, per the project's policy. Follow-up reports found while fixing (#342, #345, #347, #349) were also confirmed, assigned to us and fixed:
 
 | Issue | Fix PR |
 |---|---|
@@ -38,6 +38,7 @@ The maintainers confirmed all seven reports, and every fix PR below was reviewed
 | [#342](https://github.com/openminion/openminion/issues/342) SDK artifact store outside runtime roots (found while fixing) | [#346](https://github.com/openminion/openminion/pull/346) |
 | [#345](https://github.com/openminion/openminion/issues/345) run state read by wall-clock event order (found while fixing #326) | [#350](https://github.com/openminion/openminion/pull/350) |
 | [#347](https://github.com/openminion/openminion/issues/347) Gemini's OpenAI-compatible endpoint reads only the last system message (root cause of #328 on Gemini) | [#351](https://github.com/openminion/openminion/pull/351), with live evidence in [`openminion-347`](evidence/openminion-347) |
+| [#349](https://github.com/openminion/openminion/issues/349) runtime memory artifact store never closed on shutdown (found in review of #346) | [#356](https://github.com/openminion/openminion/pull/356) |
 
 ## Quick start
 
