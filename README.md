@@ -8,8 +8,8 @@ Built for [Cortensor Hackathon #5](https://dorahacks.io/hackathon/2418/detail). 
 
 **Impact so far (24 Oct 2026):**
 - **12 bugs filed upstream** from MinionProbe runs and follow-up probes.
-- **16 fix PRs by us merged** into OpenMinion `dev` (table in [Fix PRs](#fix-prs-bug-fix-bonus)). The fixes that shipped were re-verified on the released `openminion==0.1.10` package.
-- **8 more issues** opened by the maintainer while reviewing our PRs were taken on: 4 already merged, 4 in progress with agreed dates.
+- **17 fix PRs by us merged** into OpenMinion `dev` (table in [Fix PRs](#fix-prs-bug-fix-bonus)). The fixes that shipped were re-verified on the released `openminion==0.1.10` package.
+- **8 more issues** opened by the maintainer while reviewing our PRs were taken on: 5 already merged (including #372, the run-status facts table with migration 13), #368 in review (#380), #364 and #369 scheduled.
 
 ▶ **Demo video (2:10):** https://youtu.be/5aBN0y6YQeA. It shows an offline run, the matrix, bug #324 reproduced live, the triage agent and the filed issues. Terminal scenes are replays of real captured runs.
 
@@ -49,6 +49,7 @@ The maintainers confirmed all seven reports, and every fix PR below was reviewed
 | [#353](https://github.com/openminion/openminion/issues/353) messages with identical timestamps read in reverse append order (found in review of #350) | [#363](https://github.com/openminion/openminion/pull/363) |
 | [#361](https://github.com/openminion/openminion/issues/361) runtime memory audit database left open after shutdown (found while fixing #349) | [#366](https://github.com/openminion/openminion/pull/366) |
 | [#365](https://github.com/openminion/openminion/issues/365) transcript export orders tied events by string id (disclosed in review of #363) | [#370](https://github.com/openminion/openminion/pull/370) |
+| [#352](https://github.com/openminion/openminion/issues/352) run status read only the oldest 2,000 run events of a session (disclosed in review) | [#372](https://github.com/openminion/openminion/pull/372): per-event run facts, runtime migration 13 with an in-transaction backfill, differential fuzz identical to `dev` on SQLite and Postgres. Evidence [`openminion-372`](evidence/openminion-372) |
 | [#373](https://github.com/openminion/openminion/issues/373) migration runner leaves SQLite connections open until GC, blocking database cleanup on Windows (found while isolating #366) | [#377](https://github.com/openminion/openminion/pull/377), evidence [`openminion-373`](evidence/openminion-373). The OMX import case was split out as [#378](https://github.com/openminion/openminion/issues/378) at the maintainer's request |
 
 ## Quick start
