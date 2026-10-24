@@ -1,0 +1,167 @@
+# native Windows 11, CPython 3.11.11, openminion/openminion @ 81c134df591afd360d5a12bbebea36421200030d, PYTHONPATH=src;.
+7539bd67c88636a99f91c972a8110e9d337099ac8a6bac5ecd07b7eef12b2911 *probe_construction_failure.py
+c427eb81a0034354e0f2a632d5d2455f3dac0fbea7897229e88b88808e4f744f *probe_external_close.py
+a4ea8487f6833601a8bf06140b5be9441db97aeaceb605d021884c0fd37588e4 *probe_fallback_retention.py
+40baffecfd4f7da22c0c810fd43b10bdec112a43356ad67f5cbc32cedb69a8bb *probe_pg_connect.py
+a7e2422c89372e6ec950aff9ea7131ac86cb385c5cd57ca35695330a4d80399f *probe_remote_config.py
+=== probe_external_close.py
+{
+  "default provider (control)": {
+    "store_created_by_resolve_memory_backend": "SQLiteMemoryStore",
+    "store_closed_by_memory_service": "AuditedMemoryStore",
+    "after_each_runtime_close": [
+      {
+        "assembly_close_calls": 1,
+        "created_store_close_calls": 1,
+        "assembly_artifact_store_close_calls": 1
+      },
+      {
+        "assembly_close_calls": 1,
+        "created_store_close_calls": 1,
+        "assembly_artifact_store_close_calls": 1
+      }
+    ],
+    "assembly_close_outcomes": [
+      "closed"
+    ],
+    "assembly_artifact_store_write_after_shutdown": "ProgrammingError: Cannot operate on a closed database."
+  },
+  "external provider, SQLite memory store": {
+    "store_created_by_resolve_memory_backend": "SQLiteMemoryStore",
+    "store_closed_by_memory_service": "BackendMemoryStoreAdapter",
+    "after_each_runtime_close": [
+      {
+        "assembly_close_calls": 1,
+        "created_store_close_calls": 0,
+        "assembly_artifact_store_close_calls": 0
+      },
+      {
+        "assembly_close_calls": 1,
+        "created_store_close_calls": 0,
+        "assembly_artifact_store_close_calls": 0
+      }
+    ],
+    "assembly_close_outcomes": [
+      "raised AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'"
+    ],
+    "assembly_artifact_store_write_after_shutdown": "accepted"
+  }
+}
+3.11.11 win32
+=== probe_fallback_retention.py
+{
+  "control: runtime assembly builder, SQLite memory store": {
+    "builder": "build_runtime_memory_assembly",
+    "returned": "RuntimeMemoryAssembly",
+    "returned_object_has_close": true,
+    "assembly_close_calls": 1,
+    "audit_sink_connected_during_turn": true,
+    "close_calls": {
+      "memory store (SQLiteMemoryStore)": 1,
+      "audit sink": 1,
+      "assembly artifact store": 1
+    },
+    "audit_sink_connection_open": false,
+    "assembly_artifact_store_accepts_write": false
+  },
+  "bootstrap fallback, SQLite memory store": {
+    "builder": "build_agent_memory_service",
+    "returned": "MemoryServiceGatewayAdapter",
+    "returned_object_has_close": false,
+    "assembly_alive_after_return": false,
+    "audit_sink_connected_during_turn": true,
+    "close_calls": {
+      "memory store (SQLiteMemoryStore)": 0,
+      "audit sink": 0,
+      "assembly artifact store": 0
+    },
+    "audit_sink_connection_open": true,
+    "assembly_artifact_store_accepts_write": true,
+    "module_backend_factory_registry_references_this_store": true
+  }
+}
+3.11.11 win32
+=== probe_construction_failure.py
+{
+  "SQLite memory store": {
+    "build": "InvalidArgumentError: No external backend registered for 'not_registered'; known adapters: <none>.",
+    "created_before_the_failure": {
+      "assembly artifact store": "ArtifactCtl",
+      "memory store": "SQLiteMemoryStore",
+      "audit sink": "SQLiteMemoryAuditSink"
+    },
+    "close_calls_after_the_failure": {
+      "assembly artifact store": 0,
+      "memory store": 0,
+      "audit sink": 0
+    },
+    "audit_sink_connection_open": false,
+    "module_backend_factory_registry_references_this_store": true,
+    "assembly_artifact_store_accepts_write": true
+  }
+}
+3.11.11 win32
+=== probe_remote_config.py
+{
+  "load_config(memctl.yaml)": {
+    "store.backend": "remote",
+    "store.remote_endpoint": "http://127.0.0.1:9/memory",
+    "store.remote_timeout_seconds": 2.5,
+    "store.remote_max_retries": 2
+  },
+  "resolve_memory_backend(config=<MemctlConfig>)": "InvalidArgumentError: remote backend requires remote.endpoint",
+  "resolve_memory_backend(config=<MemctlConfig>.store)": "InvalidArgumentError: remote backend requires remote.endpoint",
+  "control: resolve_memory_backend(config=<dict with the same values>)": "ok: RemoteMemoryStore, transport endpoint='http://127.0.0.1:9/memory' timeout_seconds=2.5 max_retries=2",
+  "memctl list --scope agent:alpha --json (MEMCTL_CONFIG=memctl.yaml)": {
+    "exit_code": 1,
+    "last_error_line": "InvalidArgumentError: remote backend requires remote.endpoint"
+  }
+}
+3.11.11 win32
+=== probe_pg_connect.py
+{
+  "SQLite memory store (control)": {
+    "run_states": [
+      "completed",
+      "completed"
+    ],
+    "store_passed_to_helpers": "AuditedMemoryStore wrapping SQLiteMemoryStore",
+    "helper_calls": [
+      {
+        "caller": "_maybe_run_session_lifecycle",
+        "helper": "apply_confidence_decay",
+        "store": "AuditedMemoryStore",
+        "result": "ok"
+      },
+      {
+        "caller": "_maybe_run_session_lifecycle",
+        "helper": "compress_old_summaries_gc",
+        "store": "AuditedMemoryStore",
+        "result": "ok"
+      },
+      {
+        "caller": "_maybe_run_session_lifecycle",
+        "helper": "enforce_scope_capacity",
+        "store": "AuditedMemoryStore",
+        "result": "ok"
+      },
+      {
+        "caller": "_maybe_run_session_lifecycle",
+        "helper": "evict_stale_insights",
+        "store": "AuditedMemoryStore",
+        "result": "ok"
+      },
+      {
+        "caller": "compress_old_summaries",
+        "helper": "compress_old_summaries_gc",
+        "store": "AuditedMemoryStore",
+        "result": "ok"
+      }
+    ],
+    "session_lifecycle_warnings": 0,
+    "distinct_session_ids_in_warnings": 0,
+    "first_warning": null
+  },
+  "PostgreSQL memory store": "skipped: OPENMINION_TEST_POSTGRES_URL not set"
+}
+3.11.11 win32
