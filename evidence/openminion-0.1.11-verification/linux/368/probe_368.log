@@ -1,0 +1,34 @@
+{
+  "probe": "probe_368",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty",
+  "imported_from_site_packages": true,
+  "isolated_mode": true
+}
+PASS A. echo SDK turn completes with one SQLiteMemoryStore from resolve_memory_backend | observed={'run_state': 'completed', 'stores': ['SQLiteMemoryStore']}
+PASS A. the assembly's ArtifactCtl is injected into the store, which does not own it | observed={'store_type': 'SQLiteMemoryStore', 'store_artifactctl_is_assembly_artifactctl': True, 'store_owns_artifactctl': False}
+PASS A. runtime.close() x3: store closed once, assembly ArtifactCtl closed once | observed=[{'store_close_calls': 1, 'assembly_artifactctl_close_calls': 1}, {'store_close_calls': 1, 'assembly_artifactctl_close_calls': 1}, {'store_close_calls': 1, 'assembly_artifactctl_close_calls': 1}]
+PASS A. the assembly ArtifactCtl rejects writes after shutdown (closed database) | observed='ProgrammingError: Cannot operate on a closed database.'
+PASS B. sqlite: assembly wraps the created store in AuditedMemoryStore; close() x2 returns one closed result | observed={'created_store': 'CountingSQLiteMemoryStore', 'service_closes': 'AuditedMemoryStore', 'delegated_backend': 'BuiltinKnowledgeBackend', 'delegated_reads_same_audited_store': True, 'delegated_backend_has_close': False, 'delegated_read': 'found', 'close_results': ["RuntimeMemoryCloseResult(closed=True, reason_code='closed')", "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"], 'same_result_object': True, 'events': ['store.close', 'artifactctl.close']}
+PASS B. sqlite: delegated reads use the same audited store and add no closer | observed={'delegated_backend': 'BuiltinKnowledgeBackend', 'delegated_reads_same_audited_store': True, 'delegated_backend_has_close': False, 'delegated_read': 'found'}
+PASS B. sqlite: the created store closes once, then the injected artifact store once | observed=['store.close', 'artifactctl.close']
+PASS B. mock: assembly wraps the created store in AuditedMemoryStore; close() x2 returns one closed result | observed={'created_store': 'CountingInMemoryMemoryStore', 'service_closes': 'AuditedMemoryStore', 'delegated_backend': 'BuiltinKnowledgeBackend', 'delegated_reads_same_audited_store': True, 'delegated_backend_has_close': False, 'delegated_read': 'found', 'close_results': ["RuntimeMemoryCloseResult(closed=True, reason_code='closed')", "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"], 'same_result_object': True, 'events': ['store.close', 'artifactctl.close']}
+PASS B. mock: delegated reads use the same audited store and add no closer | observed={'delegated_backend': 'BuiltinKnowledgeBackend', 'delegated_reads_same_audited_store': True, 'delegated_backend_has_close': False, 'delegated_read': 'found'}
+PASS B. mock: the created store closes once, then the injected artifact store once | observed=['store.close', 'artifactctl.close']
+PASS B. remote: assembly wraps the created store in AuditedMemoryStore; close() x2 returns one closed result | observed={'created_store': 'CountingRemoteMemoryStore', 'service_closes': 'AuditedMemoryStore', 'delegated_backend': 'BuiltinKnowledgeBackend', 'delegated_reads_same_audited_store': True, 'delegated_backend_has_close': False, 'delegated_read': 'not attempted (remote endpoint is not served)', 'close_results': ["RuntimeMemoryCloseResult(closed=True, reason_code='closed')", "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"], 'same_result_object': True, 'events': ['store.close', 'artifactctl.close']}
+PASS B. remote: delegated reads use the same audited store and add no closer | observed={'delegated_backend': 'BuiltinKnowledgeBackend', 'delegated_reads_same_audited_store': True, 'delegated_backend_has_close': False, 'delegated_read': 'not attempted (remote endpoint is not served)'}
+PASS B. remote: the created store closes once, then the injected artifact store once | observed=['store.close', 'artifactctl.close']
+PASS C. with no injected artifact store the SQLite store creates and owns one real ArtifactCtl | observed={'assembly_artifactctl': 'None', 'store_owns_its_artifactctl': True, 'store_created_artifactctl_calls': 1, 'ref_add_calls': 1, 'close_results': ["RuntimeMemoryCloseResult(closed=True, reason_code='closed')", "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"], 'artifactctl_close_calls': 1, 'store_close_events': 1, 'write_after_close': 'ProgrammingError: Cannot operate on a closed database.'}
+PASS C. close() x2: the store closes once and closes its owned ArtifactCtl once | observed={'store_closes': 1, 'artifactctl_closes': 1, 'write_after_close': 'ProgrammingError: Cannot operate on a closed database.'}
+PASS D. a store built with an injected artifact store closes twice without closing it | observed=['store.close', 'store.close']
+PASS D. AuditedMemoryStore(store) without owns_store never closes the borrowed store | observed={'events': [], 'usable': 'ok'}
+PASS E. sqlite: live scheduler: close() x2 is scheduler_still_running; store and artifact store not closed, store usable | observed={'blocked': ["RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')", "RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')"], 'events_while_blocked': [], 'store_usable_while_blocked': True, 'after_stop': ["RuntimeMemoryCloseResult(closed=True, reason_code='closed')", "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"], 'same_result_object': True, 'events': ['store.close', 'artifactctl.close']}
+PASS E. sqlite: after the scheduler stops, close succeeds once (store.close, artifactctl.close) and repeats | observed=['store.close', 'artifactctl.close']
+PASS E. mock: live scheduler: close() x2 is scheduler_still_running; store and artifact store not closed, store usable | observed={'blocked': ["RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')", "RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')"], 'events_while_blocked': [], 'store_usable_while_blocked': True, 'after_stop': ["RuntimeMemoryCloseResult(closed=True, reason_code='closed')", "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"], 'same_result_object': True, 'events': ['store.close', 'artifactctl.close']}
+PASS E. mock: after the scheduler stops, close succeeds once (store.close, artifactctl.close) and repeats | observed=['store.close', 'artifactctl.close']
+21/21 checks pass
+exit=0

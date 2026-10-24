@@ -1,0 +1,508 @@
+{
+  "info": {
+    "probe": "probe_352_check",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.11",
+    "python": "3.12.15",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<RUNNER_TEMP>/empty/probe_352_check_upgrade12_postgres",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "target": "postgres:s352_seed12",
+    "mode": "upgrade",
+    "step12": true
+  },
+  "before": {
+    "ledger": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "stored_events": 5192,
+    "events_digest_sha256": "cc246ed1c96c79a35128283796e43c314ec885aa3652f55c36c0775208616e31",
+    "event_run_facts_table": false
+  },
+  "backup": "pg_dump of the schema taken by steps_352.sh before this probe (see the run log)",
+  "migration_12_only": {
+    "applied_versions": [
+      12
+    ],
+    "ledger": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "event_run_facts_table": false
+  },
+  "after_open": {
+    "applied_versions": [
+      13
+    ],
+    "current_version": 13,
+    "ledger": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "stored_events": 5192
+  },
+  "maintainer_probe": {
+    "runs": [
+      [
+        "new",
+        "failed"
+      ],
+      [
+        "old",
+        "completed"
+      ]
+    ],
+    "new_run_events": 2,
+    "projection": {
+      "latest_run_id": "new",
+      "latest_run_state": "failed",
+      "invocation_id": "new-inv",
+      "latest_event_id": 2002
+    },
+    "high_water": 2002
+  },
+  "bounded_reads_rows_per_query": {
+    "list_session_runs(limit=5, scan_limit=10)": [
+      4,
+      8
+    ],
+    "list_session_runs(defaults)": [
+      713,
+      29
+    ],
+    "list_session_run_events(long, limit=5)": [
+      5
+    ],
+    "resolve_thread_lifecycle(conv, thread-a)": [
+      0,
+      1,
+      3
+    ]
+  },
+  "readers_digest_sha256": "77dfe84ad40197584db6530539a8157c195e0a193171517a7ea20cc0c35b545a",
+  "events_content_digest_sha256": "dda1ff3d28c652687b271a3022364b1c038e786be4f027af5df735239c628a80",
+  "checks": [
+    {
+      "check": "stored events equal the writer's record (sha256 of every event row)",
+      "pass": true,
+      "observed": {
+        "writer_version": "0.1.10",
+        "digest": "cc246ed1c96c79a35128283796e43c314ec885aa3652f55c36c0775208616e31",
+        "events": 5192
+      }
+    },
+    {
+      "check": "pre-upgrade database is the 0.1.10 schema: ledger 1..11, no event_run_facts table",
+      "pass": true,
+      "observed": {
+        "ledger": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11
+        ],
+        "event_run_facts_table": false
+      }
+    },
+    {
+      "check": "0.1.11 migrations <= 12 applied alone: a migration-12 database (ledger 1..12, no event_run_facts), events unchanged",
+      "pass": true,
+      "observed": {
+        "applied_versions": [
+          12
+        ],
+        "ledger": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "event_run_facts_table": false
+      }
+    },
+    {
+      "check": "normal open (build_runtime_storage) applies the expected migrations; ledger 1..13",
+      "pass": true,
+      "observed": {
+        "applied_versions": [
+          13
+        ],
+        "expected": [
+          13
+        ],
+        "ledger_max": 13
+      }
+    },
+    {
+      "check": "every stored event row unchanged by the open/upgrade (sha256 of all event rows)",
+      "pass": true,
+      "observed": {
+        "events": 5192,
+        "digest": "cc246ed1c96c79a35128283796e43c314ec885aa3652f55c36c0775208616e31"
+      }
+    },
+    {
+      "check": "event_run_facts: one row per event, equal to 0.1.11 event_run_facts() and to the 0.1.10 expressions; ASCII keys without NUL",
+      "pass": true,
+      "observed": {
+        "events": 5192,
+        "facts": 5192,
+        "facts_without_event": [],
+        "mismatch_vs_event_run_facts": [],
+        "mismatch_count_vs_event_run_facts": 0,
+        "mismatch_vs_0110_expressions": [],
+        "mismatch_count_vs_0110_expressions": 0,
+        "bad_keys": [],
+        "ok": true
+      }
+    },
+    {
+      "check": "window: list_session_runs equals the reduction for 10 scan limits x 4 limits, and with defaults",
+      "pass": true,
+      "observed": {
+        "run_events_in_session": 2002,
+        "events_in_session": 2002,
+        "combinations": 41,
+        "mismatches": [],
+        "default_listing_first": [
+          {
+            "run_id": "new",
+            "started_at": "2026-10-23T09:33:20.000001+00:00",
+            "ended_at": "2026-10-23T09:33:21.000001+00:00",
+            "current_step": "step",
+            "error": "",
+            "event_count": 2,
+            "state": "failed"
+          },
+          {
+            "run_id": "old",
+            "started_at": "2026-10-23T09:00:00.000001+00:00",
+            "ended_at": "2026-10-23T09:33:19.000001+00:00",
+            "current_step": "step",
+            "error": "",
+            "event_count": 2000,
+            "state": "completed"
+          }
+        ]
+      }
+    },
+    {
+      "check": "window: list_session_run_events returns each run's newest events (all 2 runs, limits [1, 2, 200, 1000], exact and padded requests)",
+      "pass": true,
+      "observed": {
+        "runs": 2,
+        "calls": 16,
+        "mismatches": []
+      }
+    },
+    {
+      "check": "window: resolve_thread_lifecycle equals the reduction for 4 conversation/thread requests (latest run/state, invocation, latest event id = thread high water, updated_at, delivery, writer attach)",
+      "pass": true,
+      "observed": {
+        "requests": [
+          [
+            "conv",
+            "thread"
+          ],
+          [
+            "<session>",
+            "thread"
+          ],
+          [
+            "",
+            "thread"
+          ],
+          [
+            "conv",
+            "missing"
+          ]
+        ],
+        "mismatches": [],
+        "projections": {
+          "conv|thread": {
+            "latest_run_id": "new",
+            "latest_run_state": "failed",
+            "invocation_id": "new-inv",
+            "latest_event_id": 2002,
+            "thread_state": "failed"
+          },
+          "<session>|thread": {
+            "latest_run_id": "",
+            "latest_run_state": "",
+            "invocation_id": "",
+            "latest_event_id": 0,
+            "thread_state": "settled"
+          },
+          "|thread": {
+            "latest_run_id": "new",
+            "latest_run_state": "failed",
+            "invocation_id": "new-inv",
+            "latest_event_id": 2002,
+            "thread_state": "failed"
+          },
+          "conv|missing": {
+            "latest_run_id": "",
+            "latest_run_state": "",
+            "invocation_id": "",
+            "latest_event_id": 0,
+            "thread_state": "settled"
+          }
+        }
+      }
+    },
+    {
+      "check": "mixed: list_session_runs equals the reduction for 11 scan limits x 4 limits, and with defaults",
+      "pass": true,
+      "observed": {
+        "run_events_in_session": 2743,
+        "events_in_session": 3190,
+        "combinations": 45,
+        "mismatches": [],
+        "default_listing_first": [
+          {
+            "run_id": "long2",
+            "started_at": "2026-10-23T08:40:04.000001+00:00",
+            "ended_at": "2026-10-23T08:08:13.000001+00:00",
+            "current_step": "c-step-717",
+            "error": "",
+            "event_count": 242,
+            "state": "completed"
+          },
+          {
+            "run_id": "long",
+            "started_at": "2026-10-23T08:40:02.000001+00:00",
+            "ended_at": "",
+            "current_step": "final-step",
+            "error": "nan",
+            "event_count": 751,
+            "state": "running"
+          }
+        ]
+      }
+    },
+    {
+      "check": "mixed: list_session_run_events returns each run's newest events (all 972 runs, limits [1, 2, 200, 1000], exact and padded requests)",
+      "pass": true,
+      "observed": {
+        "runs": 972,
+        "calls": 7776,
+        "mismatches": []
+      }
+    },
+    {
+      "check": "mixed: resolve_thread_lifecycle equals the reduction for 8 conversation/thread requests (latest run/state, invocation, latest event id = thread high water, updated_at, delivery, writer attach)",
+      "pass": true,
+      "observed": {
+        "requests": [
+          [
+            "conv",
+            "thread-a"
+          ],
+          [
+            "conv",
+            "thread-b"
+          ],
+          [
+            "conv2",
+            "thread-c"
+          ],
+          [
+            "<session>",
+            "thread-a"
+          ],
+          [
+            "",
+            "thread-b"
+          ],
+          [
+            "conv",
+            "missing"
+          ],
+          [
+            "trace: 1e999",
+            "[NaN]"
+          ],
+          [
+            " conv\t\n\u000b\f\r\u001c\u001d\u001e\u001f \u0085\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000",
+            "\t\n\u000b\f\r\u001c\u001d\u001e\u001f \u0085\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000thread-a"
+          ]
+        ],
+        "mismatches": [],
+        "projections": {
+          "conv|thread-a": {
+            "latest_run_id": "long",
+            "latest_run_state": "running",
+            "invocation_id": "inv-long",
+            "latest_event_id": 5192,
+            "thread_state": "awaiting_response"
+          },
+          "conv|thread-b": {
+            "latest_run_id": "s-719",
+            "latest_run_state": "completed",
+            "invocation_id": "inv-s-719",
+            "latest_event_id": 5189,
+            "thread_state": "settled"
+          },
+          "conv2|thread-c": {
+            "latest_run_id": "long2",
+            "latest_run_state": "completed",
+            "invocation_id": "inv-c-717",
+            "latest_event_id": 5190,
+            "thread_state": "response_ready_undelivered"
+          },
+          "<session>|thread-a": {
+            "latest_run_id": "",
+            "latest_run_state": "",
+            "invocation_id": "",
+            "latest_event_id": 0,
+            "thread_state": "settled"
+          },
+          "|thread-b": {
+            "latest_run_id": "s-719",
+            "latest_run_state": "completed",
+            "invocation_id": "inv-s-719",
+            "latest_event_id": 5189,
+            "thread_state": "settled"
+          },
+          "conv|missing": {
+            "latest_run_id": "",
+            "latest_run_state": "",
+            "invocation_id": "",
+            "latest_event_id": 0,
+            "thread_state": "settled"
+          }
+        }
+      }
+    },
+    {
+      "check": "maintainer's probe: runs [new failed, old completed], 2 new-run events, projection new/failed/new-inv at the high water",
+      "pass": true,
+      "observed": {
+        "runs": [
+          [
+            "new",
+            "failed"
+          ],
+          [
+            "old",
+            "completed"
+          ]
+        ],
+        "new_run_events": 2,
+        "projection": {
+          "latest_run_id": "new",
+          "latest_run_state": "failed",
+          "invocation_id": "new-inv",
+          "latest_event_id": 2002
+        },
+        "high_water": 2002
+      }
+    },
+    {
+      "check": "mixed: run 'long' starts at the session's first event (below the 2,000 run-event window) and is reported over all its events",
+      "pass": true,
+      "observed": {
+        "long": {
+          "state": "running",
+          "current_step": "final-step",
+          "started_at": "2026-10-23T08:40:02.000001+00:00",
+          "ended_at": "",
+          "event_count": 751,
+          "error": "nan"
+        },
+        "long_events": 751,
+        "first_long_event_id": 2003,
+        "oldest_event_id_in_default_window": 2869,
+        "run_events_in_session": 2743
+      }
+    },
+    {
+      "check": "mixed: run 'long2' (started below the window, completed at the end) reports its first start, last end and full count",
+      "pass": true,
+      "observed": {
+        "long2": {
+          "state": "completed",
+          "started_at": "2026-10-23T08:40:04.000001+00:00",
+          "ended_at": "2026-10-23T08:08:13.000001+00:00",
+          "event_count": 242
+        },
+        "long2_events": 242
+      }
+    },
+    {
+      "check": "bounded returned rows: runs = 1 aggregate (<= window rows) + 1 read by id (<= 4 per listed run); run events = [limit]; thread = messages + 1 aggregate row + <= 4 rows",
+      "pass": true,
+      "observed": {
+        "list_session_runs(limit=5, scan_limit=10)": [
+          4,
+          8
+        ],
+        "list_session_runs(defaults)": [
+          713,
+          29
+        ],
+        "list_session_run_events(long, limit=5)": [
+          5
+        ],
+        "resolve_thread_lifecycle(conv, thread-a)": [
+          0,
+          1,
+          3
+        ]
+      }
+    }
+  ],
+  "summary": {
+    "passed": 16,
+    "failed": 0,
+    "total": 16
+  }
+}

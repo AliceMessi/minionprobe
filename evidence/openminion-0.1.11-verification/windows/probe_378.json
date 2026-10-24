@@ -1,0 +1,378 @@
+{
+  "info": {
+    "probe": "probe_378",
+    "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+    "openminion.__version__": "0.1.11",
+    "python": "3.12.11",
+    "platform": "Windows-11-10.0.22631-SP0",
+    "sqlite3.sqlite_version": "3.50.4",
+    "cwd": "<WORK>\\runs\\probe_378",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "gc_enabled_at_start": false
+  },
+  "summary": {
+    "passed": 19,
+    "failed": 0,
+    "total": 19
+  },
+  "all_pass": true,
+  "checks": [
+    {
+      "check": "A1: import_omx of the secret bundle succeeds",
+      "pass": true
+    },
+    {
+      "check": "A1: every table's rows in the target equal the source (5 secrets rows)",
+      "pass": true,
+      "observed": {
+        "alembic_version": 1,
+        "om_meta": 3,
+        "secrets": 5
+      }
+    },
+    {
+      "check": "A1: every connection import_omx opened is closed when it returns",
+      "pass": true,
+      "observed": [
+        [
+          "transfer.py:519 _import_omx_tables_sqlite <- transfer.py:615 import_omx <- probe_378.py:130 tracked_import",
+          true
+        ],
+        [
+          "verify.py:112 run_verification <- transfer.py:622 import_omx <- probe_378.py:130 tracked_import",
+          true
+        ]
+      ]
+    },
+    {
+      "check": "A2: a runtime-written telemetry.db (echo SDK turn) exports and imports successfully",
+      "pass": true
+    },
+    {
+      "check": "A2: every table's rows in the imported telemetry DB equal the source",
+      "pass": true,
+      "observed": {
+        "events": 202,
+        "om_meta": 3
+      }
+    },
+    {
+      "check": "A2: every connection import_omx opened is closed when it returns",
+      "pass": true,
+      "observed": [
+        [
+          "transfer.py:519 _import_omx_tables_sqlite <- transfer.py:615 import_omx <- probe_378.py:130 tracked_import",
+          true
+        ],
+        [
+          "verify.py:112 run_verification <- transfer.py:622 import_omx <- probe_378.py:130 tracked_import",
+          true
+        ]
+      ]
+    },
+    {
+      "check": "B1: a failure while writing the last table reports success=False and keeps the error",
+      "pass": true,
+      "observed": {
+        "error": "forced table import failure",
+        "written": [
+          "alembic_version",
+          "om_meta",
+          "secrets"
+        ]
+      }
+    },
+    {
+      "check": "B1: every table still holds the target's previous rows (all writes rolled back)",
+      "pass": true,
+      "observed": {
+        "alembic_version": 1,
+        "om_meta": 3,
+        "secrets": 2
+      }
+    },
+    {
+      "check": "B1: the import's connection is closed after the failure",
+      "pass": true,
+      "observed": [
+        {
+          "site": "transfer.py:519 _import_omx_tables_sqlite <- transfer.py:615 import_omx <- probe_378.py:130 tracked_import",
+          "target": "<WORK>\\work\\probe_378\\B\\B1\\secret-import.db",
+          "closed": true
+        }
+      ]
+    },
+    {
+      "check": "B2: a checksum mismatch on `secrets` reports success=False and keeps the error",
+      "pass": true,
+      "observed": "Checksum mismatch for table secrets: 5cd62e4b6ee2ecf008973d1ee1a77dd2055e8840905aeeab05cea72dfdbd517c != 22c9e743fe4cb55a19dfebef446d1f808d219048623a5293ec7704a6eb4003c8"
+    },
+    {
+      "check": "B2: every table still holds the target's previous rows",
+      "pass": true,
+      "observed": {
+        "alembic_version": 1,
+        "om_meta": 3,
+        "secrets": 2
+      }
+    },
+    {
+      "check": "B2: the import's connection is closed after the failure",
+      "pass": true,
+      "observed": [
+        [
+          "transfer.py:519 _import_omx_tables_sqlite <- transfer.py:615 import_omx <- probe_378.py:130 tracked_import",
+          true
+        ]
+      ]
+    },
+    {
+      "check": "C: right after a successful import_omx, the target is renamed and deleted and its dir removed",
+      "pass": true,
+      "observed": {
+        "success": true,
+        "rename_delete": "ok",
+        "rmtree_dir": "ok"
+      }
+    },
+    {
+      "check": "C: right after each failed import_omx (B1, B2), the target is renamed and deleted and its dir removed",
+      "pass": true,
+      "observed": {
+        "B1_forced_failure": {
+          "success": false,
+          "error": "forced table import failure",
+          "rename_delete": "ok",
+          "rmtree_dir": "ok"
+        },
+        "B2_checksum_failure": {
+          "success": false,
+          "error": "Checksum mismatch for table secrets: 5cd62e4b6ee2ecf008973d1ee1a77dd2055e8840905aeeab05cea72dfdbd517c != 22c9e743fe4cb55a19dfebef446d1f808d219048623a5293ec7704a6eb4003c8",
+          "rename_delete": "ok",
+          "rmtree_dir": "ok"
+        }
+      }
+    },
+    {
+      "check": "D: import_omx into a borrowed record store succeeds and does not close it",
+      "pass": true,
+      "observed": {
+        "success": true,
+        "close_calls": 0
+      }
+    },
+    {
+      "check": "D: the borrowed target store stays usable and holds the imported rows",
+      "pass": true,
+      "observed": [
+        "s1",
+        "s2",
+        "s3",
+        "s4",
+        "s5"
+      ]
+    },
+    {
+      "check": "D: export_omx from a borrowed record store does not close it and the store stays usable",
+      "pass": true,
+      "observed": {
+        "close_calls": 0,
+        "rows": 5
+      }
+    },
+    {
+      "check": "D: the owner's own close() is the first and only close of each borrowed store",
+      "pass": true,
+      "observed": [
+        1,
+        1
+      ]
+    },
+    {
+      "check": "gc stayed disabled and gc.collect() was never called",
+      "pass": true,
+      "observed": {
+        "gc_enabled": false,
+        "gc_collect_calls": 0
+      }
+    }
+  ],
+  "observed": {
+    "A1_secret": {
+      "tables": [
+        "alembic_version",
+        "om_meta",
+        "secrets"
+      ],
+      "manifest_row_counts": {
+        "alembic_version": 1,
+        "om_meta": 3,
+        "secrets": 5
+      },
+      "success": true,
+      "error": null,
+      "exported_rows": 9,
+      "imported_rows": 9,
+      "target_secrets": [
+        [
+          "api",
+          "default",
+          "s1",
+          1.0,
+          2.0
+        ],
+        [
+          "api",
+          "team",
+          "s3",
+          3.0,
+          4.0
+        ],
+        [
+          "db",
+          "default",
+          "s2",
+          2.0,
+          3.0
+        ],
+        [
+          "hook",
+          "ops",
+          "s5",
+          5.0,
+          6.0
+        ],
+        [
+          "token",
+          "ci",
+          "s4",
+          4.0,
+          5.0
+        ]
+      ],
+      "connections": [
+        {
+          "site": "transfer.py:519 _import_omx_tables_sqlite <- transfer.py:615 import_omx <- probe_378.py:130 tracked_import",
+          "target": "<WORK>\\work\\probe_378\\A1\\target\\secret-import.db",
+          "closed": true
+        },
+        {
+          "site": "verify.py:112 run_verification <- transfer.py:622 import_omx <- probe_378.py:130 tracked_import",
+          "target": "<WORK>\\work\\probe_378\\A1\\target\\secret-import.db",
+          "closed": true
+        }
+      ]
+    },
+    "A2_runtime_telemetry_db": {
+      "run_state": "completed",
+      "application_id": "0x4f4d0007",
+      "manifest_row_counts": {
+        "events": 202,
+        "om_meta": 3
+      },
+      "success": true,
+      "error": null,
+      "imported_rows": 205,
+      "connections": [
+        {
+          "site": "transfer.py:519 _import_omx_tables_sqlite <- transfer.py:615 import_omx <- probe_378.py:130 tracked_import",
+          "target": "<WORK>\\work\\probe_378\\A2\\target\\telemetry-import.db",
+          "closed": true
+        },
+        {
+          "site": "verify.py:112 run_verification <- transfer.py:622 import_omx <- probe_378.py:130 tracked_import",
+          "target": "<WORK>\\work\\probe_378\\A2\\target\\telemetry-import.db",
+          "closed": true
+        }
+      ]
+    },
+    "B1_forced_failure": {
+      "tables_written_before_failure": [
+        "alembic_version",
+        "om_meta",
+        "secrets",
+        "alembic_version",
+        "om_meta",
+        "secrets"
+      ],
+      "success": false,
+      "error": "forced table import failure",
+      "rows_before": {
+        "alembic_version": 1,
+        "om_meta": 3,
+        "secrets": 2
+      },
+      "rows_after": {
+        "alembic_version": 1,
+        "om_meta": 3,
+        "secrets": 2
+      },
+      "connections": [
+        {
+          "site": "transfer.py:519 _import_omx_tables_sqlite <- transfer.py:615 import_omx <- probe_378.py:130 tracked_import",
+          "target": "<WORK>\\work\\probe_378\\B\\B1\\secret-import.db",
+          "closed": true
+        }
+      ]
+    },
+    "B2_checksum_failure": {
+      "success": false,
+      "error": "Checksum mismatch for table secrets: 5cd62e4b6ee2ecf008973d1ee1a77dd2055e8840905aeeab05cea72dfdbd517c != 22c9e743fe4cb55a19dfebef446d1f808d219048623a5293ec7704a6eb4003c8",
+      "rows_after": {
+        "alembic_version": 1,
+        "om_meta": 3,
+        "secrets": 2
+      },
+      "connections": [
+        {
+          "site": "transfer.py:519 _import_omx_tables_sqlite <- transfer.py:615 import_omx <- probe_378.py:130 tracked_import",
+          "target": "<WORK>\\work\\probe_378\\B\\B2\\secret-import.db",
+          "closed": true
+        }
+      ]
+    },
+    "C_windows_cleanup_untracked": {
+      "success_import": {
+        "success": true,
+        "rename_delete": "ok",
+        "rmtree_dir": "ok"
+      },
+      "B1_forced_failure": {
+        "success": false,
+        "error": "forced table import failure",
+        "rename_delete": "ok",
+        "rmtree_dir": "ok"
+      },
+      "B2_checksum_failure": {
+        "success": false,
+        "error": "Checksum mismatch for table secrets: 5cd62e4b6ee2ecf008973d1ee1a77dd2055e8840905aeeab05cea72dfdbd517c != 22c9e743fe4cb55a19dfebef446d1f808d219048623a5293ec7704a6eb4003c8",
+        "rename_delete": "ok",
+        "rmtree_dir": "ok"
+      }
+    },
+    "D_borrowed_record_stores": {
+      "import_success": true,
+      "import_error": null,
+      "target_store_close_calls_by_import": 0,
+      "target_rows_read_through_borrowed_store": [
+        "s1",
+        "s2",
+        "s3",
+        "s4",
+        "s5"
+      ],
+      "export_tables": [
+        "alembic_version",
+        "om_meta",
+        "secrets"
+      ],
+      "source_store_close_calls_by_export": 0,
+      "source_store_usable_after_export": 5,
+      "close_calls_after_owner_close": [
+        1,
+        1
+      ]
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "probe": "probe_353",
+  "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.11",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "sqlite3.sqlite_version": "3.50.4",
+  "cwd": "<WORK>\\runs\\probe_353",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "backend": "sqlite"
+}
+PASS A issue probe: list_messages returns user then assistant | observed=['user', 'assistant']
+PASS A issue probe: list_recent_messages(limit=1) returns the newest append (assistant) | observed=['assistant']
+PASS B list_messages returns the 4 tied messages in append order | observed=['conv-a/inbound', 'conv-a/outbound', 'conv-b/inbound', 'conv-b/outbound']
+PASS B rowids are 1..4 at append time and on read | observed={'append': [1, 2, 3, 4], 'read': [1, 2, 3, 4]}
+PASS B public message ids are the generated ids (unchanged)
+PASS B stored created_at unchanged (one tick) | observed=['2026-10-22T01:00:00+00:00']
+PASS B list_messages(limit=2) returns the first two appends
+PASS B list_recent_messages(limit=1) returns the newest append | observed=['0000']
+PASS B list_recent_messages(limit=3) returns the last three appends in order | observed=['cccc', '8888', '0000']
+PASS B latest_conversation_id is the newest append's conversation | observed='conv-b'
+PASS B conversation filter conv-a: append order
+PASS B conversation filter conv-a, newest limit 1: the newer append
+PASS B conversation+thread filter conv-b/thread-b: append order
+PASS B thread filter newest limit 1: newest append, session-wide rowid 4 | observed={'rowid': 4}
+PASS B thread filter after an append-time cursor: append order
+PASS C list_messages_after_rowid pages of 2 follow append order | observed=[['ffff', 'cccc'], ['8888', '0000']]
+PASS C a cursor taken at the first append still points at it after 3 later tied appends
+PASS C list_recent_messages(after_rowid, exclude_message_ids) keeps append order
+PASS D append_seq is per session and continues after close + reopen | observed={'first': [1, 2, 3], 'second': [1]}
+PASS D after restart the session reads in append order | observed=['f1', 'f2', 'f3']
+PASS E a failed append raises an integrity error | observed='IntegrityError'
+PASS E the failed append left the session row unchanged
+PASS E the failed append consumed no append_seq | observed=[1, 2]
+PASS E reads stay in append order after the rollback
+PASS F 4 handles x 10 tied appends allocate append_seq 1..40 without gaps or duplicates | observed={'count': 40}
+PASS F append-time rowids are 1..40 and increase per handle
+PASS F list_messages equals the append-time order
+PASS G first compaction (keep 2) compacts t1..t4 and anchors at t4 (rowid 4) | observed={'compacted_count': 4, 'compacted_until_rowid': 4, 'anchor_body': 't4', 'compacted_message_count': 4}
+PASS G three more appends in the same tick are all visible after the boundary, in append order | observed=['t5', 't6', 't7', 't8', 't9']
+PASS G build_history shows the uncompacted tail t5..t9 and no compacted message | observed=['t5', 't6', 't7', 't8', 't9']
+PASS G second compaction compacts t5..t7, anchors at t7 (rowid 7) and leaves t8, t9 | observed={'compacted_count': 3, 'compacted_until_rowid': 7, 'compacted_message_count': 7, 'visible': ['t8', 't9']}
+PASS G after restart the boundary and the visible tail are unchanged | observed={'visible': ['t8', 't9'], 'build_history_bodies': ['t8', 't9'], 'compacted_until_rowid': 7}
+PASS H export (ids_descending): CLI exit 0 for JSONL and Markdown | observed={'jsonl': 0, 'md': 0}
+PASS H export (ids_descending): store, JSONL and Markdown all list tied messages in append order | observed={'store': ['m0', 'm1', 'm2', 'm3'], 'jsonl': ['m0', 'm1', 'm2', 'm3'], 'md': ['m0', 'm1', 'm2', 'm3']}
+PASS H export (ids_ascending): CLI exit 0 for JSONL and Markdown | observed={'jsonl': 0, 'md': 0}
+PASS H export (ids_ascending): store, JSONL and Markdown all list tied messages in append order | observed={'store': ['m0', 'm1', 'm2', 'm3'], 'jsonl': ['m0', 'm1', 'm2', 'm3'], 'md': ['m0', 'm1', 'm2', 'm3']}
+{"summary": {"passed": 36, "failed": 0, "total": 36}, "all_pass": true}

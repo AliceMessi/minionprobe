@@ -1,0 +1,22 @@
+{
+  "probe": "probe_361_cleanup",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "gc_enabled_at_start": false
+}
+PASS 1. five echo SDK turns complete | observed=5
+PASS 1. memory.audit.db exists after runtime.close() in every run | observed=[True, True, True, True, True]
+PASS 1. memory.audit.db renamed immediately after runtime.close() (GC off, no retry): 5/5 | observed=['ok', 'ok', 'ok', 'ok', 'ok']
+PASS 1. the renamed audit database deleted immediately: 5/5 | observed=['ok', 'ok', 'ok', 'ok', 'ok']
+PASS 1. the whole temporary runtime root removed by one shutil.rmtree, no errors: 5/5 | observed=[[], [], [], [], []]
+PASS 2. attributed run: no live sqlite3 connection to any file under the runtime root after runtime.close() | observed=[]
+PASS 2. attributed run: audit database renamed and deleted, runtime root removed | observed={'rename_memory.audit.db': 'ok', 'delete_renamed_audit_db': 'ok', 'rmtree_runtime_root_errors': [], 'runtime_root_removed': True}
+PASS automatic GC stayed disabled and gc.collect() was never called | observed={'gc_enabled': False, 'gc_collect_calls': 0}
+8/8 checks pass
+exit=0

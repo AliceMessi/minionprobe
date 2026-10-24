@@ -1,0 +1,613 @@
+Using Python 3.12.15 environment at: <VENV0110>
+Using Python 3.12.15 environment at: <VENV>
+Using Python 3.12.15 environment at: <VENV>
+provenance: 1 match
+=== probe_352_history_0110_sqlite: 0.1.10 python -I probe_352_history.py <RUNNER_TEMP>/work352/h0110_sqlite <RUNNER_TEMP>/logs/out/probe_352_history_0110_sqlite.json sqlite:<RUNNER_TEMP>/work352/seed12.db
+{
+  "probe": "probe_352_history",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.10",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty/probe_352_history_0110_sqlite",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "target": "sqlite:seed12.db",
+  "mode": "write"
+}
+PASS writer closed; events stored | observed={'stored_events': 5192, 'per_session': [2002, 3190]}
+PASS migration ledger head | observed={'ledger_max': 11, 'event_run_facts_table': False}
+events digest: bcd14f1ae8abcf10092279780ec89a432d53304ef68628538dbe87de6da23cc3 | ledger max: 11
+exit=0 cwd_files=0
+=== probe_352_history_0110_direct_sqlite: 0.1.10 python -I probe_352_history.py <RUNNER_TEMP>/work352/h0110d_sqlite <RUNNER_TEMP>/logs/out/probe_352_history_0110_direct_sqlite.json sqlite:<RUNNER_TEMP>/work352/direct.db
+{
+  "probe": "probe_352_history",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.10",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty/probe_352_history_0110_direct_sqlite",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "target": "sqlite:direct.db",
+  "mode": "write"
+}
+PASS writer closed; events stored | observed={'stored_events': 5192, 'per_session': [2002, 3190]}
+PASS migration ledger head | observed={'ledger_max': 11, 'event_run_facts_table': False}
+events digest: 5e329d66ab8fae858b6f55d0c78434442fcddf9ca4dbbe916a3adee4fd863bc3 | ledger max: 11
+exit=0 cwd_files=0
+=== probe_352_check_upgrade12_sqlite: 0.1.11 python -I probe_352_check.py <RUNNER_TEMP>/work352/up12_sqlite <RUNNER_TEMP>/logs/out/probe_352_check_upgrade12_sqlite.json sqlite:<RUNNER_TEMP>/work352/seed12.db --mode upgrade --step12 --seed <RUNNER_TEMP>/logs/out/probe_352_history_0110_sqlite.json
+{
+  "probe": "probe_352_check",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty/probe_352_check_upgrade12_sqlite",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "target": "sqlite:seed12.db",
+  "mode": "upgrade",
+  "step12": true
+}
+PASS stored events equal the writer's record (sha256 of every event row) | observed={'writer_version': '0.1.10', 'digest': 'bcd14f1ae8abcf10092279780ec89a432d53304ef68628538dbe87de6da23cc3', 'events': 5192}
+PASS pre-upgrade database is the 0.1.10 schema: ledger 1..11, no event_run_facts table | observed={'ledger': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 'event_run_facts_table': False}
+PASS pre-upgrade backup taken (file copy, sha256 equal to the database) | observed={'file': 'backup-pre-upgrade.db', 'sha256': '9d2f160be8fe924c6dd3682856fc2fea6d90c74569f9346edd67feb0688d37ea'}
+PASS 0.1.11 migrations <= 12 applied alone: a migration-12 database (ledger 1..12, no event_run_facts), events unchanged | observed={'applied_versions': [12], 'ledger': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], 'event_run_facts_table': False}
+PASS normal open (build_runtime_storage) applies the expected migrations; ledger 1..13 | observed={'applied_versions': [13], 'expected': [13], 'ledger_max': 13}
+PASS every stored event row unchanged by the open/upgrade (sha256 of all event rows) | observed={'events': 5192, 'digest': 'bcd14f1ae8abcf10092279780ec89a432d53304ef68628538dbe87de6da23cc3'}
+PASS event_run_facts: one row per event, equal to 0.1.11 event_run_facts() and to the 0.1.10 expressions; ASCII keys without NUL | observed={'events': 5192, 'facts': 5192, 'facts_without_event': [], 'mismatch_vs_event_run_facts': [], 'mismatch_count_vs_event_run_facts': 0, 'mismatch_vs_0110_expressions': [], 'mismatch_count_vs_0110_expressions': 0, 'bad_keys': [], 'ok': True}
+PASS window: list_session_runs equals the reduction for 10 scan limits x 4 limits, and with defaults | observed={'run_events_in_session': 2002, 'events_in_session': 2002, 'combinations': 41, 'mismatches': [], 'default_listing_first': [{'run_id': 'new', 'started_at': '2026-10-23T09:33:20.000001+00:00', 'ended_at': '2026-10-23T09:33:21.000001+00:00', 'current_step': 'step', 'error': '', 'event_count': 2, 'state': 'failed'}, {'run_id': 'old', 'started_at': '2026-10-23T09:00:00.000001+00:00', 'ended_at': '2026-10-23T09:33:19.000001+00:00', 'current_step': 'step', 'error': '', 'event_count': 2000, 'state': 'completed'}]}
+PASS window: list_session_run_events returns each run's newest events (all 2 runs, limits [1, 2, 200, 1000], exact and padded requests) | observed={'runs': 2, 'calls': 16, 'mismatches': []}
+PASS window: resolve_thread_lifecycle equals the reduction for 4 conversation/thread requests (latest run/state, invocation, latest event id = thread high water, updated_at, delivery, writer attach) | observed={'requests': [['conv', 'thread'], ['<session>', 'thread'], ['', 'thread'], ['conv', 'missing']], 'mismatches': [], 'projections': {'conv|thread': {'latest_run_id': 'new', 'latest_run_state': 'failed', 'invocation_id': 'new-inv', 'latest_event_id': 2002, 'thread_state': 'failed'}, '<session>|thread': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}, '|thread': {'latest_run_id': 'new', 'latest_run_state': 'failed', 'invocation_id': 'new-inv', 'latest_event_id': 2002, 'thread_state': 'failed'}, 'conv|missing': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}}}
+PASS mixed: list_session_runs equals the reduction for 11 scan limits x 4 limits, and with defaults | observed={'run_events_in_session': 2757, 'events_in_session': 3190, 'combinations': 45, 'mismatches': [], 'default_listing_first': [{'run_id': 'long2', 'started_at': '2026-10-23T08:40:04.000001+00:00', 'ended_at': '2026-10-23T08:08:13.000001+00:00', 'current_step': 'c-step-717', 'error': '', 'event_count': 242, 'state': 'completed'}, {'run_id': 'long', 'started_at': '2026-10-23T08:40:02.000001+00:00', 'ended_at': '', 'current_step': 'final-step', 'error': 'nan', 'event_count': 751, 'state': 'running'}]}
+PASS mixed: list_session_run_events returns each run's newest events (all 972 runs, limits [1, 2, 200, 1000], exact and padded requests) | observed={'runs': 972, 'calls': 7776, 'mismatches': []}
+PASS mixed: resolve_thread_lifecycle equals the reduction for 8 conversation/thread requests (latest run/state, invocation, latest event id = thread high water, updated_at, delivery, writer attach) | observed={'requests': [['conv', 'thread-a'], ['conv', 'thread-b'], ['conv2', 'thread-c'], ['<session>', 'thread-a'], ['', 'thread-b'], ['conv', 'missing'], ['trace: 1e999', '[NaN]'], [' conv\t\n\x0b\x0c\r\x1c\x1d\x1e\x1f \x85\xa0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000', '\t\n\x0b\x0c\r\x1c\x1d\x1e\x1f \x85\xa0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000thread-a']], 'mismatches': [], 'projections': {'conv|thread-a': {'latest_run_id': 'long', 'latest_run_state': 'running', 'invocation_id': 'inv-long', 'latest_event_id': 5192, 'thread_state': 'awaiting_response'}, 'conv|thread-b': {'latest_run_id': 's-719', 'latest_run_state': 'completed', 'invocation_id': 'inv-s-719', 'latest_event_id': 5189, 'thread_state': 'settled'}, 'conv2|thread-c': {'latest_run_id': 'long2', 'latest_run_state': 'completed', 'invocation_id': 'inv-c-717', 'latest_event_id': 5190, 'thread_state': 'response_ready_undelivered'}, '<session>|thread-a': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}, '|thread-b': {'latest_run_id': 's-719', 'latest_run_state': 'completed', 'invocation_id': 'inv-s-719', 'latest_event_id': 5189, 'thread_state': 'settled'}, 'conv|missing': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}}}
+PASS maintainer's probe: runs [new failed, old completed], 2 new-run events, projection new/failed/new-inv at the high water | observed={'runs': [['new', 'failed'], ['old', 'completed']], 'new_run_events': 2, 'projection': {'latest_run_id': 'new', 'latest_run_state': 'failed', 'invocation_id': 'new-inv', 'latest_event_id': 2002}, 'high_water': 2002}
+PASS mixed: run 'long' starts at the session's first event (below the 2,000 run-event window) and is reported over all its events | observed={'long': {'state': 'running', 'current_step': 'final-step', 'started_at': '2026-10-23T08:40:02.000001+00:00', 'ended_at': '', 'event_count': 751, 'error': 'nan'}, 'long_events': 751, 'first_long_event_id': 2003, 'oldest_event_id_in_default_window': 2882, 'run_events_in_session': 2757}
+PASS mixed: run 'long2' (started below the window, completed at the end) reports its first start, last end and full count | observed={'long2': {'state': 'completed', 'started_at': '2026-10-23T08:40:04.000001+00:00', 'ended_at': '2026-10-23T08:08:13.000001+00:00', 'event_count': 242}, 'long2_events': 242}
+PASS bounded returned rows: runs = 1 aggregate (<= window rows) + 1 read by id (<= 4 per listed run); run events = [limit]; thread = messages + 1 aggregate row + <= 4 rows | observed={'list_session_runs(limit=5, scan_limit=10)': [4, 8], 'list_session_runs(defaults)': [709, 28], 'list_session_run_events(long, limit=5)': [5], 'resolve_thread_lifecycle(conv, thread-a)': [0, 1, 3]}
+summary: {'passed': 17, 'failed': 0, 'total': 17} | readers digest: 366f9184fb48dc090190b1cfa5620bd0a58071df1508f5ddcfe370498080514f
+exit=0 cwd_files=0
+=== probe_352_check_upgrade_direct_sqlite: 0.1.11 python -I probe_352_check.py <RUNNER_TEMP>/work352/direct_sqlite <RUNNER_TEMP>/logs/out/probe_352_check_upgrade_direct_sqlite.json sqlite:<RUNNER_TEMP>/work352/direct.db --mode upgrade --seed <RUNNER_TEMP>/logs/out/probe_352_history_0110_direct_sqlite.json
+{
+  "probe": "probe_352_check",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty/probe_352_check_upgrade_direct_sqlite",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "target": "sqlite:direct.db",
+  "mode": "upgrade",
+  "step12": false
+}
+PASS stored events equal the writer's record (sha256 of every event row) | observed={'writer_version': '0.1.10', 'digest': '5e329d66ab8fae858b6f55d0c78434442fcddf9ca4dbbe916a3adee4fd863bc3', 'events': 5192}
+PASS pre-upgrade database is the 0.1.10 schema: ledger 1..11, no event_run_facts table | observed={'ledger': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 'event_run_facts_table': False}
+PASS pre-upgrade backup taken (file copy, sha256 equal to the database) | observed={'file': 'backup-pre-upgrade.db', 'sha256': '893f2df5a0f052330168b668fc48aa5c1c9526c89e812ed1c9f5c3361654b63f'}
+PASS normal open (build_runtime_storage) applies the expected migrations; ledger 1..13 | observed={'applied_versions': [12, 13], 'expected': [12, 13], 'ledger_max': 13}
+PASS every stored event row unchanged by the open/upgrade (sha256 of all event rows) | observed={'events': 5192, 'digest': '5e329d66ab8fae858b6f55d0c78434442fcddf9ca4dbbe916a3adee4fd863bc3'}
+PASS event_run_facts: one row per event, equal to 0.1.11 event_run_facts() and to the 0.1.10 expressions; ASCII keys without NUL | observed={'events': 5192, 'facts': 5192, 'facts_without_event': [], 'mismatch_vs_event_run_facts': [], 'mismatch_count_vs_event_run_facts': 0, 'mismatch_vs_0110_expressions': [], 'mismatch_count_vs_0110_expressions': 0, 'bad_keys': [], 'ok': True}
+PASS window: list_session_runs equals the reduction for 10 scan limits x 4 limits, and with defaults | observed={'run_events_in_session': 2002, 'events_in_session': 2002, 'combinations': 41, 'mismatches': [], 'default_listing_first': [{'run_id': 'new', 'started_at': '2026-10-23T09:33:20.000001+00:00', 'ended_at': '2026-10-23T09:33:21.000001+00:00', 'current_step': 'step', 'error': '', 'event_count': 2, 'state': 'failed'}, {'run_id': 'old', 'started_at': '2026-10-23T09:00:00.000001+00:00', 'ended_at': '2026-10-23T09:33:19.000001+00:00', 'current_step': 'step', 'error': '', 'event_count': 2000, 'state': 'completed'}]}
+PASS window: list_session_run_events returns each run's newest events (all 2 runs, limits [1, 2, 200, 1000], exact and padded requests) | observed={'runs': 2, 'calls': 16, 'mismatches': []}
+PASS window: resolve_thread_lifecycle equals the reduction for 4 conversation/thread requests (latest run/state, invocation, latest event id = thread high water, updated_at, delivery, writer attach) | observed={'requests': [['conv', 'thread'], ['<session>', 'thread'], ['', 'thread'], ['conv', 'missing']], 'mismatches': [], 'projections': {'conv|thread': {'latest_run_id': 'new', 'latest_run_state': 'failed', 'invocation_id': 'new-inv', 'latest_event_id': 2002, 'thread_state': 'failed'}, '<session>|thread': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}, '|thread': {'latest_run_id': 'new', 'latest_run_state': 'failed', 'invocation_id': 'new-inv', 'latest_event_id': 2002, 'thread_state': 'failed'}, 'conv|missing': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}}}
+PASS mixed: list_session_runs equals the reduction for 11 scan limits x 4 limits, and with defaults | observed={'run_events_in_session': 2757, 'events_in_session': 3190, 'combinations': 45, 'mismatches': [], 'default_listing_first': [{'run_id': 'long2', 'started_at': '2026-10-23T08:40:04.000001+00:00', 'ended_at': '2026-10-23T08:08:13.000001+00:00', 'current_step': 'c-step-717', 'error': '', 'event_count': 242, 'state': 'completed'}, {'run_id': 'long', 'started_at': '2026-10-23T08:40:02.000001+00:00', 'ended_at': '', 'current_step': 'final-step', 'error': 'nan', 'event_count': 751, 'state': 'running'}]}
+PASS mixed: list_session_run_events returns each run's newest events (all 972 runs, limits [1, 2, 200, 1000], exact and padded requests) | observed={'runs': 972, 'calls': 7776, 'mismatches': []}
+PASS mixed: resolve_thread_lifecycle equals the reduction for 8 conversation/thread requests (latest run/state, invocation, latest event id = thread high water, updated_at, delivery, writer attach) | observed={'requests': [['conv', 'thread-a'], ['conv', 'thread-b'], ['conv2', 'thread-c'], ['<session>', 'thread-a'], ['', 'thread-b'], ['conv', 'missing'], ['trace: 1e999', '[NaN]'], [' conv\t\n\x0b\x0c\r\x1c\x1d\x1e\x1f \x85\xa0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000', '\t\n\x0b\x0c\r\x1c\x1d\x1e\x1f \x85\xa0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000thread-a']], 'mismatches': [], 'projections': {'conv|thread-a': {'latest_run_id': 'long', 'latest_run_state': 'running', 'invocation_id': 'inv-long', 'latest_event_id': 5192, 'thread_state': 'awaiting_response'}, 'conv|thread-b': {'latest_run_id': 's-719', 'latest_run_state': 'completed', 'invocation_id': 'inv-s-719', 'latest_event_id': 5189, 'thread_state': 'settled'}, 'conv2|thread-c': {'latest_run_id': 'long2', 'latest_run_state': 'completed', 'invocation_id': 'inv-c-717', 'latest_event_id': 5190, 'thread_state': 'response_ready_undelivered'}, '<session>|thread-a': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}, '|thread-b': {'latest_run_id': 's-719', 'latest_run_state': 'completed', 'invocation_id': 'inv-s-719', 'latest_event_id': 5189, 'thread_state': 'settled'}, 'conv|missing': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}}}
+PASS maintainer's probe: runs [new failed, old completed], 2 new-run events, projection new/failed/new-inv at the high water | observed={'runs': [['new', 'failed'], ['old', 'completed']], 'new_run_events': 2, 'projection': {'latest_run_id': 'new', 'latest_run_state': 'failed', 'invocation_id': 'new-inv', 'latest_event_id': 2002}, 'high_water': 2002}
+PASS mixed: run 'long' starts at the session's first event (below the 2,000 run-event window) and is reported over all its events | observed={'long': {'state': 'running', 'current_step': 'final-step', 'started_at': '2026-10-23T08:40:02.000001+00:00', 'ended_at': '', 'event_count': 751, 'error': 'nan'}, 'long_events': 751, 'first_long_event_id': 2003, 'oldest_event_id_in_default_window': 2882, 'run_events_in_session': 2757}
+PASS mixed: run 'long2' (started below the window, completed at the end) reports its first start, last end and full count | observed={'long2': {'state': 'completed', 'started_at': '2026-10-23T08:40:04.000001+00:00', 'ended_at': '2026-10-23T08:08:13.000001+00:00', 'event_count': 242}, 'long2_events': 242}
+PASS bounded returned rows: runs = 1 aggregate (<= window rows) + 1 read by id (<= 4 per listed run); run events = [limit]; thread = messages + 1 aggregate row + <= 4 rows | observed={'list_session_runs(limit=5, scan_limit=10)': [4, 8], 'list_session_runs(defaults)': [709, 28], 'list_session_run_events(long, limit=5)': [5], 'resolve_thread_lifecycle(conv, thread-a)': [0, 1, 3]}
+summary: {'passed': 16, 'failed': 0, 'total': 16} | readers digest: 366f9184fb48dc090190b1cfa5620bd0a58071df1508f5ddcfe370498080514f
+exit=0 cwd_files=0
+=== probe_352_backup_0110_sqlite: 0.1.10 python -I probe_352_history.py <RUNNER_TEMP>/work352/bk_sqlite <RUNNER_TEMP>/logs/out/probe_352_backup_0110_sqlite.json sqlite:<RUNNER_TEMP>/work352/up12_sqlite/backup-pre-upgrade.db --verify-only
+{
+  "probe": "probe_352_history",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.10",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty/probe_352_backup_0110_sqlite",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "target": "sqlite:backup-pre-upgrade.db",
+  "mode": "verify-only"
+}
+PASS writer closed; events stored | observed={'stored_events': 5192, 'per_session': [2002, 3190]}
+PASS migration ledger head | observed={'ledger_max': 11, 'event_run_facts_table': False}
+events digest: bcd14f1ae8abcf10092279780ec89a432d53304ef68628538dbe87de6da23cc3 | ledger max: 11
+exit=0 cwd_files=0
+=== probe_352_compare_backup_sqlite: 0.1.11 python -I probe_352_compare.py digest <RUNNER_TEMP>/logs/out/probe_352_compare_backup_sqlite.json <RUNNER_TEMP>/logs/out/probe_352_history_0110_sqlite.json <RUNNER_TEMP>/logs/out/probe_352_backup_0110_sqlite.json
+{
+  "probe": "probe_352_compare",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty/probe_352_compare_backup_sqlite",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "mode": "digest",
+  "files": [
+    "probe_352_history_0110_sqlite.json",
+    "probe_352_backup_0110_sqlite.json"
+  ]
+}
+PASS pre-upgrade backup read back by 0.1.10: same sha256 of every event row as the 0.1.10 writer recorded, ledger 11 | observed={'events_digest': {'probe_352_history_0110_sqlite.json': 'bcd14f1ae8abcf10092279780ec89a432d53304ef68628538dbe87de6da23cc3', 'probe_352_backup_0110_sqlite.json': 'bcd14f1ae8abcf10092279780ec89a432d53304ef68628538dbe87de6da23cc3'}, 'ledger_max': {'probe_352_history_0110_sqlite.json': 11, 'probe_352_backup_0110_sqlite.json': 11}}
+summary: {'passed': 1, 'failed': 0, 'total': 1}
+exit=0 cwd_files=0
+=== probe_352_history_0111_sqlite: 0.1.11 python -I probe_352_history.py <RUNNER_TEMP>/work352/h0111_sqlite <RUNNER_TEMP>/logs/out/probe_352_history_0111_sqlite.json sqlite:<RUNNER_TEMP>/work352/fresh.db
+{
+  "probe": "probe_352_history",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty/probe_352_history_0111_sqlite",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "target": "sqlite:fresh.db",
+  "mode": "write"
+}
+PASS writer closed; events stored | observed={'stored_events': 5192, 'per_session': [2002, 3190]}
+PASS migration ledger head | observed={'ledger_max': 13, 'event_run_facts_table': True}
+events digest: cd1e6a3d587d54341134de35d860bb5c1f0747973f4fe367f55cf2820a2b0bf7 | ledger max: 13
+exit=0 cwd_files=0
+=== probe_352_check_fresh_sqlite: 0.1.11 python -I probe_352_check.py <RUNNER_TEMP>/work352/fresh_sqlite <RUNNER_TEMP>/logs/out/probe_352_check_fresh_sqlite.json sqlite:<RUNNER_TEMP>/work352/fresh.db --mode fresh --seed <RUNNER_TEMP>/logs/out/probe_352_history_0111_sqlite.json
+{
+  "probe": "probe_352_check",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty/probe_352_check_fresh_sqlite",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "target": "sqlite:fresh.db",
+  "mode": "fresh",
+  "step12": false
+}
+PASS stored events equal the writer's record (sha256 of every event row) | observed={'writer_version': '0.1.11', 'digest': 'cd1e6a3d587d54341134de35d860bb5c1f0747973f4fe367f55cf2820a2b0bf7', 'events': 5192}
+PASS normal open (build_runtime_storage) applies the expected migrations; ledger 1..13 | observed={'applied_versions': [], 'expected': [], 'ledger_max': 13}
+PASS every stored event row unchanged by the open/upgrade (sha256 of all event rows) | observed={'events': 5192, 'digest': 'cd1e6a3d587d54341134de35d860bb5c1f0747973f4fe367f55cf2820a2b0bf7'}
+PASS event_run_facts: one row per event, equal to 0.1.11 event_run_facts() and to the 0.1.10 expressions; ASCII keys without NUL | observed={'events': 5192, 'facts': 5192, 'facts_without_event': [], 'mismatch_vs_event_run_facts': [], 'mismatch_count_vs_event_run_facts': 0, 'mismatch_vs_0110_expressions': [], 'mismatch_count_vs_0110_expressions': 0, 'bad_keys': [], 'ok': True}
+PASS window: list_session_runs equals the reduction for 10 scan limits x 4 limits, and with defaults | observed={'run_events_in_session': 2002, 'events_in_session': 2002, 'combinations': 41, 'mismatches': [], 'default_listing_first': [{'run_id': 'new', 'started_at': '2026-10-23T09:33:20.000001+00:00', 'ended_at': '2026-10-23T09:33:21.000001+00:00', 'current_step': 'step', 'error': '', 'event_count': 2, 'state': 'failed'}, {'run_id': 'old', 'started_at': '2026-10-23T09:00:00.000001+00:00', 'ended_at': '2026-10-23T09:33:19.000001+00:00', 'current_step': 'step', 'error': '', 'event_count': 2000, 'state': 'completed'}]}
+PASS window: list_session_run_events returns each run's newest events (all 2 runs, limits [1, 2, 200, 1000], exact and padded requests) | observed={'runs': 2, 'calls': 16, 'mismatches': []}
+PASS window: resolve_thread_lifecycle equals the reduction for 4 conversation/thread requests (latest run/state, invocation, latest event id = thread high water, updated_at, delivery, writer attach) | observed={'requests': [['conv', 'thread'], ['<session>', 'thread'], ['', 'thread'], ['conv', 'missing']], 'mismatches': [], 'projections': {'conv|thread': {'latest_run_id': 'new', 'latest_run_state': 'failed', 'invocation_id': 'new-inv', 'latest_event_id': 2002, 'thread_state': 'failed'}, '<session>|thread': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}, '|thread': {'latest_run_id': 'new', 'latest_run_state': 'failed', 'invocation_id': 'new-inv', 'latest_event_id': 2002, 'thread_state': 'failed'}, 'conv|missing': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}}}
+PASS mixed: list_session_runs equals the reduction for 11 scan limits x 4 limits, and with defaults | observed={'run_events_in_session': 2757, 'events_in_session': 3190, 'combinations': 45, 'mismatches': [], 'default_listing_first': [{'run_id': 'long2', 'started_at': '2026-10-23T08:40:04.000001+00:00', 'ended_at': '2026-10-23T08:08:13.000001+00:00', 'current_step': 'c-step-717', 'error': '', 'event_count': 242, 'state': 'completed'}, {'run_id': 'long', 'started_at': '2026-10-23T08:40:02.000001+00:00', 'ended_at': '', 'current_step': 'final-step', 'error': 'nan', 'event_count': 751, 'state': 'running'}]}
+PASS mixed: list_session_run_events returns each run's newest events (all 972 runs, limits [1, 2, 200, 1000], exact and padded requests) | observed={'runs': 972, 'calls': 7776, 'mismatches': []}
+PASS mixed: resolve_thread_lifecycle equals the reduction for 8 conversation/thread requests (latest run/state, invocation, latest event id = thread high water, updated_at, delivery, writer attach) | observed={'requests': [['conv', 'thread-a'], ['conv', 'thread-b'], ['conv2', 'thread-c'], ['<session>', 'thread-a'], ['', 'thread-b'], ['conv', 'missing'], ['trace: 1e999', '[NaN]'], [' conv\t\n\x0b\x0c\r\x1c\x1d\x1e\x1f \x85\xa0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000', '\t\n\x0b\x0c\r\x1c\x1d\x1e\x1f \x85\xa0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000thread-a']], 'mismatches': [], 'projections': {'conv|thread-a': {'latest_run_id': 'long', 'latest_run_state': 'running', 'invocation_id': 'inv-long', 'latest_event_id': 5192, 'thread_state': 'awaiting_response'}, 'conv|thread-b': {'latest_run_id': 's-719', 'latest_run_state': 'completed', 'invocation_id': 'inv-s-719', 'latest_event_id': 5189, 'thread_state': 'settled'}, 'conv2|thread-c': {'latest_run_id': 'long2', 'latest_run_state': 'completed', 'invocation_id': 'inv-c-717', 'latest_event_id': 5190, 'thread_state': 'response_ready_undelivered'}, '<session>|thread-a': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}, '|thread-b': {'latest_run_id': 's-719', 'latest_run_state': 'completed', 'invocation_id': 'inv-s-719', 'latest_event_id': 5189, 'thread_state': 'settled'}, 'conv|missing': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}}}
+PASS maintainer's probe: runs [new failed, old completed], 2 new-run events, projection new/failed/new-inv at the high water | observed={'runs': [['new', 'failed'], ['old', 'completed']], 'new_run_events': 2, 'projection': {'latest_run_id': 'new', 'latest_run_state': 'failed', 'invocation_id': 'new-inv', 'latest_event_id': 2002}, 'high_water': 2002}
+PASS mixed: run 'long' starts at the session's first event (below the 2,000 run-event window) and is reported over all its events | observed={'long': {'state': 'running', 'current_step': 'final-step', 'started_at': '2026-10-23T08:40:02.000001+00:00', 'ended_at': '', 'event_count': 751, 'error': 'nan'}, 'long_events': 751, 'first_long_event_id': 2003, 'oldest_event_id_in_default_window': 2882, 'run_events_in_session': 2757}
+PASS mixed: run 'long2' (started below the window, completed at the end) reports its first start, last end and full count | observed={'long2': {'state': 'completed', 'started_at': '2026-10-23T08:40:04.000001+00:00', 'ended_at': '2026-10-23T08:08:13.000001+00:00', 'event_count': 242}, 'long2_events': 242}
+PASS bounded returned rows: runs = 1 aggregate (<= window rows) + 1 read by id (<= 4 per listed run); run events = [limit]; thread = messages + 1 aggregate row + <= 4 rows | observed={'list_session_runs(limit=5, scan_limit=10)': [4, 8], 'list_session_runs(defaults)': [709, 28], 'list_session_run_events(long, limit=5)': [5], 'resolve_thread_lifecycle(conv, thread-a)': [0, 1, 3]}
+summary: {'passed': 14, 'failed': 0, 'total': 14} | readers digest: 366f9184fb48dc090190b1cfa5620bd0a58071df1508f5ddcfe370498080514f
+exit=0 cwd_files=0
+=== probe_352_compare_readers_sqlite: 0.1.11 python -I probe_352_compare.py readers <RUNNER_TEMP>/logs/out/probe_352_compare_readers_sqlite.json <RUNNER_TEMP>/logs/out/probe_352_check_fresh_sqlite.json <RUNNER_TEMP>/logs/out/probe_352_check_upgrade12_sqlite.json <RUNNER_TEMP>/logs/out/probe_352_check_upgrade_direct_sqlite.json
+{
+  "probe": "probe_352_compare",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty/probe_352_compare_readers_sqlite",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "mode": "readers",
+  "files": [
+    "probe_352_check_fresh_sqlite.json",
+    "probe_352_check_upgrade12_sqlite.json",
+    "probe_352_check_upgrade_direct_sqlite.json"
+  ]
+}
+PASS same history: identical event content and identical reader outputs on the fresh and the upgraded databases | observed={'readers_digest': {'probe_352_check_fresh_sqlite.json': '366f9184fb48dc090190b1cfa5620bd0a58071df1508f5ddcfe370498080514f', 'probe_352_check_upgrade12_sqlite.json': '366f9184fb48dc090190b1cfa5620bd0a58071df1508f5ddcfe370498080514f', 'probe_352_check_upgrade_direct_sqlite.json': '366f9184fb48dc090190b1cfa5620bd0a58071df1508f5ddcfe370498080514f'}, 'events_content_digest': {'probe_352_check_fresh_sqlite.json': 'dda1ff3d28c652687b271a3022364b1c038e786be4f027af5df735239c628a80', 'probe_352_check_upgrade12_sqlite.json': 'dda1ff3d28c652687b271a3022364b1c038e786be4f027af5df735239c628a80', 'probe_352_check_upgrade_direct_sqlite.json': 'dda1ff3d28c652687b271a3022364b1c038e786be4f027af5df735239c628a80'}}
+summary: {'passed': 1, 'failed': 0, 'total': 1}
+exit=0 cwd_files=0
+=== probe_352_contract_sqlite: 0.1.11 python -I probe_352_contract.py <RUNNER_TEMP>/work352/contract_sqlite <RUNNER_TEMP>/logs/out/probe_352_contract_sqlite.json sqlite:<RUNNER_TEMP>/work352/contract.db
+{
+  "probe": "probe_352_contract",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty/probe_352_contract_sqlite",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "target": "sqlite:contract.db"
+}
+PASS 1. interleaved runs (special, padded, nested, upper-case ids; stepping clock): run listing and run events equal the reduction | observed={'run_events': 69, 'runs': 36, 'listing_combinations': 24, 'run_event_calls': 216}
+PASS 2. interleaved threads: thread lifecycle equals the reduction (latest run/state, invocation, high water, delivery, writer) | observed={"'conv'|'quiet'": {'latest_run_id': 'q1', 'latest_run_state': 'completed', 'invocation_id': 'inv-q1', 'latest_event_id': 146}, "'conv'|'busy'": {'latest_run_id': 'b11', 'latest_run_state': 'running', 'invocation_id': 'inv-b11', 'latest_event_id': 145}, "'conv'|'missing'": {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0}, "'<session>'|'busy'": {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 127}, "''|'quiet'": {'latest_run_id': 'q1', 'latest_run_state': 'completed', 'invocation_id': 'inv-q1', 'latest_event_id': 146}}
+PASS 3a. padded fields, null/bool/number/container ids, JSON-token text, zero-width space, RUN. prefix: readers equal the reduction | observed={'runs': {'run_events': 17, 'runs': 10, 'listing_combinations': 24, 'run_event_calls': 60}, 'threads': {"'conv'|'t'": {'latest_run_id': 't1', 'latest_run_state': 'failed', 'invocation_id': 'None', 'latest_event_id': 175}, "'<session>'|'t'": {'latest_run_id': 't5', 'latest_run_state': 'waiting_tool', 'invocation_id': '', 'latest_event_id': 171}, "'conv'|'\\u200bt'": {'latest_run_id': 'zw', 'latest_run_state': 'queued', 'invocation_id': '', 'latest_event_id': 174}, "''|'t'": {'latest_run_id': 't1', 'latest_run_state': 'failed', 'invocation_id': 'None', 'latest_event_id': 175}, "' conv\\t\\n\\x0b\\x0c\\r\\x1c\\x1d\\x1e\\x1f \\x85\\xa0\\u1680\\u2000\\u2001\\u2002\\u2003\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000'|'\\t\\n\\x0b\\x0c\\r\\x1c\\x1d\\x1e\\x1f \\x85\\xa0\\u1680\\u2000\\u2001\\u2002\\u2003\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000t'": {'latest_run_id': 't1', 'latest_run_state': 'failed', 'invocation_id': 'None', 'latest_event_id': 175}, "'trace: NaN'|'[NaN]'": {'latest_run_id': 'trace, Infinity', 'latest_run_state': 'queued', 'invocation_id': 'trace: 1e999', 'latest_event_id': 172}, "'trace: 1e999'|'[1e999]'": {'latest_run_id': 'x', 'latest_run_state': 'running', 'invocation_id': '', 'latest_event_id': 173}}}
+PASS 3b. the four #372 review cases: padded run id is one run; blank error keeps the earlier error; padded state; padded thread ids | observed={'padded run id': [['r', 2]], 'blank error': 'earlier error', 'padded state': ['running', ''], 'padded thread': ['failed', 183, 183]}
+PASS 3c. ids that look like JSON tokens keep their exact text: 4 distinct runs, each run/thread read exactly | observed=[['[NaN]', 1], ['trace, Infinity', 1], ['trace: 1e999', 1], ['trace: NaN', 1]]
+PASS 3d. decoded-ID order: runs starting at the same timestamp are listed by decoded run id (descending), not by their JSON-encoded keys | observed={'listed': ['éa', 'é', 'z', 'back]slash', 'back\\slash', 'b#', 'b"', 'Z'], 'json_key_order_would_be': ['z', 'back]slash', 'back\\slash', 'b"', 'b#', 'éa', 'é', 'Z']}
+PASS 4. event facts of 486 events (9 keys x 27 values incl. padding, zero-width space, token text, every JSON type, NaN, +-Infinity, NUL) equal 0.1.10's expressions; exact decoded ids; ASCII keys without NUL | observed={'events': 486, 'facts_rows': 486}
+PASS 5a. NaN/Infinity/NUL in run fields and in unrelated tool/attach fields: readers equal the reduction; run r = failed/'inf'/'bad<NUL>byte'/4 | observed={'runs': {'run_events': 8, 'runs': 5, 'listing_combinations': 24, 'run_event_calls': 30}, 'threads': {"'conv'|'t'": {'latest_run_id': '-inf', 'latest_run_state': 'completed', 'invocation_id': 'inf', 'latest_event_id': 691}, "'<session>'|'t'": {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0}, "''|'t'": {'latest_run_id': '-inf', 'latest_run_state': 'completed', 'invocation_id': 'inf', 'latest_event_id': 691}, "'c\\x00'|'t\\x00'": {'latest_run_id': 'x', 'latest_run_state': 'queued', 'invocation_id': '', 'latest_event_id': 693}}, 'run_ids': ['-inf', 'nan', 'nul\x00id', 'r', 'x'], 'r': ['failed', 'inf', 'bad\x00byte', 4], 'nul_thread_request_tested': True}
+PASS 5b. the five cases of the third #372 review (earlier error, then error NaN / step Infinity / other key -Infinity / error with NUL / other key with NUL) | observed={'error NaN': ['r', 'running', 's', 'nan', 2], 'step Infinity': ['r', 'running', 'inf', 'earlier', 2], 'other key -Infinity': ['r', 'running', 's', 'earlier', 2], 'error with NUL': ['r', 'running', 's', 'bad\x00byte', 2], 'other key with NUL': ['r', 'running', 's', 'earlier', 2]}
+PASS 6. a run id whose JSON key is over 20 kB, with a NUL: listing, run events and thread projection read it exactly | observed={'run_key_chars': 24011, 'listed': [[4004, 'failed', 2]]}
+PASS 7. bounded rows: the rows each reader reads at the backend boundary are the same at 181 and 1,201 events of history | observed=[{'history_events': 181, 'list_session_runs': [5, 5], 'list_session_run_events': [5], 'resolve_thread_lifecycle': [0, 1, 2]}, {'history_events': 1201, 'list_session_runs': [5, 5], 'list_session_run_events': [5], 'resolve_thread_lifecycle': [0, 1, 2]}]
+PASS 8. canonical replay/conflict, terminal outcome and capture result transactions, rollback of a failed facts write, session deletion: events and facts stay consistent | observed={'replay_equals_first': True, 'canonical_conflict': "RuntimeSessionStoreIntegrityError: canonical event 'facts.v1:first' conflicts with stored event", 'terminal_conflict': "RuntimeSessionStoreIntegrityError: canonical event 'turn.outcome.v1:facts' conflicts with stored event", 'capture_without_hold': "RuntimeSessionStoreIntegrityError: capture 'no-hold' has no retention hold", 'facts_write_failure': 'RuntimeError: facts failed', 'facts_after_writes': 3, 'facts_after_session_delete': 0, 'other_session_facts_kept': 1}
+PASS 9. backfill: 2,345 events stored at migration 12 (interleaved runs/threads, tool events, NaN/Infinity/NUL); migration 13 reads batches 1000/1000/345/0; rows unchanged; facts = write-path facts; readers = reduction | observed={'migration_12_applied_first': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], 'applied': [13], 'batches': [1000, 1000, 345, 0], 'events': 2345, 'facts': 2345, 'per_session': {'legacy-a': {'run_events': 880, 'runs': 10, 'listing_combinations': 24, 'run_event_calls': 60, 'threads': {"'conv'|'t0'": {'latest_run_id': 'run-4', 'latest_run_state': 'completed', 'invocation_id': 'i', 'latest_event_id': 2335}, "'conv'|'t2'": {'latest_run_id': 'run-6', 'latest_run_state': 'queued', 'invocation_id': 'i', 'latest_event_id': 2345}, "'<session>'|'t1'": {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0}}}, 'legacy-b': {'run_events': 586, 'runs': 10, 'listing_combinations': 24, 'run_event_calls': 60, 'threads': {"'conv'|'t0'": {'latest_run_id': 'run-4', 'latest_run_state': 'running', 'invocation_id': '', 'latest_event_id': 2336}, "'conv'|'t2'": {'latest_run_id': 'nul\x002', 'latest_run_state': 'running', 'invocation_id': '', 'latest_event_id': 2328}, "'<session>'|'t1'": {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0}}}}}
+PASS 10. backfill failure: unreadable payload at event 1400 of 1,500 -> MigrationError naming it; ledger stays at 12; no event_run_facts; events unchanged; after a deliberate repair the rerun applies 13 whole (1,500 facts) | observed={'migration_error': 'MigrationError: Migration v13 (add_event_run_facts) failed: event 1400 has a payload_json that is not JSON: Expecting value: line 1 column 12 (char 11)', 'normal_open_error': 'MigrationError: Migration v13 (add_event_run_facts) failed: event 1400 has a payload_json that is not JSON: Expecting value: line 1 column 12 (char 11)', 'ledger_after_failure_max': 12, 'event_run_facts_table_after_failure': False, 'events_unchanged': True, 'rerun_applied': [13], 'facts_after_rerun': 1500}
+summary: {'passed': 14, 'failed': 0, 'total': 14}
+exit=0 cwd_files=0
+=== probe_352_diff_0110_sqlite: 0.1.10 python -I probe_352_diff.py <RUNNER_TEMP>/work352/diff0110_sqlite <RUNNER_TEMP>/logs/out/probe_352_diff_0110_sqlite.json sqlite:<RUNNER_TEMP>/work352/diff0110.db 1,2,3 40
+{
+  "probe": "probe_352_diff",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.10",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty/probe_352_diff_0110_sqlite",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "target": "sqlite",
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "sessions_per_seed": 40
+}
+seeds: [1, 2, 3] | events: [1462, 1293, 1347] | nul request: [None, None, None]
+exit=0 cwd_files=0
+=== probe_352_diff_0111_sqlite: 0.1.11 python -I probe_352_diff.py <RUNNER_TEMP>/work352/diff0111_sqlite <RUNNER_TEMP>/logs/out/probe_352_diff_0111_sqlite.json sqlite:<RUNNER_TEMP>/work352/diff0111.db 1,2,3 40
+{
+  "probe": "probe_352_diff",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty/probe_352_diff_0111_sqlite",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "target": "sqlite",
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "sessions_per_seed": 40
+}
+seeds: [1, 2, 3] | events: [1462, 1293, 1347] | nul request: [None, None, None]
+exit=0 cwd_files=0
+=== probe_352_compare_diff_sqlite: 0.1.11 python -I probe_352_compare.py diff <RUNNER_TEMP>/logs/out/probe_352_compare_diff_sqlite.json <RUNNER_TEMP>/logs/out/probe_352_diff_0110_sqlite.json <RUNNER_TEMP>/logs/out/probe_352_diff_0111_sqlite.json
+{
+  "probe": "probe_352_compare",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty/probe_352_compare_diff_sqlite",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "mode": "diff",
+  "files": [
+    "probe_352_diff_0110_sqlite.json",
+    "probe_352_diff_0111_sqlite.json"
+  ]
+}
+PASS 0.1.10 vs 0.1.11: identical reader results for every session (runs, run events of 19 run ids, thread projections) | observed={'seeds': [1, 2, 3], 'sessions': 120, 'events': 4102, 'compared_values': 3840, 'differing': 0}
+summary: {'passed': 1, 'failed': 0, 'total': 1}
+exit=0 cwd_files=0
+=== probe_352_history_0110_postgres: 0.1.10 python -I probe_352_history.py <RUNNER_TEMP>/work352/h0110_postgres <RUNNER_TEMP>/logs/out/probe_352_history_0110_postgres.json postgres:s352_seed12
+{
+  "probe": "probe_352_history",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.10",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty/probe_352_history_0110_postgres",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "target": "postgres:s352_seed12",
+  "mode": "write"
+}
+PASS writer closed; events stored | observed={'stored_events': 5192, 'per_session': [2002, 3190]}
+PASS migration ledger head | observed={'ledger_max': 11, 'event_run_facts_table': False}
+events digest: cc246ed1c96c79a35128283796e43c314ec885aa3652f55c36c0775208616e31 | ledger max: 11
+exit=0 cwd_files=0
+=== probe_352_history_0110_direct_postgres: 0.1.10 python -I probe_352_history.py <RUNNER_TEMP>/work352/h0110d_postgres <RUNNER_TEMP>/logs/out/probe_352_history_0110_direct_postgres.json postgres:s352_direct
+{
+  "probe": "probe_352_history",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.10",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty/probe_352_history_0110_direct_postgres",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "target": "postgres:s352_direct",
+  "mode": "write"
+}
+PASS writer closed; events stored | observed={'stored_events': 5192, 'per_session': [2002, 3190]}
+PASS migration ledger head | observed={'ledger_max': 11, 'event_run_facts_table': False}
+events digest: 39085cc0de84b51ab41c6c6a72291a378259b5b2d3a546557caf3f28c3e29c73 | ledger max: 11
+exit=0 cwd_files=0
+backup s352_seed12: pg_dump -n s352_seed12 -> 1117316 bytes, sha256 1bf0be592aa2ded955452f4a7ae7f22ae18b8032040178fabb950b1cf00ae481, COPY blocks 17
+backup s352_direct: pg_dump -n s352_direct -> 1117317 bytes, sha256 40a9c176d6180fcadefd79675b344772e5d5c547961bfc9e2352796bba524d9e, COPY blocks 17
+=== probe_352_check_upgrade12_postgres: 0.1.11 python -I probe_352_check.py <RUNNER_TEMP>/work352/up12_postgres <RUNNER_TEMP>/logs/out/probe_352_check_upgrade12_postgres.json postgres:s352_seed12 --mode upgrade --step12 --seed <RUNNER_TEMP>/logs/out/probe_352_history_0110_postgres.json
+{
+  "probe": "probe_352_check",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty/probe_352_check_upgrade12_postgres",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "target": "postgres:s352_seed12",
+  "mode": "upgrade",
+  "step12": true
+}
+PASS stored events equal the writer's record (sha256 of every event row) | observed={'writer_version': '0.1.10', 'digest': 'cc246ed1c96c79a35128283796e43c314ec885aa3652f55c36c0775208616e31', 'events': 5192}
+PASS pre-upgrade database is the 0.1.10 schema: ledger 1..11, no event_run_facts table | observed={'ledger': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 'event_run_facts_table': False}
+PASS 0.1.11 migrations <= 12 applied alone: a migration-12 database (ledger 1..12, no event_run_facts), events unchanged | observed={'applied_versions': [12], 'ledger': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], 'event_run_facts_table': False}
+PASS normal open (build_runtime_storage) applies the expected migrations; ledger 1..13 | observed={'applied_versions': [13], 'expected': [13], 'ledger_max': 13}
+PASS every stored event row unchanged by the open/upgrade (sha256 of all event rows) | observed={'events': 5192, 'digest': 'cc246ed1c96c79a35128283796e43c314ec885aa3652f55c36c0775208616e31'}
+PASS event_run_facts: one row per event, equal to 0.1.11 event_run_facts() and to the 0.1.10 expressions; ASCII keys without NUL | observed={'events': 5192, 'facts': 5192, 'facts_without_event': [], 'mismatch_vs_event_run_facts': [], 'mismatch_count_vs_event_run_facts': 0, 'mismatch_vs_0110_expressions': [], 'mismatch_count_vs_0110_expressions': 0, 'bad_keys': [], 'ok': True}
+PASS window: list_session_runs equals the reduction for 10 scan limits x 4 limits, and with defaults | observed={'run_events_in_session': 2002, 'events_in_session': 2002, 'combinations': 41, 'mismatches': [], 'default_listing_first': [{'run_id': 'new', 'started_at': '2026-10-23T09:33:20.000001+00:00', 'ended_at': '2026-10-23T09:33:21.000001+00:00', 'current_step': 'step', 'error': '', 'event_count': 2, 'state': 'failed'}, {'run_id': 'old', 'started_at': '2026-10-23T09:00:00.000001+00:00', 'ended_at': '2026-10-23T09:33:19.000001+00:00', 'current_step': 'step', 'error': '', 'event_count': 2000, 'state': 'completed'}]}
+PASS window: list_session_run_events returns each run's newest events (all 2 runs, limits [1, 2, 200, 1000], exact and padded requests) | observed={'runs': 2, 'calls': 16, 'mismatches': []}
+PASS window: resolve_thread_lifecycle equals the reduction for 4 conversation/thread requests (latest run/state, invocation, latest event id = thread high water, updated_at, delivery, writer attach) | observed={'requests': [['conv', 'thread'], ['<session>', 'thread'], ['', 'thread'], ['conv', 'missing']], 'mismatches': [], 'projections': {'conv|thread': {'latest_run_id': 'new', 'latest_run_state': 'failed', 'invocation_id': 'new-inv', 'latest_event_id': 2002, 'thread_state': 'failed'}, '<session>|thread': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}, '|thread': {'latest_run_id': 'new', 'latest_run_state': 'failed', 'invocation_id': 'new-inv', 'latest_event_id': 2002, 'thread_state': 'failed'}, 'conv|missing': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}}}
+PASS mixed: list_session_runs equals the reduction for 11 scan limits x 4 limits, and with defaults | observed={'run_events_in_session': 2743, 'events_in_session': 3190, 'combinations': 45, 'mismatches': [], 'default_listing_first': [{'run_id': 'long2', 'started_at': '2026-10-23T08:40:04.000001+00:00', 'ended_at': '2026-10-23T08:08:13.000001+00:00', 'current_step': 'c-step-717', 'error': '', 'event_count': 242, 'state': 'completed'}, {'run_id': 'long', 'started_at': '2026-10-23T08:40:02.000001+00:00', 'ended_at': '', 'current_step': 'final-step', 'error': 'nan', 'event_count': 751, 'state': 'running'}]}
+PASS mixed: list_session_run_events returns each run's newest events (all 972 runs, limits [1, 2, 200, 1000], exact and padded requests) | observed={'runs': 972, 'calls': 7776, 'mismatches': []}
+PASS mixed: resolve_thread_lifecycle equals the reduction for 8 conversation/thread requests (latest run/state, invocation, latest event id = thread high water, updated_at, delivery, writer attach) | observed={'requests': [['conv', 'thread-a'], ['conv', 'thread-b'], ['conv2', 'thread-c'], ['<session>', 'thread-a'], ['', 'thread-b'], ['conv', 'missing'], ['trace: 1e999', '[NaN]'], [' conv\t\n\x0b\x0c\r\x1c\x1d\x1e\x1f \x85\xa0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000', '\t\n\x0b\x0c\r\x1c\x1d\x1e\x1f \x85\xa0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000thread-a']], 'mismatches': [], 'projections': {'conv|thread-a': {'latest_run_id': 'long', 'latest_run_state': 'running', 'invocation_id': 'inv-long', 'latest_event_id': 5192, 'thread_state': 'awaiting_response'}, 'conv|thread-b': {'latest_run_id': 's-719', 'latest_run_state': 'completed', 'invocation_id': 'inv-s-719', 'latest_event_id': 5189, 'thread_state': 'settled'}, 'conv2|thread-c': {'latest_run_id': 'long2', 'latest_run_state': 'completed', 'invocation_id': 'inv-c-717', 'latest_event_id': 5190, 'thread_state': 'response_ready_undelivered'}, '<session>|thread-a': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}, '|thread-b': {'latest_run_id': 's-719', 'latest_run_state': 'completed', 'invocation_id': 'inv-s-719', 'latest_event_id': 5189, 'thread_state': 'settled'}, 'conv|missing': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}}}
+PASS maintainer's probe: runs [new failed, old completed], 2 new-run events, projection new/failed/new-inv at the high water | observed={'runs': [['new', 'failed'], ['old', 'completed']], 'new_run_events': 2, 'projection': {'latest_run_id': 'new', 'latest_run_state': 'failed', 'invocation_id': 'new-inv', 'latest_event_id': 2002}, 'high_water': 2002}
+PASS mixed: run 'long' starts at the session's first event (below the 2,000 run-event window) and is reported over all its events | observed={'long': {'state': 'running', 'current_step': 'final-step', 'started_at': '2026-10-23T08:40:02.000001+00:00', 'ended_at': '', 'event_count': 751, 'error': 'nan'}, 'long_events': 751, 'first_long_event_id': 2003, 'oldest_event_id_in_default_window': 2869, 'run_events_in_session': 2743}
+PASS mixed: run 'long2' (started below the window, completed at the end) reports its first start, last end and full count | observed={'long2': {'state': 'completed', 'started_at': '2026-10-23T08:40:04.000001+00:00', 'ended_at': '2026-10-23T08:08:13.000001+00:00', 'event_count': 242}, 'long2_events': 242}
+PASS bounded returned rows: runs = 1 aggregate (<= window rows) + 1 read by id (<= 4 per listed run); run events = [limit]; thread = messages + 1 aggregate row + <= 4 rows | observed={'list_session_runs(limit=5, scan_limit=10)': [4, 8], 'list_session_runs(defaults)': [713, 29], 'list_session_run_events(long, limit=5)': [5], 'resolve_thread_lifecycle(conv, thread-a)': [0, 1, 3]}
+summary: {'passed': 16, 'failed': 0, 'total': 16} | readers digest: 77dfe84ad40197584db6530539a8157c195e0a193171517a7ea20cc0c35b545a
+exit=0 cwd_files=0
+=== probe_352_check_upgrade_direct_postgres: 0.1.11 python -I probe_352_check.py <RUNNER_TEMP>/work352/direct_postgres <RUNNER_TEMP>/logs/out/probe_352_check_upgrade_direct_postgres.json postgres:s352_direct --mode upgrade --seed <RUNNER_TEMP>/logs/out/probe_352_history_0110_direct_postgres.json
+{
+  "probe": "probe_352_check",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty/probe_352_check_upgrade_direct_postgres",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "target": "postgres:s352_direct",
+  "mode": "upgrade",
+  "step12": false
+}
+PASS stored events equal the writer's record (sha256 of every event row) | observed={'writer_version': '0.1.10', 'digest': '39085cc0de84b51ab41c6c6a72291a378259b5b2d3a546557caf3f28c3e29c73', 'events': 5192}
+PASS pre-upgrade database is the 0.1.10 schema: ledger 1..11, no event_run_facts table | observed={'ledger': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 'event_run_facts_table': False}
+PASS normal open (build_runtime_storage) applies the expected migrations; ledger 1..13 | observed={'applied_versions': [12, 13], 'expected': [12, 13], 'ledger_max': 13}
+PASS every stored event row unchanged by the open/upgrade (sha256 of all event rows) | observed={'events': 5192, 'digest': '39085cc0de84b51ab41c6c6a72291a378259b5b2d3a546557caf3f28c3e29c73'}
+PASS event_run_facts: one row per event, equal to 0.1.11 event_run_facts() and to the 0.1.10 expressions; ASCII keys without NUL | observed={'events': 5192, 'facts': 5192, 'facts_without_event': [], 'mismatch_vs_event_run_facts': [], 'mismatch_count_vs_event_run_facts': 0, 'mismatch_vs_0110_expressions': [], 'mismatch_count_vs_0110_expressions': 0, 'bad_keys': [], 'ok': True}
+PASS window: list_session_runs equals the reduction for 10 scan limits x 4 limits, and with defaults | observed={'run_events_in_session': 2002, 'events_in_session': 2002, 'combinations': 41, 'mismatches': [], 'default_listing_first': [{'run_id': 'new', 'started_at': '2026-10-23T09:33:20.000001+00:00', 'ended_at': '2026-10-23T09:33:21.000001+00:00', 'current_step': 'step', 'error': '', 'event_count': 2, 'state': 'failed'}, {'run_id': 'old', 'started_at': '2026-10-23T09:00:00.000001+00:00', 'ended_at': '2026-10-23T09:33:19.000001+00:00', 'current_step': 'step', 'error': '', 'event_count': 2000, 'state': 'completed'}]}
+PASS window: list_session_run_events returns each run's newest events (all 2 runs, limits [1, 2, 200, 1000], exact and padded requests) | observed={'runs': 2, 'calls': 16, 'mismatches': []}
+PASS window: resolve_thread_lifecycle equals the reduction for 4 conversation/thread requests (latest run/state, invocation, latest event id = thread high water, updated_at, delivery, writer attach) | observed={'requests': [['conv', 'thread'], ['<session>', 'thread'], ['', 'thread'], ['conv', 'missing']], 'mismatches': [], 'projections': {'conv|thread': {'latest_run_id': 'new', 'latest_run_state': 'failed', 'invocation_id': 'new-inv', 'latest_event_id': 2002, 'thread_state': 'failed'}, '<session>|thread': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}, '|thread': {'latest_run_id': 'new', 'latest_run_state': 'failed', 'invocation_id': 'new-inv', 'latest_event_id': 2002, 'thread_state': 'failed'}, 'conv|missing': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}}}
+PASS mixed: list_session_runs equals the reduction for 11 scan limits x 4 limits, and with defaults | observed={'run_events_in_session': 2743, 'events_in_session': 3190, 'combinations': 45, 'mismatches': [], 'default_listing_first': [{'run_id': 'long2', 'started_at': '2026-10-23T08:40:04.000001+00:00', 'ended_at': '2026-10-23T08:08:13.000001+00:00', 'current_step': 'c-step-717', 'error': '', 'event_count': 242, 'state': 'completed'}, {'run_id': 'long', 'started_at': '2026-10-23T08:40:02.000001+00:00', 'ended_at': '', 'current_step': 'final-step', 'error': 'nan', 'event_count': 751, 'state': 'running'}]}
+PASS mixed: list_session_run_events returns each run's newest events (all 972 runs, limits [1, 2, 200, 1000], exact and padded requests) | observed={'runs': 972, 'calls': 7776, 'mismatches': []}
+PASS mixed: resolve_thread_lifecycle equals the reduction for 8 conversation/thread requests (latest run/state, invocation, latest event id = thread high water, updated_at, delivery, writer attach) | observed={'requests': [['conv', 'thread-a'], ['conv', 'thread-b'], ['conv2', 'thread-c'], ['<session>', 'thread-a'], ['', 'thread-b'], ['conv', 'missing'], ['trace: 1e999', '[NaN]'], [' conv\t\n\x0b\x0c\r\x1c\x1d\x1e\x1f \x85\xa0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000', '\t\n\x0b\x0c\r\x1c\x1d\x1e\x1f \x85\xa0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000thread-a']], 'mismatches': [], 'projections': {'conv|thread-a': {'latest_run_id': 'long', 'latest_run_state': 'running', 'invocation_id': 'inv-long', 'latest_event_id': 5192, 'thread_state': 'awaiting_response'}, 'conv|thread-b': {'latest_run_id': 's-719', 'latest_run_state': 'completed', 'invocation_id': 'inv-s-719', 'latest_event_id': 5189, 'thread_state': 'settled'}, 'conv2|thread-c': {'latest_run_id': 'long2', 'latest_run_state': 'completed', 'invocation_id': 'inv-c-717', 'latest_event_id': 5190, 'thread_state': 'response_ready_undelivered'}, '<session>|thread-a': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}, '|thread-b': {'latest_run_id': 's-719', 'latest_run_state': 'completed', 'invocation_id': 'inv-s-719', 'latest_event_id': 5189, 'thread_state': 'settled'}, 'conv|missing': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}}}
+PASS maintainer's probe: runs [new failed, old completed], 2 new-run events, projection new/failed/new-inv at the high water | observed={'runs': [['new', 'failed'], ['old', 'completed']], 'new_run_events': 2, 'projection': {'latest_run_id': 'new', 'latest_run_state': 'failed', 'invocation_id': 'new-inv', 'latest_event_id': 2002}, 'high_water': 2002}
+PASS mixed: run 'long' starts at the session's first event (below the 2,000 run-event window) and is reported over all its events | observed={'long': {'state': 'running', 'current_step': 'final-step', 'started_at': '2026-10-23T08:40:02.000001+00:00', 'ended_at': '', 'event_count': 751, 'error': 'nan'}, 'long_events': 751, 'first_long_event_id': 2003, 'oldest_event_id_in_default_window': 2869, 'run_events_in_session': 2743}
+PASS mixed: run 'long2' (started below the window, completed at the end) reports its first start, last end and full count | observed={'long2': {'state': 'completed', 'started_at': '2026-10-23T08:40:04.000001+00:00', 'ended_at': '2026-10-23T08:08:13.000001+00:00', 'event_count': 242}, 'long2_events': 242}
+PASS bounded returned rows: runs = 1 aggregate (<= window rows) + 1 read by id (<= 4 per listed run); run events = [limit]; thread = messages + 1 aggregate row + <= 4 rows | observed={'list_session_runs(limit=5, scan_limit=10)': [4, 8], 'list_session_runs(defaults)': [713, 29], 'list_session_run_events(long, limit=5)': [5], 'resolve_thread_lifecycle(conv, thread-a)': [0, 1, 3]}
+summary: {'passed': 15, 'failed': 0, 'total': 15} | readers digest: 77dfe84ad40197584db6530539a8157c195e0a193171517a7ea20cc0c35b545a
+exit=0 cwd_files=0
+restore of backup_s352_seed12.sql into database restore352: psql exit 0
+=== probe_352_backup_0110_postgres: 0.1.10 python -I probe_352_history.py <RUNNER_TEMP>/work352/bk_postgres <RUNNER_TEMP>/logs/out/probe_352_backup_0110_postgres.json postgres:s352_seed12 --verify-only
+{
+  "probe": "probe_352_history",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.10",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty/probe_352_backup_0110_postgres",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "target": "postgres:s352_seed12",
+  "mode": "verify-only"
+}
+PASS writer closed; events stored | observed={'stored_events': 5192, 'per_session': [2002, 3190]}
+PASS migration ledger head | observed={'ledger_max': 11, 'event_run_facts_table': False}
+events digest: cc246ed1c96c79a35128283796e43c314ec885aa3652f55c36c0775208616e31 | ledger max: 11
+exit=0 cwd_files=0
+=== probe_352_compare_backup_postgres: 0.1.11 python -I probe_352_compare.py digest <RUNNER_TEMP>/logs/out/probe_352_compare_backup_postgres.json <RUNNER_TEMP>/logs/out/probe_352_history_0110_postgres.json <RUNNER_TEMP>/logs/out/probe_352_backup_0110_postgres.json
+{
+  "probe": "probe_352_compare",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty/probe_352_compare_backup_postgres",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "mode": "digest",
+  "files": [
+    "probe_352_history_0110_postgres.json",
+    "probe_352_backup_0110_postgres.json"
+  ]
+}
+PASS pre-upgrade backup read back by 0.1.10: same sha256 of every event row as the 0.1.10 writer recorded, ledger 11 | observed={'events_digest': {'probe_352_history_0110_postgres.json': 'cc246ed1c96c79a35128283796e43c314ec885aa3652f55c36c0775208616e31', 'probe_352_backup_0110_postgres.json': 'cc246ed1c96c79a35128283796e43c314ec885aa3652f55c36c0775208616e31'}, 'ledger_max': {'probe_352_history_0110_postgres.json': 11, 'probe_352_backup_0110_postgres.json': 11}}
+summary: {'passed': 1, 'failed': 0, 'total': 1}
+exit=0 cwd_files=0
+=== probe_352_history_0111_postgres: 0.1.11 python -I probe_352_history.py <RUNNER_TEMP>/work352/h0111_postgres <RUNNER_TEMP>/logs/out/probe_352_history_0111_postgres.json postgres:s352_fresh
+{
+  "probe": "probe_352_history",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty/probe_352_history_0111_postgres",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "target": "postgres:s352_fresh",
+  "mode": "write"
+}
+PASS writer closed; events stored | observed={'stored_events': 5192, 'per_session': [2002, 3190]}
+PASS migration ledger head | observed={'ledger_max': 13, 'event_run_facts_table': True}
+events digest: 1883db37679f293bda51e312943c321d5ed315c99fce34f6d7910aa2c6c08219 | ledger max: 13
+exit=0 cwd_files=0
+=== probe_352_check_fresh_postgres: 0.1.11 python -I probe_352_check.py <RUNNER_TEMP>/work352/fresh_postgres <RUNNER_TEMP>/logs/out/probe_352_check_fresh_postgres.json postgres:s352_fresh --mode fresh --seed <RUNNER_TEMP>/logs/out/probe_352_history_0111_postgres.json
+{
+  "probe": "probe_352_check",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty/probe_352_check_fresh_postgres",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "target": "postgres:s352_fresh",
+  "mode": "fresh",
+  "step12": false
+}
+PASS stored events equal the writer's record (sha256 of every event row) | observed={'writer_version': '0.1.11', 'digest': '1883db37679f293bda51e312943c321d5ed315c99fce34f6d7910aa2c6c08219', 'events': 5192}
+PASS normal open (build_runtime_storage) applies the expected migrations; ledger 1..13 | observed={'applied_versions': [], 'expected': [], 'ledger_max': 13}
+PASS every stored event row unchanged by the open/upgrade (sha256 of all event rows) | observed={'events': 5192, 'digest': '1883db37679f293bda51e312943c321d5ed315c99fce34f6d7910aa2c6c08219'}
+PASS event_run_facts: one row per event, equal to 0.1.11 event_run_facts() and to the 0.1.10 expressions; ASCII keys without NUL | observed={'events': 5192, 'facts': 5192, 'facts_without_event': [], 'mismatch_vs_event_run_facts': [], 'mismatch_count_vs_event_run_facts': 0, 'mismatch_vs_0110_expressions': [], 'mismatch_count_vs_0110_expressions': 0, 'bad_keys': [], 'ok': True}
+PASS window: list_session_runs equals the reduction for 10 scan limits x 4 limits, and with defaults | observed={'run_events_in_session': 2002, 'events_in_session': 2002, 'combinations': 41, 'mismatches': [], 'default_listing_first': [{'run_id': 'new', 'started_at': '2026-10-23T09:33:20.000001+00:00', 'ended_at': '2026-10-23T09:33:21.000001+00:00', 'current_step': 'step', 'error': '', 'event_count': 2, 'state': 'failed'}, {'run_id': 'old', 'started_at': '2026-10-23T09:00:00.000001+00:00', 'ended_at': '2026-10-23T09:33:19.000001+00:00', 'current_step': 'step', 'error': '', 'event_count': 2000, 'state': 'completed'}]}
+PASS window: list_session_run_events returns each run's newest events (all 2 runs, limits [1, 2, 200, 1000], exact and padded requests) | observed={'runs': 2, 'calls': 16, 'mismatches': []}
+PASS window: resolve_thread_lifecycle equals the reduction for 4 conversation/thread requests (latest run/state, invocation, latest event id = thread high water, updated_at, delivery, writer attach) | observed={'requests': [['conv', 'thread'], ['<session>', 'thread'], ['', 'thread'], ['conv', 'missing']], 'mismatches': [], 'projections': {'conv|thread': {'latest_run_id': 'new', 'latest_run_state': 'failed', 'invocation_id': 'new-inv', 'latest_event_id': 2002, 'thread_state': 'failed'}, '<session>|thread': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}, '|thread': {'latest_run_id': 'new', 'latest_run_state': 'failed', 'invocation_id': 'new-inv', 'latest_event_id': 2002, 'thread_state': 'failed'}, 'conv|missing': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}}}
+PASS mixed: list_session_runs equals the reduction for 11 scan limits x 4 limits, and with defaults | observed={'run_events_in_session': 2743, 'events_in_session': 3190, 'combinations': 45, 'mismatches': [], 'default_listing_first': [{'run_id': 'long2', 'started_at': '2026-10-23T08:40:04.000001+00:00', 'ended_at': '2026-10-23T08:08:13.000001+00:00', 'current_step': 'c-step-717', 'error': '', 'event_count': 242, 'state': 'completed'}, {'run_id': 'long', 'started_at': '2026-10-23T08:40:02.000001+00:00', 'ended_at': '', 'current_step': 'final-step', 'error': 'nan', 'event_count': 751, 'state': 'running'}]}
+PASS mixed: list_session_run_events returns each run's newest events (all 972 runs, limits [1, 2, 200, 1000], exact and padded requests) | observed={'runs': 972, 'calls': 7776, 'mismatches': []}
+PASS mixed: resolve_thread_lifecycle equals the reduction for 8 conversation/thread requests (latest run/state, invocation, latest event id = thread high water, updated_at, delivery, writer attach) | observed={'requests': [['conv', 'thread-a'], ['conv', 'thread-b'], ['conv2', 'thread-c'], ['<session>', 'thread-a'], ['', 'thread-b'], ['conv', 'missing'], ['trace: 1e999', '[NaN]'], [' conv\t\n\x0b\x0c\r\x1c\x1d\x1e\x1f \x85\xa0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000', '\t\n\x0b\x0c\r\x1c\x1d\x1e\x1f \x85\xa0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000thread-a']], 'mismatches': [], 'projections': {'conv|thread-a': {'latest_run_id': 'long', 'latest_run_state': 'running', 'invocation_id': 'inv-long', 'latest_event_id': 5192, 'thread_state': 'awaiting_response'}, 'conv|thread-b': {'latest_run_id': 's-719', 'latest_run_state': 'completed', 'invocation_id': 'inv-s-719', 'latest_event_id': 5189, 'thread_state': 'settled'}, 'conv2|thread-c': {'latest_run_id': 'long2', 'latest_run_state': 'completed', 'invocation_id': 'inv-c-717', 'latest_event_id': 5190, 'thread_state': 'response_ready_undelivered'}, '<session>|thread-a': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}, '|thread-b': {'latest_run_id': 's-719', 'latest_run_state': 'completed', 'invocation_id': 'inv-s-719', 'latest_event_id': 5189, 'thread_state': 'settled'}, 'conv|missing': {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0, 'thread_state': 'settled'}}}
+PASS maintainer's probe: runs [new failed, old completed], 2 new-run events, projection new/failed/new-inv at the high water | observed={'runs': [['new', 'failed'], ['old', 'completed']], 'new_run_events': 2, 'projection': {'latest_run_id': 'new', 'latest_run_state': 'failed', 'invocation_id': 'new-inv', 'latest_event_id': 2002}, 'high_water': 2002}
+PASS mixed: run 'long' starts at the session's first event (below the 2,000 run-event window) and is reported over all its events | observed={'long': {'state': 'running', 'current_step': 'final-step', 'started_at': '2026-10-23T08:40:02.000001+00:00', 'ended_at': '', 'event_count': 751, 'error': 'nan'}, 'long_events': 751, 'first_long_event_id': 2003, 'oldest_event_id_in_default_window': 2869, 'run_events_in_session': 2743}
+PASS mixed: run 'long2' (started below the window, completed at the end) reports its first start, last end and full count | observed={'long2': {'state': 'completed', 'started_at': '2026-10-23T08:40:04.000001+00:00', 'ended_at': '2026-10-23T08:08:13.000001+00:00', 'event_count': 242}, 'long2_events': 242}
+PASS bounded returned rows: runs = 1 aggregate (<= window rows) + 1 read by id (<= 4 per listed run); run events = [limit]; thread = messages + 1 aggregate row + <= 4 rows | observed={'list_session_runs(limit=5, scan_limit=10)': [4, 8], 'list_session_runs(defaults)': [713, 29], 'list_session_run_events(long, limit=5)': [5], 'resolve_thread_lifecycle(conv, thread-a)': [0, 1, 3]}
+summary: {'passed': 14, 'failed': 0, 'total': 14} | readers digest: 77dfe84ad40197584db6530539a8157c195e0a193171517a7ea20cc0c35b545a
+exit=0 cwd_files=0
+=== probe_352_compare_readers_postgres: 0.1.11 python -I probe_352_compare.py readers <RUNNER_TEMP>/logs/out/probe_352_compare_readers_postgres.json <RUNNER_TEMP>/logs/out/probe_352_check_fresh_postgres.json <RUNNER_TEMP>/logs/out/probe_352_check_upgrade12_postgres.json <RUNNER_TEMP>/logs/out/probe_352_check_upgrade_direct_postgres.json
+{
+  "probe": "probe_352_compare",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty/probe_352_compare_readers_postgres",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "mode": "readers",
+  "files": [
+    "probe_352_check_fresh_postgres.json",
+    "probe_352_check_upgrade12_postgres.json",
+    "probe_352_check_upgrade_direct_postgres.json"
+  ]
+}
+PASS same history: identical event content and identical reader outputs on the fresh and the upgraded databases | observed={'readers_digest': {'probe_352_check_fresh_postgres.json': '77dfe84ad40197584db6530539a8157c195e0a193171517a7ea20cc0c35b545a', 'probe_352_check_upgrade12_postgres.json': '77dfe84ad40197584db6530539a8157c195e0a193171517a7ea20cc0c35b545a', 'probe_352_check_upgrade_direct_postgres.json': '77dfe84ad40197584db6530539a8157c195e0a193171517a7ea20cc0c35b545a'}, 'events_content_digest': {'probe_352_check_fresh_postgres.json': 'dda1ff3d28c652687b271a3022364b1c038e786be4f027af5df735239c628a80', 'probe_352_check_upgrade12_postgres.json': 'dda1ff3d28c652687b271a3022364b1c038e786be4f027af5df735239c628a80', 'probe_352_check_upgrade_direct_postgres.json': 'dda1ff3d28c652687b271a3022364b1c038e786be4f027af5df735239c628a80'}}
+summary: {'passed': 1, 'failed': 0, 'total': 1}
+exit=0 cwd_files=0
+=== probe_352_contract_postgres: 0.1.11 python -I probe_352_contract.py <RUNNER_TEMP>/work352/contract_postgres <RUNNER_TEMP>/logs/out/probe_352_contract_postgres.json postgres:s352_contract
+{
+  "probe": "probe_352_contract",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty/probe_352_contract_postgres",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "target": "postgres:s352_contract"
+}
+PASS 1. interleaved runs (special, padded, nested, upper-case ids; stepping clock): run listing and run events equal the reduction | observed={'run_events': 69, 'runs': 36, 'listing_combinations': 24, 'run_event_calls': 216}
+PASS 2. interleaved threads: thread lifecycle equals the reduction (latest run/state, invocation, high water, delivery, writer) | observed={"'conv'|'quiet'": {'latest_run_id': 'q1', 'latest_run_state': 'completed', 'invocation_id': 'inv-q1', 'latest_event_id': 146}, "'conv'|'busy'": {'latest_run_id': 'b11', 'latest_run_state': 'running', 'invocation_id': 'inv-b11', 'latest_event_id': 145}, "'conv'|'missing'": {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0}, "'<session>'|'busy'": {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 127}, "''|'quiet'": {'latest_run_id': 'q1', 'latest_run_state': 'completed', 'invocation_id': 'inv-q1', 'latest_event_id': 146}}
+PASS 3a. padded fields, null/bool/number/container ids, JSON-token text, zero-width space, RUN. prefix: readers equal the reduction | observed={'runs': {'run_events': 16, 'runs': 10, 'listing_combinations': 24, 'run_event_calls': 60}, 'threads': {"'conv'|'t'": {'latest_run_id': 't1', 'latest_run_state': 'failed', 'invocation_id': 'None', 'latest_event_id': 175}, "'<session>'|'t'": {'latest_run_id': 't5', 'latest_run_state': 'waiting_tool', 'invocation_id': '', 'latest_event_id': 171}, "'conv'|'\\u200bt'": {'latest_run_id': 'zw', 'latest_run_state': 'queued', 'invocation_id': '', 'latest_event_id': 174}, "''|'t'": {'latest_run_id': 't1', 'latest_run_state': 'failed', 'invocation_id': 'None', 'latest_event_id': 175}, "' conv\\t\\n\\x0b\\x0c\\r\\x1c\\x1d\\x1e\\x1f \\x85\\xa0\\u1680\\u2000\\u2001\\u2002\\u2003\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000'|'\\t\\n\\x0b\\x0c\\r\\x1c\\x1d\\x1e\\x1f \\x85\\xa0\\u1680\\u2000\\u2001\\u2002\\u2003\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000t'": {'latest_run_id': 't1', 'latest_run_state': 'failed', 'invocation_id': 'None', 'latest_event_id': 175}, "'trace: NaN'|'[NaN]'": {'latest_run_id': 'trace, Infinity', 'latest_run_state': 'queued', 'invocation_id': 'trace: 1e999', 'latest_event_id': 172}, "'trace: 1e999'|'[1e999]'": {'latest_run_id': 'x', 'latest_run_state': 'running', 'invocation_id': '', 'latest_event_id': 173}}}
+PASS 3b. the four #372 review cases: padded run id is one run; blank error keeps the earlier error; padded state; padded thread ids | observed={'padded run id': [['r', 2]], 'blank error': 'earlier error', 'padded state': ['running', ''], 'padded thread': ['failed', 183, 183]}
+PASS 3c. ids that look like JSON tokens keep their exact text: 4 distinct runs, each run/thread read exactly | observed=[['[NaN]', 1], ['trace, Infinity', 1], ['trace: 1e999', 1], ['trace: NaN', 1]]
+PASS 3d. decoded-ID order: runs starting at the same timestamp are listed by decoded run id (descending), not by their JSON-encoded keys | observed={'listed': ['éa', 'é', 'z', 'back]slash', 'back\\slash', 'b#', 'b"', 'Z'], 'json_key_order_would_be': ['z', 'back]slash', 'back\\slash', 'b"', 'b#', 'éa', 'é', 'Z']}
+PASS 4. event facts of 486 events (9 keys x 27 values incl. padding, zero-width space, token text, every JSON type, NaN, +-Infinity, NUL) equal 0.1.10's expressions; exact decoded ids; ASCII keys without NUL | observed={'events': 486, 'facts_rows': 486}
+PASS 5a. NaN/Infinity/NUL in run fields and in unrelated tool/attach fields: readers equal the reduction; run r = failed/'inf'/'bad<NUL>byte'/4 | observed={'runs': {'run_events': 8, 'runs': 5, 'listing_combinations': 24, 'run_event_calls': 30}, 'threads': {"'conv'|'t'": {'latest_run_id': '-inf', 'latest_run_state': 'completed', 'invocation_id': 'inf', 'latest_event_id': 691}, "'<session>'|'t'": {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0}, "''|'t'": {'latest_run_id': '-inf', 'latest_run_state': 'completed', 'invocation_id': 'inf', 'latest_event_id': 691}}, 'run_ids': ['-inf', 'nan', 'nul\x00id', 'r', 'x'], 'r': ['failed', 'inf', 'bad\x00byte', 4], 'nul_thread_request_tested': False}
+PASS 5b. the five cases of the third #372 review (earlier error, then error NaN / step Infinity / other key -Infinity / error with NUL / other key with NUL) | observed={'error NaN': ['r', 'running', 's', 'nan', 2], 'step Infinity': ['r', 'running', 'inf', 'earlier', 2], 'other key -Infinity': ['r', 'running', 's', 'earlier', 2], 'error with NUL': ['r', 'running', 's', 'bad\x00byte', 2], 'other key with NUL': ['r', 'running', 's', 'earlier', 2]}
+PASS 5c. outside the request contract on PostgreSQL: a conversation/thread *request* id with NUL is rejected by the message read (stored NUL values are read; see 5a) | observed={'request_with_nul': 'DataError: (psycopg.DataError) PostgreSQL text fields cannot contain NUL (0x00) bytes\n[SQL: \n            SELECT rowid, id, session_id, conversation_id, thread_id, attach_id, role, body, metadata_json,', 'stored_nul_run_listed': [['x', 1]]}
+PASS 6. a run id whose JSON key is over 20 kB, with a NUL: listing, run events and thread projection read it exactly | observed={'run_key_chars': 24011, 'listed': [[4004, 'failed', 2]]}
+PASS 7. bounded rows: the rows each reader reads at the backend boundary are the same at 181 and 1,201 events of history | observed=[{'history_events': 181, 'list_session_runs': [5, 5], 'list_session_run_events': [5], 'resolve_thread_lifecycle': [0, 1, 2]}, {'history_events': 1201, 'list_session_runs': [5, 5], 'list_session_run_events': [5], 'resolve_thread_lifecycle': [0, 1, 2]}]
+PASS 8. canonical replay/conflict, terminal outcome and capture result transactions, rollback of a failed facts write, session deletion: events and facts stay consistent | observed={'replay_equals_first': True, 'canonical_conflict': "RuntimeSessionStoreIntegrityError: canonical event 'facts.v1:first' conflicts with stored event", 'terminal_conflict': "RuntimeSessionStoreIntegrityError: canonical event 'turn.outcome.v1:facts' conflicts with stored event", 'capture_without_hold': "RuntimeSessionStoreIntegrityError: capture 'no-hold' has no retention hold", 'facts_write_failure': 'RuntimeError: facts failed', 'facts_after_writes': 3, 'facts_after_session_delete': 0, 'other_session_facts_kept': 1}
+PASS 9. backfill: 2,345 events stored at migration 12 (interleaved runs/threads, tool events, NaN/Infinity/NUL); migration 13 reads batches 1000/1000/345/0; rows unchanged; facts = write-path facts; readers = reduction | observed={'migration_12_applied_first': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], 'applied': [13], 'batches': [1000, 1000, 345, 0], 'events': 2345, 'facts': 2345, 'per_session': {'legacy-a': {'run_events': 880, 'runs': 10, 'listing_combinations': 24, 'run_event_calls': 60, 'threads': {"'conv'|'t0'": {'latest_run_id': 'run-4', 'latest_run_state': 'completed', 'invocation_id': 'i', 'latest_event_id': 2335}, "'conv'|'t2'": {'latest_run_id': 'run-6', 'latest_run_state': 'queued', 'invocation_id': 'i', 'latest_event_id': 2345}, "'<session>'|'t1'": {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0}}}, 'legacy-b': {'run_events': 293, 'runs': 10, 'listing_combinations': 24, 'run_event_calls': 60, 'threads': {"'conv'|'t0'": {'latest_run_id': 'run-4', 'latest_run_state': 'running', 'invocation_id': '', 'latest_event_id': 2336}, "'conv'|'t2'": {'latest_run_id': 'nul\x002', 'latest_run_state': 'running', 'invocation_id': '', 'latest_event_id': 2328}, "'<session>'|'t1'": {'latest_run_id': '', 'latest_run_state': '', 'invocation_id': '', 'latest_event_id': 0}}}}}
+PASS 10. backfill failure: unreadable payload at event 1400 of 1,500 -> MigrationError naming it; ledger stays at 12; no event_run_facts; events unchanged; after a deliberate repair the rerun applies 13 whole (1,500 facts) | observed={'migration_error': 'MigrationError: Migration v13 (add_event_run_facts) failed: event 1400 has a payload_json that is not JSON: Expecting value: line 1 column 12 (char 11)', 'normal_open_error': 'MigrationError: Migration v13 (add_event_run_facts) failed: event 1400 has a payload_json that is not JSON: Expecting value: line 1 column 12 (char 11)', 'ledger_after_failure_max': 12, 'event_run_facts_table_after_failure': False, 'events_unchanged': True, 'rerun_applied': [13], 'facts_after_rerun': 1500}
+summary: {'passed': 15, 'failed': 0, 'total': 15}
+exit=0 cwd_files=0
+=== probe_352_diff_0110_postgres: 0.1.10 python -I probe_352_diff.py <RUNNER_TEMP>/work352/diff0110_postgres <RUNNER_TEMP>/logs/out/probe_352_diff_0110_postgres.json postgres:s352_diff0110 1,2,3 40
+{
+  "probe": "probe_352_diff",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.10",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty/probe_352_diff_0110_postgres",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "target": "postgres",
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "sessions_per_seed": 40
+}
+seeds: [1, 2, 3] | events: [1462, 1293, 1347] | nul request: ['DataError: (psycopg.DataError) PostgreSQL text fields cannot contain NUL (0x00) bytes', 'DataError: (psycopg.DataError) PostgreSQL text fields cannot contain NUL (0x00) bytes', 'DataError: (psycopg.DataError) PostgreSQL text fields cannot contain NUL (0x00) bytes']
+exit=0 cwd_files=0
+=== probe_352_diff_0111_postgres: 0.1.11 python -I probe_352_diff.py <RUNNER_TEMP>/work352/diff0111_postgres <RUNNER_TEMP>/logs/out/probe_352_diff_0111_postgres.json postgres:s352_diff0111 1,2,3 40
+{
+  "probe": "probe_352_diff",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty/probe_352_diff_0111_postgres",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "target": "postgres",
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "sessions_per_seed": 40
+}
+seeds: [1, 2, 3] | events: [1462, 1293, 1347] | nul request: ['DataError: (psycopg.DataError) PostgreSQL text fields cannot contain NUL (0x00) bytes', 'DataError: (psycopg.DataError) PostgreSQL text fields cannot contain NUL (0x00) bytes', 'DataError: (psycopg.DataError) PostgreSQL text fields cannot contain NUL (0x00) bytes']
+exit=0 cwd_files=0
+=== probe_352_compare_diff_postgres: 0.1.11 python -I probe_352_compare.py diff <RUNNER_TEMP>/logs/out/probe_352_compare_diff_postgres.json <RUNNER_TEMP>/logs/out/probe_352_diff_0110_postgres.json <RUNNER_TEMP>/logs/out/probe_352_diff_0111_postgres.json
+{
+  "probe": "probe_352_compare",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty/probe_352_compare_diff_postgres",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "mode": "diff",
+  "files": [
+    "probe_352_diff_0110_postgres.json",
+    "probe_352_diff_0111_postgres.json"
+  ]
+}
+PASS 0.1.10 vs 0.1.11: identical reader results for every session (runs, run events of 19 run ids, thread projections) | observed={'seeds': [1, 2, 3], 'sessions': 120, 'events': 4102, 'compared_values': 3480, 'differing': 0}
+PASS PostgreSQL: a thread request with NUL is rejected by both versions alike (outside the request contract) | observed={'0.1.10': ['DataError: (psycopg.DataError) PostgreSQL text fields cannot contain NUL (0x00) bytes', 'DataError: (psycopg.DataError) PostgreSQL text fields cannot contain NUL (0x00) bytes', 'DataError: (psycopg.DataError) PostgreSQL text fields cannot contain NUL (0x00) bytes'], '0.1.11': ['DataError: (psycopg.DataError) PostgreSQL text fields cannot contain NUL (0x00) bytes', 'DataError: (psycopg.DataError) PostgreSQL text fields cannot contain NUL (0x00) bytes', 'DataError: (psycopg.DataError) PostgreSQL text fields cannot contain NUL (0x00) bytes']}
+summary: {'passed': 2, 'failed': 0, 'total': 2}
+exit=0 cwd_files=0
+=== totals
+    144 PASS

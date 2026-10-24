@@ -1,0 +1,39 @@
+{
+  "probe": "probe_373",
+  "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.11",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "sqlite3.sqlite_version": "3.50.4",
+  "cwd": "<WORK>\\runs\\probe_373",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "gc_enabled_at_start": false
+}
+PASS A: migrate(target='head') succeeds on a fresh file for all 14 modules | observed=[['secret', '0001_baseline'], ['policy', '0002_blockchain_confirmations'], ['authoring', '0001_baseline'], ['session', '0005_cron_scheduler_control'], ['identity', '0001_baseline'], ['registry', '0001_baseline'], ['telemetry', '0003_debug_query_indexes'], ['task', '0001_baseline'], ['skill', '0007_workflow_observations'], ['memory', '0004_namespace'], ['artifact', '0001_baseline'], ['retrieve', '0002_index'], ['commerce', '0004_action_preparations'], ['controlplane', '0002_index_audit']]
+PASS A: every connection opened during migrate() is closed when it returns (no gc.collect) | observed={'secret': '9 opened, 0 open', 'policy': '9 opened, 0 open', 'authoring': '9 opened, 0 open', 'session': '9 opened, 0 open', 'identity': '9 opened, 0 open', 'registry': '9 opened, 0 open', 'telemetry': '9 opened, 0 open', 'task': '9 opened, 0 open', 'skill': '9 opened, 0 open', 'memory': '9 opened, 0 open', 'artifact': '9 opened, 0 open', 'retrieve': '9 opened, 0 open', 'commerce': '9 opened, 0 open', 'controlplane': '9 opened, 0 open'}
+PASS A: the public metadata step committed om_meta schema_head = head and last_migrated_at
+PASS A: each untracked fresh DB is renamed and deleted right after migrate() returns, GC disabled | observed=['ok']
+PASS B: detect() opens one connection and verify() one more; both closed on return | observed=[['runner.py:141 detect <- probe_373.py:178 <module>', True], ['verify.py:112 run_verification <- runner.py:300 verify <- probe_373.py:180 <module>', True]]
+PASS B: detect() + verify(level='full') on a migrated DB close both connections | observed=[['runner.py:141 detect <- probe_373.py:191 <module>', True], ['verify.py:112 run_verification <- runner.py:300 verify <- probe_373.py:192 <module>', True]]
+PASS B: the migrated DB can be renamed and deleted right after detect/verify
+PASS C: a successful metadata write is committed (read back on a new connection) | observed={'module_id': 'sessctl', 'schema_head': '0001_init', 'last_migrated_at': '2026-10-24T00:00:00+00:00'}
+PASS C: the metadata connection is closed on return | observed=[{'site': 'runner.py:499 _update_sqlite_metadata_after_migration <- probe_373.py:205 <module>', 'target': '<WORK>\\work\\probe_373\\C\\module.db', 'closed': True}]
+PASS D: a failing metadata hook propagates its error | observed='forced metadata failure'
+PASS D: the failed metadata write is rolled back | observed={'module_id': 'sessctl'}
+PASS D: the owned metadata connection is closed after the failure | observed=[{'site': 'runner.py:499 _update_sqlite_metadata_after_migration <- probe_373.py:228 <module>', 'target': '<WORK>\\work\\probe_373\\D\\module.db', 'closed': True}]
+PASS D: through migrate(), the report carries the metadata error and the snapshot is restored | observed={'success': False, 'error': 'forced metadata failure', 'rolled_back': True, 'tables_after': []}
+PASS D: through migrate(), every connection is closed and the file renames/deletes right away | observed='9 opened'
+PASS E: owned verification (runner.verify) propagates the hook error | observed='forced verification failure'
+PASS E: owned verification rolls back the hook's write | observed=0
+PASS E: the owned verification connection is closed after the failure | observed=[{'site': 'verify.py:112 run_verification <- runner.py:300 verify <- probe_373.py:288 <module>', 'target': '<WORK>\\work\\probe_373\\E\\module.db', 'closed': True}]
+PASS E: through migrate(), the verification hook error propagates, its write is rolled back and nothing is migrated | observed={'raised': 'forced verification failure', 'tables': ['verify_probe_rows'], 'hook_rows': 0}
+PASS E: through migrate(), every connection is closed and the file renames/deletes right away | observed='5 opened'
+PASS E: borrowed connection: the hook error propagates | observed='forced verification failure'
+PASS E: borrowed connection stays open and its transaction stays with the caller | observed={'raised': 'forced verification failure', 'borrowed_connection_open_after': True, 'caller_transaction_pending': True, 'hook_row_visible_to_caller_before_rollback': 1, 'hook_row_after_caller_rollback': 0}
+PASS F: 5/5 echo SDK turns complete with authored-tool storage present | observed=['completed', 'completed', 'completed', 'completed', 'completed']
+PASS F: right after runtime.close(), store.sqlite is renamed and deleted (5/5, GC disabled, no retries) | observed=['ok', 'ok', 'ok', 'ok', 'ok']
+PASS F: right after that, the whole temporary runtime root is removed (5/5, no retries) | observed=['ok', 'ok', 'ok', 'ok', 'ok']
+PASS G: runtime construction opens migration-runner/verification connections and all are closed after runtime.close() | observed="18 owner connections over ['20261024T130929445806Z-0-none.sqlite.tmp', '20261024T130929611307Z-0-none.sqlite.tmp', 'policy.db', 'sessions.db', 'store.sqlite']"
+PASS gc stayed disabled and gc.collect() was never called | observed={'gc_enabled': False, 'gc_collect_calls': 0}
+SUMMARY {'passed': 26, 'failed': 0, 'total': 26}

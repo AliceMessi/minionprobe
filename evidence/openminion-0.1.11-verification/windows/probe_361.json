@@ -1,0 +1,233 @@
+{
+  "info": {
+    "probe": "probe_361",
+    "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+    "openminion.__version__": "0.1.11",
+    "python": "3.12.11",
+    "platform": "Windows-11-10.0.22631-SP0",
+    "sqlite3.sqlite_version": "3.50.4",
+    "cwd": "<WORK>\\runs\\probe_361",
+    "imported_from_site_packages": true,
+    "isolated_mode": true
+  },
+  "summary": {
+    "passed": 18,
+    "failed": 0,
+    "total": 18
+  },
+  "all_pass": true,
+  "checks": [
+    {
+      "check": "A. echo SDK turn completes",
+      "pass": true,
+      "observed": "completed"
+    },
+    {
+      "check": "A. exactly one audit sink is created, by the runtime memory assembly",
+      "pass": true,
+      "observed": {
+        "created": 1,
+        "by_assembly": 1
+      }
+    },
+    {
+      "check": "A. the sink's database is <memory root>/memory.audit.db under the runtime root",
+      "pass": true,
+      "observed": [
+        ".openminion/memory/memory.audit.db"
+      ]
+    },
+    {
+      "check": "A. the audited turn opens the runtime-created sink's connection",
+      "pass": true,
+      "observed": [
+        true
+      ]
+    },
+    {
+      "check": "A. runtime.close() x3 closes the sink exactly once",
+      "pass": true,
+      "observed": [
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ]
+      ]
+    },
+    {
+      "check": "A. after shutdown the sink holds no connection",
+      "pass": true,
+      "observed": [
+        false
+      ]
+    },
+    {
+      "check": "A. the connection the turn opened is closed (execute raises ProgrammingError)",
+      "pass": true,
+      "observed": [
+        true
+      ]
+    },
+    {
+      "check": "B. builder: an audited write opens the sink it creates",
+      "pass": true
+    },
+    {
+      "check": "B. builder: close() twice returns the same closed result",
+      "pass": true,
+      "observed": "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"
+    },
+    {
+      "check": "B. builder: the created sink is closed exactly once",
+      "pass": true,
+      "observed": {
+        "close_calls": 1,
+        "conn_set": false
+      }
+    },
+    {
+      "check": "C. scheduler alive after stop(): close() x2 returns scheduler_still_running",
+      "pass": true,
+      "observed": [
+        "RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')",
+        "RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')"
+      ]
+    },
+    {
+      "check": "C. while blocked: 0 sink closes, 0 service closes, the sink stays open and accepts audit events (2 events)",
+      "pass": true,
+      "observed": {
+        "open": true,
+        "sink_closes": 0,
+        "service_closes": 0,
+        "events": 2
+      }
+    },
+    {
+      "check": "C. after the scheduler stops, close() succeeds and repeats the same result",
+      "pass": true,
+      "observed": [
+        "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+        "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"
+      ]
+    },
+    {
+      "check": "C. the sink and the memory service are each closed exactly once",
+      "pass": true,
+      "observed": {
+        "sink_close_calls": 1,
+        "service_close_calls": 1
+      }
+    },
+    {
+      "check": "D. AuditedMemoryStore keeps owns_sink=False as its default",
+      "pass": true,
+      "observed": false
+    },
+    {
+      "check": "D. borrowed sink: two store closes leave it open (0 close calls, same live connection, events readable)",
+      "pass": true,
+      "observed": {
+        "close_calls": 0,
+        "same_connection": true,
+        "connection_usable": true,
+        "events_readable": 1
+      }
+    },
+    {
+      "check": "D. borrowed sink: its owner can still close it",
+      "pass": true,
+      "observed": {
+        "close_calls": 1,
+        "conn_set": false
+      }
+    },
+    {
+      "check": "D. owned control: AuditedMemoryStore(owns_sink=True) closes its sink once across two closes",
+      "pass": true,
+      "observed": {
+        "close_calls": 1,
+        "conn_set": false
+      }
+    }
+  ],
+  "observed": {
+    "A_sdk": {
+      "run_state": "completed",
+      "sinks_created": 1,
+      "sinks_created_by_runtime_memory_assembly": 1,
+      "sink_paths_relative_to_runtime_root": [
+        ".openminion/memory/memory.audit.db"
+      ],
+      "sink_connection_open_after_turn": [
+        true
+      ],
+      "audit_events_after_turn": [
+        2
+      ],
+      "sink_close_calls_after_each_runtime_close": [
+        [
+          1
+        ],
+        [
+          1
+        ],
+        [
+          1
+        ]
+      ],
+      "sink_connection_attribute_set_after_close": [
+        false
+      ],
+      "turn_connection_object_closed_after_shutdown": [
+        true
+      ]
+    },
+    "B_builder": {
+      "sink": "memory.audit.db",
+      "open_after_write": true,
+      "first": "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+      "second_is_first": true,
+      "close_calls": 1,
+      "conn_after_close": false
+    },
+    "C_scheduler_still_running": {
+      "blocked": [
+        "RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')",
+        "RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')"
+      ],
+      "sink_close_calls_while_blocked": 0,
+      "service_close_calls_while_blocked": 0,
+      "sink_open_while_blocked": true,
+      "audit_events_while_blocked": 2,
+      "after_stop": [
+        "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+        "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"
+      ],
+      "sink_close_calls": 1,
+      "service_close_calls": 1,
+      "scheduler_stop_calls": 3
+    },
+    "D_borrowed_sink": {
+      "after_two_store_closes": {
+        "close_calls": 0,
+        "same_connection": true,
+        "connection_usable": true,
+        "events_readable": 1
+      },
+      "after_owner_closes_it": {
+        "close_calls": 1,
+        "conn_set": false
+      }
+    },
+    "D_owned_sink_control": {
+      "close_calls": 1,
+      "conn_set": false
+    }
+  }
+}

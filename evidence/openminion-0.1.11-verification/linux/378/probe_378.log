@@ -1,0 +1,32 @@
+{
+  "probe": "probe_378",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "gc_enabled_at_start": false
+}
+PASS A1: import_omx of the secret bundle succeeds
+PASS A1: every table's rows in the target equal the source (5 secrets rows) | observed={'alembic_version': 1, 'om_meta': 3, 'secrets': 5}
+PASS A1: every connection import_omx opened is closed when it returns | observed=[['transfer.py:519 _import_omx_tables_sqlite <- transfer.py:615 import_omx', True], ['verify.py:112 run_verification <- transfer.py:622 import_omx', True]]
+PASS A2: a runtime-written telemetry.db (echo SDK turn) exports and imports successfully
+PASS A2: every table's rows in the imported telemetry DB equal the source | observed={'events': 202, 'om_meta': 3}
+PASS A2: every connection import_omx opened is closed when it returns | observed=[['transfer.py:519 _import_omx_tables_sqlite <- transfer.py:615 import_omx', True], ['verify.py:112 run_verification <- transfer.py:622 import_omx', True]]
+PASS B1: a failure while writing the last table reports success=False and keeps the error | observed={'error': 'forced table import failure', 'written': ['alembic_version', 'om_meta', 'secrets']}
+PASS B1: every table still holds the target's previous rows (all writes rolled back) | observed={'alembic_version': 1, 'om_meta': 3, 'secrets': 2}
+PASS B1: the import's connection is closed after the failure | observed=[{'site': 'transfer.py:519 _import_omx_tables_sqlite <- transfer.py:615 import_omx', 'target': '<RUNNER_TEMP>/work/probe_378/B/B1/secret-import.db', 'closed': True}]
+PASS B2: a checksum mismatch on `secrets` reports success=False and keeps the error | observed='Checksum mismatch for table secrets: cbaf994aa8f7f975f0cd97a33387f262c9a77ea9a2cd87c61938fc82051245a8 != b20503b6e5deaa33586b0a6a8739d18f2bd8ac5ce363d3be42fb6929c6e1fd28'
+PASS B2: every table still holds the target's previous rows | observed={'alembic_version': 1, 'om_meta': 3, 'secrets': 2}
+PASS B2: the import's connection is closed after the failure | observed=[['transfer.py:519 _import_omx_tables_sqlite <- transfer.py:615 import_omx', True]]
+PASS C: right after a successful import_omx, the target is renamed and deleted and its dir removed | observed={'success': True, 'rename_delete': 'ok', 'rmtree_dir': 'ok'}
+PASS C: right after each failed import_omx (B1, B2), the target is renamed and deleted and its dir removed | observed={'B1_forced_failure': {'success': False, 'error': 'forced table import failure', 'rename_delete': 'ok', 'rmtree_dir': 'ok'}, 'B2_checksum_failure': {'success': False, 'error': 'Checksum mismatch for table secrets: cbaf994aa8f7f975f0cd97a33387f262c9a77ea9a2cd87c61938fc82051245a8 != b20503b6e5deaa33586b0a6a8739d18f2bd8ac5ce363d3be42fb6929c6e1fd28', 'rename_delete': 'ok', 'rmtree_dir': 'ok'}}
+PASS D: import_omx into a borrowed record store succeeds and does not close it | observed={'success': True, 'close_calls': 0}
+PASS D: the borrowed target store stays usable and holds the imported rows | observed=['s1', 's2', 's3', 's4', 's5']
+PASS D: export_omx from a borrowed record store does not close it and the store stays usable | observed={'close_calls': 0, 'rows': 5}
+PASS D: the owner's own close() is the first and only close of each borrowed store | observed=[1, 1]
+PASS gc stayed disabled and gc.collect() was never called | observed={'gc_enabled': False, 'gc_collect_calls': 0}
+SUMMARY {'passed': 19, 'failed': 0, 'total': 19}

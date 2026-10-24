@@ -1,0 +1,24 @@
+{
+  "probe": "probe_368_pg",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "postgres_server_version": "16.15 (Debian 16.15-1.pgdg13+2)",
+  "sqlalchemy": "2.1.6",
+  "psycopg": "3.3.6"
+}
+PASS A. echo SDK turn completes with one PostgresMemoryStore from resolve_memory_backend | observed={'run_state': 'completed', 'stores': ['PostgresMemoryStore']}
+PASS A. the turn opened an actual server connection for this runtime's application_name (memory tables created) | observed={'connections': 1, 'tables': 9}
+PASS A. runtime.close() x3 disposes the owned engine exactly once | observed=[1, 1, 1]
+PASS A. no server connection is left for the application_name after close | observed=0
+PASS B. borrowed: two AuditedMemoryStore closes leave the engine undisposed with a live server connection, store usable | observed={'disposals': 0, 'connections': 1, 'store_get': True, 'store_put_and_get_after_wrapper_close': True}
+PASS B. borrowed: the owner's two closes dispose the engine once and leave no connection | observed={'disposals': 1, 'connections': 0}
+PASS C. live scheduler: close() x2 is scheduler_still_running; engine not disposed, artifact store not closed, store usable | observed={'disposals': 0, 'artifact_closes': 0, 'connections': 1, 'store_usable': True}
+PASS C. after the scheduler stops, close succeeds once: one disposal, one artifact close, no connections | observed={'disposals': 1, 'artifact_closes': 1, 'connections': 0}
+8/8 checks pass
+exit=0

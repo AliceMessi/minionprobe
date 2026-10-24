@@ -1,0 +1,459 @@
+{
+  "info": {
+    "probe": "probe_352_contract",
+    "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+    "openminion.__version__": "0.1.11",
+    "python": "3.12.11",
+    "platform": "Windows-11-10.0.22631-SP0",
+    "sqlite3.sqlite_version": "3.50.4",
+    "cwd": "<WORK>\\runs\\352-probe_352_contract",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "target": "sqlite:contract.db"
+  },
+  "cases": {},
+  "checks": [
+    {
+      "check": "1. interleaved runs (special, padded, nested, upper-case ids; stepping clock): run listing and run events equal the reduction",
+      "pass": true,
+      "observed": {
+        "run_events": 69,
+        "runs": 36,
+        "listing_combinations": 24,
+        "run_event_calls": 216
+      }
+    },
+    {
+      "check": "2. interleaved threads: thread lifecycle equals the reduction (latest run/state, invocation, high water, delivery, writer)",
+      "pass": true,
+      "observed": {
+        "'conv'|'quiet'": {
+          "latest_run_id": "q1",
+          "latest_run_state": "completed",
+          "invocation_id": "inv-q1",
+          "latest_event_id": 146
+        },
+        "'conv'|'busy'": {
+          "latest_run_id": "b11",
+          "latest_run_state": "running",
+          "invocation_id": "inv-b11",
+          "latest_event_id": 145
+        },
+        "'conv'|'missing'": {
+          "latest_run_id": "",
+          "latest_run_state": "",
+          "invocation_id": "",
+          "latest_event_id": 0
+        },
+        "'<session>'|'busy'": {
+          "latest_run_id": "",
+          "latest_run_state": "",
+          "invocation_id": "",
+          "latest_event_id": 127
+        },
+        "''|'quiet'": {
+          "latest_run_id": "q1",
+          "latest_run_state": "completed",
+          "invocation_id": "inv-q1",
+          "latest_event_id": 146
+        }
+      }
+    },
+    {
+      "check": "3a. padded fields, null/bool/number/container ids, JSON-token text, zero-width space, RUN. prefix: readers equal the reduction",
+      "pass": true,
+      "observed": {
+        "runs": {
+          "run_events": 17,
+          "runs": 10,
+          "listing_combinations": 24,
+          "run_event_calls": 60
+        },
+        "threads": {
+          "'conv'|'t'": {
+            "latest_run_id": "t1",
+            "latest_run_state": "failed",
+            "invocation_id": "None",
+            "latest_event_id": 175
+          },
+          "'<session>'|'t'": {
+            "latest_run_id": "t5",
+            "latest_run_state": "waiting_tool",
+            "invocation_id": "",
+            "latest_event_id": 171
+          },
+          "'conv'|'\\u200bt'": {
+            "latest_run_id": "zw",
+            "latest_run_state": "queued",
+            "invocation_id": "",
+            "latest_event_id": 174
+          },
+          "''|'t'": {
+            "latest_run_id": "t1",
+            "latest_run_state": "failed",
+            "invocation_id": "None",
+            "latest_event_id": 175
+          },
+          "' conv\\t\\n\\x0b\\x0c\\r\\x1c\\x1d\\x1e\\x1f \\x85\\xa0\\u1680\\u2000\\u2001\\u2002\\u2003\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000'|'\\t\\n\\x0b\\x0c\\r\\x1c\\x1d\\x1e\\x1f \\x85\\xa0\\u1680\\u2000\\u2001\\u2002\\u2003\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000t'": {
+            "latest_run_id": "t1",
+            "latest_run_state": "failed",
+            "invocation_id": "None",
+            "latest_event_id": 175
+          },
+          "'trace: NaN'|'[NaN]'": {
+            "latest_run_id": "trace, Infinity",
+            "latest_run_state": "queued",
+            "invocation_id": "trace: 1e999",
+            "latest_event_id": 172
+          },
+          "'trace: 1e999'|'[1e999]'": {
+            "latest_run_id": "x",
+            "latest_run_state": "running",
+            "invocation_id": "",
+            "latest_event_id": 173
+          }
+        }
+      }
+    },
+    {
+      "check": "3b. the four #372 review cases: padded run id is one run; blank error keeps the earlier error; padded state; padded thread ids",
+      "pass": true,
+      "observed": {
+        "padded run id": [
+          [
+            "r",
+            2
+          ]
+        ],
+        "blank error": "earlier error",
+        "padded state": [
+          "running",
+          ""
+        ],
+        "padded thread": [
+          "failed",
+          183,
+          183
+        ]
+      }
+    },
+    {
+      "check": "3c. ids that look like JSON tokens keep their exact text: 4 distinct runs, each run/thread read exactly",
+      "pass": true,
+      "observed": [
+        [
+          "[NaN]",
+          1
+        ],
+        [
+          "trace, Infinity",
+          1
+        ],
+        [
+          "trace: 1e999",
+          1
+        ],
+        [
+          "trace: NaN",
+          1
+        ]
+      ]
+    },
+    {
+      "check": "3d. decoded-ID order: runs starting at the same timestamp are listed by decoded run id (descending), not by their JSON-encoded keys",
+      "pass": true,
+      "observed": {
+        "listed": [
+          "\u00e9a",
+          "\u00e9",
+          "z",
+          "back]slash",
+          "back\\slash",
+          "b#",
+          "b\"",
+          "Z"
+        ],
+        "json_key_order_would_be": [
+          "z",
+          "back]slash",
+          "back\\slash",
+          "b\"",
+          "b#",
+          "\u00e9a",
+          "\u00e9",
+          "Z"
+        ]
+      }
+    },
+    {
+      "check": "4. event facts of 486 events (9 keys x 27 values incl. padding, zero-width space, token text, every JSON type, NaN, +-Infinity, NUL) equal 0.1.10's expressions; exact decoded ids; ASCII keys without NUL",
+      "pass": true,
+      "observed": {
+        "events": 486,
+        "facts_rows": 486
+      }
+    },
+    {
+      "check": "5a. NaN/Infinity/NUL in run fields and in unrelated tool/attach fields: readers equal the reduction; run r = failed/'inf'/'bad<NUL>byte'/4",
+      "pass": true,
+      "observed": {
+        "runs": {
+          "run_events": 8,
+          "runs": 5,
+          "listing_combinations": 24,
+          "run_event_calls": 30
+        },
+        "threads": {
+          "'conv'|'t'": {
+            "latest_run_id": "-inf",
+            "latest_run_state": "completed",
+            "invocation_id": "inf",
+            "latest_event_id": 691
+          },
+          "'<session>'|'t'": {
+            "latest_run_id": "",
+            "latest_run_state": "",
+            "invocation_id": "",
+            "latest_event_id": 0
+          },
+          "''|'t'": {
+            "latest_run_id": "-inf",
+            "latest_run_state": "completed",
+            "invocation_id": "inf",
+            "latest_event_id": 691
+          },
+          "'c\\x00'|'t\\x00'": {
+            "latest_run_id": "x",
+            "latest_run_state": "queued",
+            "invocation_id": "",
+            "latest_event_id": 693
+          }
+        },
+        "run_ids": [
+          "-inf",
+          "nan",
+          "nul\u0000id",
+          "r",
+          "x"
+        ],
+        "r": [
+          "failed",
+          "inf",
+          "bad\u0000byte",
+          4
+        ],
+        "nul_thread_request_tested": true
+      }
+    },
+    {
+      "check": "5b. the five cases of the third #372 review (earlier error, then error NaN / step Infinity / other key -Infinity / error with NUL / other key with NUL)",
+      "pass": true,
+      "observed": {
+        "error NaN": [
+          "r",
+          "running",
+          "s",
+          "nan",
+          2
+        ],
+        "step Infinity": [
+          "r",
+          "running",
+          "inf",
+          "earlier",
+          2
+        ],
+        "other key -Infinity": [
+          "r",
+          "running",
+          "s",
+          "earlier",
+          2
+        ],
+        "error with NUL": [
+          "r",
+          "running",
+          "s",
+          "bad\u0000byte",
+          2
+        ],
+        "other key with NUL": [
+          "r",
+          "running",
+          "s",
+          "earlier",
+          2
+        ]
+      }
+    },
+    {
+      "check": "6. a run id whose JSON key is over 20 kB, with a NUL: listing, run events and thread projection read it exactly",
+      "pass": true,
+      "observed": {
+        "run_key_chars": 24011,
+        "listed": [
+          [
+            4004,
+            "failed",
+            2
+          ]
+        ]
+      }
+    },
+    {
+      "check": "7. bounded rows: the rows each reader reads at the backend boundary are the same at 181 and 1,201 events of history",
+      "pass": true,
+      "observed": [
+        {
+          "history_events": 181,
+          "list_session_runs": [
+            5,
+            5
+          ],
+          "list_session_run_events": [
+            5
+          ],
+          "resolve_thread_lifecycle": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "history_events": 1201,
+          "list_session_runs": [
+            5,
+            5
+          ],
+          "list_session_run_events": [
+            5
+          ],
+          "resolve_thread_lifecycle": [
+            0,
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "check": "8. canonical replay/conflict, terminal outcome and capture result transactions, rollback of a failed facts write, session deletion: events and facts stay consistent",
+      "pass": true,
+      "observed": {
+        "replay_equals_first": true,
+        "canonical_conflict": "RuntimeSessionStoreIntegrityError: canonical event 'facts.v1:first' conflicts with stored event",
+        "terminal_conflict": "RuntimeSessionStoreIntegrityError: canonical event 'turn.outcome.v1:facts' conflicts with stored event",
+        "capture_without_hold": "RuntimeSessionStoreIntegrityError: capture 'no-hold' has no retention hold",
+        "facts_write_failure": "RuntimeError: facts failed",
+        "facts_after_writes": 3,
+        "facts_after_session_delete": 0,
+        "other_session_facts_kept": 1
+      }
+    },
+    {
+      "check": "9. backfill: 2,345 events stored at migration 12 (interleaved runs/threads, tool events, NaN/Infinity/NUL); migration 13 reads batches 1000/1000/345/0; rows unchanged; facts = write-path facts; readers = reduction",
+      "pass": true,
+      "observed": {
+        "migration_12_applied_first": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "applied": [
+          13
+        ],
+        "batches": [
+          1000,
+          1000,
+          345,
+          0
+        ],
+        "events": 2345,
+        "facts": 2345,
+        "per_session": {
+          "legacy-a": {
+            "run_events": 880,
+            "runs": 10,
+            "listing_combinations": 24,
+            "run_event_calls": 60,
+            "threads": {
+              "'conv'|'t0'": {
+                "latest_run_id": "run-4",
+                "latest_run_state": "completed",
+                "invocation_id": "i",
+                "latest_event_id": 2335
+              },
+              "'conv'|'t2'": {
+                "latest_run_id": "run-6",
+                "latest_run_state": "queued",
+                "invocation_id": "i",
+                "latest_event_id": 2345
+              },
+              "'<session>'|'t1'": {
+                "latest_run_id": "",
+                "latest_run_state": "",
+                "invocation_id": "",
+                "latest_event_id": 0
+              }
+            }
+          },
+          "legacy-b": {
+            "run_events": 586,
+            "runs": 10,
+            "listing_combinations": 24,
+            "run_event_calls": 60,
+            "threads": {
+              "'conv'|'t0'": {
+                "latest_run_id": "run-4",
+                "latest_run_state": "running",
+                "invocation_id": "",
+                "latest_event_id": 2336
+              },
+              "'conv'|'t2'": {
+                "latest_run_id": "nul\u00002",
+                "latest_run_state": "running",
+                "invocation_id": "",
+                "latest_event_id": 2328
+              },
+              "'<session>'|'t1'": {
+                "latest_run_id": "",
+                "latest_run_state": "",
+                "invocation_id": "",
+                "latest_event_id": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "check": "10. backfill failure: unreadable payload at event 1400 of 1,500 -> MigrationError naming it; ledger stays at 12; no event_run_facts; events unchanged; after a deliberate repair the rerun applies 13 whole (1,500 facts)",
+      "pass": true,
+      "observed": {
+        "migration_error": "MigrationError: Migration v13 (add_event_run_facts) failed: event 1400 has a payload_json that is not JSON: Expecting value: line 1 column 12 (char 11)",
+        "normal_open_error": "MigrationError: Migration v13 (add_event_run_facts) failed: event 1400 has a payload_json that is not JSON: Expecting value: line 1 column 12 (char 11)",
+        "ledger_after_failure_max": 12,
+        "event_run_facts_table_after_failure": false,
+        "events_unchanged": true,
+        "rerun_applied": [
+          13
+        ],
+        "facts_after_rerun": 1500
+      }
+    }
+  ],
+  "summary": {
+    "passed": 14,
+    "failed": 0,
+    "total": 14
+  }
+}

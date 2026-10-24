@@ -1,0 +1,156 @@
+{
+  "info": {
+    "probe": "probe_368_pg",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.11",
+    "python": "3.12.15",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<RUNNER_TEMP>/empty",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "postgres_server_version": "16.15 (Debian 16.15-1.pgdg13+2)",
+    "sqlalchemy": "2.1.6",
+    "psycopg": "3.3.6"
+  },
+  "summary": {
+    "passed": 8,
+    "failed": 0,
+    "total": 8
+  },
+  "all_pass": true,
+  "checks": [
+    {
+      "check": "A. echo SDK turn completes with one PostgresMemoryStore from resolve_memory_backend",
+      "pass": true,
+      "observed": {
+        "run_state": "completed",
+        "stores": [
+          "PostgresMemoryStore"
+        ]
+      }
+    },
+    {
+      "check": "A. the turn opened an actual server connection for this runtime's application_name (memory tables created)",
+      "pass": true,
+      "observed": {
+        "connections": 1,
+        "tables": 9
+      }
+    },
+    {
+      "check": "A. runtime.close() x3 disposes the owned engine exactly once",
+      "pass": true,
+      "observed": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "check": "A. no server connection is left for the application_name after close",
+      "pass": true,
+      "observed": 0
+    },
+    {
+      "check": "B. borrowed: two AuditedMemoryStore closes leave the engine undisposed with a live server connection, store usable",
+      "pass": true,
+      "observed": {
+        "disposals": 0,
+        "connections": 1,
+        "store_get": true,
+        "store_put_and_get_after_wrapper_close": true
+      }
+    },
+    {
+      "check": "B. borrowed: the owner's two closes dispose the engine once and leave no connection",
+      "pass": true,
+      "observed": {
+        "disposals": 1,
+        "connections": 0
+      }
+    },
+    {
+      "check": "C. live scheduler: close() x2 is scheduler_still_running; engine not disposed, artifact store not closed, store usable",
+      "pass": true,
+      "observed": {
+        "disposals": 0,
+        "artifact_closes": 0,
+        "connections": 1,
+        "store_usable": true
+      }
+    },
+    {
+      "check": "C. after the scheduler stops, close succeeds once: one disposal, one artifact close, no connections",
+      "pass": true,
+      "observed": {
+        "disposals": 1,
+        "artifact_closes": 1,
+        "connections": 0
+      }
+    }
+  ],
+  "observed": {
+    "A_sdk_postgres": {
+      "run_state": "completed",
+      "memory_stores": [
+        "PostgresMemoryStore"
+      ],
+      "memory_tables_in_schema": 9,
+      "server_connections_after_turn": 1,
+      "engine_disposals_after_each_runtime_close": [
+        1,
+        1,
+        1
+      ],
+      "server_connections_after_close": 0,
+      "dispose_stack": [
+        [
+          "openminion/api/core/lifecycle.py:136 close_runtime_components",
+          "openminion/api/core/lifecycle.py:29 _call",
+          "openminion/modules/memory/runtime/assembly.py:59 close",
+          "openminion/modules/memory/service/base.py:96 close",
+          "openminion/modules/memory/storage/audit.py:173 close",
+          "openminion/modules/memory/storage/postgres/store.py:117 close"
+        ]
+      ]
+    },
+    "B_borrowed_audited_postgres": {
+      "after_two_wrapper_closes": {
+        "disposals": 0,
+        "connections": 1,
+        "store_get": true,
+        "store_put_and_get_after_wrapper_close": true
+      },
+      "after_owner_closes_twice": {
+        "disposals": 1,
+        "connections": 0
+      }
+    },
+    "C_scheduler_postgres": {
+      "store": [
+        "PostgresMemoryStore"
+      ],
+      "blocked": [
+        "RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')",
+        "RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')"
+      ],
+      "while_blocked": {
+        "disposals": 0,
+        "artifact_closes": 0,
+        "connections": 1,
+        "store_usable": true
+      },
+      "after_stop": [
+        "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+        "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"
+      ],
+      "after_stop_counts": {
+        "disposals": 1,
+        "artifact_closes": 1,
+        "connections": 0
+      },
+      "same_result_object": true
+    }
+  }
+}

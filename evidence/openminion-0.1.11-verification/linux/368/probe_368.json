@@ -1,0 +1,414 @@
+{
+  "info": {
+    "probe": "probe_368",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.11",
+    "python": "3.12.15",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<RUNNER_TEMP>/empty",
+    "imported_from_site_packages": true,
+    "isolated_mode": true
+  },
+  "summary": {
+    "passed": 21,
+    "failed": 0,
+    "total": 21
+  },
+  "all_pass": true,
+  "checks": [
+    {
+      "check": "A. echo SDK turn completes with one SQLiteMemoryStore from resolve_memory_backend",
+      "pass": true,
+      "observed": {
+        "run_state": "completed",
+        "stores": [
+          "SQLiteMemoryStore"
+        ]
+      }
+    },
+    {
+      "check": "A. the assembly's ArtifactCtl is injected into the store, which does not own it",
+      "pass": true,
+      "observed": {
+        "store_type": "SQLiteMemoryStore",
+        "store_artifactctl_is_assembly_artifactctl": true,
+        "store_owns_artifactctl": false
+      }
+    },
+    {
+      "check": "A. runtime.close() x3: store closed once, assembly ArtifactCtl closed once",
+      "pass": true,
+      "observed": [
+        {
+          "store_close_calls": 1,
+          "assembly_artifactctl_close_calls": 1
+        },
+        {
+          "store_close_calls": 1,
+          "assembly_artifactctl_close_calls": 1
+        },
+        {
+          "store_close_calls": 1,
+          "assembly_artifactctl_close_calls": 1
+        }
+      ]
+    },
+    {
+      "check": "A. the assembly ArtifactCtl rejects writes after shutdown (closed database)",
+      "pass": true,
+      "observed": "ProgrammingError: Cannot operate on a closed database."
+    },
+    {
+      "check": "B. sqlite: assembly wraps the created store in AuditedMemoryStore; close() x2 returns one closed result",
+      "pass": true,
+      "observed": {
+        "created_store": "CountingSQLiteMemoryStore",
+        "service_closes": "AuditedMemoryStore",
+        "delegated_backend": "BuiltinKnowledgeBackend",
+        "delegated_reads_same_audited_store": true,
+        "delegated_backend_has_close": false,
+        "delegated_read": "found",
+        "close_results": [
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"
+        ],
+        "same_result_object": true,
+        "events": [
+          "store.close",
+          "artifactctl.close"
+        ]
+      }
+    },
+    {
+      "check": "B. sqlite: delegated reads use the same audited store and add no closer",
+      "pass": true,
+      "observed": {
+        "delegated_backend": "BuiltinKnowledgeBackend",
+        "delegated_reads_same_audited_store": true,
+        "delegated_backend_has_close": false,
+        "delegated_read": "found"
+      }
+    },
+    {
+      "check": "B. sqlite: the created store closes once, then the injected artifact store once",
+      "pass": true,
+      "observed": [
+        "store.close",
+        "artifactctl.close"
+      ]
+    },
+    {
+      "check": "B. mock: assembly wraps the created store in AuditedMemoryStore; close() x2 returns one closed result",
+      "pass": true,
+      "observed": {
+        "created_store": "CountingInMemoryMemoryStore",
+        "service_closes": "AuditedMemoryStore",
+        "delegated_backend": "BuiltinKnowledgeBackend",
+        "delegated_reads_same_audited_store": true,
+        "delegated_backend_has_close": false,
+        "delegated_read": "found",
+        "close_results": [
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"
+        ],
+        "same_result_object": true,
+        "events": [
+          "store.close",
+          "artifactctl.close"
+        ]
+      }
+    },
+    {
+      "check": "B. mock: delegated reads use the same audited store and add no closer",
+      "pass": true,
+      "observed": {
+        "delegated_backend": "BuiltinKnowledgeBackend",
+        "delegated_reads_same_audited_store": true,
+        "delegated_backend_has_close": false,
+        "delegated_read": "found"
+      }
+    },
+    {
+      "check": "B. mock: the created store closes once, then the injected artifact store once",
+      "pass": true,
+      "observed": [
+        "store.close",
+        "artifactctl.close"
+      ]
+    },
+    {
+      "check": "B. remote: assembly wraps the created store in AuditedMemoryStore; close() x2 returns one closed result",
+      "pass": true,
+      "observed": {
+        "created_store": "CountingRemoteMemoryStore",
+        "service_closes": "AuditedMemoryStore",
+        "delegated_backend": "BuiltinKnowledgeBackend",
+        "delegated_reads_same_audited_store": true,
+        "delegated_backend_has_close": false,
+        "delegated_read": "not attempted (remote endpoint is not served)",
+        "close_results": [
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"
+        ],
+        "same_result_object": true,
+        "events": [
+          "store.close",
+          "artifactctl.close"
+        ]
+      }
+    },
+    {
+      "check": "B. remote: delegated reads use the same audited store and add no closer",
+      "pass": true,
+      "observed": {
+        "delegated_backend": "BuiltinKnowledgeBackend",
+        "delegated_reads_same_audited_store": true,
+        "delegated_backend_has_close": false,
+        "delegated_read": "not attempted (remote endpoint is not served)"
+      }
+    },
+    {
+      "check": "B. remote: the created store closes once, then the injected artifact store once",
+      "pass": true,
+      "observed": [
+        "store.close",
+        "artifactctl.close"
+      ]
+    },
+    {
+      "check": "C. with no injected artifact store the SQLite store creates and owns one real ArtifactCtl",
+      "pass": true,
+      "observed": {
+        "assembly_artifactctl": "None",
+        "store_owns_its_artifactctl": true,
+        "store_created_artifactctl_calls": 1,
+        "ref_add_calls": 1,
+        "close_results": [
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"
+        ],
+        "artifactctl_close_calls": 1,
+        "store_close_events": 1,
+        "write_after_close": "ProgrammingError: Cannot operate on a closed database."
+      }
+    },
+    {
+      "check": "C. close() x2: the store closes once and closes its owned ArtifactCtl once",
+      "pass": true,
+      "observed": {
+        "store_closes": 1,
+        "artifactctl_closes": 1,
+        "write_after_close": "ProgrammingError: Cannot operate on a closed database."
+      }
+    },
+    {
+      "check": "D. a store built with an injected artifact store closes twice without closing it",
+      "pass": true,
+      "observed": [
+        "store.close",
+        "store.close"
+      ]
+    },
+    {
+      "check": "D. AuditedMemoryStore(store) without owns_store never closes the borrowed store",
+      "pass": true,
+      "observed": {
+        "events": [],
+        "usable": "ok"
+      }
+    },
+    {
+      "check": "E. sqlite: live scheduler: close() x2 is scheduler_still_running; store and artifact store not closed, store usable",
+      "pass": true,
+      "observed": {
+        "blocked": [
+          "RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')",
+          "RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')"
+        ],
+        "events_while_blocked": [],
+        "store_usable_while_blocked": true,
+        "after_stop": [
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"
+        ],
+        "same_result_object": true,
+        "events": [
+          "store.close",
+          "artifactctl.close"
+        ]
+      }
+    },
+    {
+      "check": "E. sqlite: after the scheduler stops, close succeeds once (store.close, artifactctl.close) and repeats",
+      "pass": true,
+      "observed": [
+        "store.close",
+        "artifactctl.close"
+      ]
+    },
+    {
+      "check": "E. mock: live scheduler: close() x2 is scheduler_still_running; store and artifact store not closed, store usable",
+      "pass": true,
+      "observed": {
+        "blocked": [
+          "RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')",
+          "RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')"
+        ],
+        "events_while_blocked": [],
+        "store_usable_while_blocked": true,
+        "after_stop": [
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"
+        ],
+        "same_result_object": true,
+        "events": [
+          "store.close",
+          "artifactctl.close"
+        ]
+      }
+    },
+    {
+      "check": "E. mock: after the scheduler stops, close succeeds once (store.close, artifactctl.close) and repeats",
+      "pass": true,
+      "observed": [
+        "store.close",
+        "artifactctl.close"
+      ]
+    }
+  ],
+  "observed": {
+    "A_sdk_sqlite": {
+      "run_state": "completed",
+      "stores_created": 1,
+      "store_type": "SQLiteMemoryStore",
+      "store_artifactctl_is_assembly_artifactctl": true,
+      "store_owns_artifactctl": false,
+      "after_each_runtime_close": [
+        {
+          "store_close_calls": 1,
+          "assembly_artifactctl_close_calls": 1
+        },
+        {
+          "store_close_calls": 1,
+          "assembly_artifactctl_close_calls": 1
+        },
+        {
+          "store_close_calls": 1,
+          "assembly_artifactctl_close_calls": 1
+        }
+      ],
+      "assembly_artifactctl_write_after_shutdown": "ProgrammingError: Cannot operate on a closed database."
+    },
+    "B_builder_backends": {
+      "sqlite": {
+        "created_store": "CountingSQLiteMemoryStore",
+        "service_closes": "AuditedMemoryStore",
+        "delegated_backend": "BuiltinKnowledgeBackend",
+        "delegated_reads_same_audited_store": true,
+        "delegated_backend_has_close": false,
+        "delegated_read": "found",
+        "close_results": [
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"
+        ],
+        "same_result_object": true,
+        "events": [
+          "store.close",
+          "artifactctl.close"
+        ]
+      },
+      "mock": {
+        "created_store": "CountingInMemoryMemoryStore",
+        "service_closes": "AuditedMemoryStore",
+        "delegated_backend": "BuiltinKnowledgeBackend",
+        "delegated_reads_same_audited_store": true,
+        "delegated_backend_has_close": false,
+        "delegated_read": "found",
+        "close_results": [
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"
+        ],
+        "same_result_object": true,
+        "events": [
+          "store.close",
+          "artifactctl.close"
+        ]
+      },
+      "remote": {
+        "created_store": "CountingRemoteMemoryStore",
+        "service_closes": "AuditedMemoryStore",
+        "delegated_backend": "BuiltinKnowledgeBackend",
+        "delegated_reads_same_audited_store": true,
+        "delegated_backend_has_close": false,
+        "delegated_read": "not attempted (remote endpoint is not served)",
+        "close_results": [
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"
+        ],
+        "same_result_object": true,
+        "events": [
+          "store.close",
+          "artifactctl.close"
+        ]
+      }
+    },
+    "C_owned_artifact": {
+      "assembly_artifactctl": "None",
+      "store_owns_its_artifactctl": true,
+      "store_created_artifactctl_calls": 1,
+      "ref_add_calls": 1,
+      "close_results": [
+        "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+        "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"
+      ],
+      "artifactctl_close_calls": 1,
+      "store_close_events": 1,
+      "write_after_close": "ProgrammingError: Cannot operate on a closed database."
+    },
+    "D_controls": {
+      "store_with_injected_artifactctl_close_x2_events": [
+        "store.close",
+        "store.close"
+      ],
+      "borrowed_audited_wrapper_close_x2_events": [],
+      "store_usable_after_borrowed_wrapper_closed": "ok"
+    },
+    "E_scheduler": {
+      "sqlite": {
+        "blocked": [
+          "RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')",
+          "RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')"
+        ],
+        "events_while_blocked": [],
+        "store_usable_while_blocked": true,
+        "after_stop": [
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"
+        ],
+        "same_result_object": true,
+        "events": [
+          "store.close",
+          "artifactctl.close"
+        ]
+      },
+      "mock": {
+        "blocked": [
+          "RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')",
+          "RuntimeMemoryCloseResult(closed=False, reason_code='scheduler_still_running')"
+        ],
+        "events_while_blocked": [],
+        "store_usable_while_blocked": true,
+        "after_stop": [
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')",
+          "RuntimeMemoryCloseResult(closed=True, reason_code='closed')"
+        ],
+        "same_result_object": true,
+        "events": [
+          "store.close",
+          "artifactctl.close"
+        ]
+      }
+    }
+  }
+}

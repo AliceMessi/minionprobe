@@ -1,0 +1,938 @@
+{
+  "info": {
+    "probe": "probe_373",
+    "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+    "openminion.__version__": "0.1.10",
+    "python": "3.12.11",
+    "platform": "Windows-11-10.0.22631-SP0",
+    "sqlite3.sqlite_version": "3.50.4",
+    "cwd": "<WORK>\\runs\\probe_373",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "gc_enabled_at_start": false
+  },
+  "summary": {
+    "passed": 13,
+    "failed": 13,
+    "total": 26
+  },
+  "all_pass": false,
+  "checks": [
+    {
+      "check": "A: migrate(target='head') succeeds on a fresh file for all 14 modules",
+      "pass": true,
+      "observed": [
+        [
+          "secret",
+          "0001_baseline"
+        ],
+        [
+          "policy",
+          "0002_blockchain_confirmations"
+        ],
+        [
+          "authoring",
+          "0001_baseline"
+        ],
+        [
+          "session",
+          "0005_cron_scheduler_control"
+        ],
+        [
+          "identity",
+          "0001_baseline"
+        ],
+        [
+          "registry",
+          "0001_baseline"
+        ],
+        [
+          "telemetry",
+          "0003_debug_query_indexes"
+        ],
+        [
+          "task",
+          "0001_baseline"
+        ],
+        [
+          "skill",
+          "0007_workflow_observations"
+        ],
+        [
+          "memory",
+          "0004_namespace"
+        ],
+        [
+          "artifact",
+          "0001_baseline"
+        ],
+        [
+          "retrieve",
+          "0002_index"
+        ],
+        [
+          "commerce",
+          "0004_action_preparations"
+        ],
+        [
+          "controlplane",
+          "0002_index_audit"
+        ]
+      ]
+    },
+    {
+      "check": "A: every connection opened during migrate() is closed when it returns (no gc.collect)",
+      "pass": false,
+      "observed": {
+        "secret": "9 opened, 6 open",
+        "policy": "9 opened, 6 open",
+        "authoring": "9 opened, 6 open",
+        "session": "9 opened, 6 open",
+        "identity": "9 opened, 6 open",
+        "registry": "9 opened, 6 open",
+        "telemetry": "9 opened, 6 open",
+        "task": "9 opened, 6 open",
+        "skill": "9 opened, 6 open",
+        "memory": "9 opened, 6 open",
+        "artifact": "9 opened, 6 open",
+        "retrieve": "9 opened, 6 open",
+        "commerce": "9 opened, 6 open",
+        "controlplane": "9 opened, 6 open"
+      }
+    },
+    {
+      "check": "A: the public metadata step committed om_meta schema_head = head and last_migrated_at",
+      "pass": true
+    },
+    {
+      "check": "A: each untracked fresh DB is renamed and deleted right after migrate() returns, GC disabled",
+      "pass": false,
+      "observed": [
+        "rename failed: PermissionError [WinError 32]"
+      ]
+    },
+    {
+      "check": "B: detect() opens one connection and verify() one more; both closed on return",
+      "pass": false,
+      "observed": [
+        [
+          "runner.py:141 detect <- probe_373.py:178 <module>",
+          false
+        ],
+        [
+          "verify.py:111 run_verification <- runner.py:300 verify <- probe_373.py:180 <module>",
+          false
+        ]
+      ]
+    },
+    {
+      "check": "B: detect() + verify(level='full') on a migrated DB close both connections",
+      "pass": false,
+      "observed": [
+        [
+          "runner.py:141 detect <- probe_373.py:191 <module>",
+          false
+        ],
+        [
+          "verify.py:111 run_verification <- runner.py:300 verify <- probe_373.py:192 <module>",
+          false
+        ]
+      ]
+    },
+    {
+      "check": "B: the migrated DB can be renamed and deleted right after detect/verify",
+      "pass": true
+    },
+    {
+      "check": "C: a successful metadata write is committed (read back on a new connection)",
+      "pass": true,
+      "observed": {
+        "module_id": "sessctl",
+        "schema_head": "0001_init",
+        "last_migrated_at": "2026-10-24T00:00:00+00:00"
+      }
+    },
+    {
+      "check": "C: the metadata connection is closed on return",
+      "pass": false,
+      "observed": [
+        {
+          "site": "runner.py:499 _update_sqlite_metadata_after_migration <- probe_373.py:205 <module>",
+          "target": "<WORK>\\work\\probe_373\\C\\module.db",
+          "closed": false
+        }
+      ]
+    },
+    {
+      "check": "D: a failing metadata hook propagates its error",
+      "pass": true,
+      "observed": "forced metadata failure"
+    },
+    {
+      "check": "D: the failed metadata write is rolled back",
+      "pass": true,
+      "observed": {
+        "module_id": "sessctl"
+      }
+    },
+    {
+      "check": "D: the owned metadata connection is closed after the failure",
+      "pass": false,
+      "observed": [
+        {
+          "site": "runner.py:499 _update_sqlite_metadata_after_migration <- probe_373.py:228 <module>",
+          "target": "<WORK>\\work\\probe_373\\D\\module.db",
+          "closed": false
+        }
+      ]
+    },
+    {
+      "check": "D: through migrate(), the report carries the metadata error and the snapshot is restored",
+      "pass": false,
+      "observed": {
+        "raised": "PermissionError [WinError 5]",
+        "tables_after": [
+          "alembic_version",
+          "om_meta",
+          "secrets"
+        ]
+      }
+    },
+    {
+      "check": "D: through migrate(), every connection is closed and the file renames/deletes right away",
+      "pass": false,
+      "observed": "7 opened"
+    },
+    {
+      "check": "E: owned verification (runner.verify) propagates the hook error",
+      "pass": true,
+      "observed": "forced verification failure"
+    },
+    {
+      "check": "E: owned verification rolls back the hook's write",
+      "pass": true,
+      "observed": 0
+    },
+    {
+      "check": "E: the owned verification connection is closed after the failure",
+      "pass": false,
+      "observed": [
+        {
+          "site": "verify.py:111 run_verification <- runner.py:300 verify <- probe_373.py:288 <module>",
+          "target": "<WORK>\\work\\probe_373\\E\\module.db",
+          "closed": false
+        }
+      ]
+    },
+    {
+      "check": "E: through migrate(), the verification hook error propagates, its write is rolled back and nothing is migrated",
+      "pass": true,
+      "observed": {
+        "raised": "forced verification failure",
+        "tables": [
+          "verify_probe_rows"
+        ],
+        "hook_rows": 0
+      }
+    },
+    {
+      "check": "E: through migrate(), every connection is closed and the file renames/deletes right away",
+      "pass": false,
+      "observed": "5 opened"
+    },
+    {
+      "check": "E: borrowed connection: the hook error propagates",
+      "pass": true,
+      "observed": "forced verification failure"
+    },
+    {
+      "check": "E: borrowed connection stays open and its transaction stays with the caller",
+      "pass": true,
+      "observed": {
+        "raised": "forced verification failure",
+        "borrowed_connection_open_after": true,
+        "caller_transaction_pending": true,
+        "hook_row_visible_to_caller_before_rollback": 1,
+        "hook_row_after_caller_rollback": 0
+      }
+    },
+    {
+      "check": "F: 5/5 echo SDK turns complete with authored-tool storage present",
+      "pass": true,
+      "observed": [
+        "completed",
+        "completed",
+        "completed",
+        "completed",
+        "completed"
+      ]
+    },
+    {
+      "check": "F: right after runtime.close(), store.sqlite is renamed and deleted (5/5, GC disabled, no retries)",
+      "pass": false,
+      "observed": [
+        "rename failed: PermissionError [WinError 32]",
+        "rename failed: PermissionError [WinError 32]",
+        "rename failed: PermissionError [WinError 32]",
+        "rename failed: PermissionError [WinError 32]",
+        "rename failed: PermissionError [WinError 32]"
+      ]
+    },
+    {
+      "check": "F: right after that, the whole temporary runtime root is removed (5/5, no retries)",
+      "pass": false,
+      "observed": [
+        "PermissionError [WinError 32] <WORK>\\work\\probe_373\\F\\run0\\root\\.openminion\\authored_tools\\store.sqlite",
+        "PermissionError [WinError 32] <WORK>\\work\\probe_373\\F\\run1\\root\\.openminion\\authored_tools\\store.sqlite",
+        "PermissionError [WinError 32] <WORK>\\work\\probe_373\\F\\run2\\root\\.openminion\\authored_tools\\store.sqlite",
+        "PermissionError [WinError 32] <WORK>\\work\\probe_373\\F\\run3\\root\\.openminion\\authored_tools\\store.sqlite",
+        "PermissionError [WinError 32] <WORK>\\work\\probe_373\\F\\run4\\root\\.openminion\\authored_tools\\store.sqlite"
+      ]
+    },
+    {
+      "check": "G: runtime construction opens migration-runner/verification connections and all are closed after runtime.close()",
+      "pass": false,
+      "observed": "18 owner connections over ['20261024T130946120443Z-0-none.sqlite.tmp', '20261024T130946332126Z-0-none.sqlite.tmp', 'policy.db', 'sessions.db', 'store.sqlite']"
+    },
+    {
+      "check": "gc stayed disabled and gc.collect() was never called",
+      "pass": true,
+      "observed": {
+        "gc_enabled": false,
+        "gc_collect_calls": 0
+      }
+    }
+  ],
+  "observed": {
+    "A_fresh_migration": [
+      {
+        "module": "secret",
+        "success": true,
+        "head": "0001_baseline",
+        "connections_opened": 9,
+        "connections_open_after_return": 6,
+        "sites": [
+          "alembic.py:148 run_migrations_online <- alembic.py:154 run_module_env <- env.py:10 <module>",
+          "backup.py:115 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "backup.py:116 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "runner.py:141 detect <- runner.py:166 backup <- runner.py:254 _migrate_impl",
+          "runner.py:141 detect <- runner.py:240 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:141 detect <- runner.py:279 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:499 _update_sqlite_metadata_after_migration <- runner.py:406 _update_metadata_after_migration <- runner.py:262 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:256 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:263 _migrate_impl"
+        ],
+        "om_meta_schema_head": "0001_baseline",
+        "om_meta_has_last_migrated_at": true,
+        "untracked_success": true,
+        "untracked_rename_delete_right_after_migrate": "rename failed: PermissionError [WinError 32]"
+      },
+      {
+        "module": "policy",
+        "success": true,
+        "head": "0002_blockchain_confirmations",
+        "connections_opened": 9,
+        "connections_open_after_return": 6,
+        "sites": [
+          "alembic.py:148 run_migrations_online <- alembic.py:154 run_module_env <- env.py:10 <module>",
+          "backup.py:115 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "backup.py:116 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "runner.py:141 detect <- runner.py:166 backup <- runner.py:254 _migrate_impl",
+          "runner.py:141 detect <- runner.py:240 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:141 detect <- runner.py:279 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:499 _update_sqlite_metadata_after_migration <- runner.py:406 _update_metadata_after_migration <- runner.py:262 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:256 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:263 _migrate_impl"
+        ],
+        "om_meta_schema_head": "0002_blockchain_confirmations",
+        "om_meta_has_last_migrated_at": true,
+        "untracked_success": true,
+        "untracked_rename_delete_right_after_migrate": "rename failed: PermissionError [WinError 32]"
+      },
+      {
+        "module": "authoring",
+        "success": true,
+        "head": "0001_baseline",
+        "connections_opened": 9,
+        "connections_open_after_return": 6,
+        "sites": [
+          "alembic.py:148 run_migrations_online <- alembic.py:154 run_module_env <- env.py:10 <module>",
+          "backup.py:115 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "backup.py:116 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "runner.py:141 detect <- runner.py:166 backup <- runner.py:254 _migrate_impl",
+          "runner.py:141 detect <- runner.py:240 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:141 detect <- runner.py:279 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:499 _update_sqlite_metadata_after_migration <- runner.py:406 _update_metadata_after_migration <- runner.py:262 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:256 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:263 _migrate_impl"
+        ],
+        "om_meta_schema_head": "0001_baseline",
+        "om_meta_has_last_migrated_at": true,
+        "untracked_success": true,
+        "untracked_rename_delete_right_after_migrate": "rename failed: PermissionError [WinError 32]"
+      },
+      {
+        "module": "session",
+        "success": true,
+        "head": "0005_cron_scheduler_control",
+        "connections_opened": 9,
+        "connections_open_after_return": 6,
+        "sites": [
+          "alembic.py:148 run_migrations_online <- alembic.py:154 run_module_env <- env.py:10 <module>",
+          "backup.py:115 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "backup.py:116 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "runner.py:141 detect <- runner.py:166 backup <- runner.py:254 _migrate_impl",
+          "runner.py:141 detect <- runner.py:240 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:141 detect <- runner.py:279 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:499 _update_sqlite_metadata_after_migration <- runner.py:406 _update_metadata_after_migration <- runner.py:262 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:256 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:263 _migrate_impl"
+        ],
+        "om_meta_schema_head": "0005_cron_scheduler_control",
+        "om_meta_has_last_migrated_at": true,
+        "untracked_success": true,
+        "untracked_rename_delete_right_after_migrate": "rename failed: PermissionError [WinError 32]"
+      },
+      {
+        "module": "identity",
+        "success": true,
+        "head": "0001_baseline",
+        "connections_opened": 9,
+        "connections_open_after_return": 6,
+        "sites": [
+          "alembic.py:148 run_migrations_online <- alembic.py:154 run_module_env <- env.py:10 <module>",
+          "backup.py:115 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "backup.py:116 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "runner.py:141 detect <- runner.py:166 backup <- runner.py:254 _migrate_impl",
+          "runner.py:141 detect <- runner.py:240 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:141 detect <- runner.py:279 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:499 _update_sqlite_metadata_after_migration <- runner.py:406 _update_metadata_after_migration <- runner.py:262 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:256 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:263 _migrate_impl"
+        ],
+        "om_meta_schema_head": "0001_baseline",
+        "om_meta_has_last_migrated_at": true,
+        "untracked_success": true,
+        "untracked_rename_delete_right_after_migrate": "rename failed: PermissionError [WinError 32]"
+      },
+      {
+        "module": "registry",
+        "success": true,
+        "head": "0001_baseline",
+        "connections_opened": 9,
+        "connections_open_after_return": 6,
+        "sites": [
+          "alembic.py:148 run_migrations_online <- alembic.py:154 run_module_env <- env.py:10 <module>",
+          "backup.py:115 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "backup.py:116 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "runner.py:141 detect <- runner.py:166 backup <- runner.py:254 _migrate_impl",
+          "runner.py:141 detect <- runner.py:240 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:141 detect <- runner.py:279 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:499 _update_sqlite_metadata_after_migration <- runner.py:406 _update_metadata_after_migration <- runner.py:262 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:256 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:263 _migrate_impl"
+        ],
+        "om_meta_schema_head": "0001_baseline",
+        "om_meta_has_last_migrated_at": true,
+        "untracked_success": true,
+        "untracked_rename_delete_right_after_migrate": "rename failed: PermissionError [WinError 32]"
+      },
+      {
+        "module": "telemetry",
+        "success": true,
+        "head": "0003_debug_query_indexes",
+        "connections_opened": 9,
+        "connections_open_after_return": 6,
+        "sites": [
+          "alembic.py:148 run_migrations_online <- alembic.py:154 run_module_env <- env.py:10 <module>",
+          "backup.py:115 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "backup.py:116 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "runner.py:141 detect <- runner.py:166 backup <- runner.py:254 _migrate_impl",
+          "runner.py:141 detect <- runner.py:240 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:141 detect <- runner.py:279 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:499 _update_sqlite_metadata_after_migration <- runner.py:406 _update_metadata_after_migration <- runner.py:262 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:256 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:263 _migrate_impl"
+        ],
+        "om_meta_schema_head": "0003_debug_query_indexes",
+        "om_meta_has_last_migrated_at": true,
+        "untracked_success": true,
+        "untracked_rename_delete_right_after_migrate": "rename failed: PermissionError [WinError 32]"
+      },
+      {
+        "module": "task",
+        "success": true,
+        "head": "0001_baseline",
+        "connections_opened": 9,
+        "connections_open_after_return": 6,
+        "sites": [
+          "alembic.py:148 run_migrations_online <- alembic.py:154 run_module_env <- env.py:10 <module>",
+          "backup.py:115 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "backup.py:116 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "runner.py:141 detect <- runner.py:166 backup <- runner.py:254 _migrate_impl",
+          "runner.py:141 detect <- runner.py:240 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:141 detect <- runner.py:279 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:499 _update_sqlite_metadata_after_migration <- runner.py:406 _update_metadata_after_migration <- runner.py:262 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:256 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:263 _migrate_impl"
+        ],
+        "om_meta_schema_head": "0001_baseline",
+        "om_meta_has_last_migrated_at": true,
+        "untracked_success": true,
+        "untracked_rename_delete_right_after_migrate": "rename failed: PermissionError [WinError 32]"
+      },
+      {
+        "module": "skill",
+        "success": true,
+        "head": "0007_workflow_observations",
+        "connections_opened": 9,
+        "connections_open_after_return": 6,
+        "sites": [
+          "alembic.py:148 run_migrations_online <- alembic.py:154 run_module_env <- env.py:10 <module>",
+          "backup.py:115 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "backup.py:116 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "runner.py:141 detect <- runner.py:166 backup <- runner.py:254 _migrate_impl",
+          "runner.py:141 detect <- runner.py:240 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:141 detect <- runner.py:279 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:499 _update_sqlite_metadata_after_migration <- runner.py:406 _update_metadata_after_migration <- runner.py:262 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:256 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:263 _migrate_impl"
+        ],
+        "om_meta_schema_head": "0007_workflow_observations",
+        "om_meta_has_last_migrated_at": true,
+        "untracked_success": true,
+        "untracked_rename_delete_right_after_migrate": "rename failed: PermissionError [WinError 32]"
+      },
+      {
+        "module": "memory",
+        "success": true,
+        "head": "0004_namespace",
+        "connections_opened": 9,
+        "connections_open_after_return": 6,
+        "sites": [
+          "alembic.py:148 run_migrations_online <- alembic.py:154 run_module_env <- env.py:10 <module>",
+          "backup.py:115 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "backup.py:116 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "runner.py:141 detect <- runner.py:166 backup <- runner.py:254 _migrate_impl",
+          "runner.py:141 detect <- runner.py:240 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:141 detect <- runner.py:279 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:499 _update_sqlite_metadata_after_migration <- runner.py:406 _update_metadata_after_migration <- runner.py:262 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:256 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:263 _migrate_impl"
+        ],
+        "om_meta_schema_head": "0004_namespace",
+        "om_meta_has_last_migrated_at": true,
+        "untracked_success": true,
+        "untracked_rename_delete_right_after_migrate": "rename failed: PermissionError [WinError 32]"
+      },
+      {
+        "module": "artifact",
+        "success": true,
+        "head": "0001_baseline",
+        "connections_opened": 9,
+        "connections_open_after_return": 6,
+        "sites": [
+          "alembic.py:148 run_migrations_online <- alembic.py:154 run_module_env <- env.py:10 <module>",
+          "backup.py:115 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "backup.py:116 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "runner.py:141 detect <- runner.py:166 backup <- runner.py:254 _migrate_impl",
+          "runner.py:141 detect <- runner.py:240 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:141 detect <- runner.py:279 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:499 _update_sqlite_metadata_after_migration <- runner.py:406 _update_metadata_after_migration <- runner.py:262 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:256 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:263 _migrate_impl"
+        ],
+        "om_meta_schema_head": "0001_baseline",
+        "om_meta_has_last_migrated_at": true,
+        "untracked_success": true,
+        "untracked_rename_delete_right_after_migrate": "rename failed: PermissionError [WinError 32]"
+      },
+      {
+        "module": "retrieve",
+        "success": true,
+        "head": "0002_index",
+        "connections_opened": 9,
+        "connections_open_after_return": 6,
+        "sites": [
+          "alembic.py:148 run_migrations_online <- alembic.py:154 run_module_env <- env.py:10 <module>",
+          "backup.py:115 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "backup.py:116 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "runner.py:141 detect <- runner.py:166 backup <- runner.py:254 _migrate_impl",
+          "runner.py:141 detect <- runner.py:240 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:141 detect <- runner.py:279 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:499 _update_sqlite_metadata_after_migration <- runner.py:406 _update_metadata_after_migration <- runner.py:262 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:256 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:263 _migrate_impl"
+        ],
+        "om_meta_schema_head": "0002_index",
+        "om_meta_has_last_migrated_at": true,
+        "untracked_success": true,
+        "untracked_rename_delete_right_after_migrate": "rename failed: PermissionError [WinError 32]"
+      },
+      {
+        "module": "commerce",
+        "success": true,
+        "head": "0004_action_preparations",
+        "connections_opened": 9,
+        "connections_open_after_return": 6,
+        "sites": [
+          "alembic.py:148 run_migrations_online <- alembic.py:154 run_module_env <- env.py:11 <module>",
+          "backup.py:115 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "backup.py:116 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "runner.py:141 detect <- runner.py:166 backup <- runner.py:254 _migrate_impl",
+          "runner.py:141 detect <- runner.py:240 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:141 detect <- runner.py:279 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:499 _update_sqlite_metadata_after_migration <- runner.py:406 _update_metadata_after_migration <- runner.py:262 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:256 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:263 _migrate_impl"
+        ],
+        "om_meta_schema_head": "0004_action_preparations",
+        "om_meta_has_last_migrated_at": true,
+        "untracked_success": true,
+        "untracked_rename_delete_right_after_migrate": "rename failed: PermissionError [WinError 32]"
+      },
+      {
+        "module": "controlplane",
+        "success": true,
+        "head": "0002_index_audit",
+        "connections_opened": 9,
+        "connections_open_after_return": 6,
+        "sites": [
+          "alembic.py:148 run_migrations_online <- alembic.py:154 run_module_env <- env.py:10 <module>",
+          "backup.py:115 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "backup.py:116 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          "runner.py:141 detect <- runner.py:166 backup <- runner.py:254 _migrate_impl",
+          "runner.py:141 detect <- runner.py:240 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:141 detect <- runner.py:279 _migrate_impl <- runner.py:204 migrate",
+          "runner.py:499 _update_sqlite_metadata_after_migration <- runner.py:406 _update_metadata_after_migration <- runner.py:262 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:256 _migrate_impl",
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:263 _migrate_impl"
+        ],
+        "om_meta_schema_head": "0002_index_audit",
+        "om_meta_has_last_migrated_at": true,
+        "untracked_success": true,
+        "untracked_rename_delete_right_after_migrate": "rename failed: PermissionError [WinError 32]"
+      }
+    ],
+    "A_opening_sites": [
+      "alembic.py:148 run_migrations_online <- alembic.py:154 run_module_env <- env.py:10 <module>",
+      "alembic.py:148 run_migrations_online <- alembic.py:154 run_module_env <- env.py:11 <module>",
+      "backup.py:115 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+      "backup.py:116 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+      "runner.py:141 detect <- runner.py:166 backup <- runner.py:254 _migrate_impl",
+      "runner.py:141 detect <- runner.py:240 _migrate_impl <- runner.py:204 migrate",
+      "runner.py:141 detect <- runner.py:279 _migrate_impl <- runner.py:204 migrate",
+      "runner.py:499 _update_sqlite_metadata_after_migration <- runner.py:406 _update_metadata_after_migration <- runner.py:262 _migrate_impl",
+      "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:256 _migrate_impl",
+      "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:263 _migrate_impl"
+    ],
+    "B_detect_verify_module_db": {
+      "application_id": 1330446337,
+      "revision": "0001_init",
+      "verification_ok": true,
+      "connections": [
+        {
+          "site": "runner.py:141 detect <- probe_373.py:178 <module>",
+          "target": "<WORK>\\work\\probe_373\\B\\module.db",
+          "closed": false
+        },
+        {
+          "site": "verify.py:111 run_verification <- runner.py:300 verify <- probe_373.py:180 <module>",
+          "target": "<WORK>\\work\\probe_373\\B\\module.db",
+          "closed": false
+        }
+      ],
+      "opened_by_detect": 1
+    },
+    "B_detect_verify_migrated_db": {
+      "revision": "0001_baseline",
+      "verification_ok": true,
+      "integrity_check": "ok",
+      "connections": [
+        {
+          "site": "runner.py:141 detect <- probe_373.py:191 <module>",
+          "target": "<WORK>\\work\\probe_373\\A\\secret.db",
+          "closed": false
+        },
+        {
+          "site": "verify.py:111 run_verification <- runner.py:300 verify <- probe_373.py:192 <module>",
+          "target": "<WORK>\\work\\probe_373\\A\\secret.db",
+          "closed": false
+        }
+      ]
+    },
+    "C_metadata_commit": {
+      "om_meta": {
+        "module_id": "sessctl",
+        "schema_head": "0001_init",
+        "last_migrated_at": "2026-10-24T00:00:00+00:00"
+      },
+      "connections": [
+        {
+          "site": "runner.py:499 _update_sqlite_metadata_after_migration <- probe_373.py:205 <module>",
+          "target": "<WORK>\\work\\probe_373\\C\\module.db",
+          "closed": false
+        }
+      ]
+    },
+    "D_metadata_failure_direct": {
+      "raised": "forced metadata failure",
+      "om_meta": {
+        "module_id": "sessctl"
+      },
+      "connections": [
+        {
+          "site": "runner.py:499 _update_sqlite_metadata_after_migration <- probe_373.py:228 <module>",
+          "target": "<WORK>\\work\\probe_373\\D\\module.db",
+          "closed": false
+        }
+      ]
+    },
+    "D_metadata_failure_through_migrate": {
+      "raised": "PermissionError [WinError 5]",
+      "tables_after": [
+        "alembic_version",
+        "om_meta",
+        "secrets"
+      ],
+      "connections_opened": 7,
+      "open_after": [
+        {
+          "site": "runner.py:141 detect <- runner.py:240 _migrate_impl <- runner.py:204 migrate",
+          "target": "<WORK>\\work\\probe_373\\D\\secret.db",
+          "closed": false
+        },
+        {
+          "site": "runner.py:141 detect <- runner.py:166 backup <- runner.py:254 _migrate_impl",
+          "target": "<WORK>\\work\\probe_373\\D\\secret.db",
+          "closed": false
+        },
+        {
+          "site": "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:256 _migrate_impl",
+          "target": "<WORK>\\work\\probe_373\\D\\secret.db",
+          "closed": false
+        },
+        {
+          "site": "runner.py:499 _update_sqlite_metadata_after_migration <- runner.py:406 _update_metadata_after_migration <- runner.py:262 _migrate_impl",
+          "target": "<WORK>\\work\\probe_373\\D\\secret.db",
+          "closed": false
+        }
+      ]
+    },
+    "E_verifier_failure_owned": {
+      "raised": "forced verification failure",
+      "hook_rows_after": 0,
+      "connections": [
+        {
+          "site": "verify.py:111 run_verification <- runner.py:300 verify <- probe_373.py:288 <module>",
+          "target": "<WORK>\\work\\probe_373\\E\\module.db",
+          "closed": false
+        }
+      ]
+    },
+    "E_verifier_failure_through_migrate": {
+      "raised": "forced verification failure",
+      "tables_after": [
+        "verify_probe_rows"
+      ],
+      "hook_rows_after": 0,
+      "connections": [
+        [
+          "runner.py:141 detect <- runner.py:240 _migrate_impl <- runner.py:204 migrate",
+          false
+        ],
+        [
+          "runner.py:141 detect <- runner.py:166 backup <- runner.py:254 _migrate_impl",
+          false
+        ],
+        [
+          "backup.py:115 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          true
+        ],
+        [
+          "backup.py:116 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+          true
+        ],
+        [
+          "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:256 _migrate_impl",
+          false
+        ]
+      ]
+    },
+    "E_verifier_failure_borrowed": {
+      "raised": "forced verification failure",
+      "borrowed_connection_open_after": true,
+      "caller_transaction_pending": true,
+      "hook_row_visible_to_caller_before_rollback": 1,
+      "hook_row_after_caller_rollback": 0
+    },
+    "F_sdk_turn_cleanup": [
+      {
+        "run": 0,
+        "run_state": "completed",
+        "store_exists": true,
+        "gc_enabled": false,
+        "rename_delete_store": "rename failed: PermissionError [WinError 32]",
+        "rmtree_runtime_root": "PermissionError [WinError 32] <WORK>\\work\\probe_373\\F\\run0\\root\\.openminion\\authored_tools\\store.sqlite",
+        "root_exists_after": true
+      },
+      {
+        "run": 1,
+        "run_state": "completed",
+        "store_exists": true,
+        "gc_enabled": false,
+        "rename_delete_store": "rename failed: PermissionError [WinError 32]",
+        "rmtree_runtime_root": "PermissionError [WinError 32] <WORK>\\work\\probe_373\\F\\run1\\root\\.openminion\\authored_tools\\store.sqlite",
+        "root_exists_after": true
+      },
+      {
+        "run": 2,
+        "run_state": "completed",
+        "store_exists": true,
+        "gc_enabled": false,
+        "rename_delete_store": "rename failed: PermissionError [WinError 32]",
+        "rmtree_runtime_root": "PermissionError [WinError 32] <WORK>\\work\\probe_373\\F\\run2\\root\\.openminion\\authored_tools\\store.sqlite",
+        "root_exists_after": true
+      },
+      {
+        "run": 3,
+        "run_state": "completed",
+        "store_exists": true,
+        "gc_enabled": false,
+        "rename_delete_store": "rename failed: PermissionError [WinError 32]",
+        "rmtree_runtime_root": "PermissionError [WinError 32] <WORK>\\work\\probe_373\\F\\run3\\root\\.openminion\\authored_tools\\store.sqlite",
+        "root_exists_after": true
+      },
+      {
+        "run": 4,
+        "run_state": "completed",
+        "store_exists": true,
+        "gc_enabled": false,
+        "rename_delete_store": "rename failed: PermissionError [WinError 32]",
+        "rmtree_runtime_root": "PermissionError [WinError 32] <WORK>\\work\\probe_373\\F\\run4\\root\\.openminion\\authored_tools\\store.sqlite",
+        "root_exists_after": true
+      }
+    ],
+    "G_attribution": {
+      "run_state": "completed",
+      "connections_opened_total": 65,
+      "owner_connections": 18,
+      "owner_connections_open_after_close": [
+        {
+          "site": "runner.py:141 detect <- runner.py:240 _migrate_impl <- runner.py:204 migrate",
+          "target": "<WORK>\\work\\probe_373\\G\\root\\.openminion\\policy\\policy.db",
+          "closed": false
+        },
+        {
+          "site": "runner.py:141 detect <- runner.py:166 backup <- runner.py:254 _migrate_impl",
+          "target": "<WORK>\\work\\probe_373\\G\\root\\.openminion\\policy\\policy.db",
+          "closed": false
+        },
+        {
+          "site": "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:256 _migrate_impl",
+          "target": "<WORK>\\work\\probe_373\\G\\root\\.openminion\\policy\\policy.db",
+          "closed": false
+        },
+        {
+          "site": "runner.py:499 _update_sqlite_metadata_after_migration <- runner.py:406 _update_metadata_after_migration <- runner.py:262 _migrate_impl",
+          "target": "<WORK>\\work\\probe_373\\G\\root\\.openminion\\policy\\policy.db",
+          "closed": false
+        },
+        {
+          "site": "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:263 _migrate_impl",
+          "target": "<WORK>\\work\\probe_373\\G\\root\\.openminion\\policy\\policy.db",
+          "closed": false
+        },
+        {
+          "site": "runner.py:141 detect <- runner.py:279 _migrate_impl <- runner.py:204 migrate",
+          "target": "<WORK>\\work\\probe_373\\G\\root\\.openminion\\policy\\policy.db",
+          "closed": false
+        },
+        {
+          "site": "runner.py:141 detect <- runner.py:240 _migrate_impl <- runner.py:204 migrate",
+          "target": "<WORK>\\work\\probe_373\\G\\root\\.openminion\\authored_tools\\store.sqlite",
+          "closed": false
+        },
+        {
+          "site": "runner.py:141 detect <- runner.py:166 backup <- runner.py:254 _migrate_impl",
+          "target": "<WORK>\\work\\probe_373\\G\\root\\.openminion\\authored_tools\\store.sqlite",
+          "closed": false
+        },
+        {
+          "site": "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:256 _migrate_impl",
+          "target": "<WORK>\\work\\probe_373\\G\\root\\.openminion\\authored_tools\\store.sqlite",
+          "closed": false
+        },
+        {
+          "site": "runner.py:499 _update_sqlite_metadata_after_migration <- runner.py:406 _update_metadata_after_migration <- runner.py:262 _migrate_impl",
+          "target": "<WORK>\\work\\probe_373\\G\\root\\.openminion\\authored_tools\\store.sqlite",
+          "closed": false
+        },
+        {
+          "site": "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:263 _migrate_impl",
+          "target": "<WORK>\\work\\probe_373\\G\\root\\.openminion\\authored_tools\\store.sqlite",
+          "closed": false
+        },
+        {
+          "site": "runner.py:141 detect <- runner.py:279 _migrate_impl <- runner.py:204 migrate",
+          "target": "<WORK>\\work\\probe_373\\G\\root\\.openminion\\authored_tools\\store.sqlite",
+          "closed": false
+        },
+        {
+          "site": "verify.py:111 run_verification <- module_integrity.py:22 verify_module_integrity <- store.py:492 _verify_startup_integrity",
+          "target": "<WORK>\\work\\probe_373\\G\\root\\.openminion\\brain\\sessions.db",
+          "closed": false
+        },
+        {
+          "site": "verify.py:111 run_verification <- module_integrity.py:22 verify_module_integrity <- store.py:492 _verify_startup_integrity",
+          "target": "<WORK>\\work\\probe_373\\G\\root\\.openminion\\brain\\sessions.db",
+          "closed": false
+        }
+      ],
+      "owner_sites": [
+        "backup.py:115 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+        "backup.py:116 backup_online <- backup.py:73 create_snapshot <- runner.py:181 backup",
+        "runner.py:141 detect <- runner.py:166 backup <- runner.py:254 _migrate_impl",
+        "runner.py:141 detect <- runner.py:240 _migrate_impl <- runner.py:204 migrate",
+        "runner.py:141 detect <- runner.py:279 _migrate_impl <- runner.py:204 migrate",
+        "runner.py:499 _update_sqlite_metadata_after_migration <- runner.py:406 _update_metadata_after_migration <- runner.py:262 _migrate_impl",
+        "verify.py:111 run_verification <- module_integrity.py:22 verify_module_integrity <- store.py:492 _verify_startup_integrity",
+        "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:256 _migrate_impl",
+        "verify.py:111 run_verification <- runner.py:300 verify <- runner.py:263 _migrate_impl"
+      ],
+      "owner_db_files": [
+        "20261024T130946120443Z-0-none.sqlite.tmp",
+        "20261024T130946332126Z-0-none.sqlite.tmp",
+        "policy.db",
+        "sessions.db",
+        "store.sqlite"
+      ],
+      "other_connections_open_after_close": [
+        {
+          "site": "record_store.py:323 __init__ <- module_store.py:68 __init__ <- store.py:250 __init__",
+          "target": ":memory:",
+          "closed": false
+        },
+        {
+          "site": "record_store.py:323 __init__ <- checkpoint_store.py:247 __init__ <- compaction.py:214 __init__",
+          "target": ":memory:",
+          "closed": false
+        },
+        {
+          "site": "audit.py:38 _connect <- audit.py:69 append_event <- audit.py:158 _append",
+          "target": "<WORK>\\work\\probe_373\\G\\root\\.openminion\\memory\\memory.audit.db",
+          "closed": false
+        }
+      ]
+    },
+    "G_observation_other_open_connections": {
+      "count": 3,
+      "all_in_memory": false,
+      "sites": [
+        "record_store.py:323 __init__ <- module_store.py:68 __init__ <- store.py:250 __init__",
+        "record_store.py:323 __init__ <- checkpoint_store.py:247 __init__ <- compaction.py:214 __init__",
+        "audit.py:38 _connect <- audit.py:69 append_event <- audit.py:158 _append"
+      ]
+    }
+  }
+}

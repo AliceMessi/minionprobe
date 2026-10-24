@@ -1,0 +1,37 @@
+{
+  "probe": "probe_353_upgrade",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "mode": "upgrade",
+  "backend": "sqlite"
+}
+PASS pre-upgrade backup taken after the writer stopped | observed={'writers_stopped': 'the 0.1.10 seed process closed its storage and exited before this step', 'method': 'sqlite3 online backup API', 'sha256': '1cfba64cf956fab802d373b827898a53bd4d5e7b018419670a87659c915efae0', 'ledger_max': 11, 'messages': 12}
+PASS upgrade applies migrations 12 and 13 | observed=[12, 13]
+PASS ledger after upgrade is 1..13 | observed=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+PASS after upgrade: public ids, bodies, roles and created_at unchanged | observed={'seeded': 8, 'matching': 8}
+PASS after upgrade: append_seq order is the migration-time rowid (append) order | observed=['e0', 'g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'l1']
+PASS after upgrade: list_messages reads in that order | observed=['e0', 'g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'l1']
+PASS after upgrade: tied-group boundary moved back to e0 (rowid 1, count 1), summary kept | observed={'compacted_until_rowid': 1, 'compacted_until_created_at': '2026-10-22T00:59:00+00:00', 'compacted_until_message_id': '55555555555555555555555555555555', 'compacted_message_count': 1, 'rolling_summary': '- user: e0\n- user: g4\n- user: g3', 'version': 2, 'updated_at': '2026-10-24T13:18:28.758835+00:00'}
+PASS after upgrade: no never-compacted message is hidden | observed={'never_compacted': ['g1', 'g2', 'g5', 'g6', 'l1'], 'visible': ['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'l1']}
+PASS after upgrade: visible history = every message after e0 in the stored order | observed=['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'l1']
+PASS after upgrade: build_history shows the same messages | observed=['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'l1']
+PASS after upgrade: control session (anchor alone at its timestamp) keeps its boundary | observed={'context': {'compacted_until_rowid': 2, 'compacted_until_created_at': '2026-10-22T01:00:00+00:00', 'compacted_until_message_id': 'cccccccccccccccccccccccccccccccc', 'compacted_message_count': 2, 'rolling_summary': '- user: a1\n- user: a2', 'version': 2, 'updated_at': '2026-10-24T13:18:28.762622+00:00'}, 'visible': ['a3', 'a4']}
+PASS restart: no migration re-applied | observed=[]
+PASS after restart: public ids, bodies, roles and created_at unchanged | observed={'seeded': 8, 'matching': 8}
+PASS after restart: append_seq order is the migration-time rowid (append) order | observed=['e0', 'g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'l1']
+PASS after restart: list_messages reads in that order | observed=['e0', 'g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'l1']
+PASS after restart: tied-group boundary moved back to e0 (rowid 1, count 1), summary kept | observed={'compacted_until_rowid': 1, 'compacted_until_created_at': '2026-10-22T00:59:00+00:00', 'compacted_until_message_id': '55555555555555555555555555555555', 'compacted_message_count': 1, 'rolling_summary': '- user: e0\n- user: g4\n- user: g3', 'version': 2, 'updated_at': '2026-10-24T13:18:28.758835+00:00'}
+PASS after restart: no never-compacted message is hidden | observed={'never_compacted': ['g1', 'g2', 'g5', 'g6', 'l1'], 'visible': ['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'l1']}
+PASS after restart: visible history = every message after e0 in the stored order | observed=['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'l1']
+PASS after restart: build_history shows the same messages | observed=['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'l1']
+PASS after restart: control session (anchor alone at its timestamp) keeps its boundary | observed={'context': {'compacted_until_rowid': 2, 'compacted_until_created_at': '2026-10-22T01:00:00+00:00', 'compacted_until_message_id': 'cccccccccccccccccccccccccccccccc', 'compacted_message_count': 2, 'rolling_summary': '- user: a1\n- user: a2', 'version': 2, 'updated_at': '2026-10-24T13:18:28.762622+00:00'}, 'visible': ['a3', 'a4']}
+PASS post-upgrade appends in the same tick land after the tied group and are visible | observed=['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'l1']
+PASS compaction after the upgrade keeps the last 2 in stored order and hides nothing else | observed={'count': 7, 'visible': ['g8', 'l1']}
+PASS second restart: boundary and visible tail unchanged | observed={'visible': ['g8', 'l1'], 'history': ['g8', 'l1']}
+{"summary": {"passed": 23, "failed": 0, "total": 23}, "all_pass": true}

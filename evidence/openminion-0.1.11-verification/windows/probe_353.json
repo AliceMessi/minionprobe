@@ -1,0 +1,507 @@
+{
+  "banner": {
+    "probe": "probe_353",
+    "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+    "openminion.__version__": "0.1.11",
+    "python": "3.12.11",
+    "platform": "Windows-11-10.0.22631-SP0",
+    "sqlite3.sqlite_version": "3.50.4",
+    "cwd": "<WORK>\\runs\\probe_353",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "backend": "sqlite"
+  },
+  "backend": "sqlite",
+  "summary": {
+    "passed": 36,
+    "failed": 0,
+    "total": 36
+  },
+  "all_pass": true,
+  "checks": [
+    {
+      "check": "A issue probe: list_messages returns user then assistant",
+      "pass": true,
+      "observed": [
+        "user",
+        "assistant"
+      ]
+    },
+    {
+      "check": "A issue probe: list_recent_messages(limit=1) returns the newest append (assistant)",
+      "pass": true,
+      "observed": [
+        "assistant"
+      ]
+    },
+    {
+      "check": "B list_messages returns the 4 tied messages in append order",
+      "pass": true,
+      "observed": [
+        "conv-a/inbound",
+        "conv-a/outbound",
+        "conv-b/inbound",
+        "conv-b/outbound"
+      ]
+    },
+    {
+      "check": "B rowids are 1..4 at append time and on read",
+      "pass": true,
+      "observed": {
+        "append": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "read": [
+          1,
+          2,
+          3,
+          4
+        ]
+      }
+    },
+    {
+      "check": "B public message ids are the generated ids (unchanged)",
+      "pass": true
+    },
+    {
+      "check": "B stored created_at unchanged (one tick)",
+      "pass": true,
+      "observed": [
+        "2026-10-22T01:00:00+00:00"
+      ]
+    },
+    {
+      "check": "B list_messages(limit=2) returns the first two appends",
+      "pass": true
+    },
+    {
+      "check": "B list_recent_messages(limit=1) returns the newest append",
+      "pass": true,
+      "observed": [
+        "0000"
+      ]
+    },
+    {
+      "check": "B list_recent_messages(limit=3) returns the last three appends in order",
+      "pass": true,
+      "observed": [
+        "cccc",
+        "8888",
+        "0000"
+      ]
+    },
+    {
+      "check": "B latest_conversation_id is the newest append's conversation",
+      "pass": true,
+      "observed": "conv-b"
+    },
+    {
+      "check": "B conversation filter conv-a: append order",
+      "pass": true
+    },
+    {
+      "check": "B conversation filter conv-a, newest limit 1: the newer append",
+      "pass": true
+    },
+    {
+      "check": "B conversation+thread filter conv-b/thread-b: append order",
+      "pass": true
+    },
+    {
+      "check": "B thread filter newest limit 1: newest append, session-wide rowid 4",
+      "pass": true,
+      "observed": {
+        "rowid": 4
+      }
+    },
+    {
+      "check": "B thread filter after an append-time cursor: append order",
+      "pass": true
+    },
+    {
+      "check": "C list_messages_after_rowid pages of 2 follow append order",
+      "pass": true,
+      "observed": [
+        [
+          "ffff",
+          "cccc"
+        ],
+        [
+          "8888",
+          "0000"
+        ]
+      ]
+    },
+    {
+      "check": "C a cursor taken at the first append still points at it after 3 later tied appends",
+      "pass": true
+    },
+    {
+      "check": "C list_recent_messages(after_rowid, exclude_message_ids) keeps append order",
+      "pass": true
+    },
+    {
+      "check": "D append_seq is per session and continues after close + reopen",
+      "pass": true,
+      "observed": {
+        "first": [
+          1,
+          2,
+          3
+        ],
+        "second": [
+          1
+        ]
+      }
+    },
+    {
+      "check": "D after restart the session reads in append order",
+      "pass": true,
+      "observed": [
+        "f1",
+        "f2",
+        "f3"
+      ]
+    },
+    {
+      "check": "E a failed append raises an integrity error",
+      "pass": true,
+      "observed": "IntegrityError"
+    },
+    {
+      "check": "E the failed append left the session row unchanged",
+      "pass": true
+    },
+    {
+      "check": "E the failed append consumed no append_seq",
+      "pass": true,
+      "observed": [
+        1,
+        2
+      ]
+    },
+    {
+      "check": "E reads stay in append order after the rollback",
+      "pass": true
+    },
+    {
+      "check": "F 4 handles x 10 tied appends allocate append_seq 1..40 without gaps or duplicates",
+      "pass": true,
+      "observed": {
+        "count": 40
+      }
+    },
+    {
+      "check": "F append-time rowids are 1..40 and increase per handle",
+      "pass": true
+    },
+    {
+      "check": "F list_messages equals the append-time order",
+      "pass": true
+    },
+    {
+      "check": "G first compaction (keep 2) compacts t1..t4 and anchors at t4 (rowid 4)",
+      "pass": true,
+      "observed": {
+        "compacted_count": 4,
+        "compacted_until_rowid": 4,
+        "anchor_body": "t4",
+        "compacted_message_count": 4
+      }
+    },
+    {
+      "check": "G three more appends in the same tick are all visible after the boundary, in append order",
+      "pass": true,
+      "observed": [
+        "t5",
+        "t6",
+        "t7",
+        "t8",
+        "t9"
+      ]
+    },
+    {
+      "check": "G build_history shows the uncompacted tail t5..t9 and no compacted message",
+      "pass": true,
+      "observed": [
+        "t5",
+        "t6",
+        "t7",
+        "t8",
+        "t9"
+      ]
+    },
+    {
+      "check": "G second compaction compacts t5..t7, anchors at t7 (rowid 7) and leaves t8, t9",
+      "pass": true,
+      "observed": {
+        "compacted_count": 3,
+        "compacted_until_rowid": 7,
+        "compacted_message_count": 7,
+        "visible": [
+          "t8",
+          "t9"
+        ]
+      }
+    },
+    {
+      "check": "G after restart the boundary and the visible tail are unchanged",
+      "pass": true,
+      "observed": {
+        "visible": [
+          "t8",
+          "t9"
+        ],
+        "build_history_bodies": [
+          "t8",
+          "t9"
+        ],
+        "compacted_until_rowid": 7
+      }
+    },
+    {
+      "check": "H export (ids_descending): CLI exit 0 for JSONL and Markdown",
+      "pass": true,
+      "observed": {
+        "jsonl": 0,
+        "md": 0
+      }
+    },
+    {
+      "check": "H export (ids_descending): store, JSONL and Markdown all list tied messages in append order",
+      "pass": true,
+      "observed": {
+        "store": [
+          "m0",
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "jsonl": [
+          "m0",
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "md": [
+          "m0",
+          "m1",
+          "m2",
+          "m3"
+        ]
+      }
+    },
+    {
+      "check": "H export (ids_ascending): CLI exit 0 for JSONL and Markdown",
+      "pass": true,
+      "observed": {
+        "jsonl": 0,
+        "md": 0
+      }
+    },
+    {
+      "check": "H export (ids_ascending): store, JSONL and Markdown all list tied messages in append order",
+      "pass": true,
+      "observed": {
+        "store": [
+          "m0",
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "jsonl": [
+          "m0",
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "md": [
+          "m0",
+          "m1",
+          "m2",
+          "m3"
+        ]
+      }
+    }
+  ],
+  "observed": {
+    "A_issue_probe": {
+      "inserted_roles": [
+        "user",
+        "assistant"
+      ],
+      "read_roles": [
+        "user",
+        "assistant"
+      ],
+      "newest_role": [
+        "assistant"
+      ]
+    },
+    "B_tied_four": {
+      "appended_ids": [
+        "ffff...",
+        "cccc...",
+        "8888...",
+        "0000..."
+      ],
+      "listed_bodies": [
+        "conv-a/inbound",
+        "conv-a/outbound",
+        "conv-b/inbound",
+        "conv-b/outbound"
+      ],
+      "listed_rowids": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "append_time_rowids": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "created_at": [
+        "2026-10-22T01:00:00+00:00"
+      ]
+    },
+    "C_pages": [
+      [
+        "ffff",
+        "cccc"
+      ],
+      [
+        "8888",
+        "0000"
+      ]
+    ],
+    "G_compaction": {
+      "first_compaction": {
+        "compacted_count": 4,
+        "compacted_until_rowid": 4,
+        "anchor_body": "t4",
+        "compacted_message_count": 4
+      },
+      "after_tied_appends": {
+        "visible_after_boundary": [
+          "t5",
+          "t6",
+          "t7",
+          "t8",
+          "t9"
+        ],
+        "build_history_bodies": [
+          "t5",
+          "t6",
+          "t7",
+          "t8",
+          "t9"
+        ],
+        "anchor_rowid_now": null
+      },
+      "second_compaction": {
+        "compacted_count": 3,
+        "compacted_until_rowid": 7,
+        "compacted_message_count": 7,
+        "visible": [
+          "t8",
+          "t9"
+        ]
+      },
+      "after_restart": {
+        "visible": [
+          "t8",
+          "t9"
+        ],
+        "build_history_bodies": [
+          "t8",
+          "t9"
+        ],
+        "compacted_until_rowid": 7
+      }
+    },
+    "H_transcript": {
+      "ids_descending": {
+        "message_ids": [
+          "ffff...",
+          "cccc...",
+          "8888...",
+          "0000..."
+        ],
+        "store_order": [
+          "m0",
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "jsonl_order": [
+          "m0",
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "markdown_order": [
+          "m0",
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "jsonl_cli": {
+          "returncode": 0,
+          "stdout": "Exported 4 records to <WORK>\\work\\probe_353\\h-ids_descending\\out.jsonl",
+          "stderr": "",
+          "command": "openminion --home-root <root> --data-root <root>/.openminion --config <root>/config.json --no-update-check export transcript --session-id tied-session --format jsonl --include-events --output <file>"
+        },
+        "md_cli": {
+          "returncode": 0,
+          "stdout": "Exported 4 records to <WORK>\\work\\probe_353\\h-ids_descending\\out.md",
+          "stderr": "",
+          "command": "openminion --home-root <root> --data-root <root>/.openminion --config <root>/config.json --no-update-check export transcript --session-id tied-session --format md --include-events --output <file>"
+        }
+      },
+      "ids_ascending": {
+        "message_ids": [
+          "0000...",
+          "8888...",
+          "cccc...",
+          "ffff..."
+        ],
+        "store_order": [
+          "m0",
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "jsonl_order": [
+          "m0",
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "markdown_order": [
+          "m0",
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "jsonl_cli": {
+          "returncode": 0,
+          "stdout": "Exported 4 records to <WORK>\\work\\probe_353\\h-ids_ascending\\out.jsonl",
+          "stderr": "",
+          "command": "openminion --home-root <root> --data-root <root>/.openminion --config <root>/config.json --no-update-check export transcript --session-id tied-session --format jsonl --include-events --output <file>"
+        },
+        "md_cli": {
+          "returncode": 0,
+          "stdout": "Exported 4 records to <WORK>\\work\\probe_353\\h-ids_ascending\\out.md",
+          "stderr": "",
+          "command": "openminion --home-root <root> --data-root <root>/.openminion --config <root>/config.json --no-update-check export transcript --session-id tied-session --format md --include-events --output <file>"
+        }
+      }
+    }
+  }
+}

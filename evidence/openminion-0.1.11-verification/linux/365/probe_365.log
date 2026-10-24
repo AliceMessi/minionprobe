@@ -1,0 +1,27 @@
+{
+  "probe": "probe_365",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty",
+  "imported_from_site_packages": true,
+  "isolated_mode": true
+}
+PASS A export CLI exit 0 (JSONL, Markdown) | observed={'jsonl': 0, 'md': 0}
+PASS A store returns insertion ids #1..#12 | observed=['#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#10', '#11', '#12']
+PASS A JSONL exports the 12 tied events in insertion order across 9/10 | observed=['#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#10', '#11', '#12']
+PASS A Markdown shows the 12 tied events in insertion order (payload append 0..11) | observed=['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']
+PASS B export CLI exit 0 (JSONL, Markdown) | observed={'jsonl': 0, 'md': 0}
+PASS B store: tied messages in append order (ids sort the other way) | observed=['earlier', 'hello', 'reply']
+PASS B JSONL: created_at first; at the tie messages in append order, then events #2..#12 in insertion order; clock-ahead #1 last | observed=['earlier', 'hello', 'reply', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#10', '#11', '#12', '#1']
+PASS B JSONL: primary created_at order is non-decreasing
+PASS B Markdown: same order (headings and message bodies) | observed={'headings': ['Inbound', 'Inbound', 'Outbound', 'Event: test.setup', 'Event: test.setup', 'Event: test.setup', 'Event: test.setup', 'Event: test.setup', 'Event: test.setup', 'Event: test.setup', 'Event: run.running', 'Event: run.responding', 'Event: response.persisted', 'Event: run.completed', 'Event: clock.ahead'], 'bodies': ['earlier', 'hello', 'reply']}
+PASS C (ids_descending) export CLI exit 0
+PASS C (ids_descending) JSONL: 4 tied messages in append order, then 14 tied events in insertion order | observed=['m0', 'm1', 'm2', 'm3', '#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#10', '#11', '#12', '#13', '#14']
+PASS C (ids_descending) Markdown: tied messages in append order | observed=['m0', 'm1', 'm2', 'm3']
+PASS C (ids_ascending) export CLI exit 0
+PASS C (ids_ascending) JSONL: 4 tied messages in append order, then 14 tied events in insertion order | observed=['m0', 'm1', 'm2', 'm3', '#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#10', '#11', '#12', '#13', '#14']
+PASS C (ids_ascending) Markdown: tied messages in append order | observed=['m0', 'm1', 'm2', 'm3']
+{"summary": {"passed": 15, "failed": 0, "total": 15}, "all_pass": true}
