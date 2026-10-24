@@ -1,0 +1,63 @@
+# runner: AliceMessi/linux-runner run 40108810331 (ubuntu-24.04, preset openminion), checkout openminion/openminion @ f349cd07
+checkout: f349cd07 Merge pull request #383 from Afar88/fix/tool-postponed-annotations
+python: Python 3.11.17
+packages: sophiagraph 0.0.12 | sqlalchemy 2.1.6 | psycopg 3.3.6
+os: PRETTY_NAME="Ubuntu 24.04.5 LTS"
+probe sha256:
+  592c272d186c698fe2df0eb8a43a0edd1df8be200e63c11319c777c11f232814  probe_memctl_audit_sink.py
+=== [dev f349cd07] PYTHONPATH=src:. python probe_memctl_audit_sink.py
+{
+  "in-process (CliRunner)": {
+    "command": "memctl approve c1 --reviewer agent --db <tmp>/test.db (CliRunner, GC disabled)",
+    "exit code": 0,
+    "output": "Approved: c1",
+    "audit database": "test.audit.db",
+    "after the command returns": {
+      "open connections to the audit database": 1,
+      "opened at": [
+        [
+          "openminion/modules/memory/storage/audit.py:38 _connect",
+          "openminion/modules/memory/storage/audit.py:69 append_event",
+          "openminion/modules/memory/storage/audit.py:158 _append",
+          "openminion/modules/memory/storage/audit.py:331 candidate_update"
+        ]
+      ],
+      "rename": "ok"
+    },
+    "cyclic collector": {
+      "unreachable objects found": true,
+      "openminion objects among them": {
+        "openminion.modules.memory.portability.service.MemoryBundleServiceOps": 1,
+        "openminion.modules.memory.runtime.candidate_lifecycle.MemoryCandidateLifecycle": 1,
+        "openminion.modules.memory.runtime.policies.DefaultCapsuleRefreshPolicyEngine": 1,
+        "openminion.modules.memory.runtime.policies.DefaultPromotionPolicyEngine": 1,
+        "openminion.modules.memory.runtime.policies.DefaultRetentionPolicyEngine": 1,
+        "openminion.modules.memory.runtime.policies.DefaultRetrievalPolicyEngine": 1,
+        "openminion.modules.memory.runtime.promotion.PromotionPolicy": 1,
+        "openminion.modules.memory.service.base.MemoryService": 1,
+        "openminion.modules.memory.storage.audit.AuditedMemoryStore": 1,
+        "openminion.modules.memory.storage.audit.SQLiteMemoryAuditSink": 1,
+        "openminion.modules.memory.storage.sqlite.store.SQLiteMemoryStore": 1
+      },
+      "audit database connection among them": true
+    },
+    "after the cyclic collector": {
+      "open connections to the audit database": 0,
+      "rename": "ok",
+      "delete": "ok"
+    }
+  },
+  "separate memctl process": {
+    "command": "python -m openminion.modules.memory approve c2 --reviewer agent --db <tmp>/test.db",
+    "exit code": 0,
+    "output": "Approved: c2",
+    "files next to test.db after exit": [
+      "test.audit.db"
+    ],
+    "rename right after exit": "ok",
+    "delete right after exit": "ok"
+  }
+}
+3.11.17 linux
+=== [dev f349cd07] pytest -q tests/memory/test_cli_read_commands.py
+16 passed in 0.76s

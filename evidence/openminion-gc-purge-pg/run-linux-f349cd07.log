@@ -1,0 +1,132 @@
+# runner: AliceMessi/linux-runner run 40109033202 (ubuntu-24.04, preset openminion, PostgreSQL 16 service), checkout openminion/openminion @ f349cd07
+checkout: f349cd07 Merge pull request #383 from Afar88/fix/tool-postponed-annotations
+python: Python 3.11.17
+packages: sophiagraph 0.0.12 | sqlalchemy 2.1.6 | psycopg 3.3.6
+os: PRETTY_NAME="Ubuntu 24.04.5 LTS"
+probe sha256:
+  adeeb6a0d3acdfb324d086e52a184db37933a3c4fe0a9125a92fbeaae7e0cb4d  probe_gc_purge_pg.py
+=== [dev f349cd07] PYTHONPATH=src:. python probe_gc_purge_pg.py
+{
+  "SQLite memory store (control)": {
+    "memctl gc": {
+      "exit code": 0,
+      "output": [
+        "GC: deleted_records=1, deleted_candidates=0"
+      ],
+      "rows after": {
+        "old": "confidence 0.600, active",
+        "deleted": "row purged"
+      }
+    }
+  },
+  "PostgreSQL memory store": {
+    "memctl gc": {
+      "exit code": 1,
+      "output": [
+        "Error: gc is not supported for this memory store ('PostgresMemoryStore' object has no attribute '_connect')"
+      ],
+      "rows after": {
+        "old": "confidence 0.800, active",
+        "deleted": "confidence 0.800, soft-deleted"
+      }
+    },
+    "run_gc as memctl gc calls it": {
+      "store passed to run_gc": "AuditedMemoryStore wrapping PostgresMemoryStore",
+      "result": "raised AttributeError: 'PostgresMemoryStore' object has no attribute '_connect'",
+      "raised at": [
+        "openminion/modules/memory/runtime/gc_confidence.py:47 apply_confidence_decay",
+        "openminion/modules/memory/runtime/gc_confidence.py:194 _decay_sqlite_records",
+        "openminion/modules/memory/storage/audit.py:152 __getattr__"
+      ],
+      "rows after": {
+        "old": "confidence 0.800, active",
+        "deleted": "confidence 0.800, soft-deleted"
+      }
+    },
+    "run_gc on the PostgresMemoryStore inside it": {
+      "store passed to run_gc": "PostgresMemoryStore",
+      "result": "ok (decayed_records=1, deleted_records=1)",
+      "rows after": {
+        "old": "confidence 0.600, active",
+        "deleted": "row purged"
+      }
+    }
+  }
+}
+3.11.17 linux
+=== src now at PR #399 head fdcf4de7
+M  src/openminion/modules/memory/runtime/gc_capacity.py
+M  src/openminion/modules/memory/runtime/gc_confidence.py
+M  src/openminion/modules/memory/runtime/gc_insights.py
+M  src/openminion/modules/memory/runtime/gc_records.py
+M  src/openminion/modules/memory/runtime/gc_summaries.py
+=== [PR #399 src] PYTHONPATH=src:. python probe_gc_purge_pg.py
+{
+  "SQLite memory store (control)": {
+    "memctl gc": {
+      "exit code": 0,
+      "output": [
+        "GC: deleted_records=1, deleted_candidates=0"
+      ],
+      "rows after": {
+        "old": "confidence 0.600, active",
+        "deleted": "row purged"
+      }
+    }
+  },
+  "PostgreSQL memory store": {
+    "memctl gc": {
+      "exit code": 1,
+      "output": [
+        "Error: gc is not supported for this memory store ('PostgresMemoryStore' object has no attribute '_connect')"
+      ],
+      "rows after": {
+        "old": "confidence 0.600, active",
+        "deleted": "confidence 0.800, soft-deleted"
+      }
+    },
+    "run_gc as memctl gc calls it": {
+      "store passed to run_gc": "AuditedMemoryStore wrapping PostgresMemoryStore",
+      "result": "raised AttributeError: 'PostgresMemoryStore' object has no attribute '_connect'",
+      "raised at": [
+        "openminion/modules/memory/runtime/purge.py:327 purge_soft_deleted",
+        "openminion/modules/memory/runtime/purge.py:276 _purge_sqlite_soft_deleted",
+        "openminion/modules/memory/storage/audit.py:152 __getattr__"
+      ],
+      "rows after": {
+        "old": "confidence 0.600, active",
+        "deleted": "confidence 0.800, soft-deleted"
+      }
+    },
+    "run_gc on the PostgresMemoryStore inside it": {
+      "store passed to run_gc": "PostgresMemoryStore",
+      "result": "ok (decayed_records=1, deleted_records=1)",
+      "rows after": {
+        "old": "confidence 0.600, active",
+        "deleted": "row purged"
+      }
+    }
+  }
+}
+3.11.17 linux
+
+# Related: the stale PostgreSQL truth-maintenance test, from AliceMessi/linux-runner run 40108810331 (same checkout, PostgreSQL 16 service)
+=== [dev f349cd07] pytest -q -m postgres -rfE tests/services/agent/test_truth_maintenance.py tests/memory/test_operability_postgres.py
+E           AssertionError: assert MemoryRecord(id='purge-me', scope='agent:truth-agent', type='fact', content='obsolete fact', created_at='2026-10-24T15...amespace=None, deleted_at=None, deleted_reason=None, tier='working', access_count=0, integrity_hash=None, goal_id=None) is None
+E            +  where MemoryRecord(id='purge-me', scope='agent:truth-agent', type='fact', content='obsolete fact', created_at='2026-10-24T15...amespace=None, deleted_at=None, deleted_reason=None, tier='working', access_count=0, integrity_hash=None, goal_id=None) = get('purge-me')
+E            +    where get = <openminion.modules.memory.storage.postgres.store.PostgresMemoryStore object at 0x7fe17b7c10d0>.get
+FAILED tests/services/agent/test_truth_maintenance.py::test_session_lifecycle_runs_capacity_and_purge_on_postgres - AssertionError: assert MemoryRecord(id='purge-me', scope='agent:truth-agent', type='fact', content='obsolete fact', created_at='2026-10-24T15...amespace=None, deleted_at=None, deleted_reason=None, tier='working', access_count=0, integrity_hash=None, goal_id=None) is None
+1 failed, 6 passed in 3.08s
+=== src now at PR #399 head fdcf4de7
+M  src/openminion/modules/memory/runtime/gc_capacity.py
+M  src/openminion/modules/memory/runtime/gc_confidence.py
+M  src/openminion/modules/memory/runtime/gc_insights.py
+M  src/openminion/modules/memory/runtime/gc_records.py
+M  src/openminion/modules/memory/runtime/gc_summaries.py
+?? .deps/
+=== [PR #399 src] pytest -q -m postgres -rfE tests/services/agent/test_truth_maintenance.py tests/memory/test_operability_postgres.py
+E           AssertionError: assert MemoryRecord(id='purge-me', scope='agent:truth-agent', type='fact', content='obsolete fact', created_at='2026-10-24T15...amespace=None, deleted_at=None, deleted_reason=None, tier='working', access_count=0, integrity_hash=None, goal_id=None) is None
+E            +  where MemoryRecord(id='purge-me', scope='agent:truth-agent', type='fact', content='obsolete fact', created_at='2026-10-24T15...amespace=None, deleted_at=None, deleted_reason=None, tier='working', access_count=0, integrity_hash=None, goal_id=None) = get('purge-me')
+E            +    where get = <openminion.modules.memory.storage.postgres.store.PostgresMemoryStore object at 0x7f4071b51150>.get
+FAILED tests/services/agent/test_truth_maintenance.py::test_session_lifecycle_runs_capacity_and_purge_on_postgres - AssertionError: assert MemoryRecord(id='purge-me', scope='agent:truth-agent', type='fact', content='obsolete fact', created_at='2026-10-24T15...amespace=None, deleted_at=None, deleted_reason=None, tier='working', access_count=0, integrity_hash=None, goal_id=None) is None
+1 failed, 6 passed in 2.81s

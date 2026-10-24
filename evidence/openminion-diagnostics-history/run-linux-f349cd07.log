@@ -1,0 +1,41 @@
+# runner: AliceMessi/linux-runner run 40108810331 (ubuntu-24.04, preset openminion), checkout openminion/openminion @ f349cd07
+checkout: f349cd07 Merge pull request #383 from Afar88/fix/tool-postponed-annotations
+python: Python 3.11.17
+packages: sophiagraph 0.0.12 | sqlalchemy 2.1.6 | psycopg 3.3.6
+os: PRETTY_NAME="Ubuntu 24.04.5 LTS"
+probe sha256:
+  c7ff0322423562ea2bc887faefbf77b79933d53997aedf931d885fbd552bfb34  probe_inspect_history.py
+=== [dev f349cd07] PYTHONPATH=src:. python probe_inspect_history.py
+{
+  "memctl history --scope agent:a --type fact --key pref:indent --json": {
+    "exit code": 0,
+    "record titles": [
+      "Prefer spaces",
+      "Prefer tabs"
+    ]
+  },
+  "memctl inspect --scope agent:a --db <tmp>/memory.db --json": {
+    "exit code": 0,
+    "stats.active_record_count": 1,
+    "stats.supersession_chain_count": 1,
+    "history_summary": null
+  },
+  "memctl inspect --scope agent:a --db <tmp>/memory.db": {
+    "exit code": 0,
+    "prints a 'Deepest history' line": false
+  },
+  "build_inspect_payload with memctl's _get_service(db)": {
+    "service store": "AuditedMemoryStore wrapping SQLiteMemoryStore",
+    "history_summary": null
+  },
+  "build_inspect_payload with MemoryService over the bare SQLiteMemoryStore": {
+    "service store": "SQLiteMemoryStore",
+    "history_summary": {
+      "scope": "agent:a",
+      "type": "fact",
+      "key": "pref:indent",
+      "depth": 2
+    }
+  }
+}
+3.11.17 linux
