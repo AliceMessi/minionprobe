@@ -1,12 +1,19 @@
 # MinionProbe
 
+[![ci](https://github.com/AliceMessi/minionprobe/actions/workflows/ci.yml/badge.svg)](https://github.com/AliceMessi/minionprobe/actions/workflows/ci.yml)
+
 **A probe suite for the [OpenMinion](https://github.com/openminion/openminion) Python SDK.** It has one small probe for each building block (agent execution, models, tools, permissions, sessions, memory, skills, tasks, delegation, diagnostics) and runs them against real model providers. The output is a **provider × building-block matrix** plus evidence you can act on: redacted HTTP traces, failed checks, and **drafted GitHub issues that a human approves before anything is filed**.
 
 Built for [Cortensor Hackathon #5](https://dorahacks.io/hackathon/2418/detail). MinionProbe is a QA helper for builders who want to know which OpenMinion features work on *their* provider before they build on them.
 
+**Impact so far (24 Oct 2026):**
+- **11 bugs filed upstream** from MinionProbe runs.
+- **15 fix PRs by us merged** into OpenMinion `dev` (table in [Fix PRs](#fix-prs-bug-fix-bonus)). The fixes that shipped were re-verified on the released `openminion==0.1.10` package.
+- **8 more issues** opened by the maintainer while reviewing our PRs were taken on: 4 already merged, 4 in progress with agreed dates.
+
 ▶ **Demo video (2:10):** https://youtu.be/5aBN0y6YQeA. It shows an offline run, the matrix, bug #324 reproduced live, the triage agent and the filed issues. Terminal scenes are replays of real captured runs.
 
-> Status: v0.1 (2026-10-21). Tested on Windows 11, Python 3.12, `openminion==0.1.8` (latest PyPI release) and the `dev` branch at `b642697`.
+> Status: v0.1 (2026-10-21). The probes are pinned to `openminion==0.1.8`, so every reproduction keeps working; tested on Windows 11 and Linux, Python 3.12, plus the `dev` branch at `b642697`. The upstream fixes were verified on `openminion==0.1.10` ([evidence](evidence/openminion-0.1.10-verification)).
 
 ## What it found (v0.1)
 
