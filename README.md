@@ -7,8 +7,8 @@
 Built for [Cortensor Hackathon #5](https://dorahacks.io/hackathon/2418/detail). MinionProbe is a QA helper for builders who want to know which OpenMinion features work on *their* provider before they build on them.
 
 **Impact so far (24 Oct 2026):**
-- **12 bugs filed upstream** from MinionProbe runs and follow-up probes.
-- **19 fix PRs by us merged** into OpenMinion `dev` (table in [Fix PRs](#fix-prs-bug-fix-bonus)). The fixes that shipped were re-verified on the released `openminion==0.1.10` package.
+- **17 bugs filed upstream** from MinionProbe runs and follow-up probes (the latest five, #388–#392, on 24 Oct at the maintainer's request, awaiting triage).
+- **19 fix PRs by us merged** into OpenMinion `dev` (table in [Fix PRs](#fix-prs-bug-fix-bonus)). The fixes that shipped were re-verified on the released packages: `openminion==0.1.10` ([evidence](evidence/openminion-0.1.10-verification)) and `openminion==0.1.11`, which ships seven more of our fixes ([evidence](evidence/openminion-0.1.11-verification); every check passed for #352, #353, #361, #365, #368, #373, #378).
 - **8 more issues** opened by the maintainer while reviewing our PRs were taken on: 6 already merged (including #372, the run-status facts table with migration 13, and #380 for #368), #364 in review (#385) and #369 scheduled.
 
 ▶ **Demo video (2:10):** https://youtu.be/5aBN0y6YQeA. It shows an offline run, the matrix, bug #324 reproduced live, the triage agent and the filed issues. Terminal scenes are replays of real captured runs.
