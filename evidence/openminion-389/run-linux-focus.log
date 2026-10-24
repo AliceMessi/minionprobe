@@ -1,0 +1,466 @@
+5e8951ffdd1b29b791acaf0bc4d369a94a368e7fea0d5368ce306e4227eaa590  /tmp/probe_389.py
+a4ea8487f6833601a8bf06140b5be9441db97aeaceb605d021884c0fd37588e4  /tmp/probe_fallback_retention.py
+e015df93 docs(changelog): note closing the bootstrap memory fallback
+Python 3.11.17
+=== branch focused
+........................................................................ [ 46%]
+........................................................................ [ 69%]
+........................................................................ [ 92%]
+......................                                                   [100%]
+310 passed in 17.13s
+=== branch postgres job
+--- tests/memory/test_memory_postgres_conformance.py
+
+...................                                                      [100%]
+19 passed in 2.38s
+--- tests/memory/test_memory_search_quality.py::test_postgres_lexical_score_contributes_to_semantic_order
+
+.                                                                        [100%]
+1 passed in 0.36s
+--- tests/skill/test_skill_postgres_conformance.py
+
+......                                                                   [100%]
+6 passed, 6 deselected in 0.90s
+--- tests/integration/test_runtime_storage_postgres.py
+
+.............                                                            [100%]
+13 passed in 10.41s
+--- tests/integration/test_runtime_memory_postgres.py
+
+....                                                                     [100%]
+4 passed in 2.25s
+--- tests/memory/test_backend_factory.py
+
+....                                                                     [100%]
+4 passed in 0.37s
+=== branch postgres runtime memory (verbose)
+tests/integration/test_runtime_memory_postgres.py::test_runtime_close_disposes_the_postgres_memory_engine_once PASSED [ 25%]
+tests/integration/test_runtime_memory_postgres.py::test_bootstrap_memory_fallback_owner_disposes_the_postgres_engine_once[gateway] PASSED [ 50%]
+tests/integration/test_runtime_memory_postgres.py::test_bootstrap_memory_fallback_owner_disposes_the_postgres_engine_once[caller] PASSED [ 75%]
+tests/integration/test_runtime_memory_postgres.py::test_audited_store_leaves_a_borrowed_postgres_store_open PASSED [100%]
+============================== 4 passed in 2.25s ===============================
+=== branch probe_389
+{
+  "direct build_agent_memory_service caller, SQLite memory store": {
+    "stores_created": ["SQLiteMemoryStore"],
+    "audit_sink_open_after_turn": [true],
+    "after_each_close": [
+      {
+        "closed [store, sink, artifact]": [1, 1, 1]
+      },
+      {
+        "closed [store, sink, artifact]": [1, 1, 1]
+      }
+    ],
+    "audit_sink_open_after_close": [false],
+    "artifact_store_write_after_close": "ProgrammingError: Cannot operate on a closed database.",
+    "runtime_roots": "sqlite-0",
+    "fallback_artifact_index": "env-home/data/artifact/index.db"
+  },
+  "gateway service built without agent_memory, SQLite memory store": {
+    "turn_reply": "Noted.",
+    "stores_created": ["SQLiteMemoryStore"],
+    "audit_sink_open_after_turn": [true],
+    "after_each_close": [
+      {
+        "closed [store, sink, artifact]": [1, 1, 1]
+      },
+      {
+        "closed [store, sink, artifact]": [1, 1, 1]
+      }
+    ],
+    "audit_sink_open_after_close": [false],
+    "artifact_store_write_after_close": "ProgrammingError: Cannot operate on a closed database.",
+    "runtime_roots": "sqlite-1",
+    "fallback_artifact_index": "env-home/data/artifact/index.db"
+  },
+  "borrowed: gateway service given the fallback memory, SQLite memory store": {
+    "turn_reply": "Noted.",
+    "stores_created": ["SQLiteMemoryStore"],
+    "audit_sink_open_after_turn": [true],
+    "after_each_close": [
+      {
+        "closed [store, sink, artifact]": [0, 0, 0]
+      },
+      {
+        "closed [store, sink, artifact]": [0, 0, 0]
+      }
+    ],
+    "then_the_memory_own_close": [
+      {
+        "closed [store, sink, artifact]": [1, 1, 1]
+      },
+      {
+        "closed [store, sink, artifact]": [1, 1, 1]
+      }
+    ],
+    "audit_sink_open_after_close": [false],
+    "artifact_store_write_after_close": "ProgrammingError: Cannot operate on a closed database.",
+    "runtime_roots": "sqlite-2",
+    "fallback_artifact_index": "env-home/data/artifact/index.db"
+  },
+  "SDK control: echo runtime": {
+    "turn_run_state": "completed",
+    "runtime_gateway_service_uses_this_memory_gateway": true,
+    "memory_gateway_close_owner": "None",
+    "memory_gateway_has_close": true,
+    "after_memory_gateway_and_gateway_service_close": [0, 0, 0],
+    "after_each_runtime_close": [
+      [1, 1, 1],
+      [1, 1, 1]
+    ]
+  },
+  "direct build_agent_memory_service caller, PostgreSQL memory store": {
+    "stores_created": ["PostgresMemoryStore"],
+    "audit_sink_open_after_turn": [true],
+    "server_connections_after_turn": 1,
+    "after_each_close": [
+      {
+        "closed [store, sink, artifact]": [1, 1, 1],
+        "engine_disposals": 1
+      },
+      {
+        "closed [store, sink, artifact]": [1, 1, 1],
+        "engine_disposals": 1
+      }
+    ],
+    "audit_sink_open_after_close": [false],
+    "artifact_store_write_after_close": "ProgrammingError: Cannot operate on a closed database.",
+    "server_connections_after_close": 0
+  },
+  "gateway service built without agent_memory, PostgreSQL memory store": {
+    "turn_reply": "Noted.",
+    "stores_created": ["PostgresMemoryStore"],
+    "audit_sink_open_after_turn": [true],
+    "server_connections_after_turn": 1,
+    "after_each_close": [
+      {
+        "closed [store, sink, artifact]": [1, 1, 1],
+        "engine_disposals": 1
+      },
+      {
+        "closed [store, sink, artifact]": [1, 1, 1],
+        "engine_disposals": 1
+      }
+    ],
+    "audit_sink_open_after_close": [false],
+    "artifact_store_write_after_close": "ProgrammingError: Cannot operate on a closed database.",
+    "server_connections_after_close": 0
+  }
+}
+3.11.17 linux
+=== branch probe_fallback_retention
+{
+  "control: runtime assembly builder, SQLite memory store": {
+    "builder": "build_runtime_memory_assembly",
+    "returned": "RuntimeMemoryAssembly",
+    "returned_object_has_close": true,
+    "assembly_close_calls": 1,
+    "audit_sink_connected_during_turn": true,
+    "close_calls": {
+      "memory store (SQLiteMemoryStore)": 1,
+      "audit sink": 1,
+      "assembly artifact store": 1
+    },
+    "audit_sink_connection_open": false,
+    "assembly_artifact_store_accepts_write": false
+  },
+  "bootstrap fallback, SQLite memory store": {
+    "builder": "build_agent_memory_service",
+    "returned": "MemoryServiceGatewayAdapter",
+    "returned_object_has_close": true,
+    "assembly_alive_after_return": true,
+    "audit_sink_connected_during_turn": true,
+    "close_calls": {
+      "memory store (SQLiteMemoryStore)": 0,
+      "audit sink": 0,
+      "assembly artifact store": 0
+    },
+    "audit_sink_connection_open": true,
+    "assembly_artifact_store_accepts_write": true,
+    "module_backend_factory_registry_references_this_store": true
+  },
+  "bootstrap fallback, PostgreSQL memory store": {
+    "builder": "build_agent_memory_service",
+    "returned": "MemoryServiceGatewayAdapter",
+    "returned_object_has_close": true,
+    "assembly_alive_after_return": true,
+    "audit_sink_connected_during_turn": true,
+    "close_calls": {
+      "memory store (PostgresMemoryStore)": 0,
+      "audit sink": 0,
+      "assembly artifact store": 0
+    },
+    "audit_sink_connection_open": true,
+    "assembly_artifact_store_accepts_write": true,
+    "module_backend_factory_registry_references_this_store": true,
+    "server_connections_while_gateway_alive": 1,
+    "engine_dispose_calls": 0
+  }
+}
+3.11.17 linux
+=== ruff check
+All checks passed!
+=== format-check
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m ruff format --check "/home/runner/work/linux-runner/linux-runner"
+5107 files already formatted
+=== lint
+  + src/openminion/modules/policy/storage/migrations/versions/0002_blockchain_confirmations.py (2 underscores)
+  + src/openminion/modules/session/storage/migrations/versions/0002_run_invocation.py (2 underscores)
+  + src/openminion/modules/session/storage/migrations/versions/0003_cron_coordination.py (2 underscores)
+  + src/openminion/modules/session/storage/migrations/versions/0004_task_plan_step_start.py (4 underscores)
+  + src/openminion/modules/session/storage/migrations/versions/0005_cron_scheduler_control.py (3 underscores)
+  + src/openminion/modules/skill/storage/migrations/versions/0004_active_version_admission.py (3 underscores)
+  + src/openminion/modules/skill/storage/migrations/versions/0005_verification_evidence.py (2 underscores)
+  + src/openminion/modules/skill/storage/migrations/versions/0006_proposal_replay_proof.py (3 underscores)
+  + src/openminion/modules/skill/storage/migrations/versions/0007_workflow_observations.py (2 underscores)
+  + src/openminion/modules/telemetry/storage/migrations/versions/0002_event_v2.py (2 underscores)
+  + src/openminion/modules/telemetry/storage/migrations/versions/0003_debug_query_indexes.py (3 underscores)
+  + src/openminion/tools/commerce/storage/migrations/versions/0002_preparation_invalidation.py (2 underscores)
+  + src/openminion/tools/commerce/storage/migrations/versions/0003_placement_attempt_authorization.py (3 underscores)
+  + src/openminion/tools/commerce/storage/migrations/versions/0004_action_preparations.py (2 underscores)
+
+[WARN] Source advisory inventory
+  - 18 src filename(s) still exceed the underscore practice threshold.
+  These stay visible as context-dependent readability/refactor candidates, even when they already exist in the frozen baseline.
+  Use --show-src-detail to print the full src-path advisory list.
+
+[INFO] Tests inventory
+  - 1716 test filename(s) exceed the underscore practice threshold; informational only.
+  Use --show-tests-detail to print the full test-path inventory.
+
+[ADVISORY] Result
+[ADVISORY] _ADVISORY_MODE=True
+  - New drift is reported as a naming/readability practice warning for enforced roots; test-path inventory stays informational. Use --strict to fail on enforced drift.
+{"advisory_mode": true, "findings": ["new:scripts/ci/publish_runtime_manifest.py:2", "new:scripts/ci/runtime_release_status.py:2", "new:scripts/inventory_controlplane_schema.py:2", "new:src/openminion/modules/a2a/storage/migrations/versions/0004_job_owner.py:2", "new:src/openminion/modules/a2a/storage/migrations/versions/0005_job_idempotency_scope.py:3", "new:src/openminion/modules/controlplane/channels/telegram/storage/migrations/versions/0002_polling_lease_schema.py:3", "new:src/openminion/modules/controlplane/storage/migrations/versions/0002_index_audit.py:2", "new:src/openminion/modules/policy/storage/migrations/versions/0002_blockchain_confirmations.py:2", "new:src/openminion/modules/session/storage/migrations/versions/0002_run_invocation.py:2", "new:src/openminion/modules/session/storage/migrations/versions/0003_cron_coordination.py:2", "new:src/openminion/modules/session/storage/migrations/versions/0004_task_plan_step_start.py:4", "new:src/openminion/modules/session/storage/migrations/versions/0005_cron_scheduler_control.py:3", "new:src/openminion/modules/skill/storage/migrations/versions/0004_active_version_admission.py:3", "new:src/openminion/modules/skill/storage/migrations/versions/0005_verification_evidence.py:2", "new:src/openminion/modules/skill/storage/migrations/versions/0006_proposal_replay_proof.py:3", "new:src/openminion/modules/skill/storage/migrations/versions/0007_workflow_observations.py:2", "new:src/openminion/modules/telemetry/storage/migrations/versions/0002_event_v2.py:2", "new:src/openminion/modules/telemetry/storage/migrations/versions/0003_debug_query_indexes.py:3", "new:src/openminion/tools/commerce/storage/migrations/versions/0002_preparation_invalidation.py:2", "new:src/openminion/tools/commerce/storage/migrations/versions/0003_placement_attempt_authorization.py:3", "new:src/openminion/tools/commerce/storage/migrations/versions/0004_action_preparations.py:2"], "metrics": {"baseline_entries": 1315, "detected_entries": 1770, "enforced_baseline_entries": 33, "enforced_detected_entries": 54, "new_entries": 21, "removed_entries": 0, "scanned_files": 4956, "src_baseline_entries": 0, "src_detected_entries": 18, "tests_baseline_entries": 1282, "tests_detected_entries": 1716, "threshold": 1}, "ok": true, "strict": false, "validator": "validate_filename_underscore_hygiene"}
+method_loc
+
+[INFO] Summary
+  checked: 20813
+  ceiling: 100
+  over ceiling: 111
+  baseline entries: 111
+
+[OK] Result
+  - method-LOC baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 111, "ceiling": 100, "checked": 20813, "over_ceiling": 111}, "ok": true, "validator": "method_loc"}
+[type-ignore-hygiene] clean — 0 bare ignores; 93 qualified ignores across 14 codes
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=0
+{
+  "checked": 2646,
+  "ok": true,
+  "violations": []
+}
+broad_exception
+
+[INFO] Summary
+  files: 410
+  handlers: 1101
+  silent pass: 106
+  baseline entries: 410
+
+[OK] Result
+  - broad-exception baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 410, "files_with_handlers": 410, "handler_count": 1101, "silent_pass_count": 106}, "ok": true, "validator": "broad_exception"}
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/controlplane_delivery.py
+[coo-09] clean — no synchronous runner deliver regressions
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/webhook_secret.py
+[coo-10] clean — webhook secret-required contract preserved
+Skipping workspace browser tool-family contract validator (not present in standalone checkout).
+make typecheck
+make[1]: Entering directory '/home/runner/work/linux-runner/linux-runner'
+cd "/home/runner/work/linux-runner/linux-runner" && /home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4309; baseline total: 4309
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 290
+[tcr] api: 77 / 77 | monthly quota -50 | next target <= 27 | headroom 0
+[tcr] cli: 309 / 309 | monthly quota -50 | next target <= 259 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 222 / 222 | monthly quota -50 | next target <= 172 | headroom 0
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+lint exit=0
+=== services LOC
+208 41768
+=== test-critical
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+482 passed, 4 skipped, 1 warning in 16.85s
+=== dev focused
+FAILED tests/services/runtime/test_bootstrap_memory_owner.py::test_gateway_service_closes_the_memory_it_builds_once
+FAILED tests/services/runtime/test_bootstrap_memory_owner.py::test_gateway_service_leaves_an_injected_agent_memory_open
+FAILED tests/services/runtime/test_bootstrap_memory_owner.py::test_build_agent_memory_service_result_closes_its_assembly_once
+FAILED tests/services/runtime/test_bootstrap_memory_owner.py::test_fallback_memory_close_waits_for_the_scheduler[gateway]
+FAILED tests/services/runtime/test_bootstrap_memory_owner.py::test_fallback_memory_close_waits_for_the_scheduler[caller]
+5 failed, 305 passed in 15.61s
+=== dev postgres runtime memory (verbose)
+tests/integration/test_runtime_memory_postgres.py::test_runtime_close_disposes_the_postgres_memory_engine_once PASSED [ 25%]
+tests/integration/test_runtime_memory_postgres.py::test_bootstrap_memory_fallback_owner_disposes_the_postgres_engine_once[gateway] FAILED [ 50%]
+tests/integration/test_runtime_memory_postgres.py::test_bootstrap_memory_fallback_owner_disposes_the_postgres_engine_once[caller] FAILED [ 75%]
+tests/integration/test_runtime_memory_postgres.py::test_audited_store_leaves_a_borrowed_postgres_store_open PASSED [100%]
+E       assert [0, 0] == [1, 1]
+E         
+E         At index 0 diff: 0 != 1
+E         
+E         Full diff:
+E           [
+E         -     1,
+E         ?     ^
+E         +     0,
+E         ?     ^
+E         -     1,
+E         ?     ^
+E         +     0,
+E         ?     ^
+E           ]
+E               AttributeError: 'MemoryServiceGatewayAdapter' object has no attribute 'close'
+FAILED tests/integration/test_runtime_memory_postgres.py::test_bootstrap_memory_fallback_owner_disposes_the_postgres_engine_once[gateway] - assert [0, 0] == [1, 1]
+FAILED tests/integration/test_runtime_memory_postgres.py::test_bootstrap_memory_fallback_owner_disposes_the_postgres_engine_once[caller] - AttributeError: 'MemoryServiceGatewayAdapter' object has no attribute 'close'
+========================= 2 failed, 2 passed in 7.46s ==========================
+=== dev probe_389
+{
+  "direct build_agent_memory_service caller, SQLite memory store": {
+    "stores_created": ["SQLiteMemoryStore"],
+    "audit_sink_open_after_turn": [true],
+    "after_each_close": "MemoryServiceGatewayAdapter has no close()",
+    "audit_sink_open_after_close": [true],
+    "artifact_store_write_after_close": "accepted",
+    "runtime_roots": "sqlite-0",
+    "fallback_artifact_index": "env-home/data/artifact/index.db"
+  },
+  "gateway service built without agent_memory, SQLite memory store": {
+    "turn_reply": "Noted.",
+    "stores_created": ["SQLiteMemoryStore"],
+    "audit_sink_open_after_turn": [true],
+    "after_each_close": [
+      {
+        "closed [store, sink, artifact]": [0, 0, 0]
+      },
+      {
+        "closed [store, sink, artifact]": [0, 0, 0]
+      }
+    ],
+    "audit_sink_open_after_close": [true],
+    "artifact_store_write_after_close": "accepted",
+    "runtime_roots": "sqlite-1",
+    "fallback_artifact_index": "env-home/data/artifact/index.db"
+  },
+  "borrowed: gateway service given the fallback memory, SQLite memory store": {
+    "turn_reply": "Noted.",
+    "stores_created": ["SQLiteMemoryStore"],
+    "audit_sink_open_after_turn": [true],
+    "after_each_close": [
+      {
+        "closed [store, sink, artifact]": [0, 0, 0]
+      },
+      {
+        "closed [store, sink, artifact]": [0, 0, 0]
+      }
+    ],
+    "then_the_memory_own_close": "MemoryServiceGatewayAdapter has no close()",
+    "audit_sink_open_after_close": [true],
+    "artifact_store_write_after_close": "accepted",
+    "runtime_roots": "sqlite-2",
+    "fallback_artifact_index": "env-home/data/artifact/index.db"
+  },
+  "SDK control: echo runtime": {
+    "turn_run_state": "completed",
+    "runtime_gateway_service_uses_this_memory_gateway": true,
+    "memory_gateway_close_owner": "None",
+    "memory_gateway_has_close": false,
+    "after_memory_gateway_and_gateway_service_close": [0, 0, 0],
+    "after_each_runtime_close": [
+      [1, 1, 1],
+      [1, 1, 1]
+    ]
+  },
+  "direct build_agent_memory_service caller, PostgreSQL memory store": {
+    "stores_created": ["PostgresMemoryStore"],
+    "audit_sink_open_after_turn": [true],
+    "server_connections_after_turn": 1,
+    "after_each_close": "MemoryServiceGatewayAdapter has no close()",
+    "audit_sink_open_after_close": [true],
+    "artifact_store_write_after_close": "accepted",
+    "server_connections_after_close": 1
+  },
+  "gateway service built without agent_memory, PostgreSQL memory store": {
+    "turn_reply": "Noted.",
+    "stores_created": ["PostgresMemoryStore"],
+    "audit_sink_open_after_turn": [true],
+    "server_connections_after_turn": 1,
+    "after_each_close": [
+      {
+        "closed [store, sink, artifact]": [0, 0, 0],
+        "engine_disposals": 0
+      },
+      {
+        "closed [store, sink, artifact]": [0, 0, 0],
+        "engine_disposals": 0
+      }
+    ],
+    "audit_sink_open_after_close": [true],
+    "artifact_store_write_after_close": "accepted",
+    "server_connections_after_close": 1
+  }
+}
+3.11.17 linux
+=== dev probe_fallback_retention
+{
+  "control: runtime assembly builder, SQLite memory store": {
+    "builder": "build_runtime_memory_assembly",
+    "returned": "RuntimeMemoryAssembly",
+    "returned_object_has_close": true,
+    "assembly_close_calls": 1,
+    "audit_sink_connected_during_turn": true,
+    "close_calls": {
+      "memory store (SQLiteMemoryStore)": 1,
+      "audit sink": 1,
+      "assembly artifact store": 1
+    },
+    "audit_sink_connection_open": false,
+    "assembly_artifact_store_accepts_write": false
+  },
+  "bootstrap fallback, SQLite memory store": {
+    "builder": "build_agent_memory_service",
+    "returned": "MemoryServiceGatewayAdapter",
+    "returned_object_has_close": false,
+    "assembly_alive_after_return": false,
+    "audit_sink_connected_during_turn": true,
+    "close_calls": {
+      "memory store (SQLiteMemoryStore)": 0,
+      "audit sink": 0,
+      "assembly artifact store": 0
+    },
+    "audit_sink_connection_open": true,
+    "assembly_artifact_store_accepts_write": true,
+    "module_backend_factory_registry_references_this_store": true
+  },
+  "bootstrap fallback, PostgreSQL memory store": {
+    "builder": "build_agent_memory_service",
+    "returned": "MemoryServiceGatewayAdapter",
+    "returned_object_has_close": false,
+    "assembly_alive_after_return": false,
+    "audit_sink_connected_during_turn": true,
+    "close_calls": {
+      "memory store (PostgresMemoryStore)": 0,
+      "audit sink": 0,
+      "assembly artifact store": 0
+    },
+    "audit_sink_connection_open": true,
+    "assembly_artifact_store_accepts_write": true,
+    "module_backend_factory_registry_references_this_store": true,
+    "server_connections_while_gateway_alive": 1,
+    "engine_dispose_calls": 0
+  }
+}
+3.11.17 linux
+=== dev services LOC
+208 41757
+?? .deps/
