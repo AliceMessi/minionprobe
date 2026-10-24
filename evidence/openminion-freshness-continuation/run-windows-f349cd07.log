@@ -1,0 +1,93 @@
+# PYTHONPATH="src;." python probe_freshness_continuation.py   (native Windows 11, dev checkout)
+probe sha256: 46f202591c702573d36a9674cb522c5e659f8ed844326adaeb068c838aa9c289
+openminion 0.1.11, checkout f349cd07, python 3.11.11 win32
+
+== B_continuation_text
+requests:
+  seq  0 reflect
+  seq  1 entry tools=['lookup_order'] freshness_in_tool_schema=False last_user='Check order A-104'
+  seq  2 freshness
+  seq  3 act_loop
+  seq  4 judge
+  seq  5 entry_after_tool tools=['lookup_order'] freshness_in_tool_schema=False last_user='Continue the active task using the existing conversation and'
+observations:
+  {"at": "turn", "user_message": "Check order A-104"}
+  {"at": "_apply_entry_freshness", "user_input": "Check order A-104", "state.goal": "Check order A-104", "entry_response": "tool call lookup_order", "freshness_argument": "none", "before": null, "after": {"contract": {"domain": "shopping", "time_sensitive": true, "needs_live_data": true, "needs_sources": true, "needs_exact_date": true, "answer_mode": "browse_then_answer"}, "obligations": {"require_live_data": true, "require_sources": true, "require_exact_date": true, "require_explicit_failure_wording": true}, "classifier_mode": "llm"}}
+  {"at": "closure freshness guard", "time_sensitive": true, "require_exact_date": true, "tool_outputs_checked": ["lookup_order call-lookup-1: {'data': 'order A-104: ready for pickup, pickup code ZEBRA-42'}"], "dated_evidence": false, "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "closure gate", "satisfied": false, "next_action": "continue", "reason": "freshness_verifier_blocked", "freshness_verified": false}
+  {"at": "_apply_entry_freshness", "user_input": null, "state.goal": "Check order A-104", "entry_response": "text", "freshness_argument": "none", "before": {"contract": {"domain": "shopping", "time_sensitive": true, "needs_live_data": true, "needs_sources": true, "needs_exact_date": true, "answer_mode": "browse_then_answer"}, "obligations": {"require_live_data": true, "require_sources": true, "require_exact_date": true, "require_explicit_failure_wording": true}, "classifier_mode": "llm"}, "after": {"contract": {"domain": "general", "time_sensitive": false, "needs_live_data": false, "needs_sources": false, "needs_exact_date": false, "answer_mode": "local_only"}, "obligations": {"require_live_data": false, "require_sources": false, "require_exact_date": false, "require_explicit_failure_wording": false}, "classifier_mode": "skipped_empty_request"}}
+tool executions: ['A-104']
+result.text for 'Check order A-104': 'openminion: [continuation] Order A-104 is ready for pickup, code ZEBRA-42.'
+
+== E_continuation_tool
+requests:
+  seq  0 reflect
+  seq  1 entry tools=['lookup_order'] freshness_in_tool_schema=False last_user='Check order A-104'
+  seq  2 freshness
+  seq  3 act_loop
+  seq  4 judge
+  seq  5 entry_after_tool tools=['lookup_order'] freshness_in_tool_schema=False last_user='Continue the active task using the existing conversation and'
+  seq  6 act_loop
+  seq  7 judge
+observations:
+  {"at": "turn", "user_message": "Check order A-104"}
+  {"at": "_apply_entry_freshness", "user_input": "Check order A-104", "state.goal": "Check order A-104", "entry_response": "tool call lookup_order", "freshness_argument": "none", "before": null, "after": {"contract": {"domain": "shopping", "time_sensitive": true, "needs_live_data": true, "needs_sources": true, "needs_exact_date": true, "answer_mode": "browse_then_answer"}, "obligations": {"require_live_data": true, "require_sources": true, "require_exact_date": true, "require_explicit_failure_wording": true}, "classifier_mode": "llm"}}
+  {"at": "closure freshness guard", "time_sensitive": true, "require_exact_date": true, "tool_outputs_checked": ["lookup_order call-lookup-1: {'data': 'order A-104: ready for pickup, pickup code ZEBRA-42'}"], "dated_evidence": false, "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "closure gate", "satisfied": false, "next_action": "continue", "reason": "freshness_verifier_blocked", "freshness_verified": false}
+  {"at": "_apply_entry_freshness", "user_input": null, "state.goal": "Check order A-104", "entry_response": "tool call lookup_order", "freshness_argument": "none", "before": {"contract": {"domain": "shopping", "time_sensitive": true, "needs_live_data": true, "needs_sources": true, "needs_exact_date": true, "answer_mode": "browse_then_answer"}, "obligations": {"require_live_data": true, "require_sources": true, "require_exact_date": true, "require_explicit_failure_wording": true}, "classifier_mode": "llm"}, "after": {"contract": {"domain": "general", "time_sensitive": false, "needs_live_data": false, "needs_sources": false, "needs_exact_date": false, "answer_mode": "local_only"}, "obligations": {"require_live_data": false, "require_sources": false, "require_exact_date": false, "require_explicit_failure_wording": false}, "classifier_mode": "skipped_empty_request"}}
+  {"at": "closure freshness guard", "time_sensitive": false, "require_exact_date": false, "tool_outputs_checked": ["lookup_order call-lookup-5: {'data': 'order A-104: ready for pickup, pickup code ZEBRA-42'}"], "dated_evidence": false, "result": "pass"}
+  {"at": "closure gate", "satisfied": true, "next_action": "close", "reason": "", "freshness_verified": true}
+tool executions: ['A-104', 'A-104']
+result.text for 'Check order A-104': 'openminion: [judge] Order A-104 is ready for pickup, code ZEBRA-42.'
+
+== A1_control_valid_contract_on_continuation
+requests:
+  seq  0 reflect
+  seq  1 entry tools=['lookup_order'] freshness_in_tool_schema=False last_user='Check order A-104'
+  seq  2 freshness
+  seq  3 act_loop
+  seq  4 judge
+  seq  5 entry_after_tool tools=['lookup_order'] freshness_in_tool_schema=False last_user='Continue the active task using the existing conversation and'
+  seq  6 act_loop
+  seq  7 judge
+  seq  8 entry_after_tool tools=['lookup_order'] freshness_in_tool_schema=False last_user='Continue the active task using the existing conversation and'
+observations:
+  {"at": "turn", "user_message": "Check order A-104"}
+  {"at": "_apply_entry_freshness", "user_input": "Check order A-104", "state.goal": "Check order A-104", "entry_response": "tool call lookup_order", "freshness_argument": "none", "before": null, "after": {"contract": {"domain": "shopping", "time_sensitive": true, "needs_live_data": true, "needs_sources": true, "needs_exact_date": true, "answer_mode": "browse_then_answer"}, "obligations": {"require_live_data": true, "require_sources": true, "require_exact_date": true, "require_explicit_failure_wording": true}, "classifier_mode": "llm"}}
+  {"at": "closure freshness guard", "time_sensitive": true, "require_exact_date": true, "tool_outputs_checked": ["lookup_order call-lookup-1: {'data': 'order A-104: ready for pickup, pickup code ZEBRA-42'}"], "dated_evidence": false, "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "closure gate", "satisfied": false, "next_action": "continue", "reason": "freshness_verifier_blocked", "freshness_verified": false}
+  {"at": "_apply_entry_freshness", "user_input": null, "state.goal": "Check order A-104", "entry_response": "tool call lookup_order", "freshness_argument": "valid contract", "before": {"contract": {"domain": "shopping", "time_sensitive": true, "needs_live_data": true, "needs_sources": true, "needs_exact_date": true, "answer_mode": "browse_then_answer"}, "obligations": {"require_live_data": true, "require_sources": true, "require_exact_date": true, "require_explicit_failure_wording": true}, "classifier_mode": "llm"}, "after": {"contract": {"domain": "shopping", "time_sensitive": true, "needs_live_data": true, "needs_sources": true, "needs_exact_date": true, "answer_mode": "browse_then_answer"}, "obligations": {"require_live_data": true, "require_sources": true, "require_exact_date": true, "require_explicit_failure_wording": true}, "classifier_mode": "entry_contract"}}
+  {"at": "closure freshness guard", "time_sensitive": true, "require_exact_date": true, "tool_outputs_checked": ["lookup_order call-lookup-5: {'data': 'order A-104: ready for pickup, pickup code ZEBRA-42'}"], "dated_evidence": false, "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "closure gate", "satisfied": false, "next_action": "continue", "reason": "freshness_verifier_blocked", "freshness_verified": false}
+  {"at": "_apply_entry_freshness", "user_input": null, "state.goal": "Check order A-104", "entry_response": "text", "freshness_argument": "none", "before": {"contract": {"domain": "shopping", "time_sensitive": true, "needs_live_data": true, "needs_sources": true, "needs_exact_date": true, "answer_mode": "browse_then_answer"}, "obligations": {"require_live_data": true, "require_sources": true, "require_exact_date": true, "require_explicit_failure_wording": true}, "classifier_mode": "entry_contract"}, "after": {"contract": {"domain": "general", "time_sensitive": false, "needs_live_data": false, "needs_sources": false, "needs_exact_date": false, "answer_mode": "local_only"}, "obligations": {"require_live_data": false, "require_sources": false, "require_exact_date": false, "require_explicit_failure_wording": false}, "classifier_mode": "skipped_empty_request"}}
+tool executions: ['A-104', 'A-104']
+result.text for 'Check order A-104': 'openminion: [continuation] Order A-104 is ready for pickup, code ZEBRA-42.'
+
+== N1_control_new_user_input
+requests:
+  seq  0 reflect
+  seq  1 entry tools=['lookup_order'] freshness_in_tool_schema=False last_user='Check order A-104'
+  seq  2 freshness
+  seq  3 act_loop
+  seq  4 judge
+  seq  5 entry_after_tool tools=['lookup_order'] freshness_in_tool_schema=False last_user='Continue the active task using the existing conversation and'
+  seq  6 reflect
+  seq  7 entry tools=['lookup_order'] freshness_in_tool_schema=False last_user='Check order B-205'
+  seq  8 freshness
+  seq  9 act_loop
+  seq 10 judge
+observations:
+  {"at": "turn", "user_message": "Check order A-104"}
+  {"at": "_apply_entry_freshness", "user_input": "Check order A-104", "state.goal": "Check order A-104", "entry_response": "tool call lookup_order", "freshness_argument": "none", "before": null, "after": {"contract": {"domain": "shopping", "time_sensitive": true, "needs_live_data": true, "needs_sources": true, "needs_exact_date": true, "answer_mode": "browse_then_answer"}, "obligations": {"require_live_data": true, "require_sources": true, "require_exact_date": true, "require_explicit_failure_wording": true}, "classifier_mode": "llm"}}
+  {"at": "closure freshness guard", "time_sensitive": true, "require_exact_date": true, "tool_outputs_checked": ["lookup_order call-lookup-1: {'data': 'order A-104: ready for pickup, pickup code ZEBRA-42'}"], "dated_evidence": false, "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "closure gate", "satisfied": false, "next_action": "continue", "reason": "freshness_verifier_blocked", "freshness_verified": false}
+  {"at": "_apply_entry_freshness", "user_input": null, "state.goal": "Check order A-104", "entry_response": "text", "freshness_argument": "none", "before": {"contract": {"domain": "shopping", "time_sensitive": true, "needs_live_data": true, "needs_sources": true, "needs_exact_date": true, "answer_mode": "browse_then_answer"}, "obligations": {"require_live_data": true, "require_sources": true, "require_exact_date": true, "require_explicit_failure_wording": true}, "classifier_mode": "llm"}, "after": {"contract": {"domain": "general", "time_sensitive": false, "needs_live_data": false, "needs_sources": false, "needs_exact_date": false, "answer_mode": "local_only"}, "obligations": {"require_live_data": false, "require_sources": false, "require_exact_date": false, "require_explicit_failure_wording": false}, "classifier_mode": "skipped_empty_request"}}
+  {"at": "turn", "user_message": "Check order B-205"}
+  {"at": "_apply_entry_freshness", "user_input": "Check order B-205", "state.goal": "Check order B-205", "entry_response": "tool call lookup_order", "freshness_argument": "none", "before": null, "after": {"contract": {"domain": "shopping", "time_sensitive": true, "needs_live_data": true, "needs_sources": true, "needs_exact_date": false, "answer_mode": "browse_then_answer"}, "obligations": {"require_live_data": true, "require_sources": true, "require_exact_date": false, "require_explicit_failure_wording": true}, "classifier_mode": "llm"}}
+  {"at": "closure freshness guard", "time_sensitive": true, "require_exact_date": false, "tool_outputs_checked": ["lookup_order call-lookup-7: {'data': 'order B-205: ready for pickup, pickup code ZEBRA-42'}"], "dated_evidence": false, "result": "pass"}
+  {"at": "closure gate", "satisfied": true, "next_action": "close", "reason": "", "freshness_verified": true}
+tool executions: ['A-104', 'B-205']
+result.text for 'Check order A-104': 'openminion: [continuation] Order A-104 is ready for pickup, code ZEBRA-42.'
+result.text for 'Check order B-205': 'openminion: [judge] Order B-205 is ready for pickup, code ZEBRA-42.'
+
+non-loopback connections attempted: 0

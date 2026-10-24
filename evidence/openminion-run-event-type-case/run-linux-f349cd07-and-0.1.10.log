@@ -1,0 +1,43 @@
+# runner: AliceMessi/linux-runner run 40103716221 (ubuntu-24.04, PostgreSQL 16 in Docker), checkout openminion/openminion @ f349cd07
+checkout: f349cd07 Merge pull request #383 from Afar88/fix/tool-postponed-annotations
+probe sha256: d5f914fbda98f664e34f3bfd3e44f26628cb6438f45e8279e4878c6557ea807c
+os: PRETTY_NAME="Ubuntu 24.04.5 LTS"
+sqlite: 3.45.1
+postgres: 16.15 (Debian 16.15-1.pgdg13+2)
+0.1.10 wheel: Version: 0.1.10
+=== dev (editable checkout): python -I probe_run_event_type_case.py <work>
+SQLite
+  stored event types: ["run.queued", "run.running", "RUN.failed", "run.queued", "Run.completed"]
+  list_session_runs: [{"run_id": "r2", "state": "running", "event_count": 2, "ended": false, "error": ""}, {"run_id": "r1", "state": "failed", "event_count": 3, "ended": true, "error": "boom"}]
+  list_session_run_events r1: ["run.queued -> queued", "run.running -> running", "RUN.failed -> failed"]
+  list_session_run_events r2: ["run.queued -> queued", "Run.completed -> running"]
+  resolve_thread_lifecycle conv/t: {"latest_run_id": "r2", "latest_run_state": "queued", "thread_state": "awaiting_response"}
+  resolve_invocation_terminal (trigger: event 3 RUN.failed): null
+  count_events(event_type_prefix='run.'): 5
+PostgreSQL
+  stored event types: ["run.queued", "run.running", "RUN.failed", "run.queued", "Run.completed"]
+  list_session_runs: [{"run_id": "r2", "state": "queued", "event_count": 1, "ended": false, "error": ""}, {"run_id": "r1", "state": "running", "event_count": 2, "ended": false, "error": ""}]
+  list_session_run_events r1: ["run.queued -> queued", "run.running -> running"]
+  list_session_run_events r2: ["run.queued -> queued"]
+  resolve_thread_lifecycle conv/t: {"latest_run_id": "r2", "latest_run_state": "queued", "thread_state": "awaiting_response"}
+  resolve_invocation_terminal (trigger: event 3 RUN.failed): null
+  count_events(event_type_prefix='run.'): 3
+openminion 0.1.11 from checkout f349cd07 | python 3.11.17 linux
+=== 0.1.10 (PyPI): python -I probe_run_event_type_case.py <work>
+SQLite
+  stored event types: ["run.queued", "run.running", "RUN.failed", "run.queued", "Run.completed"]
+  list_session_runs: [{"run_id": "r2", "state": "running", "event_count": 2, "ended": false, "error": ""}, {"run_id": "r1", "state": "failed", "event_count": 3, "ended": true, "error": "boom"}]
+  list_session_run_events r1: ["run.queued -> queued", "run.running -> running", "RUN.failed -> failed"]
+  list_session_run_events r2: ["run.queued -> queued", "Run.completed -> running"]
+  resolve_thread_lifecycle conv/t: {"latest_run_id": "r2", "latest_run_state": "queued", "thread_state": "awaiting_response"}
+  resolve_invocation_terminal (trigger: event 3 RUN.failed): null
+  count_events(event_type_prefix='run.'): 5
+PostgreSQL
+  stored event types: ["run.queued", "run.running", "RUN.failed", "run.queued", "Run.completed"]
+  list_session_runs: [{"run_id": "r2", "state": "queued", "event_count": 1, "ended": false, "error": ""}, {"run_id": "r1", "state": "running", "event_count": 2, "ended": false, "error": ""}]
+  list_session_run_events r1: ["run.queued -> queued", "run.running -> running"]
+  list_session_run_events r2: ["run.queued -> queued"]
+  resolve_thread_lifecycle conv/t: {"latest_run_id": "r2", "latest_run_state": "queued", "thread_state": "awaiting_response"}
+  resolve_invocation_terminal (trigger: event 3 RUN.failed): null
+  count_events(event_type_prefix='run.'): 3
+openminion 0.1.10 from installed package | python 3.11.17 linux
