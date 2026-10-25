@@ -1,0 +1,146 @@
+Ubuntu 24.04 GitHub-hosted runner, fresh checkout of openminion/openminion dev @ c9578ab6b849f8c41984db439e783a8845f5886d, make dev-install
+run: https://github.com/AliceMessi/linux-runner/actions/runs/40185573269
+(section 3, the traceback, is Windows-only: nothing fails here; `?? .deps/` at the end is the runner's openminion-eval clone)
+c9578ab6 Merge pull request #385 from AliceMessi/fix/364-participant-join-order
+80df0ebae2440a5afe799f7fba039942d346e690c52cc61dcd908d0d6ebbdfed  /tmp/ev/probe_test_cleanup.py
+109151d07407a3bab64290e3f9c22d80247af1f3fcb81805ab07816bf8d7b0aa  /tmp/ev/closing-experiment.diff
+3.11.17 linux SQLite 3.45.1
+src/openminion/__init__.py
+
+== 1. probe_test_cleanup.py (standard library only), 3 runs
+-- run 1
+{
+  "1. as in the tests": {
+    "code": "with sqlite3.connect(path) as conn: (read), inside with TemporaryDirectory()",
+    "connection after the with block": "open",
+    "after gc.collect(), conn still bound": "open",
+    "TemporaryDirectory cleanup": "ok"
+  },
+  "2. name dropped, cyclic GC disabled": {
+    "code": "same, then del conn, cyclic GC disabled",
+    "open connections to the file": 1,
+    "referred to by": [
+      "builtins.dict",
+      "functools._lru_cache_wrapper"
+    ],
+    "TemporaryDirectory cleanup": "ok"
+  },
+  "3. name dropped, then gc.collect()": {
+    "code": "same, then del conn and gc.collect()",
+    "open connections to the file": 0,
+    "TemporaryDirectory cleanup": "ok"
+  },
+  "4. suggested fix": {
+    "code": "with closing(sqlite3.connect(path)) as conn: (read), inside with TemporaryDirectory()",
+    "connection after the with block": "closed",
+    "TemporaryDirectory cleanup": "ok"
+  },
+  "5. restore shape, as in the tests": {
+    "code": "with sqlite3.connect(path) as conn: (write), then os.replace(copy, path)",
+    "connection after the with block": "open",
+    "replace the database": "ok"
+  },
+  "6. restore shape, with closing": {
+    "code": "with closing(sqlite3.connect(path)) as conn, conn: (write), then os.replace(copy, path)",
+    "connection after the with block": "closed",
+    "replace the database": "ok"
+  }
+}
+3.11.17 linux 6.17.0-1022-azure SQLite 3.45.1
+-- run 2
+{
+  "1. as in the tests": {
+    "code": "with sqlite3.connect(path) as conn: (read), inside with TemporaryDirectory()",
+    "connection after the with block": "open",
+    "after gc.collect(), conn still bound": "open",
+    "TemporaryDirectory cleanup": "ok"
+  },
+  "2. name dropped, cyclic GC disabled": {
+    "code": "same, then del conn, cyclic GC disabled",
+    "open connections to the file": 1,
+    "referred to by": [
+      "builtins.dict",
+      "functools._lru_cache_wrapper"
+    ],
+    "TemporaryDirectory cleanup": "ok"
+  },
+  "3. name dropped, then gc.collect()": {
+    "code": "same, then del conn and gc.collect()",
+    "open connections to the file": 0,
+    "TemporaryDirectory cleanup": "ok"
+  },
+  "4. suggested fix": {
+    "code": "with closing(sqlite3.connect(path)) as conn: (read), inside with TemporaryDirectory()",
+    "connection after the with block": "closed",
+    "TemporaryDirectory cleanup": "ok"
+  },
+  "5. restore shape, as in the tests": {
+    "code": "with sqlite3.connect(path) as conn: (write), then os.replace(copy, path)",
+    "connection after the with block": "open",
+    "replace the database": "ok"
+  },
+  "6. restore shape, with closing": {
+    "code": "with closing(sqlite3.connect(path)) as conn, conn: (write), then os.replace(copy, path)",
+    "connection after the with block": "closed",
+    "replace the database": "ok"
+  }
+}
+3.11.17 linux 6.17.0-1022-azure SQLite 3.45.1
+-- run 3
+{
+  "1. as in the tests": {
+    "code": "with sqlite3.connect(path) as conn: (read), inside with TemporaryDirectory()",
+    "connection after the with block": "open",
+    "after gc.collect(), conn still bound": "open",
+    "TemporaryDirectory cleanup": "ok"
+  },
+  "2. name dropped, cyclic GC disabled": {
+    "code": "same, then del conn, cyclic GC disabled",
+    "open connections to the file": 1,
+    "referred to by": [
+      "builtins.dict",
+      "functools._lru_cache_wrapper"
+    ],
+    "TemporaryDirectory cleanup": "ok"
+  },
+  "3. name dropped, then gc.collect()": {
+    "code": "same, then del conn and gc.collect()",
+    "open connections to the file": 0,
+    "TemporaryDirectory cleanup": "ok"
+  },
+  "4. suggested fix": {
+    "code": "with closing(sqlite3.connect(path)) as conn: (read), inside with TemporaryDirectory()",
+    "connection after the with block": "closed",
+    "TemporaryDirectory cleanup": "ok"
+  },
+  "5. restore shape, as in the tests": {
+    "code": "with sqlite3.connect(path) as conn: (write), then os.replace(copy, path)",
+    "connection after the with block": "open",
+    "replace the database": "ok"
+  },
+  "6. restore shape, with closing": {
+    "code": "with closing(sqlite3.connect(path)) as conn, conn: (write), then os.replace(copy, path)",
+    "connection after the with block": "closed",
+    "replace the database": "ok"
+  }
+}
+3.11.17 linux 6.17.0-1022-azure SQLite 3.45.1
+
+== 2. the two tests reported in PR #385, unchanged checkout, 3 runs
+-- run 1
+2 passed in 0.22s
+-- run 2
+2 passed in 0.08s
+-- run 3
+2 passed in 0.06s
+
+== 4. the same test files and nearby storage test files, unchanged checkout
+$ python -m pytest -q -rf --tb=line tests/test_storage_migrations.py tests/storage/test_migrations_runner.py tests/storage/test_migration_telemetry.py tests/storage/test_module_ops.py tests/storage/test_storagectl_cli.py tests/test_api_runtime.py::APIRuntimeBootstrapTests
+83 passed, 3 skipped in 2.81s
+
+== 5. with closing-experiment.diff applied
+applied closing-experiment.diff
+2 passed in 0.06s
+83 passed, 3 skipped in 2.09s
+reverted closing-experiment.diff
+?? .deps/

@@ -1,0 +1,202 @@
+dev @ c9578ab6b849f8c41984db439e783a8845f5886d (git worktree of that commit, clean: True), native Windows 11
+sha256 80df0ebae2440a5afe799f7fba039942d346e690c52cc61dcd908d0d6ebbdfed  probe_test_cleanup.py
+sha256 109151d07407a3bab64290e3f9c22d80247af1f3fcb81805ab07816bf8d7b0aa  closing-experiment.diff
+$ python -c "print(python, SQLite, openminion.__file__)"
+3.11.11 win32 SQLite 3.47.1
+<checkout>\src\openminion\__init__.py
+
+== 1. probe_test_cleanup.py (standard library only), 5 runs
+-- run 1: $ python probe_test_cleanup.py
+{
+  "1. as in the tests": {
+    "code": "with sqlite3.connect(path) as conn: (read), inside with TemporaryDirectory()",
+    "connection after the with block": "open",
+    "after gc.collect(), conn still bound": "open",
+    "TemporaryDirectory cleanup": "PermissionError [WinError 32]"
+  },
+  "2. name dropped, cyclic GC disabled": {
+    "code": "same, then del conn, cyclic GC disabled",
+    "open connections to the file": 1,
+    "referred to by": [
+      "builtins.dict",
+      "functools._lru_cache_wrapper"
+    ],
+    "TemporaryDirectory cleanup": "PermissionError [WinError 32]"
+  },
+  "3. name dropped, then gc.collect()": {
+    "code": "same, then del conn and gc.collect()",
+    "open connections to the file": 0,
+    "TemporaryDirectory cleanup": "ok"
+  },
+  "4. suggested fix": {
+    "code": "with closing(sqlite3.connect(path)) as conn: (read), inside with TemporaryDirectory()",
+    "connection after the with block": "closed",
+    "TemporaryDirectory cleanup": "ok"
+  },
+  "5. restore shape, as in the tests": {
+    "code": "with sqlite3.connect(path) as conn: (write), then os.replace(copy, path)",
+    "connection after the with block": "open",
+    "replace the database": "PermissionError [WinError 5]"
+  },
+  "6. restore shape, with closing": {
+    "code": "with closing(sqlite3.connect(path)) as conn, conn: (write), then os.replace(copy, path)",
+    "connection after the with block": "closed",
+    "replace the database": "ok"
+  }
+}
+3.11.11 win32 10 SQLite 3.47.1
+-- run 2: identical to run 1
+-- run 3: identical to run 1
+-- run 4: identical to run 1
+-- run 5: identical to run 1
+
+== 2. the two tests reported in PR #385, unchanged checkout, default settings, 5 runs (--tb=line)
+-- run 1
+$ python -m pytest -q -rf --tb=line <the two tests>
+<python>\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): '<tmp>\\<tmpdir>\\state\\openminion.db'
+<python>\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): '<tmp>\\<tmpdir>\\state\\openminion.db'
+FAILED tests/test_storage_migrations.py::StorageMigrationTests::test_migrate_database_creates_expected_schema
+FAILED tests/test_storage_migrations.py::StorageMigrationTests::test_migrate_database_is_idempotent_on_rerun
+2 failed in 0.30s
+-- run 2
+$ python -m pytest -q -rf --tb=line <the two tests>
+<python>\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): '<tmp>\\<tmpdir>\\state\\openminion.db'
+<python>\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): '<tmp>\\<tmpdir>\\state\\openminion.db'
+FAILED tests/test_storage_migrations.py::StorageMigrationTests::test_migrate_database_creates_expected_schema
+FAILED tests/test_storage_migrations.py::StorageMigrationTests::test_migrate_database_is_idempotent_on_rerun
+2 failed in 0.26s
+-- run 3
+$ python -m pytest -q -rf --tb=line <the two tests>
+<python>\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): '<tmp>\\<tmpdir>\\state\\openminion.db'
+<python>\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): '<tmp>\\<tmpdir>\\state\\openminion.db'
+FAILED tests/test_storage_migrations.py::StorageMigrationTests::test_migrate_database_creates_expected_schema
+FAILED tests/test_storage_migrations.py::StorageMigrationTests::test_migrate_database_is_idempotent_on_rerun
+2 failed in 0.27s
+-- run 4
+$ python -m pytest -q -rf --tb=line <the two tests>
+<python>\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): '<tmp>\\<tmpdir>\\state\\openminion.db'
+<python>\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): '<tmp>\\<tmpdir>\\state\\openminion.db'
+FAILED tests/test_storage_migrations.py::StorageMigrationTests::test_migrate_database_creates_expected_schema
+FAILED tests/test_storage_migrations.py::StorageMigrationTests::test_migrate_database_is_idempotent_on_rerun
+2 failed in 0.28s
+-- run 5
+$ python -m pytest -q -rf --tb=line <the two tests>
+<python>\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): '<tmp>\\<tmpdir>\\state\\openminion.db'
+<python>\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): '<tmp>\\<tmpdir>\\state\\openminion.db'
+FAILED tests/test_storage_migrations.py::StorageMigrationTests::test_migrate_database_creates_expected_schema
+FAILED tests/test_storage_migrations.py::StorageMigrationTests::test_migrate_database_is_idempotent_on_rerun
+2 failed in 0.27s
+
+== 3. full traceback, one run (--tb=short)
+$ python -m pytest -q -rf --tb=short <the two tests>
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_____ StorageMigrationTests.test_migrate_database_creates_expected_schema _____
+<python>\Lib\shutil.py:632: in _rmtree_unsafe
+    os.unlink(fullname)
+E   PermissionError: [WinError 32] (localized message trimmed): '<tmp>\\<tmpdir>\\state\\openminion.db'
+
+During handling of the above exception, another exception occurred:
+tests\test_storage_migrations.py:42: in test_migrate_database_creates_expected_schema
+    with tempfile.TemporaryDirectory() as tmp:
+<python>\Lib\tempfile.py:943: in __exit__
+    self.cleanup()
+<python>\Lib\tempfile.py:947: in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+<python>\Lib\tempfile.py:929: in _rmtree
+    _shutil.rmtree(name, onerror=onerror)
+<python>\Lib\shutil.py:787: in rmtree
+    return _rmtree_unsafe(path, onerror)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<python>\Lib\shutil.py:629: in _rmtree_unsafe
+    _rmtree_unsafe(fullname, onerror)
+<python>\Lib\shutil.py:634: in _rmtree_unsafe
+    onerror(os.unlink, fullname, sys.exc_info())
+<python>\Lib\tempfile.py:893: in onerror
+    _os.unlink(path)
+E   PermissionError: [WinError 32] (localized message trimmed): '<tmp>\\<tmpdir>\\state\\openminion.db'
+_____ StorageMigrationTests.test_migrate_database_is_idempotent_on_rerun ______
+<python>\Lib\shutil.py:632: in _rmtree_unsafe
+    os.unlink(fullname)
+E   PermissionError: [WinError 32] (localized message trimmed): '<tmp>\\<tmpdir>\\state\\openminion.db'
+
+During handling of the above exception, another exception occurred:
+tests\test_storage_migrations.py:141: in test_migrate_database_is_idempotent_on_rerun
+    with tempfile.TemporaryDirectory() as tmp:
+<python>\Lib\tempfile.py:943: in __exit__
+    self.cleanup()
+<python>\Lib\tempfile.py:947: in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+<python>\Lib\tempfile.py:929: in _rmtree
+    _shutil.rmtree(name, onerror=onerror)
+<python>\Lib\shutil.py:787: in rmtree
+    return _rmtree_unsafe(path, onerror)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<python>\Lib\shutil.py:629: in _rmtree_unsafe
+    _rmtree_unsafe(fullname, onerror)
+<python>\Lib\shutil.py:634: in _rmtree_unsafe
+    onerror(os.unlink, fullname, sys.exc_info())
+<python>\Lib\tempfile.py:893: in onerror
+    _os.unlink(path)
+E   PermissionError: [WinError 32] (localized message trimmed): '<tmp>\\<tmpdir>\\state\\openminion.db'
+=========================== short test summary info ===========================
+FAILED tests/test_storage_migrations.py::StorageMigrationTests::test_migrate_database_creates_expected_schema
+FAILED tests/test_storage_migrations.py::StorageMigrationTests::test_migrate_database_is_idempotent_on_rerun
+2 failed in 0.73s
+
+== 4. the same test files and nearby storage test files, unchanged checkout
+$ python -m pytest -q -rf --tb=line tests/test_storage_migrations.py tests/storage/test_migrations_runner.py tests/storage/test_migration_telemetry.py tests/storage/test_module_ops.py tests/storage/test_storagectl_cli.py tests/test_api_runtime.py::APIRuntimeBootstrapTests
+<python>\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): '<tmp>\\<tmpdir>\\state\\openminion.db'
+<python>\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): '<tmp>\\<tmpdir>\\state\\openminion.db'
+<python>\Lib\pathlib.py:1188: PermissionError: [WinError 5] (localized message trimmed): '<tmp>\\test_runner_rolls_back_on_fail0\\module.db.restore.tmp' -> '<tmp>\\test_runner_rolls_back_on_fail0\\module.db'
+<python>\Lib\pathlib.py:1188: PermissionError: [WinError 5] (localized message trimmed): '<tmp>\\test_secret_backup_restore_rou0\\secret-roundtrip.db.restore.tmp' -> '<tmp>\\test_secret_backup_restore_rou0\\secret-roundtrip.db'
+<python>\Lib\pathlib.py:1188: PermissionError: [WinError 5] (localized message trimmed): '<tmp>\\test_migrate_with_verify_emits0\\module.db.restore.tmp' -> '<tmp>\\test_migrate_with_verify_emits0\\module.db'
+<python>\Lib\pathlib.py:1188: PermissionError: [WinError 5] (localized message trimmed): '<tmp>\\test_restore_from_backup0\\test.db.restore.tmp' -> '<tmp>\\test_restore_from_backup0\\test.db'
+<python>\Lib\pathlib.py:1188: PermissionError: [WinError 5] (localized message trimmed): '<tmp>\\test_backup_then_restore_prese0\\test.db.restore.tmp' -> '<tmp>\\test_backup_then_restore_prese0\\test.db'
+<python>\Lib\pathlib.py:1188: PermissionError: [WinError 5] (localized message trimmed): '<tmp>\\test_snapshot_not_silently_del0\\test.db.restore.tmp' -> '<tmp>\\test_snapshot_not_silently_del0\\test.db'
+<python>\Lib\pathlib.py:1188: PermissionError: [WinError 5] (localized message trimmed): '<tmp>\\test_restore_is_idempotent0\\test.db.restore.tmp' -> '<tmp>\\test_restore_is_idempotent0\\test.db'
+<python>\Lib\pathlib.py:1188: PermissionError: [WinError 5] (localized message trimmed): '<tmp>\\test_backup_restore_round_trip0\\secrets.db.restore.tmp' -> '<tmp>\\test_backup_restore_round_trip0\\secrets.db'
+<python>\Lib\pathlib.py:1188: PermissionError: [WinError 5] (localized message trimmed): '<tmp>\\test_storagectl_backup_restore0\\restored.db.restore.tmp' -> '<tmp>\\test_storagectl_backup_restore0\\restored.db'
+<python>\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): '<tmp>\\<tmpdir>\\state\\runtime.db'
+FAILED tests/test_storage_migrations.py::StorageMigrationTests::test_migrate_database_creates_expected_schema
+FAILED tests/test_storage_migrations.py::StorageMigrationTests::test_migrate_database_is_idempotent_on_rerun
+FAILED tests/storage/test_migrations_runner.py::test_runner_rolls_back_on_failed_verify
+FAILED tests/storage/test_migrations_runner.py::test_secret_backup_restore_round_trip_after_migrate
+FAILED tests/storage/test_migration_telemetry.py::test_migrate_with_verify_emits_failed_outcome_without_exception
+FAILED tests/storage/test_module_ops.py::TestStorageModuleOps::test_restore_from_backup
+FAILED tests/storage/test_module_ops.py::TestStorageModuleOps::test_restore_envelope
+FAILED tests/storage/test_module_ops.py::TestRollbackSafety::test_backup_then_restore_preserves_data
+FAILED tests/storage/test_module_ops.py::TestRollbackSafety::test_snapshot_not_silently_deleted
+FAILED tests/storage/test_module_ops.py::TestRollbackSafety::test_restore_is_idempotent
+FAILED tests/storage/test_module_ops.py::TestE2ESmoke::test_full_lifecycle_envelope_mode
+FAILED tests/storage/test_module_ops.py::TestCLIOpsWiring::test_backup_restore_round_trip
+FAILED tests/storage/test_storagectl_cli.py::test_storagectl_backup_restore_roundtrip
+FAILED tests/test_api_runtime.py::APIRuntimeBootstrapTests::test_runtime_bootstraps_storage_schema
+14 failed, 69 passed, 3 skipped in 6.83s
+
+== 5. with closing-experiment.diff applied (each bare `with sqlite3.connect(...) as x:` in those test files
+==    becomes `with closing(sqlite3.connect(...)) as x, x:`; test_api_runtime also closes its APIRuntime)
+$ git apply closing-experiment.diff
+-- run 1
+$ python -m pytest -q -rf --tb=line <the two tests>
+2 passed in 0.37s
+-- run 2
+$ python -m pytest -q -rf --tb=line <the two tests>
+2 passed in 0.31s
+-- run 3
+$ python -m pytest -q -rf --tb=line <the two tests>
+2 passed in 0.26s
+-- run 4
+$ python -m pytest -q -rf --tb=line <the two tests>
+2 passed in 0.24s
+-- run 5
+$ python -m pytest -q -rf --tb=line <the two tests>
+2 passed in 0.26s
+$ python -m pytest -q -rf --tb=line tests/test_storage_migrations.py tests/storage/test_migrations_runner.py tests/storage/test_migration_telemetry.py tests/storage/test_module_ops.py tests/storage/test_storagectl_cli.py tests/test_api_runtime.py::APIRuntimeBootstrapTests
+<python>\Lib\pathlib.py:1188: PermissionError: [WinError 5] (localized message trimmed): '<tmp>\\test_backup_restore_round_trip0\\secrets.db.restore.tmp' -> '<tmp>\\test_backup_restore_round_trip0\\secrets.db'
+<python>\Lib\pathlib.py:1188: PermissionError: [WinError 5] (localized message trimmed): '<tmp>\\test_storagectl_backup_restore0\\restored.db.restore.tmp' -> '<tmp>\\test_storagectl_backup_restore0\\restored.db'
+FAILED tests/storage/test_module_ops.py::TestCLIOpsWiring::test_backup_restore_round_trip
+FAILED tests/storage/test_storagectl_cli.py::test_storagectl_backup_restore_roundtrip
+2 failed, 81 passed, 3 skipped in 6.80s
+$ git apply -R closing-experiment.diff
+$ git status --short

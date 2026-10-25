@@ -1,0 +1,369 @@
+diff --git a/tests/storage/test_migration_telemetry.py b/tests/storage/test_migration_telemetry.py
+index 3ea22383..0e110ea3 100644
+--- a/tests/storage/test_migration_telemetry.py
++++ b/tests/storage/test_migration_telemetry.py
+@@ -1,6 +1,7 @@
+ from __future__ import annotations
+ 
+ import sqlite3
++from contextlib import closing
+ from pathlib import Path
+ from types import SimpleNamespace
+ 
+@@ -25,7 +26,7 @@ def test_telemetry_migration_head_includes_debug_query_indexes() -> None:
+ 
+ 
+ def _init_db(path: Path) -> None:
+-    with sqlite3.connect(str(path)) as conn:
++    with closing(sqlite3.connect(str(path))) as conn, conn:
+         conn.execute(f"PRAGMA application_id = {MODULE_APP_ID}")
+         conn.execute("PRAGMA user_version = 1")
+         conn.execute(
+@@ -161,7 +162,7 @@ def test_migrate_emits_start_and_end(tmp_path: Path) -> None:
+ 
+     def fake_upgrade(*, target: str) -> None:
+         del target
+-        with sqlite3.connect(str(runner.db_path)) as conn:
++        with closing(sqlite3.connect(str(runner.db_path))) as conn, conn:
+             conn.execute("INSERT INTO notes(body) VALUES ('migrated')")
+             conn.commit()
+ 
+@@ -195,7 +196,7 @@ def test_migrate_with_verify_emits_failed_outcome_without_exception(
+ 
+     def fake_upgrade(*, target: str) -> None:
+         del target
+-        with sqlite3.connect(str(runner.db_path)) as conn:
++        with closing(sqlite3.connect(str(runner.db_path))) as conn, conn:
+             conn.execute("INSERT INTO notes(body) VALUES ('changed-during-migration')")
+             conn.commit()
+ 
+diff --git a/tests/storage/test_migrations_runner.py b/tests/storage/test_migrations_runner.py
+index 3fed232d..9b7db83b 100644
+--- a/tests/storage/test_migrations_runner.py
++++ b/tests/storage/test_migrations_runner.py
+@@ -2,6 +2,7 @@ from __future__ import annotations
+ 
+ import os
+ import sqlite3
++from contextlib import closing
+ import uuid
+ from pathlib import Path
+ 
+@@ -29,7 +30,7 @@ SESSION_APP_ID = get_module_application_id("session")
+ 
+ 
+ def _init_db(path: Path) -> None:
+-    with sqlite3.connect(str(path)) as conn:
++    with closing(sqlite3.connect(str(path))) as conn, conn:
+         conn.execute(f"PRAGMA application_id = {MODULE_APP_ID}")
+         conn.execute("PRAGMA user_version = 1")
+         conn.execute(
+@@ -109,7 +110,7 @@ def test_backup_online_creates_snapshot(tmp_path):
+     snapshot_path = Path(artifact.snapshot_path)
+     assert snapshot_path.exists()
+ 
+-    with sqlite3.connect(str(snapshot_path)) as conn:
++    with closing(sqlite3.connect(str(snapshot_path))) as conn, conn:
+         row = conn.execute("SELECT body FROM notes LIMIT 1").fetchone()
+     assert row is not None
+     assert row[0] == "baseline"
+@@ -152,7 +153,7 @@ def test_runner_rolls_back_on_failed_verify(tmp_path):
+ 
+     def fake_upgrade(*, target: str) -> None:
+         del target
+-        with sqlite3.connect(str(db_path)) as conn:
++        with closing(sqlite3.connect(str(db_path))) as conn, conn:
+             conn.execute("INSERT INTO notes(body) VALUES ('changed-during-migration')")
+             conn.commit()
+ 
+@@ -164,7 +165,7 @@ def test_runner_rolls_back_on_failed_verify(tmp_path):
+     assert report.rolled_back is True
+     assert report.error is not None
+ 
+-    with sqlite3.connect(str(db_path)) as conn:
++    with closing(sqlite3.connect(str(db_path))) as conn, conn:
+         rows = conn.execute("SELECT body FROM notes ORDER BY id").fetchall()
+ 
+     # rollback should restore snapshot, removing the migration-time row.
+@@ -184,7 +185,7 @@ def test_runner_migrate_with_verify_success(tmp_path):
+ 
+     def fake_upgrade(*, target: str) -> None:
+         del target
+-        with sqlite3.connect(str(db_path)) as conn:
++        with closing(sqlite3.connect(str(db_path))) as conn, conn:
+             conn.execute("INSERT INTO notes(body) VALUES ('verified-migration')")
+             conn.commit()
+ 
+@@ -196,7 +197,7 @@ def test_runner_migrate_with_verify_success(tmp_path):
+     assert report.rolled_back is False
+     assert report.error is None
+ 
+-    with sqlite3.connect(str(db_path)) as conn:
++    with closing(sqlite3.connect(str(db_path))) as conn, conn:
+         rows = conn.execute("SELECT body FROM notes ORDER BY id").fetchall()
+ 
+     assert [row[0] for row in rows] == ["baseline", "verified-migration"]
+@@ -220,7 +221,7 @@ def test_secret_migrate_bootstraps_fresh_db_with_alembic(tmp_path: Path) -> None
+     assert report.after.alembic_revision == "0001_baseline"
+     assert report.after.om_meta["schema_head"] == "0001_baseline"
+ 
+-    with sqlite3.connect(str(db_path)) as conn:
++    with closing(sqlite3.connect(str(db_path))) as conn, conn:
+         assert (
+             conn.execute("SELECT version_num FROM alembic_version").fetchone()[0]
+             == "0001_baseline"
+@@ -252,7 +253,7 @@ def test_secret_migrate_existing_db_is_idempotent(tmp_path: Path) -> None:
+     assert report.success is True
+     assert report.after.alembic_revision == "0001_baseline"
+ 
+-    with sqlite3.connect(str(db_path)) as conn:
++    with closing(sqlite3.connect(str(db_path))) as conn, conn:
+         row = conn.execute(
+             "SELECT value FROM secrets WHERE key = ? AND namespace = ?",
+             ("token", "default"),
+@@ -272,7 +273,7 @@ def test_secret_backup_restore_round_trip_after_migrate(tmp_path: Path) -> None:
+     )
+     assert runner.migrate(target="head").success is True
+ 
+-    with sqlite3.connect(str(db_path)) as conn:
++    with closing(sqlite3.connect(str(db_path))) as conn, conn:
+         conn.execute(
+             """
+             INSERT INTO secrets(key, namespace, value, created_at, updated_at)
+@@ -283,7 +284,7 @@ def test_secret_backup_restore_round_trip_after_migrate(tmp_path: Path) -> None:
+ 
+     artifact = runner.backup()
+ 
+-    with sqlite3.connect(str(db_path)) as conn:
++    with closing(sqlite3.connect(str(db_path))) as conn, conn:
+         conn.execute("DELETE FROM secrets")
+         conn.commit()
+ 
+@@ -291,7 +292,7 @@ def test_secret_backup_restore_round_trip_after_migrate(tmp_path: Path) -> None:
+     verify = runner.verify(level="quick")
+     assert verify.ok is True
+ 
+-    with sqlite3.connect(str(db_path)) as conn:
++    with closing(sqlite3.connect(str(db_path))) as conn, conn:
+         row = conn.execute("SELECT value FROM secrets WHERE key = 'k1'").fetchone()
+     assert row is not None
+     assert row[0] == "v1"
+@@ -307,7 +308,7 @@ def test_secret_export_import_round_trip_after_migrate(tmp_path: Path) -> None:
+     )
+     assert runner.migrate(target="head").success is True
+ 
+-    with sqlite3.connect(str(source_db)) as conn:
++    with closing(sqlite3.connect(str(source_db))) as conn, conn:
+         conn.execute(
+             """
+             INSERT INTO secrets(key, namespace, value, created_at, updated_at)
+@@ -336,7 +337,7 @@ def test_secret_export_import_round_trip_after_migrate(tmp_path: Path) -> None:
+     )
+     assert imported_runner.verify(level="quick").ok is True
+ 
+-    with sqlite3.connect(str(target_db)) as conn:
++    with closing(sqlite3.connect(str(target_db))) as conn, conn:
+         row = conn.execute("SELECT value FROM secrets WHERE key = 'api'").fetchone()
+     assert row is not None
+     assert row[0] == "secret"
+diff --git a/tests/storage/test_module_ops.py b/tests/storage/test_module_ops.py
+index 0c39b57d..aa84864d 100644
+--- a/tests/storage/test_module_ops.py
++++ b/tests/storage/test_module_ops.py
+@@ -2,6 +2,7 @@ from __future__ import annotations
+ 
+ import json
+ import sqlite3
++from contextlib import closing
+ from pathlib import Path
+ 
+ import pytest
+@@ -41,7 +42,7 @@ def _create_test_db(
+ ) -> None:
+     db_path.parent.mkdir(parents=True, exist_ok=True)
+     signed_app_id = _to_signed32(app_id)
+-    with sqlite3.connect(str(db_path)) as conn:
++    with closing(sqlite3.connect(str(db_path))) as conn, conn:
+         conn.execute(f"PRAGMA application_id={signed_app_id}")
+         conn.execute(f"PRAGMA user_version={user_version}")
+         conn.execute(
+@@ -210,20 +211,20 @@ class TestStorageModuleOps:
+ 
+     def test_restore_from_backup(self, tmp_path: Path) -> None:
+         ops = _build_ops(tmp_path)
+-        with sqlite3.connect(str(tmp_path / "test.db")) as conn:
++        with closing(sqlite3.connect(str(tmp_path / "test.db"))) as conn, conn:
+             conn.execute(
+                 "INSERT INTO secrets(key, namespace, value, created_at, updated_at) "
+                 "VALUES ('k1', 'default', 'v1', 1.0, 1.0)"
+             )
+             conn.commit()
+         artifact = ops.backup()
+-        with sqlite3.connect(str(tmp_path / "test.db")) as conn:
++        with closing(sqlite3.connect(str(tmp_path / "test.db"))) as conn, conn:
+             conn.execute("DELETE FROM secrets")
+             conn.commit()
+         state = ops.restore(snapshot_path=artifact.snapshot_path)
+         assert isinstance(state, DbState)
+         assert state.exists is True
+-        with sqlite3.connect(str(tmp_path / "test.db")) as conn:
++        with closing(sqlite3.connect(str(tmp_path / "test.db"))) as conn, conn:
+             row = conn.execute("SELECT value FROM secrets WHERE key='k1'").fetchone()
+         assert row is not None
+         assert row[0] == "v1"
+@@ -237,7 +238,7 @@ class TestStorageModuleOps:
+ 
+     def test_export_creates_omx(self, tmp_path: Path) -> None:
+         ops = _build_ops(tmp_path)
+-        with sqlite3.connect(str(tmp_path / "test.db")) as conn:
++        with closing(sqlite3.connect(str(tmp_path / "test.db"))) as conn, conn:
+             conn.execute(
+                 "INSERT INTO secrets(key, namespace, value, created_at, updated_at) "
+                 "VALUES ('k1', 'default', 'v1', 1.0, 1.0)"
+@@ -255,7 +256,7 @@ class TestStorageModuleOps:
+ 
+     def test_rehydrate_from_export(self, tmp_path: Path) -> None:
+         ops = _build_ops(tmp_path)
+-        with sqlite3.connect(str(tmp_path / "test.db")) as conn:
++        with closing(sqlite3.connect(str(tmp_path / "test.db"))) as conn, conn:
+             conn.execute(
+                 "INSERT INTO secrets(key, namespace, value, created_at, updated_at) "
+                 "VALUES ('k1', 'default', 'v1', 1.0, 1.0)"
+@@ -274,7 +275,7 @@ class TestStorageModuleOps:
+         assert report.success is True
+         assert report.imported_rows > 0
+ 
+-        with sqlite3.connect(str(target_db)) as conn:
++        with closing(sqlite3.connect(str(target_db))) as conn, conn:
+             conn.row_factory = sqlite3.Row
+             row = conn.execute("SELECT value FROM secrets WHERE key='k1'").fetchone()
+         assert row is not None
+@@ -282,7 +283,7 @@ class TestStorageModuleOps:
+ 
+     def test_rehydrate_envelope(self, tmp_path: Path) -> None:
+         ops = _build_ops(tmp_path)
+-        with sqlite3.connect(str(tmp_path / "test.db")) as conn:
++        with closing(sqlite3.connect(str(tmp_path / "test.db"))) as conn, conn:
+             conn.execute(
+                 "INSERT INTO secrets(key, namespace, value, created_at, updated_at) "
+                 "VALUES ('k2', 'default', 'v2', 2.0, 2.0)"
+@@ -386,7 +387,7 @@ class TestIdentityMismatch:
+         db_path = tmp_path / "protected.db"
+         session_app_id = get_module_application_id("session")
+         _create_test_db(db_path, app_id=session_app_id)
+-        with sqlite3.connect(str(db_path)) as conn:
++        with closing(sqlite3.connect(str(db_path))) as conn, conn:
+             before_app_id = conn.execute("PRAGMA application_id").fetchone()[0]
+             before_version = conn.execute("PRAGMA user_version").fetchone()[0]
+ 
+@@ -399,7 +400,7 @@ class TestIdentityMismatch:
+         env = ops.backup_envelope()
+         assert env.ok is False
+ 
+-        with sqlite3.connect(str(db_path)) as conn:
++        with closing(sqlite3.connect(str(db_path))) as conn, conn:
+             after_app_id = conn.execute("PRAGMA application_id").fetchone()[0]
+             after_version = conn.execute("PRAGMA user_version").fetchone()[0]
+ 
+@@ -435,7 +436,7 @@ class TestSchemaDrift:
+     def test_version_drift_detectable(self, tmp_path: Path) -> None:
+         db_path = tmp_path / "test.db"
+         _create_test_db(db_path)
+-        with sqlite3.connect(str(db_path)) as conn:
++        with closing(sqlite3.connect(str(db_path))) as conn, conn:
+             conn.execute("PRAGMA user_version=99")
+             conn.commit()
+ 
+@@ -459,20 +460,20 @@ class TestRollbackSafety:
+     def test_backup_then_restore_preserves_data(self, tmp_path: Path) -> None:
+         ops = _build_ops(tmp_path)
+         db_path = tmp_path / "test.db"
+-        with sqlite3.connect(str(db_path)) as conn:
++        with closing(sqlite3.connect(str(db_path))) as conn, conn:
+             conn.execute(
+                 "INSERT INTO secrets(key, namespace, value, created_at, updated_at) "
+                 "VALUES ('preserve_me', 'default', 'safe', 1.0, 1.0)"
+             )
+             conn.commit()
+         artifact = ops.backup()
+-        with sqlite3.connect(str(db_path)) as conn:
++        with closing(sqlite3.connect(str(db_path))) as conn, conn:
+             conn.execute("DELETE FROM secrets")
+             conn.commit()
+-        with sqlite3.connect(str(db_path)) as conn:
++        with closing(sqlite3.connect(str(db_path))) as conn, conn:
+             assert conn.execute("SELECT COUNT(*) FROM secrets").fetchone()[0] == 0
+         ops.restore(snapshot_path=artifact.snapshot_path)
+-        with sqlite3.connect(str(db_path)) as conn:
++        with closing(sqlite3.connect(str(db_path))) as conn, conn:
+             row = conn.execute(
+                 "SELECT value FROM secrets WHERE key='preserve_me'"
+             ).fetchone()
+@@ -510,7 +511,7 @@ class TestE2ESmoke:
+         export_dir = data_root / "secret" / "export"
+ 
+         _create_test_db(db_path)
+-        with sqlite3.connect(str(db_path)) as conn:
++        with closing(sqlite3.connect(str(db_path))) as conn, conn:
+             conn.execute(
+                 "INSERT INTO secrets(key, namespace, value, created_at, updated_at) "
+                 "VALUES ('e2e_key', 'prod', 'e2e_value', 100.0, 100.0)"
+@@ -552,7 +553,7 @@ class TestE2ESmoke:
+         )
+         assert rehydrate_report.success is True
+ 
+-        with sqlite3.connect(str(imported_db)) as conn:
++        with closing(sqlite3.connect(str(imported_db))) as conn, conn:
+             conn.row_factory = sqlite3.Row
+             row = conn.execute(
+                 "SELECT value FROM secrets WHERE key='e2e_key'"
+diff --git a/tests/test_api_runtime.py b/tests/test_api_runtime.py
+index fd62f6d7..33f7b04f 100644
+--- a/tests/test_api_runtime.py
++++ b/tests/test_api_runtime.py
+@@ -1,5 +1,6 @@
+ import asyncio
+ import sqlite3
++from contextlib import closing
+ import tempfile
+ import unittest
+ from contextlib import redirect_stdout
+@@ -1040,7 +1041,7 @@ class APIRuntimeBootstrapTests(unittest.TestCase):
+             self.assertEqual(app.gateway._agent_memory._max_todos, 44)
+             self.assertEqual(app.memory_root, (app.data_root / "memory").resolve())
+ 
+-            with sqlite3.connect(str(database_path)) as conn:
++            with closing(sqlite3.connect(str(database_path))) as conn, conn:
+                 version = conn.execute(
+                     "SELECT MAX(version) FROM migrations"
+                 ).fetchone()[0]
+@@ -1048,6 +1049,7 @@ class APIRuntimeBootstrapTests(unittest.TestCase):
+                     migration.version for migration in DEFAULT_MIGRATIONS
+                 )
+                 self.assertEqual(version, expected_head)
++            app.close()
+ 
+ 
+ def _make_config(tmp_path: Path) -> Path:
+diff --git a/tests/test_storage_migrations.py b/tests/test_storage_migrations.py
+index 7af07593..71cd4811 100644
+--- a/tests/test_storage_migrations.py
++++ b/tests/test_storage_migrations.py
+@@ -49,7 +49,7 @@ class StorageMigrationTests(unittest.TestCase):
+                 (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14),
+             )
+ 
+-            with sqlite3.connect(str(database_path)) as conn:
++            with closing(sqlite3.connect(str(database_path))) as conn, conn:
+                 tables = {
+                     row[0]
+                     for row in conn.execute(
+@@ -152,7 +152,7 @@ class StorageMigrationTests(unittest.TestCase):
+             self.assertEqual(second.current_version, 14)
+             self.assertEqual(second.applied_versions, ())
+ 
+-            with sqlite3.connect(str(database_path)) as conn:
++            with closing(sqlite3.connect(str(database_path))) as conn, conn:
+                 migration_count = conn.execute(
+                     "SELECT COUNT(*) FROM migrations"
+                 ).fetchone()[0]
