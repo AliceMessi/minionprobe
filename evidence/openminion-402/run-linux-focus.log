@@ -1,0 +1,282 @@
+Ubuntu 24.04 GitHub-hosted runner, AliceMessi/linux-runner run 40199835696 (https://github.com/AliceMessi/linux-runner/actions/runs/40199835696), preset openminion with the postgres extra and PostgreSQL 16
+head: 4b5df8dc docs(changelog): note memctl inspect history with the audited store
+dev:  b670bbb6 Merge pull request #415 from AliceMessi/fix/400-pg-evidence-ref-decode
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+packages: psycopg 3.3.6;sophiagraph 0.0.12;SQLAlchemy 2.1.6;typer 0.27.3;
+OPENMINION_TEST_POSTGRES_URL set: yes
+fc8d904dbb34272e06e47e4e21c5540c866f94f75e559f7c100f5144b268394e  /tmp/ev/pg_inspect_history.py
+c7ff0322423562ea2bc887faefbf77b79933d53997aedf931d885fbd552bfb34  /tmp/ev/probe_inspect_history.py
+018563278ec9de76c3612adcf9e876175a30d9117b3f84e84686bd9b1a39be53  /tmp/ev/probe_inspect_scope.py
+34321faa055736e3dad22f59a4bcd6b5f84438c69140a66881a07c1e5671e95f  /tmp/ev/run402.sh
+
+== [head] pytest -q -p no:cacheprovider -rf --tb=short <focused>
+9 passed in 0.53s
+
+== [head] pytest -q -p no:cacheprovider -rf --tb=line <related> (PostgreSQL cases included)
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+..............................                                           [100%]
+30 passed in 1.27s
+
+== [head] the issue's probe: PYTHONPATH=src:. python probe_inspect_history.py
+{
+  "memctl history --scope agent:a --type fact --key pref:indent --json": {
+    "exit code": 0,
+    "record titles": [
+      "Prefer spaces",
+      "Prefer tabs"
+    ]
+  },
+  "memctl inspect --scope agent:a --db <tmp>/memory.db --json": {
+    "exit code": 0,
+    "stats.active_record_count": 1,
+    "stats.supersession_chain_count": 1,
+    "history_summary": {
+      "depth": 2,
+      "active_id": "6f98e3bc81da46a7afd1d3ab48153e07",
+      "reasons": [
+        "keyed_upsert"
+      ],
+      "scope": "agent:a",
+      "type": "fact",
+      "key": "pref:indent"
+    }
+  },
+  "memctl inspect --scope agent:a --db <tmp>/memory.db": {
+    "exit code": 0,
+    "prints a 'Deepest history' line": true
+  },
+  "build_inspect_payload with memctl's _get_service(db)": {
+    "service store": "AuditedMemoryStore wrapping SQLiteMemoryStore",
+    "history_summary": {
+      "scope": "agent:a",
+      "type": "fact",
+      "key": "pref:indent",
+      "depth": 2
+    }
+  },
+  "build_inspect_payload with MemoryService over the bare SQLiteMemoryStore": {
+    "service store": "SQLiteMemoryStore",
+    "history_summary": {
+      "scope": "agent:a",
+      "type": "fact",
+      "key": "pref:indent",
+      "depth": 2
+    }
+  }
+}
+3.11.17 linux
+
+== [head] PostgreSQL inspect history (unchanged, SQLite-only summary): PYTHONPATH=src:. python pg_inspect_history.py
+history depth for the key: 2
+bare PostgresMemoryStore: history_summary=None, stats.active_record_count=1
+AuditedMemoryStore(PostgresMemoryStore): history_summary=None, stats.active_record_count=1
+3.11.17 linux
+
+== [head] memctl inspect scope handling (separate report): PYTHONPATH=src:. python probe_inspect_scope.py
+{
+  "memctl inspect no --scope --json": {
+    "exit code": 1,
+    "last stderr line": "sophiagraph.contracts.errors.InvalidArgumentError: invalid scope: ''"
+  },
+  "memctl inspect --scope \"\" --json": {
+    "exit code": 1,
+    "last stderr line": "sophiagraph.contracts.errors.InvalidArgumentError: invalid scope: ''"
+  },
+  "memctl inspect --scope agent:a (control) --json": {
+    "exit code": 0,
+    "last stderr line": "",
+    "scope": "agent:a",
+    "stats.active_record_count": 1
+  },
+  "memctl inspect --scope not-a-scope --json": {
+    "exit code": 1,
+    "last stderr line": "sophiagraph.contracts.errors.InvalidArgumentError: invalid scope: 'not-a-scope'"
+  },
+  "memctl inspect no --scope": {
+    "exit code": 1,
+    "last stderr line": "sophiagraph.contracts.errors.InvalidArgumentError: invalid scope: ''",
+    "prints 'Memory inspect'": false
+  },
+  "memctl inspect --scope \"\"": {
+    "exit code": 1,
+    "last stderr line": "sophiagraph.contracts.errors.InvalidArgumentError: invalid scope: ''",
+    "prints 'Memory inspect'": false
+  },
+  "memctl inspect --scope agent:a (control)": {
+    "exit code": 0,
+    "last stderr line": "",
+    "prints 'Memory inspect'": true
+  },
+  "memctl inspect --scope not-a-scope": {
+    "exit code": 1,
+    "last stderr line": "sophiagraph.contracts.errors.InvalidArgumentError: invalid scope: 'not-a-scope'",
+    "prints 'Memory inspect'": false
+  },
+  "memctl stats --json, no --scope (control)": {
+    "exit code": 0,
+    "last stderr line": "",
+    "active_record_count": 1
+  }
+}
+3.11.17 linux
+
+== dev sources from here on: git checkout b670bbb6 -- src
+M  src/openminion/modules/memory/diagnostics/cli.py
+
+== [dev] pytest -q -p no:cacheprovider -rf --tb=short <focused>
+E   AssertionError: assert {'human': [], 'json': None} == {'human': ['D...ype': 'fact'}}
+E     
+E     Differing items:
+E     {'human': []} != {'human': ['Deepest history: agent:history fact pref:indent (depth 2)']}
+E     {'json': None} != {'json': {'depth': 2, 'key': 'pref:indent', 'scope': 'agent:history', 'type': 'fact'}}
+E     
+E     Full diff:
+E       {
+E     -     'human': [
+E     +     'human': [],
+E     ?               ++
+E     -         'Deepest history: agent:history fact pref:indent (depth 2)',
+E     -     ],
+E     -     'json': {
+E     ?             ^
+E     +     'json': None,
+E     ?             ^^^^^
+E     -         'depth': 2,
+E     -         'key': 'pref:indent',
+E     -         'scope': 'agent:history',
+
+== [dev] pytest -q -p no:cacheprovider -rf --tb=line <related> (PostgreSQL cases included)
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+..............................                                           [100%]
+30 passed in 0.85s
+
+== [dev] the issue's probe: PYTHONPATH=src:. python probe_inspect_history.py
+{
+  "memctl history --scope agent:a --type fact --key pref:indent --json": {
+    "exit code": 0,
+    "record titles": [
+      "Prefer spaces",
+      "Prefer tabs"
+    ]
+  },
+  "memctl inspect --scope agent:a --db <tmp>/memory.db --json": {
+    "exit code": 0,
+    "stats.active_record_count": 1,
+    "stats.supersession_chain_count": 1,
+    "history_summary": null
+  },
+  "memctl inspect --scope agent:a --db <tmp>/memory.db": {
+    "exit code": 0,
+    "prints a 'Deepest history' line": false
+  },
+  "build_inspect_payload with memctl's _get_service(db)": {
+    "service store": "AuditedMemoryStore wrapping SQLiteMemoryStore",
+    "history_summary": null
+  },
+  "build_inspect_payload with MemoryService over the bare SQLiteMemoryStore": {
+    "service store": "SQLiteMemoryStore",
+    "history_summary": {
+      "scope": "agent:a",
+      "type": "fact",
+      "key": "pref:indent",
+      "depth": 2
+    }
+  }
+}
+3.11.17 linux
+
+== [dev] PostgreSQL inspect history (unchanged, SQLite-only summary): PYTHONPATH=src:. python pg_inspect_history.py
+history depth for the key: 2
+bare PostgresMemoryStore: history_summary=None, stats.active_record_count=1
+AuditedMemoryStore(PostgresMemoryStore): history_summary=None, stats.active_record_count=1
+3.11.17 linux
+
+== [dev] memctl inspect scope handling (separate report): PYTHONPATH=src:. python probe_inspect_scope.py
+{
+  "memctl inspect no --scope --json": {
+    "exit code": 1,
+    "last stderr line": "sophiagraph.contracts.errors.InvalidArgumentError: invalid scope: ''"
+  },
+  "memctl inspect --scope \"\" --json": {
+    "exit code": 1,
+    "last stderr line": "sophiagraph.contracts.errors.InvalidArgumentError: invalid scope: ''"
+  },
+  "memctl inspect --scope agent:a (control) --json": {
+    "exit code": 0,
+    "last stderr line": "",
+    "scope": "agent:a",
+    "stats.active_record_count": 1
+  },
+  "memctl inspect --scope not-a-scope --json": {
+    "exit code": 1,
+    "last stderr line": "sophiagraph.contracts.errors.InvalidArgumentError: invalid scope: 'not-a-scope'"
+  },
+  "memctl inspect no --scope": {
+    "exit code": 1,
+    "last stderr line": "sophiagraph.contracts.errors.InvalidArgumentError: invalid scope: ''",
+    "prints 'Memory inspect'": false
+  },
+  "memctl inspect --scope \"\"": {
+    "exit code": 1,
+    "last stderr line": "sophiagraph.contracts.errors.InvalidArgumentError: invalid scope: ''",
+    "prints 'Memory inspect'": false
+  },
+  "memctl inspect --scope agent:a (control)": {
+    "exit code": 0,
+    "last stderr line": "",
+    "prints 'Memory inspect'": true
+  },
+  "memctl inspect --scope not-a-scope": {
+    "exit code": 1,
+    "last stderr line": "sophiagraph.contracts.errors.InvalidArgumentError: invalid scope: 'not-a-scope'",
+    "prints 'Memory inspect'": false
+  },
+  "memctl stats --json, no --scope (control)": {
+    "exit code": 0,
+    "last stderr line": "",
+    "active_record_count": 1
+  }
+}
+3.11.17 linux
+
+== back to the branch head
+?? .deps/
+
+== ruff check .
+All checks passed!
+
+== make format-check
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m ruff format --check "/home/runner/work/linux-runner/linux-runner"
+5111 files already formatted
+
+== make workflow-check
+[INFO] This may take a few minutes...
+Lint GitHub Actions workflow files.......................................Passed
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/action_pins.py
+workflow action pins: clean
+
+== make lint
+[coo-10] clean — webhook secret-required contract preserved
+Skipping workspace browser tool-family contract validator (not present in standalone checkout).
+make typecheck
+make[1]: Entering directory '/home/runner/work/linux-runner/linux-runner'
+cd "/home/runner/work/linux-runner/linux-runner" && /home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4309; baseline total: 4309
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 290
+[tcr] api: 77 / 77 | monthly quota -50 | next target <= 27 | headroom 0
+[tcr] cli: 309 / 309 | monthly quota -50 | next target <= 259 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 222 / 222 | monthly quota -50 | next target <= 172 | headroom 0
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+make lint exit: 0
+
+== make test-critical
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+482 passed, 4 skipped, 1 warning in 12.52s

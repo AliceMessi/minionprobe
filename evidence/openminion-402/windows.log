@@ -1,0 +1,105 @@
+fix/402-inspect-history-audited-store @ 4b5df8dcb802ea56f929aa3dd822a368215e6183 and dev @ b670bbb61a3e7a67eeeb90cfa40e28ccf58c1726; native Windows 11 Pro 10.0.22631, CPython 3.11.11, SQLite 3.47.1, PYTHONPATH="src;."
+OPENMINION_TEST_POSTGRES_URL is not set here, so the PostgreSQL cases skip
+
+== [head] pytest -q -p no:cacheprovider -rf --tb=line tests/memory/test_operability.py
+9 passed in 0.97s
+
+== [head] pytest -q -p no:cacheprovider -rf --tb=line <related: tests/integration/test_operability.py tests/memory/test_operability_postgres.py tests/memory/test_memory_blocks_cli.py tests/memory/test_audit_trail.py>
+28 passed, 2 skipped in 2.22s
+
+== [dev src: the branch's test file copied into a clean worktree of dev] pytest -q -p no:cacheprovider -rf --tb=short tests/memory/test_operability.py
+E   AssertionError: assert {'human': [], 'json': None} == {'human': ['D...ype': 'fact'}}
+E     
+E     Differing items:
+E     {'json': None} != {'json': {'depth': 2, 'key': 'pref:indent', 'scope': 'agent:history', 'type': 'fact'}}
+E     {'human': []} != {'human': ['Deepest history: agent:history fact pref:indent (depth 2)']}
+E     Use -v to get more diff
+FAILED tests/memory/test_operability.py::test_memctl_inspect_reports_deepest_history_in_json_and_human_output
+1 failed, 8 passed in 1.29s
+
+== [dev] related
+28 passed, 2 skipped in 1.91s
+
+== [head] the issue's probe: python probe_inspect_history.py
+{
+  "memctl history --scope agent:a --type fact --key pref:indent --json": {
+    "exit code": 0,
+    "record titles": [
+      "Prefer spaces",
+      "Prefer tabs"
+    ]
+  },
+  "memctl inspect --scope agent:a --db <tmp>/memory.db --json": {
+    "exit code": 0,
+    "stats.active_record_count": 1,
+    "stats.supersession_chain_count": 1,
+    "history_summary": {
+      "depth": 2,
+      "active_id": "b92cf55f596548718a857bd76b429ed6",
+      "reasons": [
+        "keyed_upsert"
+      ],
+      "scope": "agent:a",
+      "type": "fact",
+      "key": "pref:indent"
+    }
+  },
+  "memctl inspect --scope agent:a --db <tmp>/memory.db": {
+    "exit code": 0,
+    "prints a 'Deepest history' line": true
+  },
+  "build_inspect_payload with memctl's _get_service(db)": {
+    "service store": "AuditedMemoryStore wrapping SQLiteMemoryStore",
+    "history_summary": {
+      "scope": "agent:a",
+      "type": "fact",
+      "key": "pref:indent",
+      "depth": 2
+    }
+  },
+  "build_inspect_payload with MemoryService over the bare SQLiteMemoryStore": {
+    "service store": "SQLiteMemoryStore",
+    "history_summary": {
+      "scope": "agent:a",
+      "type": "fact",
+      "key": "pref:indent",
+      "depth": 2
+    }
+  }
+}
+3.11.11 win32
+
+== [dev] the issue's probe
+{
+  "memctl history --scope agent:a --type fact --key pref:indent --json": {
+    "exit code": 0,
+    "record titles": [
+      "Prefer spaces",
+      "Prefer tabs"
+    ]
+  },
+  "memctl inspect --scope agent:a --db <tmp>/memory.db --json": {
+    "exit code": 0,
+    "stats.active_record_count": 1,
+    "stats.supersession_chain_count": 1,
+    "history_summary": null
+  },
+  "memctl inspect --scope agent:a --db <tmp>/memory.db": {
+    "exit code": 0,
+    "prints a 'Deepest history' line": false
+  },
+  "build_inspect_payload with memctl's _get_service(db)": {
+    "service store": "AuditedMemoryStore wrapping SQLiteMemoryStore",
+    "history_summary": null
+  },
+  "build_inspect_payload with MemoryService over the bare SQLiteMemoryStore": {
+    "service store": "SQLiteMemoryStore",
+    "history_summary": {
+      "scope": "agent:a",
+      "type": "fact",
+      "key": "pref:indent",
+      "depth": 2
+    }
+  }
+}
+3.11.11 win32
