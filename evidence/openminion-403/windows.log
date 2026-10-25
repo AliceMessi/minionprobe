@@ -1,0 +1,158 @@
+fix/403-memctl-service-close @ 6aa73f15052ae6e40ef9d00516db8f5e3dd0c12e (worktree clean: True) and dev @ b670bbb61a3e7a67eeeb90cfa40e28ccf58c1726
+native Windows 11 Pro 10.0.22631, CPython 3.11.11 SQLite 3.47.1, typer 0.27.3, PYTHONPATH="src;."
+OPENMINION_TEST_POSTGRES_URL is not set here, so the PostgreSQL cases skip. pytest output is shown without its progress dots.
+
+== [head] pytest -q -p no:cacheprovider -rf --tb=line <focused: tests/memory/test_memctl_service_close.py tests/memory/test_cli_read_commands.py tests/memory/test_memory_review_cli.py tests/memory/test_utility_plan_cli.py tests/memory/test_operability.py tests/memory/test_operability_postgres.py tests/architecture/test_marker_discipline.py>
+39 passed, 2 skipped in 6.67s
+
+== [head] pytest -q -p no:cacheprovider -rf --tb=line <related: tests/memory/test_bundle_provenance_roundtrip.py tests/memory/test_cli_provenance_and_forget.py tests/memory/test_memory_blocks_cli.py tests/memory/test_tool_failure_diagnostics.py tests/integration/test_memory_export_import.py tests/integration/test_operability.py tests/memory/test_audit_trail.py>
+================================== FAILURES ===================================
+C:\Users\User\AppData\Roaming\uv\python\cpython-3.11.11-windows-x86_64-none\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): 'C:\\Users\\User\\AppData\\Local\\Temp\\tmpy5oxypbo\\test.audit.db'
+=========================== short test summary info ===========================
+FAILED tests/memory/test_cli_provenance_and_forget.py::TestMemoryForgetCLI::test_forget_emits_delete_event_to_audit_sink
+1 failed, 59 passed in 20.24s
+
+== [head] the issue's probe: python probe_memctl_audit_sink.py
+{
+  "in-process (CliRunner)": {
+    "command": "memctl approve c1 --reviewer agent --db <tmp>/test.db (CliRunner, GC disabled)",
+    "exit code": 0,
+    "output": "Approved: c1",
+    "audit database": "test.audit.db",
+    "after the command returns": {
+      "open connections to the audit database": 0,
+      "opened at": [],
+      "rename": "ok"
+    },
+    "cyclic collector": {
+      "unreachable objects found": true,
+      "openminion objects among them": {
+        "openminion.modules.memory.portability.service.MemoryBundleServiceOps": 1,
+        "openminion.modules.memory.runtime.candidate_lifecycle.MemoryCandidateLifecycle": 1,
+        "openminion.modules.memory.runtime.policies.DefaultCapsuleRefreshPolicyEngine": 1,
+        "openminion.modules.memory.runtime.policies.DefaultPromotionPolicyEngine": 1,
+        "openminion.modules.memory.runtime.policies.DefaultRetentionPolicyEngine": 1,
+        "openminion.modules.memory.runtime.policies.DefaultRetrievalPolicyEngine": 1,
+        "openminion.modules.memory.runtime.promotion.PromotionPolicy": 1,
+        "openminion.modules.memory.service.base.MemoryService": 1,
+        "openminion.modules.memory.storage.audit.AuditedMemoryStore": 1,
+        "openminion.modules.memory.storage.audit.SQLiteMemoryAuditSink": 1,
+        "openminion.modules.memory.storage.sqlite.store.SQLiteMemoryStore": 1
+      },
+      "audit database connection among them": false
+    },
+    "after the cyclic collector": {
+      "open connections to the audit database": 0,
+      "rename": "ok",
+      "delete": "ok"
+    }
+  },
+  "separate memctl process": {
+    "command": "python -m openminion.modules.memory approve c2 --reviewer agent --db <tmp>/test.db",
+    "exit code": 0,
+    "output": "Approved: c2",
+    "files next to test.db after exit": [
+      "test.audit.db"
+    ],
+    "rename right after exit": "ok",
+    "delete right after exit": "ok"
+  }
+}
+3.11.11 win32
+
+== dev sources from here on: git checkout b670bbb6 -- src scripts/baselines
+
+== [dev] pytest -q -p no:cacheprovider -rf --tb=line <focused: tests/memory/test_memctl_service_close.py tests/memory/test_cli_read_commands.py tests/memory/test_memory_review_cli.py tests/memory/test_utility_plan_cli.py tests/memory/test_operability.py tests/memory/test_operability_postgres.py tests/architecture/test_marker_discipline.py>
+C:\Users\User\AppData\Roaming\uv\python\cpython-3.11.11-windows-x86_64-none\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): 'C:\\Users\\User\\AppData\\Local\\Temp\\tmp8ch35283\\test.audit.db'
+C:\Users\User\AppData\Roaming\uv\python\cpython-3.11.11-windows-x86_64-none\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): 'C:\\Users\\User\\AppData\\Local\\Temp\\tmpptbwrner\\test.audit.db'
+C:\Users\User\AppData\Roaming\uv\python\cpython-3.11.11-windows-x86_64-none\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): 'C:\\Users\\User\\AppData\\Local\\Temp\\tmpma4vhcal\\test.audit.db'
+=========================== short test summary info ===========================
+FAILED tests/memory/test_memctl_service_close.py::test_write_command_closes_its_service_and_audit_database[args0-Approved: c1-approved-audited0]
+FAILED tests/memory/test_memctl_service_close.py::test_write_command_closes_its_service_and_audit_database[args1-Rejected: c1-rejected-audited1]
+FAILED tests/memory/test_memctl_service_close.py::test_write_command_closes_its_service_and_audit_database[args2-Promoted: 1, Failed: 0-promoted-audited2]
+FAILED tests/memory/test_memctl_service_close.py::test_read_command_closes_its_service_without_opening_the_audit_database
+FAILED tests/memory/test_memctl_service_close.py::test_failing_write_command_closes_its_service
+FAILED tests/memory/test_memctl_service_close.py::test_command_failing_after_an_audited_write_closes_its_service
+FAILED tests/memory/test_memctl_service_close.py::test_command_raising_an_unexpected_error_closes_its_service
+FAILED tests/memory/test_memctl_service_close.py::test_service_built_outside_a_command_is_closed_by_its_caller
+FAILED tests/memory/test_cli_read_commands.py::TestCLIWriteCommands::test_approve_command
+FAILED tests/memory/test_cli_read_commands.py::TestCLIWriteCommands::test_promote_approved_command
+FAILED tests/memory/test_cli_read_commands.py::TestCLIWriteCommands::test_reject_command
+11 failed, 28 passed, 2 skipped in 6.49s
+
+== [dev] pytest -q -p no:cacheprovider -rf --tb=line <related: tests/memory/test_bundle_provenance_roundtrip.py tests/memory/test_cli_provenance_and_forget.py tests/memory/test_memory_blocks_cli.py tests/memory/test_tool_failure_diagnostics.py tests/integration/test_memory_export_import.py tests/integration/test_operability.py tests/memory/test_audit_trail.py>
+C:\Users\User\AppData\Roaming\uv\python\cpython-3.11.11-windows-x86_64-none\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): 'C:\\Users\\User\\AppData\\Local\\Temp\\tmpvbe3f534\\test.audit.db'
+C:\Users\User\AppData\Roaming\uv\python\cpython-3.11.11-windows-x86_64-none\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): 'C:\\Users\\User\\AppData\\Local\\Temp\\tmpd1ezq3lu\\test.audit.db'
+C:\Users\User\AppData\Roaming\uv\python\cpython-3.11.11-windows-x86_64-none\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): 'C:\\Users\\User\\AppData\\Local\\Temp\\tmprscw3l11\\test.audit.db'
+C:\Users\User\AppData\Roaming\uv\python\cpython-3.11.11-windows-x86_64-none\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): 'C:\\Users\\User\\AppData\\Local\\Temp\\tmp7mn1azhv\\test.audit.db'
+C:\Users\User\AppData\Roaming\uv\python\cpython-3.11.11-windows-x86_64-none\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): 'C:\\Users\\User\\AppData\\Local\\Temp\\tmpqwfkaiuu\\test.audit.db'
+C:\Users\User\AppData\Roaming\uv\python\cpython-3.11.11-windows-x86_64-none\Lib\tempfile.py:893: PermissionError: [WinError 32] (localized message trimmed): 'C:\\Users\\User\\AppData\\Local\\Temp\\tmpub9ib_79\\test.audit.db'
+=========================== short test summary info ===========================
+FAILED tests/memory/test_cli_provenance_and_forget.py::TestMemoryForgetCLI::test_audit_fields_persist_on_batch_forget
+FAILED tests/memory/test_cli_provenance_and_forget.py::TestMemoryForgetCLI::test_audit_fields_persist_on_real_sqlite_store
+FAILED tests/memory/test_cli_provenance_and_forget.py::TestMemoryForgetCLI::test_forget_by_source_apply_mutates
+FAILED tests/memory/test_cli_provenance_and_forget.py::TestMemoryForgetCLI::test_forget_by_source_pages_through_large_scope
+FAILED tests/memory/test_cli_provenance_and_forget.py::TestMemoryForgetCLI::test_forget_emits_delete_event_to_audit_sink
+FAILED tests/memory/test_cli_provenance_and_forget.py::TestMemoryForgetCLI::test_forget_single_memory
+6 failed, 54 passed in 20.05s
+
+== [dev] the issue's probe: python probe_memctl_audit_sink.py
+{
+  "in-process (CliRunner)": {
+    "command": "memctl approve c1 --reviewer agent --db <tmp>/test.db (CliRunner, GC disabled)",
+    "exit code": 0,
+    "output": "Approved: c1",
+    "audit database": "test.audit.db",
+    "after the command returns": {
+      "open connections to the audit database": 1,
+      "opened at": [
+        [
+          "openminion/modules/memory/storage/audit.py:38 _connect",
+          "openminion/modules/memory/storage/audit.py:69 append_event",
+          "openminion/modules/memory/storage/audit.py:158 _append",
+          "openminion/modules/memory/storage/audit.py:331 candidate_update"
+        ]
+      ],
+      "rename": "PermissionError [WinError 32]"
+    },
+    "cyclic collector": {
+      "unreachable objects found": true,
+      "openminion objects among them": {
+        "openminion.modules.memory.portability.service.MemoryBundleServiceOps": 1,
+        "openminion.modules.memory.runtime.candidate_lifecycle.MemoryCandidateLifecycle": 1,
+        "openminion.modules.memory.runtime.policies.DefaultCapsuleRefreshPolicyEngine": 1,
+        "openminion.modules.memory.runtime.policies.DefaultPromotionPolicyEngine": 1,
+        "openminion.modules.memory.runtime.policies.DefaultRetentionPolicyEngine": 1,
+        "openminion.modules.memory.runtime.policies.DefaultRetrievalPolicyEngine": 1,
+        "openminion.modules.memory.runtime.promotion.PromotionPolicy": 1,
+        "openminion.modules.memory.service.base.MemoryService": 1,
+        "openminion.modules.memory.storage.audit.AuditedMemoryStore": 1,
+        "openminion.modules.memory.storage.audit.SQLiteMemoryAuditSink": 1,
+        "openminion.modules.memory.storage.sqlite.store.SQLiteMemoryStore": 1
+      },
+      "audit database connection among them": true
+    },
+    "after the cyclic collector": {
+      "open connections to the audit database": 0,
+      "rename": "ok",
+      "delete": "ok"
+    }
+  },
+  "separate memctl process": {
+    "command": "python -m openminion.modules.memory approve c2 --reviewer agent --db <tmp>/test.db",
+    "exit code": 0,
+    "output": "Approved: c2",
+    "files next to test.db after exit": [
+      "test.audit.db"
+    ],
+    "rename right after exit": "ok",
+    "delete right after exit": "ok"
+  }
+}
+3.11.11 win32
+
+== back to the head: git status --short
+
+== ruff check / ruff format --check on the 7 changed Python files
+All checks passed!
+7 files already formatted

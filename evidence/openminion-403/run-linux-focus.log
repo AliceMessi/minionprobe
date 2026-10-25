@@ -1,0 +1,207 @@
+head: 6aa73f15 docs(changelog): note memctl closing its store and audit database
+dev:  b670bbb6 Merge pull request #415 from AliceMessi/fix/400-pg-evidence-ref-decode
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+packages: psycopg 3.3.6;SQLAlchemy 2.1.6;typer 0.27.3;
+OPENMINION_TEST_POSTGRES_URL set: yes
+592c272d186c698fe2df0eb8a43a0edd1df8be200e63c11319c777c11f232814  /tmp/ev/probe_memctl_audit_sink.py
+a4a3acfdb6cf969832d9a66143a938af58c72c36890033f99da3326c5e82a763  /tmp/ev/run403.sh
+
+== [head] pytest -q -p no:cacheprovider -rf --tb=line <focused>
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+.........................................                                [100%]
+41 passed in 3.91s
+
+== [head] the PostgreSQL memctl operability tests, with -m postgres
+
+..                                                                       [100%]
+2 passed in 0.52s
+
+== [head] pytest -q -p no:cacheprovider -rf --tb=line <related>
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+............................................................             [100%]
+60 passed in 4.42s
+
+== [head] the issue's probe: PYTHONPATH=src:. python probe_memctl_audit_sink.py
+{
+  "in-process (CliRunner)": {
+    "command": "memctl approve c1 --reviewer agent --db <tmp>/test.db (CliRunner, GC disabled)",
+    "exit code": 0,
+    "output": "Approved: c1",
+    "audit database": "test.audit.db",
+    "after the command returns": {
+      "open connections to the audit database": 0,
+      "opened at": [],
+      "rename": "ok"
+    },
+    "cyclic collector": {
+      "unreachable objects found": true,
+      "openminion objects among them": {
+        "openminion.modules.memory.portability.service.MemoryBundleServiceOps": 1,
+        "openminion.modules.memory.runtime.candidate_lifecycle.MemoryCandidateLifecycle": 1,
+        "openminion.modules.memory.runtime.policies.DefaultCapsuleRefreshPolicyEngine": 1,
+        "openminion.modules.memory.runtime.policies.DefaultPromotionPolicyEngine": 1,
+        "openminion.modules.memory.runtime.policies.DefaultRetentionPolicyEngine": 1,
+        "openminion.modules.memory.runtime.policies.DefaultRetrievalPolicyEngine": 1,
+        "openminion.modules.memory.runtime.promotion.PromotionPolicy": 1,
+        "openminion.modules.memory.service.base.MemoryService": 1,
+        "openminion.modules.memory.storage.audit.AuditedMemoryStore": 1,
+        "openminion.modules.memory.storage.audit.SQLiteMemoryAuditSink": 1,
+        "openminion.modules.memory.storage.sqlite.store.SQLiteMemoryStore": 1
+      },
+      "audit database connection among them": false
+    },
+    "after the cyclic collector": {
+      "open connections to the audit database": 0,
+      "rename": "ok",
+      "delete": "ok"
+    }
+  },
+  "separate memctl process": {
+    "command": "python -m openminion.modules.memory approve c2 --reviewer agent --db <tmp>/test.db",
+    "exit code": 0,
+    "output": "Approved: c2",
+    "files next to test.db after exit": [
+      "test.audit.db"
+    ],
+    "rename right after exit": "ok",
+    "delete right after exit": "ok"
+  }
+}
+3.11.17 linux
+
+== dev sources from here on: git checkout b670bbb6 -- src scripts/baselines
+M  scripts/baselines/method_loc_baseline.tsv
+M  src/openminion/modules/memory/cli.py
+M  src/openminion/modules/memory/review_cli.py
+
+== [dev] pytest -q -p no:cacheprovider -rf --tb=line <focused>
+  ?     ^
+  -     1,
+  ?     ^
+  +     0,
+  ?     ^
+    )
+FAILED tests/memory/test_memctl_service_close.py::test_service_built_outside_a_command_is_closed_by_its_caller - AssertionError: assert ['/tmp/pytest...est.audit.db'] == []
+  
+  Left contains one more item: '/tmp/pytest-of-runner/pytest-3/test_service_built_outside_a_c0/test.audit.db'
+  
+  Full diff:
+  - []
+  + [
+  +     '/tmp/pytest-of-runner/pytest-3/test_service_built_outside_a_c0/test.audit.db',
+  + ]
+8 failed, 33 passed in 5.39s
+
+== [dev] the PostgreSQL memctl operability tests, with -m postgres
+
+..                                                                       [100%]
+2 passed in 0.47s
+
+== [dev] pytest -q -p no:cacheprovider -rf --tb=line <related>
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+............................................................             [100%]
+60 passed in 4.00s
+
+== [dev] the issue's probe: PYTHONPATH=src:. python probe_memctl_audit_sink.py
+{
+  "in-process (CliRunner)": {
+    "command": "memctl approve c1 --reviewer agent --db <tmp>/test.db (CliRunner, GC disabled)",
+    "exit code": 0,
+    "output": "Approved: c1",
+    "audit database": "test.audit.db",
+    "after the command returns": {
+      "open connections to the audit database": 1,
+      "opened at": [
+        [
+          "openminion/modules/memory/storage/audit.py:38 _connect",
+          "openminion/modules/memory/storage/audit.py:69 append_event",
+          "openminion/modules/memory/storage/audit.py:158 _append",
+          "openminion/modules/memory/storage/audit.py:331 candidate_update"
+        ]
+      ],
+      "rename": "ok"
+    },
+    "cyclic collector": {
+      "unreachable objects found": true,
+      "openminion objects among them": {
+        "openminion.modules.memory.portability.service.MemoryBundleServiceOps": 1,
+        "openminion.modules.memory.runtime.candidate_lifecycle.MemoryCandidateLifecycle": 1,
+        "openminion.modules.memory.runtime.policies.DefaultCapsuleRefreshPolicyEngine": 1,
+        "openminion.modules.memory.runtime.policies.DefaultPromotionPolicyEngine": 1,
+        "openminion.modules.memory.runtime.policies.DefaultRetentionPolicyEngine": 1,
+        "openminion.modules.memory.runtime.policies.DefaultRetrievalPolicyEngine": 1,
+        "openminion.modules.memory.runtime.promotion.PromotionPolicy": 1,
+        "openminion.modules.memory.service.base.MemoryService": 1,
+        "openminion.modules.memory.storage.audit.AuditedMemoryStore": 1,
+        "openminion.modules.memory.storage.audit.SQLiteMemoryAuditSink": 1,
+        "openminion.modules.memory.storage.sqlite.store.SQLiteMemoryStore": 1
+      },
+      "audit database connection among them": true
+    },
+    "after the cyclic collector": {
+      "open connections to the audit database": 0,
+      "rename": "ok",
+      "delete": "ok"
+    }
+  },
+  "separate memctl process": {
+    "command": "python -m openminion.modules.memory approve c2 --reviewer agent --db <tmp>/test.db",
+    "exit code": 0,
+    "output": "Approved: c2",
+    "files next to test.db after exit": [
+      "test.audit.db"
+    ],
+    "rename right after exit": "ok",
+    "delete right after exit": "ok"
+  }
+}
+3.11.17 linux
+
+== back to the branch head
+
+== ruff check .
+All checks passed!
+
+== make format-check
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m ruff format --check "/home/runner/work/linux-runner/linux-runner"
+5112 files already formatted
+
+== make workflow-check
+[INFO] This may take a few minutes...
+Lint GitHub Actions workflow files.......................................Passed
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/action_pins.py
+workflow action pins: clean
+
+== make lint
+[coo-10] clean — webhook secret-required contract preserved
+Skipping workspace browser tool-family contract validator (not present in standalone checkout).
+make typecheck
+make[1]: Entering directory '/home/runner/work/linux-runner/linux-runner'
+cd "/home/runner/work/linux-runner/linux-runner" && /home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4309; baseline total: 4309
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 290
+[tcr] api: 77 / 77 | monthly quota -50 | next target <= 27 | headroom 0
+[tcr] cli: 309 / 309 | monthly quota -50 | next target <= 259 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 222 / 222 | monthly quota -50 | next target <= 172 | headroom 0
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+make lint exit: 0
+
+== make test-critical
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+482 passed, 4 skipped, 1 warning in 12.75s
