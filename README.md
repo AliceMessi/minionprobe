@@ -6,10 +6,10 @@
 
 Built for [Cortensor Hackathon #5](https://dorahacks.io/hackathon/2418/detail). MinionProbe is a QA helper for builders who want to know which OpenMinion features work on *their* provider before they build on them.
 
-**Impact so far (24 Oct 2026):**
-- **17 bugs filed upstream** from MinionProbe runs and follow-up probes (the latest five, #388–#392, on 24 Oct at the maintainer's request, awaiting triage).
-- **19 fix PRs by us merged** into OpenMinion `dev` (table in [Fix PRs](#fix-prs-bug-fix-bonus)). The fixes that shipped were re-verified on the released packages: `openminion==0.1.10` ([evidence](evidence/openminion-0.1.10-verification)) and `openminion==0.1.11`, which ships seven more of our fixes ([evidence](evidence/openminion-0.1.11-verification); every check passed for #352, #353, #361, #365, #368, #373, #378).
-- **8 more issues** opened by the maintainer while reviewing our PRs were taken on: 6 already merged (including #372, the run-status facts table with migration 13, and #380 for #368), #364 in review (#385) and #369 scheduled.
+**Impact so far (25 Oct 2026):**
+- **26 bugs filed upstream** from MinionProbe runs and follow-up probes (the latest, [#408](https://github.com/openminion/openminion/issues/408), on 25 Oct at the maintainer's request in the #385 merge comment).
+- **20 fix PRs by us merged** into OpenMinion `dev` (table in [Fix PRs](#fix-prs-bug-fix-bonus)). The fixes that shipped were re-verified on the released packages: `openminion==0.1.10` ([evidence](evidence/openminion-0.1.10-verification)) and `openminion==0.1.11`, which ships seven more of our fixes ([evidence](evidence/openminion-0.1.11-verification); every check passed for #352, #353, #361, #365, #368, #373, #378).
+- **8 more issues** opened by the maintainer while reviewing our PRs were taken on: 7 already merged (including #372, the run-status facts table with migration 13, #380 for #368, and #385 for #364 with migration 14), and #369 in review (#406).
 
 ▶ **Demo video (2:10):** https://youtu.be/5aBN0y6YQeA. It shows an offline run, the matrix, bug #324 reproduced live, the triage agent and the filed issues. Terminal scenes are replays of real captured runs.
 
@@ -53,6 +53,7 @@ The maintainers confirmed all seven reports, and every fix PR below was reviewed
 | [#373](https://github.com/openminion/openminion/issues/373) migration runner leaves SQLite connections open until GC, blocking database cleanup on Windows (found while isolating #366) | [#377](https://github.com/openminion/openminion/pull/377), evidence [`openminion-373`](evidence/openminion-373). The OMX import case was split out as [#378](https://github.com/openminion/openminion/issues/378) at the maintainer's request |
 | [#378](https://github.com/openminion/openminion/issues/378) OMX import leaves the target SQLite connection open until GC, blocking file cleanup on Windows (split out of #373) | [#379](https://github.com/openminion/openminion/pull/379), evidence [`openminion-omx-close`](evidence/openminion-omx-close) |
 | [#368](https://github.com/openminion/openminion/issues/368) runtime memory assembly never closes the store it creates; with PostgreSQL the engine stays open (disclosed in review of #366) | [#380](https://github.com/openminion/openminion/pull/380), live PostgreSQL close-chain evidence in [`openminion-368`](evidence/openminion-368) |
+| [#364](https://github.com/openminion/openminion/issues/364) tied participant join timestamps reorder listings and the active-agent fallback (opened by the maintainer) | [#385](https://github.com/openminion/openminion/pull/385): runtime migration 14 (`join_seq`) and a session-row lock for joins and leaves, evidence [`openminion-364`](evidence/openminion-364). The first-active-agent race was split out as [#393](https://github.com/openminion/openminion/issues/393), and the tests' own Windows cleanup problem as [#408](https://github.com/openminion/openminion/issues/408) (evidence [`openminion-windows-test-cleanup`](evidence/openminion-windows-test-cleanup)), at the maintainer's request |
 
 ## Quick start
 
