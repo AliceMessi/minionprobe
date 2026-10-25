@@ -1,0 +1,627 @@
+head: f60cc798 docs(changelog): note case-sensitive run event selection on SQLite
+dev:  b670bbb6 Merge pull request #415 from AliceMessi/fix/400-pg-evidence-ref-decode
+CPython 3.11.17; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+13d7eb4ea2a02cab27da71ac6d2f893727215c91ed1943866323c757158600ee  /tmp/ev/plans_396_pg.py
+59664fb1103880be5e5d5ce7f49f00518d2de2fa86cd9b549ad7c1c138a7b858  /tmp/ev/run396b.sh
+
+== [head] plans_396_pg.py 40 100
+sessions 40, turns per session 100, events 48000, probe session index 20; seeded in 100 s
+
+-- summarize_recent_runs, scan_limit 200
+   | Nested Loop (actual rows=34 loops=1)
+   |   Buffers: shared hit=2696
+   |   ->  GroupAggregate (actual rows=34 loops=1)
+   |         Group Key: f.run_key
+   |         Buffers: shared hit=2594
+   |         ->  Sort (actual rows=204 loops=1)
+   |               Sort Key: f.run_key
+   |               Sort Method: quicksort  Memory: 36kB
+   |               Buffers: shared hit=2594
+   |               ->  Nested Loop (actual rows=204 loops=1)
+   |                     Buffers: shared hit=2594
+   |                     ->  Nested Loop (actual rows=408 loops=1)
+   |                           Buffers: shared hit=1370
+   |                           ->  Unique (actual rows=34 loops=1)
+   |                                 Buffers: shared hit=1228
+   |                                 ->  Sort (actual rows=200 loops=1)
+   |                                       Sort Key: recent.run_key_digest, recent.run_key
+   |                                       Sort Method: quicksort  Memory: 34kB
+   |                                       Buffers: shared hit=1228
+   |                                       ->  Subquery Scan on recent (actual rows=200 loops=1)
+   |                                             Filter: (recent.run_key <> ''::text)
+   |                                             Buffers: shared hit=1228
+   |                                             ->  Limit (actual rows=200 loops=1)
+   |                                                   Buffers: shared hit=1228
+   |                                                   ->  Sort (actual rows=200 loops=1)
+   |                                                         Sort Key: w.event_id DESC
+   |                                                         Sort Method: top-N heapsort  Memory: 53kB
+   |                                                         Buffers: shared hit=1228
+   |                                                         ->  Hash Join (actual rows=600 loops=1)
+   |                                                               Hash Cond: (we.id = w.event_id)
+   |                                                               Buffers: shared hit=1228
+   |                                                               ->  Seq Scan on events we (actual rows=24000 loops=1)
+   |                                                                     Filter: (substr(event_type, 1, 4) = 'run.'::text)
+   |                                                                     Rows Removed by Filter: 24000
+   |                                                                     Buffers: shared hit=1091
+   |                                                               ->  Hash (actual rows=1200 loops=1)
+   |                                                                     Buckets: 2048  Batches: 1  Memory Usage: 91kB
+   |                                                                     Buffers: shared hit=137
+   |                                                                     ->  Bitmap Heap Scan on event_run_facts w (actual rows=1200 loops=1)
+   |                                                                           Recheck Cond: (session_id = 'c69a9d9356d74759bb32662d136fc335'::text)
+   |                                                                           Heap Blocks: exact=118
+   |                                                                           Buffers: shared hit=137
+   |                                                                           ->  Bitmap Index Scan on idx_event_run_facts_run (actual rows=1200 loops=1)
+   |                                                                                 Index Cond: (session_id = 'c69a9d9356d74759bb32662d136fc335'::text)
+   |                                                                                 Buffers: shared hit=19
+   |                           ->  Bitmap Heap Scan on event_run_facts f (actual rows=12 loops=34)
+   |                                 Recheck Cond: ((session_id = 'c69a9d9356d74759bb32662d136fc335'::text) AND (run_key_digest = recent.run_key_digest))
+   |                                 Filter: (recent.run_key = run_key)
+   |                                 Heap Blocks: exact=40
+   |                                 Buffers: shared hit=142
+   |                                 ->  Bitmap Index Scan on idx_event_run_facts_run (actual rows=12 loops=34)
+   |                                       Index Cond: ((session_id = 'c69a9d9356d74759bb32662d136fc335'::text) AND (run_key_digest = recent.run_key_digest))
+   |                                       Buffers: shared hit=102
+   |                     ->  Index Scan using events_pkey on events e (actual rows=0 loops=408)
+   |                           Index Cond: (id = f.event_id)
+   |                           Filter: (substr(event_type, 1, 4) = 'run.'::text)
+   |                           Rows Removed by Filter: 0
+   |                           Buffers: shared hit=1224
+   |   ->  Index Scan using events_pkey on events head (actual rows=1 loops=34)
+   |         Index Cond: (id = (min(f.event_id)))
+   |         Buffers: shared hit=102
+   | Planning:
+   |   Buffers: shared hit=28
+
+-- list_run_events
+   | Limit (actual rows=6 loops=1)
+   |   Buffers: shared hit=40
+   |   ->  Sort (actual rows=6 loops=1)
+   |         Sort Key: e.id DESC
+   |         Sort Method: quicksort  Memory: 26kB
+   |         Buffers: shared hit=40
+   |         ->  Nested Loop (actual rows=6 loops=1)
+   |               Buffers: shared hit=40
+   |               ->  Bitmap Heap Scan on event_run_facts f (actual rows=12 loops=1)
+   |                     Recheck Cond: ((session_id = 'c69a9d9356d74759bb32662d136fc335'::text) AND (run_key_digest = 'b02c482782251443'::text))
+   |                     Filter: (run_key = '"r5"'::text)
+   |                     Heap Blocks: exact=1
+   |                     Buffers: shared hit=4
+   |                     ->  Bitmap Index Scan on idx_event_run_facts_run (actual rows=12 loops=1)
+   |                           Index Cond: ((session_id = 'c69a9d9356d74759bb32662d136fc335'::text) AND (run_key_digest = 'b02c482782251443'::text))
+   |                           Buffers: shared hit=3
+   |               ->  Index Scan using events_pkey on events e (actual rows=0 loops=12)
+   |                     Index Cond: (id = f.event_id)
+   |                     Filter: (substr(event_type, 1, 4) = 'run.'::text)
+   |                     Rows Removed by Filter: 0
+   |                     Buffers: shared hit=36
+   | Planning:
+   |   Buffers: shared hit=14
+-- list_session_runs(scan_limit=200) median of 15: 12.5 ms
+
+-- summarize_recent_runs, scan_limit 2000
+   | Nested Loop (actual rows=100 loops=1)
+   |   Buffers: shared hit=5550
+   |   ->  GroupAggregate (actual rows=100 loops=1)
+   |         Group Key: f.run_key
+   |         Buffers: shared hit=5250
+   |         ->  Sort (actual rows=600 loops=1)
+   |               Sort Key: f.run_key
+   |               Sort Method: quicksort  Memory: 60kB
+   |               Buffers: shared hit=5250
+   |               ->  Nested Loop (actual rows=600 loops=1)
+   |                     Buffers: shared hit=5250
+   |                     ->  Nested Loop (actual rows=1200 loops=1)
+   |                           Buffers: shared hit=1650
+   |                           ->  Unique (actual rows=100 loops=1)
+   |                                 Buffers: shared hit=1228
+   |                                 ->  Sort (actual rows=600 loops=1)
+   |                                       Sort Key: recent.run_key_digest, recent.run_key
+   |                                       Sort Method: quicksort  Memory: 53kB
+   |                                       Buffers: shared hit=1228
+   |                                       ->  Subquery Scan on recent (actual rows=600 loops=1)
+   |                                             Filter: (recent.run_key <> ''::text)
+   |                                             Buffers: shared hit=1228
+   |                                             ->  Limit (actual rows=600 loops=1)
+   |                                                   Buffers: shared hit=1228
+   |                                                   ->  Sort (actual rows=600 loops=1)
+   |                                                         Sort Key: w.event_id DESC
+   |                                                         Sort Method: quicksort  Memory: 67kB
+   |                                                         Buffers: shared hit=1228
+   |                                                         ->  Hash Join (actual rows=600 loops=1)
+   |                                                               Hash Cond: (we.id = w.event_id)
+   |                                                               Buffers: shared hit=1228
+   |                                                               ->  Seq Scan on events we (actual rows=24000 loops=1)
+   |                                                                     Filter: (substr(event_type, 1, 4) = 'run.'::text)
+   |                                                                     Rows Removed by Filter: 24000
+   |                                                                     Buffers: shared hit=1091
+   |                                                               ->  Hash (actual rows=1200 loops=1)
+   |                                                                     Buckets: 2048  Batches: 1  Memory Usage: 91kB
+   |                                                                     Buffers: shared hit=137
+   |                                                                     ->  Bitmap Heap Scan on event_run_facts w (actual rows=1200 loops=1)
+   |                                                                           Recheck Cond: (session_id = 'c69a9d9356d74759bb32662d136fc335'::text)
+   |                                                                           Heap Blocks: exact=118
+   |                                                                           Buffers: shared hit=137
+   |                                                                           ->  Bitmap Index Scan on idx_event_run_facts_run (actual rows=1200 loops=1)
+   |                                                                                 Index Cond: (session_id = 'c69a9d9356d74759bb32662d136fc335'::text)
+   |                                                                                 Buffers: shared hit=19
+   |                           ->  Bitmap Heap Scan on event_run_facts f (actual rows=12 loops=100)
+   |                                 Recheck Cond: ((session_id = 'c69a9d9356d74759bb32662d136fc335'::text) AND (run_key_digest = recent.run_key_digest))
+   |                                 Filter: (recent.run_key = run_key)
+   |                                 Heap Blocks: exact=118
+   |                                 Buffers: shared hit=422
+   |                                 ->  Bitmap Index Scan on idx_event_run_facts_run (actual rows=12 loops=100)
+   |                                       Index Cond: ((session_id = 'c69a9d9356d74759bb32662d136fc335'::text) AND (run_key_digest = recent.run_key_digest))
+   |                                       Buffers: shared hit=304
+   |                     ->  Index Scan using events_pkey on events e (actual rows=0 loops=1200)
+   |                           Index Cond: (id = f.event_id)
+   |                           Filter: (substr(event_type, 1, 4) = 'run.'::text)
+   |                           Rows Removed by Filter: 0
+   |                           Buffers: shared hit=3600
+   |   ->  Index Scan using events_pkey on events head (actual rows=1 loops=100)
+   |         Index Cond: (id = (min(f.event_id)))
+   |         Buffers: shared hit=300
+   | Planning:
+   |   Buffers: shared hit=28
+-- list_session_runs(scan_limit=2000) median of 15: 14.8 ms
+-- list_session_run_events median of 15: 1.1 ms
+
+== [head] plans_396_pg.py 8 500
+sessions 8, turns per session 500, events 48000, probe session index 4; seeded in 99 s
+
+-- summarize_recent_runs, scan_limit 200
+   | Nested Loop (actual rows=34 loops=1)
+   |   Buffers: shared hit=3250
+   |   ->  GroupAggregate (actual rows=34 loops=1)
+   |         Group Key: f.run_key
+   |         Buffers: shared hit=3148
+   |         ->  Sort (actual rows=204 loops=1)
+   |               Sort Key: f.run_key
+   |               Sort Method: quicksort  Memory: 36kB
+   |               Buffers: shared hit=3148
+   |               ->  Nested Loop (actual rows=204 loops=1)
+   |                     Buffers: shared hit=3148
+   |                     ->  Nested Loop (actual rows=408 loops=1)
+   |                           Buffers: shared hit=1924
+   |                           ->  Unique (actual rows=34 loops=1)
+   |                                 Buffers: shared hit=1783
+   |                                 ->  Sort (actual rows=200 loops=1)
+   |                                       Sort Key: recent.run_key_digest, recent.run_key
+   |                                       Sort Method: quicksort  Memory: 34kB
+   |                                       Buffers: shared hit=1783
+   |                                       ->  Subquery Scan on recent (actual rows=200 loops=1)
+   |                                             Filter: (recent.run_key <> ''::text)
+   |                                             Buffers: shared hit=1783
+   |                                             ->  Limit (actual rows=200 loops=1)
+   |                                                   Buffers: shared hit=1783
+   |                                                   ->  Sort (actual rows=200 loops=1)
+   |                                                         Sort Key: w.event_id DESC
+   |                                                         Sort Method: top-N heapsort  Memory: 53kB
+   |                                                         Buffers: shared hit=1783
+   |                                                         ->  Hash Join (actual rows=3000 loops=1)
+   |                                                               Hash Cond: (w.event_id = we.id)
+   |                                                               Buffers: shared hit=1783
+   |                                                               ->  Bitmap Heap Scan on event_run_facts w (actual rows=6000 loops=1)
+   |                                                                     Recheck Cond: (session_id = 'eeb45fdda9bf43718ef7c15eb78e4a80'::text)
+   |                                                                     Heap Blocks: exact=590
+   |                                                                     Buffers: shared hit=675
+   |                                                                     ->  Bitmap Index Scan on idx_event_run_facts_run (actual rows=6000 loops=1)
+   |                                                                           Index Cond: (session_id = 'eeb45fdda9bf43718ef7c15eb78e4a80'::text)
+   |                                                                           Buffers: shared hit=85
+   |                                                               ->  Hash (actual rows=24000 loops=1)
+   |                                                                     Buckets: 32768 (originally 1024)  Batches: 1 (originally 1)  Memory Usage: 1194kB
+   |                                                                     Buffers: shared hit=1108
+   |                                                                     ->  Seq Scan on events we (actual rows=24000 loops=1)
+   |                                                                           Filter: (substr(event_type, 1, 4) = 'run.'::text)
+   |                                                                           Rows Removed by Filter: 24000
+   |                                                                           Buffers: shared hit=1108
+   |                           ->  Bitmap Heap Scan on event_run_facts f (actual rows=12 loops=34)
+   |                                 Recheck Cond: ((session_id = 'eeb45fdda9bf43718ef7c15eb78e4a80'::text) AND (run_key_digest = recent.run_key_digest))
+   |                                 Filter: (recent.run_key = run_key)
+   |                                 Heap Blocks: exact=39
+   |                                 Buffers: shared hit=141
+   |                                 ->  Bitmap Index Scan on idx_event_run_facts_run (actual rows=12 loops=34)
+   |                                       Index Cond: ((session_id = 'eeb45fdda9bf43718ef7c15eb78e4a80'::text) AND (run_key_digest = recent.run_key_digest))
+   |                                       Buffers: shared hit=102
+   |                     ->  Index Scan using events_pkey on events e (actual rows=0 loops=408)
+   |                           Index Cond: (id = f.event_id)
+   |                           Filter: (substr(event_type, 1, 4) = 'run.'::text)
+   |                           Rows Removed by Filter: 0
+   |                           Buffers: shared hit=1224
+   |   ->  Index Scan using events_pkey on events head (actual rows=1 loops=34)
+   |         Index Cond: (id = (min(f.event_id)))
+   |         Buffers: shared hit=102
+   | Planning:
+   |   Buffers: shared hit=28
+
+-- list_run_events
+   | Limit (actual rows=6 loops=1)
+   |   Buffers: shared hit=40
+   |   ->  Sort (actual rows=6 loops=1)
+   |         Sort Key: e.id DESC
+   |         Sort Method: quicksort  Memory: 26kB
+   |         Buffers: shared hit=40
+   |         ->  Nested Loop (actual rows=6 loops=1)
+   |               Buffers: shared hit=40
+   |               ->  Bitmap Heap Scan on event_run_facts f (actual rows=12 loops=1)
+   |                     Recheck Cond: ((session_id = 'eeb45fdda9bf43718ef7c15eb78e4a80'::text) AND (run_key_digest = 'b02c482782251443'::text))
+   |                     Filter: (run_key = '"r5"'::text)
+   |                     Heap Blocks: exact=1
+   |                     Buffers: shared hit=4
+   |                     ->  Bitmap Index Scan on idx_event_run_facts_run (actual rows=12 loops=1)
+   |                           Index Cond: ((session_id = 'eeb45fdda9bf43718ef7c15eb78e4a80'::text) AND (run_key_digest = 'b02c482782251443'::text))
+   |                           Buffers: shared hit=3
+   |               ->  Index Scan using events_pkey on events e (actual rows=0 loops=12)
+   |                     Index Cond: (id = f.event_id)
+   |                     Filter: (substr(event_type, 1, 4) = 'run.'::text)
+   |                     Rows Removed by Filter: 0
+   |                     Buffers: shared hit=36
+   | Planning:
+   |   Buffers: shared hit=14
+-- list_session_runs(scan_limit=200) median of 15: 15.0 ms
+
+-- summarize_recent_runs, scan_limit 2000
+   | Nested Loop (actual rows=334 loops=1)
+   |   Buffers: shared hit=16212
+   |   ->  GroupAggregate (actual rows=334 loops=1)
+   |         Group Key: f.run_key
+   |         Buffers: shared hit=15210
+   |         ->  Sort (actual rows=2004 loops=1)
+   |               Sort Key: f.run_key
+   |               Sort Method: quicksort  Memory: 166kB
+   |               Buffers: shared hit=15210
+   |               ->  Nested Loop (actual rows=2004 loops=1)
+   |                     Buffers: shared hit=15210
+   |                     ->  Nested Loop (actual rows=4008 loops=1)
+   |                           Buffers: shared hit=3186
+   |                           ->  Unique (actual rows=334 loops=1)
+   |                                 Buffers: shared hit=1783
+   |                                 ->  Sort (actual rows=2000 loops=1)
+   |                                       Sort Key: recent.run_key_digest, recent.run_key
+   |                                       Sort Method: quicksort  Memory: 142kB
+   |                                       Buffers: shared hit=1783
+   |                                       ->  Subquery Scan on recent (actual rows=2000 loops=1)
+   |                                             Filter: (recent.run_key <> ''::text)
+   |                                             Buffers: shared hit=1783
+   |                                             ->  Limit (actual rows=2000 loops=1)
+   |                                                   Buffers: shared hit=1783
+   |                                                   ->  Sort (actual rows=2000 loops=1)
+   |                                                         Sort Key: w.event_id DESC
+   |                                                         Sort Method: quicksort  Memory: 307kB
+   |                                                         Buffers: shared hit=1783
+   |                                                         ->  Hash Join (actual rows=3000 loops=1)
+   |                                                               Hash Cond: (w.event_id = we.id)
+   |                                                               Buffers: shared hit=1783
+   |                                                               ->  Bitmap Heap Scan on event_run_facts w (actual rows=6000 loops=1)
+   |                                                                     Recheck Cond: (session_id = 'eeb45fdda9bf43718ef7c15eb78e4a80'::text)
+   |                                                                     Heap Blocks: exact=590
+   |                                                                     Buffers: shared hit=675
+   |                                                                     ->  Bitmap Index Scan on idx_event_run_facts_run (actual rows=6000 loops=1)
+   |                                                                           Index Cond: (session_id = 'eeb45fdda9bf43718ef7c15eb78e4a80'::text)
+   |                                                                           Buffers: shared hit=85
+   |                                                               ->  Hash (actual rows=24000 loops=1)
+   |                                                                     Buckets: 32768 (originally 1024)  Batches: 1 (originally 1)  Memory Usage: 1194kB
+   |                                                                     Buffers: shared hit=1108
+   |                                                                     ->  Seq Scan on events we (actual rows=24000 loops=1)
+   |                                                                           Filter: (substr(event_type, 1, 4) = 'run.'::text)
+   |                                                                           Rows Removed by Filter: 24000
+   |                                                                           Buffers: shared hit=1108
+   |                           ->  Bitmap Heap Scan on event_run_facts f (actual rows=12 loops=334)
+   |                                 Recheck Cond: ((session_id = 'eeb45fdda9bf43718ef7c15eb78e4a80'::text) AND (run_key_digest = recent.run_key_digest))
+   |                                 Filter: (recent.run_key = run_key)
+   |                                 Heap Blocks: exact=393
+   |                                 Buffers: shared hit=1403
+   |                                 ->  Bitmap Index Scan on idx_event_run_facts_run (actual rows=12 loops=334)
+   |                                       Index Cond: ((session_id = 'eeb45fdda9bf43718ef7c15eb78e4a80'::text) AND (run_key_digest = recent.run_key_digest))
+   |                                       Buffers: shared hit=1010
+   |                     ->  Index Scan using events_pkey on events e (actual rows=0 loops=4008)
+   |                           Index Cond: (id = f.event_id)
+   |                           Filter: (substr(event_type, 1, 4) = 'run.'::text)
+   |                           Rows Removed by Filter: 0
+   |                           Buffers: shared hit=12024
+   |   ->  Index Scan using events_pkey on events head (actual rows=1 loops=334)
+   |         Index Cond: (id = (min(f.event_id)))
+   |         Buffers: shared hit=1002
+   | Planning:
+   |   Buffers: shared hit=28
+-- list_session_runs(scan_limit=2000) median of 15: 25.5 ms
+-- list_session_run_events median of 15: 1.1 ms
+
+== dev sources from here on: git checkout b670bbb6 -- src
+
+== [dev] plans_396_pg.py 40 100
+sessions 40, turns per session 100, events 48000, probe session index 20; seeded in 100 s
+
+-- summarize_recent_runs, scan_limit 200
+   | Nested Loop (actual rows=34 loops=1)
+   |   Buffers: shared hit=2273
+   |   ->  GroupAggregate (actual rows=34 loops=1)
+   |         Group Key: f.run_key
+   |         Buffers: shared hit=2171
+   |         ->  Sort (actual rows=204 loops=1)
+   |               Sort Key: f.run_key
+   |               Sort Method: quicksort  Memory: 36kB
+   |               Buffers: shared hit=2171
+   |               ->  Nested Loop (actual rows=204 loops=1)
+   |                     Buffers: shared hit=2171
+   |                     ->  Hash Join (actual rows=408 loops=1)
+   |                           Hash Cond: ((f.run_key_digest = recent.run_key_digest) AND (f.run_key = recent.run_key))
+   |                           Buffers: shared hit=947
+   |                           ->  Bitmap Heap Scan on event_run_facts f (actual rows=1200 loops=1)
+   |                                 Recheck Cond: (session_id = 'e346ad3aab8c489ea5840acd53c6cdfb'::text)
+   |                                 Heap Blocks: exact=118
+   |                                 Buffers: shared hit=137
+   |                                 ->  Bitmap Index Scan on idx_event_run_facts_run (actual rows=1200 loops=1)
+   |                                       Index Cond: (session_id = 'e346ad3aab8c489ea5840acd53c6cdfb'::text)
+   |                                       Buffers: shared hit=19
+   |                           ->  Hash (actual rows=34 loops=1)
+   |                                 Buckets: 1024  Batches: 1  Memory Usage: 10kB
+   |                                 Buffers: shared hit=810
+   |                                 ->  Unique (actual rows=34 loops=1)
+   |                                       Buffers: shared hit=810
+   |                                       ->  Sort (actual rows=200 loops=1)
+   |                                             Sort Key: recent.run_key_digest, recent.run_key
+   |                                             Sort Method: quicksort  Memory: 34kB
+   |                                             Buffers: shared hit=810
+   |                                             ->  Subquery Scan on recent (actual rows=200 loops=1)
+   |                                                   Filter: (recent.run_key <> ''::text)
+   |                                                   Buffers: shared hit=810
+   |                                                   ->  Limit (actual rows=200 loops=1)
+   |                                                         Buffers: shared hit=810
+   |                                                         ->  Merge Join (actual rows=200 loops=1)
+   |                                                               Merge Cond: (w.event_id = we.id)
+   |                                                               Buffers: shared hit=810
+   |                                                               ->  Index Scan Backward using event_run_facts_pkey on event_run_facts w (actual rows=401 loops=1)
+   |                                                                     Filter: (session_id = 'e346ad3aab8c489ea5840acd53c6cdfb'::text)
+   |                                                                     Rows Removed by Filter: 15672
+   |                                                                     Buffers: shared hit=354
+   |                                                               ->  Index Scan Backward using events_pkey on events we (actual rows=8036 loops=1)
+   |                                                                     Filter: (event_type ~~ 'run.%'::text)
+   |                                                                     Rows Removed by Filter: 8037
+   |                                                                     Buffers: shared hit=456
+   |                     ->  Index Scan using events_pkey on events e (actual rows=0 loops=408)
+   |                           Index Cond: (id = f.event_id)
+   |                           Filter: (event_type ~~ 'run.%'::text)
+   |                           Rows Removed by Filter: 0
+   |                           Buffers: shared hit=1224
+   |   ->  Index Scan using events_pkey on events head (actual rows=1 loops=34)
+   |         Index Cond: (id = (min(f.event_id)))
+   |         Buffers: shared hit=102
+   | Planning:
+   |   Buffers: shared hit=28
+
+-- list_run_events
+   | Limit (actual rows=6 loops=1)
+   |   Buffers: shared hit=40
+   |   ->  Sort (actual rows=6 loops=1)
+   |         Sort Key: e.id DESC
+   |         Sort Method: quicksort  Memory: 26kB
+   |         Buffers: shared hit=40
+   |         ->  Nested Loop (actual rows=6 loops=1)
+   |               Buffers: shared hit=40
+   |               ->  Bitmap Heap Scan on event_run_facts f (actual rows=12 loops=1)
+   |                     Recheck Cond: ((session_id = 'e346ad3aab8c489ea5840acd53c6cdfb'::text) AND (run_key_digest = 'b02c482782251443'::text))
+   |                     Filter: (run_key = '"r5"'::text)
+   |                     Heap Blocks: exact=1
+   |                     Buffers: shared hit=4
+   |                     ->  Bitmap Index Scan on idx_event_run_facts_run (actual rows=12 loops=1)
+   |                           Index Cond: ((session_id = 'e346ad3aab8c489ea5840acd53c6cdfb'::text) AND (run_key_digest = 'b02c482782251443'::text))
+   |                           Buffers: shared hit=3
+   |               ->  Index Scan using events_pkey on events e (actual rows=0 loops=12)
+   |                     Index Cond: (id = f.event_id)
+   |                     Filter: (event_type ~~ 'run.%'::text)
+   |                     Rows Removed by Filter: 0
+   |                     Buffers: shared hit=36
+   | Planning:
+   |   Buffers: shared hit=14
+-- list_session_runs(scan_limit=200) median of 15: 8.2 ms
+
+-- summarize_recent_runs, scan_limit 2000
+   | Nested Loop (actual rows=100 loops=1)
+   |   Buffers: shared hit=5265
+   |   ->  GroupAggregate (actual rows=100 loops=1)
+   |         Group Key: f.run_key
+   |         Buffers: shared hit=4965
+   |         ->  Sort (actual rows=600 loops=1)
+   |               Sort Key: f.run_key
+   |               Sort Method: quicksort  Memory: 60kB
+   |               Buffers: shared hit=4965
+   |               ->  Nested Loop (actual rows=600 loops=1)
+   |                     Buffers: shared hit=4965
+   |                     ->  Hash Join (actual rows=1200 loops=1)
+   |                           Hash Cond: ((f.run_key_digest = recent.run_key_digest) AND (f.run_key = recent.run_key))
+   |                           Buffers: shared hit=1365
+   |                           ->  Bitmap Heap Scan on event_run_facts f (actual rows=1200 loops=1)
+   |                                 Recheck Cond: (session_id = 'e346ad3aab8c489ea5840acd53c6cdfb'::text)
+   |                                 Heap Blocks: exact=118
+   |                                 Buffers: shared hit=137
+   |                                 ->  Bitmap Index Scan on idx_event_run_facts_run (actual rows=1200 loops=1)
+   |                                       Index Cond: (session_id = 'e346ad3aab8c489ea5840acd53c6cdfb'::text)
+   |                                       Buffers: shared hit=19
+   |                           ->  Hash (actual rows=100 loops=1)
+   |                                 Buckets: 1024  Batches: 1  Memory Usage: 14kB
+   |                                 Buffers: shared hit=1228
+   |                                 ->  HashAggregate (actual rows=100 loops=1)
+   |                                       Group Key: recent.run_key_digest, recent.run_key
+   |                                       Batches: 1  Memory Usage: 24kB
+   |                                       Buffers: shared hit=1228
+   |                                       ->  Subquery Scan on recent (actual rows=600 loops=1)
+   |                                             Filter: (recent.run_key <> ''::text)
+   |                                             Buffers: shared hit=1228
+   |                                             ->  Limit (actual rows=600 loops=1)
+   |                                                   Buffers: shared hit=1228
+   |                                                   ->  Sort (actual rows=600 loops=1)
+   |                                                         Sort Key: w.event_id DESC
+   |                                                         Sort Method: quicksort  Memory: 67kB
+   |                                                         Buffers: shared hit=1228
+   |                                                         ->  Hash Join (actual rows=600 loops=1)
+   |                                                               Hash Cond: (we.id = w.event_id)
+   |                                                               Buffers: shared hit=1228
+   |                                                               ->  Seq Scan on events we (actual rows=24000 loops=1)
+   |                                                                     Filter: (event_type ~~ 'run.%'::text)
+   |                                                                     Rows Removed by Filter: 24000
+   |                                                                     Buffers: shared hit=1091
+   |                                                               ->  Hash (actual rows=1200 loops=1)
+   |                                                                     Buckets: 2048  Batches: 1  Memory Usage: 91kB
+   |                                                                     Buffers: shared hit=137
+   |                                                                     ->  Bitmap Heap Scan on event_run_facts w (actual rows=1200 loops=1)
+   |                                                                           Recheck Cond: (session_id = 'e346ad3aab8c489ea5840acd53c6cdfb'::text)
+   |                                                                           Heap Blocks: exact=118
+   |                                                                           Buffers: shared hit=137
+   |                                                                           ->  Bitmap Index Scan on idx_event_run_facts_run (actual rows=1200 loops=1)
+   |                                                                                 Index Cond: (session_id = 'e346ad3aab8c489ea5840acd53c6cdfb'::text)
+   |                                                                                 Buffers: shared hit=19
+   |                     ->  Index Scan using events_pkey on events e (actual rows=0 loops=1200)
+   |                           Index Cond: (id = f.event_id)
+   |                           Filter: (event_type ~~ 'run.%'::text)
+   |                           Rows Removed by Filter: 0
+   |                           Buffers: shared hit=3600
+   |   ->  Index Scan using events_pkey on events head (actual rows=1 loops=100)
+   |         Index Cond: (id = (min(f.event_id)))
+   |         Buffers: shared hit=300
+   | Planning:
+   |   Buffers: shared hit=28
+-- list_session_runs(scan_limit=2000) median of 15: 11.6 ms
+-- list_session_run_events median of 15: 1.1 ms
+
+== [dev] plans_396_pg.py 8 500
+sessions 8, turns per session 500, events 48000, probe session index 4; seeded in 100 s
+
+-- summarize_recent_runs, scan_limit 200
+   | Nested Loop (actual rows=34 loops=1)
+   |   Buffers: shared hit=2137
+   |   ->  GroupAggregate (actual rows=34 loops=1)
+   |         Group Key: f.run_key
+   |         Buffers: shared hit=2035
+   |         ->  Sort (actual rows=204 loops=1)
+   |               Sort Key: f.run_key
+   |               Sort Method: quicksort  Memory: 36kB
+   |               Buffers: shared hit=2035
+   |               ->  Nested Loop (actual rows=204 loops=1)
+   |                     Buffers: shared hit=2035
+   |                     ->  Hash Join (actual rows=408 loops=1)
+   |                           Hash Cond: ((f.run_key_digest = recent.run_key_digest) AND (f.run_key = recent.run_key))
+   |                           Buffers: shared hit=811
+   |                           ->  Bitmap Heap Scan on event_run_facts f (actual rows=6000 loops=1)
+   |                                 Recheck Cond: (session_id = 'd09ea06b717a4e96890907b3147eac39'::text)
+   |                                 Heap Blocks: exact=590
+   |                                 Buffers: shared hit=642
+   |                                 ->  Bitmap Index Scan on idx_event_run_facts_session (actual rows=6000 loops=1)
+   |                                       Index Cond: (session_id = 'd09ea06b717a4e96890907b3147eac39'::text)
+   |                                       Buffers: shared hit=52
+   |                           ->  Hash (actual rows=34 loops=1)
+   |                                 Buckets: 1024  Batches: 1  Memory Usage: 10kB
+   |                                 Buffers: shared hit=169
+   |                                 ->  HashAggregate (actual rows=34 loops=1)
+   |                                       Group Key: recent.run_key_digest, recent.run_key
+   |                                       Batches: 1  Memory Usage: 40kB
+   |                                       Buffers: shared hit=169
+   |                                       ->  Subquery Scan on recent (actual rows=200 loops=1)
+   |                                             Filter: (recent.run_key <> ''::text)
+   |                                             Buffers: shared hit=169
+   |                                             ->  Limit (actual rows=200 loops=1)
+   |                                                   Buffers: shared hit=169
+   |                                                   ->  Merge Join (actual rows=200 loops=1)
+   |                                                         Merge Cond: (w.event_id = we.id)
+   |                                                         Buffers: shared hit=169
+   |                                                         ->  Index Scan Backward using event_run_facts_pkey on event_run_facts w (actual rows=401 loops=1)
+   |                                                               Filter: (session_id = 'd09ea06b717a4e96890907b3147eac39'::text)
+   |                                                               Rows Removed by Filter: 2808
+   |                                                               Buffers: shared hit=73
+   |                                                         ->  Index Scan Backward using events_pkey on events we (actual rows=1604 loops=1)
+   |                                                               Filter: (event_type ~~ 'run.%'::text)
+   |                                                               Rows Removed by Filter: 1605
+   |                                                               Buffers: shared hit=96
+   |                     ->  Index Scan using events_pkey on events e (actual rows=0 loops=408)
+   |                           Index Cond: (id = f.event_id)
+   |                           Filter: (event_type ~~ 'run.%'::text)
+   |                           Rows Removed by Filter: 0
+   |                           Buffers: shared hit=1224
+   |   ->  Index Scan using events_pkey on events head (actual rows=1 loops=34)
+   |         Index Cond: (id = (min(f.event_id)))
+   |         Buffers: shared hit=102
+   | Planning:
+   |   Buffers: shared hit=28
+
+-- list_run_events
+   | Limit (actual rows=6 loops=1)
+   |   Buffers: shared hit=40
+   |   ->  Sort (actual rows=6 loops=1)
+   |         Sort Key: e.id DESC
+   |         Sort Method: quicksort  Memory: 26kB
+   |         Buffers: shared hit=40
+   |         ->  Nested Loop (actual rows=6 loops=1)
+   |               Buffers: shared hit=40
+   |               ->  Bitmap Heap Scan on event_run_facts f (actual rows=12 loops=1)
+   |                     Recheck Cond: ((session_id = 'd09ea06b717a4e96890907b3147eac39'::text) AND (run_key_digest = 'b02c482782251443'::text))
+   |                     Filter: (run_key = '"r5"'::text)
+   |                     Heap Blocks: exact=1
+   |                     Buffers: shared hit=4
+   |                     ->  Bitmap Index Scan on idx_event_run_facts_run (actual rows=12 loops=1)
+   |                           Index Cond: ((session_id = 'd09ea06b717a4e96890907b3147eac39'::text) AND (run_key_digest = 'b02c482782251443'::text))
+   |                           Buffers: shared hit=3
+   |               ->  Index Scan using events_pkey on events e (actual rows=0 loops=12)
+   |                     Index Cond: (id = f.event_id)
+   |                     Filter: (event_type ~~ 'run.%'::text)
+   |                     Rows Removed by Filter: 0
+   |                     Buffers: shared hit=36
+   | Planning:
+   |   Buffers: shared hit=14
+-- list_session_runs(scan_limit=200) median of 15: 5.8 ms
+
+-- summarize_recent_runs, scan_limit 2000
+   | Nested Loop (actual rows=334 loops=1)
+   |   Buffers: shared hit=15291
+   |   ->  GroupAggregate (actual rows=334 loops=1)
+   |         Group Key: f.run_key
+   |         Buffers: shared hit=14289
+   |         ->  Sort (actual rows=2004 loops=1)
+   |               Sort Key: f.run_key
+   |               Sort Method: quicksort  Memory: 166kB
+   |               Buffers: shared hit=14289
+   |               ->  Nested Loop (actual rows=2004 loops=1)
+   |                     Buffers: shared hit=14289
+   |                     ->  Hash Join (actual rows=4008 loops=1)
+   |                           Hash Cond: ((f.run_key_digest = recent.run_key_digest) AND (f.run_key = recent.run_key))
+   |                           Buffers: shared hit=2265
+   |                           ->  Bitmap Heap Scan on event_run_facts f (actual rows=6000 loops=1)
+   |                                 Recheck Cond: (session_id = 'd09ea06b717a4e96890907b3147eac39'::text)
+   |                                 Heap Blocks: exact=590
+   |                                 Buffers: shared hit=642
+   |                                 ->  Bitmap Index Scan on idx_event_run_facts_session (actual rows=6000 loops=1)
+   |                                       Index Cond: (session_id = 'd09ea06b717a4e96890907b3147eac39'::text)
+   |                                       Buffers: shared hit=52
+   |                           ->  Hash (actual rows=334 loops=1)
+   |                                 Buckets: 1024  Batches: 1  Memory Usage: 27kB
+   |                                 Buffers: shared hit=1623
+   |                                 ->  HashAggregate (actual rows=334 loops=1)
+   |                                       Group Key: recent.run_key_digest, recent.run_key
+   |                                       Batches: 1  Memory Usage: 73kB
+   |                                       Buffers: shared hit=1623
+   |                                       ->  Subquery Scan on recent (actual rows=2000 loops=1)
+   |                                             Filter: (recent.run_key <> ''::text)
+   |                                             Buffers: shared hit=1623
+   |                                             ->  Limit (actual rows=2000 loops=1)
+   |                                                   Buffers: shared hit=1623
+   |                                                   ->  Merge Join (actual rows=2000 loops=1)
+   |                                                         Merge Cond: (w.event_id = we.id)
+   |                                                         Buffers: shared hit=1623
+   |                                                         ->  Index Scan Backward using event_run_facts_pkey on event_run_facts w (actual rows=4001 loops=1)
+   |                                                               Filter: (session_id = 'd09ea06b717a4e96890907b3147eac39'::text)
+   |                                                               Rows Removed by Filter: 28008
+   |                                                               Buffers: shared hit=703
+   |                                                         ->  Index Scan Backward using events_pkey on events we (actual rows=16004 loops=1)
+   |                                                               Filter: (event_type ~~ 'run.%'::text)
+   |                                                               Rows Removed by Filter: 16005
+   |                                                               Buffers: shared hit=920
+   |                     ->  Index Scan using events_pkey on events e (actual rows=0 loops=4008)
+   |                           Index Cond: (id = f.event_id)
+   |                           Filter: (event_type ~~ 'run.%'::text)
+   |                           Rows Removed by Filter: 0
+   |                           Buffers: shared hit=12024
+   |   ->  Index Scan using events_pkey on events head (actual rows=1 loops=334)
+   |         Index Cond: (id = (min(f.event_id)))
+   |         Buffers: shared hit=1002
+   | Planning:
+   |   Buffers: shared hit=28
+-- list_session_runs(scan_limit=2000) median of 15: 22.1 ms
+-- list_session_run_events median of 15: 1.1 ms

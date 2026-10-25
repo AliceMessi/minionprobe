@@ -1,0 +1,50 @@
+fix/396-run-reader-case-sensitive-prefix @ f60cc7982a1d5e3fd9c3d7c24a5062879bbc41f3 (worktree clean: True) and dev @ b670bbb61a3e7a67eeeb90cfa40e28ccf58c1726
+native Windows 11 Pro 10.0.22631, CPython 3.11.11 SQLite 3.47.1, PYTHONPATH="src;."
+OPENMINION_TEST_POSTGRES_URL is not set here, so the PostgreSQL cases skip
+
+== [head] pytest -q -p no:cacheprovider -rf --tb=line <focused: tests/test_run_status.py tests/integration/test_runtime_storage_postgres.py tests/test_session_store.py tests/test_conversation_lifecycle.py tests/architecture/test_marker_discipline.py>
+..................ssssssssssssssssssssss................................ [ 54%]
+...........................................................              [100%]
+109 passed, 22 skipped in 9.74s
+
+== [dev sources: git checkout b670bbb6 -- src] the same
+C:\Users\User\Downloads\agentprize\projects\cortensor-hackathon-5\om-396\tests\_run_status_scenarios.py:258: AssertionError: (1, 1)
+C:\Users\User\Downloads\agentprize\projects\cortensor-hackathon-5\om-396\tests\_run_status_scenarios.py:512: AssertionError
+C:\Users\User\Downloads\agentprize\projects\cortensor-hackathon-5\om-396\tests\_run_status_scenarios.py:258: AssertionError: (1, 1)
+=========================== short test summary info ===========================
+FAILED tests/test_run_status.py::test_run_readers_normalize_payload_values_as_the_python_readers
+FAILED tests/test_run_status.py::test_run_readers_match_the_run_prefix_case_sensitively
+FAILED tests/test_session_store.py::SessionStoreTests::test_event_facts_migration_backfills_existing_history
+3 failed, 106 passed, 22 skipped in 9.12s
+
+== back to the head: git status --short
+
+== [head] the issue's probe: python probe_run_event_type_case.py <work_dir>
+SQLite
+  stored event types: ["run.queued", "run.running", "RUN.failed", "run.queued", "Run.completed"]
+  list_session_runs: [{"run_id": "r2", "state": "queued", "event_count": 1, "ended": false, "error": ""}, {"run_id": "r1", "state": "running", "event_count": 2, "ended": false, "error": ""}]
+  list_session_run_events r1: ["run.queued -> queued", "run.running -> running"]
+  list_session_run_events r2: ["run.queued -> queued"]
+  resolve_thread_lifecycle conv/t: {"latest_run_id": "r2", "latest_run_state": "queued", "thread_state": "awaiting_response"}
+  resolve_invocation_terminal (trigger: event 3 RUN.failed): null
+  count_events(event_type_prefix='run.'): 5
+PostgreSQL
+  skipped: OPENMINION_TEST_POSTGRES_URL not set
+openminion 0.1.11 from checkout f60cc798 | python 3.11.11 win32
+
+== [dev sources] the issue's probe
+SQLite
+  stored event types: ["run.queued", "run.running", "RUN.failed", "run.queued", "Run.completed"]
+  list_session_runs: [{"run_id": "r2", "state": "running", "event_count": 2, "ended": false, "error": ""}, {"run_id": "r1", "state": "failed", "event_count": 3, "ended": true, "error": "boom"}]
+  list_session_run_events r1: ["run.queued -> queued", "run.running -> running", "RUN.failed -> failed"]
+  list_session_run_events r2: ["run.queued -> queued", "Run.completed -> running"]
+  resolve_thread_lifecycle conv/t: {"latest_run_id": "r2", "latest_run_state": "queued", "thread_state": "awaiting_response"}
+  resolve_invocation_terminal (trigger: event 3 RUN.failed): null
+  count_events(event_type_prefix='run.'): 5
+PostgreSQL
+  skipped: OPENMINION_TEST_POSTGRES_URL not set
+openminion 0.1.11 from checkout f60cc798 | python 3.11.11 win32
+
+== ruff check / ruff format --check on the 4 changed Python files
+All checks passed!
+4 files already formatted

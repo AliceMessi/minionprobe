@@ -1,0 +1,355 @@
+head: f60cc798 docs(changelog): note case-sensitive run event selection on SQLite
+dev:  b670bbb6 Merge pull request #415 from AliceMessi/fix/400-pg-evidence-ref-decode
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+packages: psycopg 3.3.6;sophiagraph 0.0.12;SQLAlchemy 2.1.6;
+OPENMINION_TEST_POSTGRES_URL set: yes
+PostgreSQL: Traceback (most recent call last):
+  File "/home/runner/work/linux-runner/linux-runner/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/home/runner/work/linux-runner/linux-runner/.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+  File "/home/runner/work/linux-runner/linux-runner/.venv/lib/python3.11/site-packages/psycopg/cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+psycopg.errors.UndefinedObject: unrecognized configuration parameter "lc_collate"
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<stdin>", line 4, in <module>
+  File "/home/runner/work/linux-runner/linux-runner/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1463, in execute
+    return meth(
+           ^^^^^
+  File "/home/runner/work/linux-runner/linux-runner/.venv/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 533, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/linux-runner/linux-runner/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1683, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/linux-runner/linux-runner/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1837, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/linux-runner/linux-runner/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1977, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/home/runner/work/linux-runner/linux-runner/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2347, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/home/runner/work/linux-runner/linux-runner/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/home/runner/work/linux-runner/linux-runner/.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+  File "/home/runner/work/linux-runner/linux-runner/.venv/lib/python3.11/site-packages/psycopg/cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedObject) unrecognized configuration parameter "lc_collate"
+[SQL: SHOW lc_collate]
+(Background on this error at: https://sqlalche.me/e/21/f405)
+f287dae0c88b2abe6a09a3fcf1f2709f06c8689015b40baf584715bb53a14d52  /tmp/ev/plans_396.py
+d5f914fbda98f664e34f3bfd3e44f26628cb6438f45e8279e4878c6557ea807c  /tmp/ev/probe_run_event_type_case.py
+ec38afaccd4903738d362c85456dbee4f94293014fd4b05178708b2c0054fdb7  /tmp/ev/run396.sh
+
+== [head] pytest -q -p no:cacheprovider -rf --tb=line <focused>
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+........................................................................ [ 54%]
+...........................................................              [100%]
+131 passed in 19.03s
+
+== [head] the PostgreSQL tests, with -m postgres: tests/integration/test_runtime_storage_postgres.py (the postgres-memory-retrieval job's command)
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+......................                                                   [100%]
+22 passed in 11.33s
+-- the new case test alone: 1 passed in 0.34s
+
+== [head] pytest -q -p no:cacheprovider -rf --tb=line <related>
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+........................................................................ [ 74%]
+.........................                                                [100%]
+97 passed in 45.40s
+
+== [head] the issue's probe: PYTHONPATH=src:. python probe_run_event_type_case.py <work_dir>
+SQLite
+  stored event types: ["run.queued", "run.running", "RUN.failed", "run.queued", "Run.completed"]
+  list_session_runs: [{"run_id": "r2", "state": "queued", "event_count": 1, "ended": false, "error": ""}, {"run_id": "r1", "state": "running", "event_count": 2, "ended": false, "error": ""}]
+  list_session_run_events r1: ["run.queued -> queued", "run.running -> running"]
+  list_session_run_events r2: ["run.queued -> queued"]
+  resolve_thread_lifecycle conv/t: {"latest_run_id": "r2", "latest_run_state": "queued", "thread_state": "awaiting_response"}
+  resolve_invocation_terminal (trigger: event 3 RUN.failed): null
+  count_events(event_type_prefix='run.'): 5
+PostgreSQL
+  stored event types: ["run.queued", "run.running", "RUN.failed", "run.queued", "Run.completed"]
+  list_session_runs: [{"run_id": "r2", "state": "queued", "event_count": 1, "ended": false, "error": ""}, {"run_id": "r1", "state": "running", "event_count": 2, "ended": false, "error": ""}]
+  list_session_run_events r1: ["run.queued -> queued", "run.running -> running"]
+  list_session_run_events r2: ["run.queued -> queued"]
+  resolve_thread_lifecycle conv/t: {"latest_run_id": "r2", "latest_run_state": "queued", "thread_state": "awaiting_response"}
+  resolve_invocation_terminal (trigger: event 3 RUN.failed): null
+  count_events(event_type_prefix='run.'): 3
+openminion 0.1.11 from checkout f60cc798 | python 3.11.17 linux
+
+== [head] query plans: PYTHONPATH=src:. python plans_396.py <work_dir>
+== SQLite
+-- list_run_events
+   SQL: SELECT e.id, e.session_id, e.event_type, e.payload_json, e.created_at, e.canonical_event_id FROM event_run_facts AS f JOIN events AS e ON e.id = f.event_id WHERE f.session_id = ? AND f.run_key_digest = ? AND f.run_key = ? AND SUBSTR(e.event_type, 1, 4) = 'run.' ORDER BY f.event_id DESC LIMIT ?
+   parameters: 4
+   | SEARCH f USING INDEX idx_event_run_facts_run (session_id=? AND run_key_digest=?)
+   | SEARCH e USING INTEGER PRIMARY KEY (rowid=?)
+-- summarize_recent_runs
+   SQL: SELECT runs.run_key, runs.event_count, runs.last_id, runs.step_id, runs.error_id, runs.terminal_id, head.created_at AS started_at FROM ( SELECT f.run_key, COUNT(*) AS event_count, MIN(f.event_id) AS first_id, MAX(f.event_id) AS last_id, MAX(CASE WHEN f.has_step = 1 THEN f.event_id END) AS step_id, MAX(CASE WHEN f.has_error = 1 THEN f.event_id END) AS error_id, MAX(CASE WHEN f.run_state IN (?, ?, ?) THEN f.event_id END) AS terminal_id FROM ( SELECT DISTINCT recent.run_key_digest, recent.run_key FROM ( SELECT w.run_key_digest, w.run_key FROM event_run_facts AS w JOIN events AS we ON we.id = w.event_id WHERE w.session_id = ? AND SUBSTR(we.event_type, 1, 4) = 'run.' ORDER BY w.event_id DESC LIMIT ? ) AS recent WHERE recent.run_key <> '' ) AS listed JOIN event_run_facts AS f ON f.session_id = ? AND f.run_key_digest = listed.run_key_digest AND f.run_key = listed.run_key JOIN events AS e ON e.id = f.event_id WHERE SUBSTR(e.event_type, 1, 4) = 'run.' GROUP BY f.run_key ) AS runs JOIN events AS head ON head.id = runs.first_id
+   parameters: 6
+   | CO-ROUTINE runs
+   |   CO-ROUTINE listed
+   |     CO-ROUTINE recent
+   |       SEARCH w USING INDEX idx_event_run_facts_session (session_id=?)
+   |       SEARCH we USING INTEGER PRIMARY KEY (rowid=?)
+   |     SCAN recent
+   |     USE TEMP B-TREE FOR DISTINCT
+   |   SCAN listed
+   |   SEARCH f USING INDEX idx_event_run_facts_run (session_id=? AND run_key_digest=?)
+   |   SEARCH e USING INTEGER PRIMARY KEY (rowid=?)
+   |   USE TEMP B-TREE FOR GROUP BY
+   | SCAN runs
+   | SEARCH head USING INTEGER PRIMARY KEY (rowid=?)
+-- list_session_run_events('long', limit=50): 50
+-- list_session_runs(limit=20, scan_limit=200): 20
+-- rows read by both readers: 126
+== PostgreSQL
+-- list_run_events
+   SQL: SELECT e.id, e.session_id, e.event_type, e.payload_json, e.created_at, e.canonical_event_id FROM event_run_facts AS f JOIN events AS e ON e.id = f.event_id WHERE f.session_id = ? AND f.run_key_digest = ? AND f.run_key = ? AND SUBSTR(e.event_type, 1, 4) = 'run.' ORDER BY f.event_id DESC LIMIT ?
+   parameters: 4
+   | Limit (actual rows=50 loops=1)
+   |   ->  Sort (actual rows=50 loops=1)
+   |         Sort Key: e.id DESC
+   |         Sort Method: top-N heapsort  Memory: 51kB
+   |         ->  Nested Loop (actual rows=200 loops=1)
+   |               ->  Bitmap Heap Scan on event_run_facts f (actual rows=200 loops=1)
+   |                     Recheck Cond: ((session_id = '7d22df271f8d4191a5f63473727ed054'::text) AND (run_key_digest = 'c32c497df6730c97'::text))
+   |                     Filter: (run_key = '"long"'::text)
+   |                     Heap Blocks: exact=40
+   |                     ->  Bitmap Index Scan on idx_event_run_facts_run (actual rows=200 loops=1)
+   |                           Index Cond: ((session_id = '7d22df271f8d4191a5f63473727ed054'::text) AND (run_key_digest = 'c32c497df6730c97'::text))
+   |               ->  Index Scan using events_pkey on events e (actual rows=1 loops=200)
+   |                     Index Cond: (id = f.event_id)
+   |                     Filter: (substr(event_type, 1, 4) = 'run.'::text)
+-- summarize_recent_runs
+   SQL: SELECT runs.run_key, runs.event_count, runs.last_id, runs.step_id, runs.error_id, runs.terminal_id, head.created_at AS started_at FROM ( SELECT f.run_key, COUNT(*) AS event_count, MIN(f.event_id) AS first_id, MAX(f.event_id) AS last_id, MAX(CASE WHEN f.has_step = 1 THEN f.event_id END) AS step_id, MAX(CASE WHEN f.has_error = 1 THEN f.event_id END) AS error_id, MAX(CASE WHEN f.run_state IN (?, ?, ?) THEN f.event_id END) AS terminal_id FROM ( SELECT DISTINCT recent.run_key_digest, recent.run_key FROM ( SELECT w.run_key_digest, w.run_key FROM event_run_facts AS w JOIN events AS we ON we.id = w.event_id WHERE w.session_id = ? AND SUBSTR(we.event_type, 1, 4) = 'run.' ORDER BY w.event_id DESC LIMIT ? ) AS recent WHERE recent.run_key <> '' ) AS listed JOIN event_run_facts AS f ON f.session_id = ? AND f.run_key_digest = listed.run_key_digest AND f.run_key = listed.run_key JOIN events AS e ON e.id = f.event_id WHERE SUBSTR(e.event_type, 1, 4) = 'run.' GROUP BY f.run_key ) AS runs JOIN events AS head ON head.id = runs.first_id
+   parameters: 6
+   | Nested Loop (actual rows=36 loops=1)
+   |   ->  GroupAggregate (actual rows=36 loops=1)
+   |         Group Key: f.run_key
+   |         ->  Sort (actual rows=368 loops=1)
+   |               Sort Key: f.run_key
+   |               Sort Method: quicksort  Memory: 47kB
+   |               ->  Nested Loop (actual rows=368 loops=1)
+   |                     ->  Hash Join (actual rows=515 loops=1)
+   |                           Hash Cond: ((f.run_key_digest = recent.run_key_digest) AND (f.run_key = recent.run_key))
+   |                           ->  Seq Scan on event_run_facts f (actual rows=2400 loops=1)
+   |                                 Filter: (session_id = '7d22df271f8d4191a5f63473727ed054'::text)
+   |                                 Rows Removed by Filter: 2400
+   |                           ->  Hash (actual rows=36 loops=1)
+   |                                 Buckets: 1024  Batches: 1  Memory Usage: 11kB
+   |                                 ->  Unique (actual rows=36 loops=1)
+   |                                       ->  Sort (actual rows=200 loops=1)
+   |                                             Sort Key: recent.run_key_digest, recent.run_key
+   |                                             Sort Method: quicksort  Memory: 35kB
+   |                                             ->  Subquery Scan on recent (actual rows=200 loops=1)
+   |                                                   Filter: (recent.run_key <> ''::text)
+   |                                                   ->  Limit (actual rows=200 loops=1)
+   |                                                         ->  Sort (actual rows=200 loops=1)
+   |                                                               Sort Key: w.event_id DESC
+   |                                                               Sort Method: top-N heapsort  Memory: 53kB
+   |                                                               ->  Nested Loop (actual rows=1160 loops=1)
+   |                                                                     ->  Seq Scan on events we (actual rows=2320 loops=1)
+   |                                                                           Filter: (substr(event_type, 1, 4) = 'run.'::text)
+   |                                                                           Rows Removed by Filter: 2480
+   |                                                                     ->  Index Scan using event_run_facts_pkey on event_run_facts w (actual rows=0 loops=2320)
+   |                                                                           Index Cond: (event_id = we.id)
+   |                                                                           Filter: (session_id = '7d22df271f8d4191a5f63473727ed054'::text)
+   |                                                                           Rows Removed by Filter: 0
+   |                     ->  Index Scan using events_pkey on events e (actual rows=1 loops=515)
+   |                           Index Cond: (id = f.event_id)
+   |                           Filter: (substr(event_type, 1, 4) = 'run.'::text)
+   |                           Rows Removed by Filter: 0
+   |   ->  Index Scan using events_pkey on events head (actual rows=1 loops=36)
+   |         Index Cond: (id = (min(f.event_id)))
+-- list_session_run_events('long', limit=50): 50
+-- list_session_runs(limit=20, scan_limit=200): 20
+-- rows read by both readers: 126
+
+== dev sources from here on: git checkout b670bbb6 -- src
+M  src/openminion/modules/storage/runtime/session_store/lifecycle.py
+
+== [dev] pytest -q -p no:cacheprovider -rf --tb=line <focused>
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+.............FF..........................................F.............. [ 54%]
+...........................................................              [100%]
+=================================== FAILURES ===================================
+/home/runner/work/linux-runner/linux-runner/tests/_run_status_scenarios.py:258: AssertionError: (1, 1)
+/home/runner/work/linux-runner/linux-runner/tests/_run_status_scenarios.py:512: AssertionError
+/home/runner/work/linux-runner/linux-runner/tests/_run_status_scenarios.py:258: AssertionError: (1, 1)
+=========================== short test summary info ============================
+FAILED tests/test_run_status.py::test_run_readers_normalize_payload_values_as_the_python_readers - AssertionError: (1, 1)
+FAILED tests/test_run_status.py::test_run_readers_match_the_run_prefix_case_sensitively - AssertionError
+FAILED tests/test_session_store.py::SessionStoreTests::test_event_facts_migration_backfills_existing_history - AssertionError: (1, 1)
+3 failed, 128 passed in 15.70s
+
+== [dev] the PostgreSQL tests, with -m postgres: tests/integration/test_runtime_storage_postgres.py (the postgres-memory-retrieval job's command)
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+......................                                                   [100%]
+22 passed in 12.05s
+-- the new case test alone: 1 passed in 0.36s
+
+== [dev] pytest -q -p no:cacheprovider -rf --tb=line <related>
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+........................................................................ [ 74%]
+.........................                                                [100%]
+97 passed in 42.77s
+
+== [dev] the issue's probe: PYTHONPATH=src:. python probe_run_event_type_case.py <work_dir>
+SQLite
+  stored event types: ["run.queued", "run.running", "RUN.failed", "run.queued", "Run.completed"]
+  list_session_runs: [{"run_id": "r2", "state": "running", "event_count": 2, "ended": false, "error": ""}, {"run_id": "r1", "state": "failed", "event_count": 3, "ended": true, "error": "boom"}]
+  list_session_run_events r1: ["run.queued -> queued", "run.running -> running", "RUN.failed -> failed"]
+  list_session_run_events r2: ["run.queued -> queued", "Run.completed -> running"]
+  resolve_thread_lifecycle conv/t: {"latest_run_id": "r2", "latest_run_state": "queued", "thread_state": "awaiting_response"}
+  resolve_invocation_terminal (trigger: event 3 RUN.failed): null
+  count_events(event_type_prefix='run.'): 5
+PostgreSQL
+  stored event types: ["run.queued", "run.running", "RUN.failed", "run.queued", "Run.completed"]
+  list_session_runs: [{"run_id": "r2", "state": "queued", "event_count": 1, "ended": false, "error": ""}, {"run_id": "r1", "state": "running", "event_count": 2, "ended": false, "error": ""}]
+  list_session_run_events r1: ["run.queued -> queued", "run.running -> running"]
+  list_session_run_events r2: ["run.queued -> queued"]
+  resolve_thread_lifecycle conv/t: {"latest_run_id": "r2", "latest_run_state": "queued", "thread_state": "awaiting_response"}
+  resolve_invocation_terminal (trigger: event 3 RUN.failed): null
+  count_events(event_type_prefix='run.'): 3
+openminion 0.1.11 from checkout f60cc798 | python 3.11.17 linux
+
+== [dev] query plans: PYTHONPATH=src:. python plans_396.py <work_dir>
+== SQLite
+-- list_run_events
+   SQL: SELECT e.id, e.session_id, e.event_type, e.payload_json, e.created_at, e.canonical_event_id FROM event_run_facts AS f JOIN events AS e ON e.id = f.event_id WHERE f.session_id = ? AND f.run_key_digest = ? AND f.run_key = ? AND e.event_type LIKE ? ORDER BY f.event_id DESC LIMIT ?
+   parameters: 5
+   | SEARCH f USING INDEX idx_event_run_facts_run (session_id=? AND run_key_digest=?)
+   | SEARCH e USING INTEGER PRIMARY KEY (rowid=?)
+-- summarize_recent_runs
+   SQL: SELECT runs.run_key, runs.event_count, runs.last_id, runs.step_id, runs.error_id, runs.terminal_id, head.created_at AS started_at FROM ( SELECT f.run_key, COUNT(*) AS event_count, MIN(f.event_id) AS first_id, MAX(f.event_id) AS last_id, MAX(CASE WHEN f.has_step = 1 THEN f.event_id END) AS step_id, MAX(CASE WHEN f.has_error = 1 THEN f.event_id END) AS error_id, MAX(CASE WHEN f.run_state IN (?, ?, ?) THEN f.event_id END) AS terminal_id FROM ( SELECT DISTINCT recent.run_key_digest, recent.run_key FROM ( SELECT w.run_key_digest, w.run_key FROM event_run_facts AS w JOIN events AS we ON we.id = w.event_id WHERE w.session_id = ? AND we.event_type LIKE ? ORDER BY w.event_id DESC LIMIT ? ) AS recent WHERE recent.run_key <> '' ) AS listed JOIN event_run_facts AS f ON f.session_id = ? AND f.run_key_digest = listed.run_key_digest AND f.run_key = listed.run_key JOIN events AS e ON e.id = f.event_id WHERE e.event_type LIKE ? GROUP BY f.run_key ) AS runs JOIN events AS head ON head.id = runs.first_id
+   parameters: 8
+   | CO-ROUTINE runs
+   |   CO-ROUTINE listed
+   |     CO-ROUTINE recent
+   |       SEARCH w USING INDEX idx_event_run_facts_session (session_id=?)
+   |       SEARCH we USING INTEGER PRIMARY KEY (rowid=?)
+   |     SCAN recent
+   |     USE TEMP B-TREE FOR DISTINCT
+   |   SCAN listed
+   |   SEARCH f USING INDEX idx_event_run_facts_run (session_id=? AND run_key_digest=?)
+   |   SEARCH e USING INTEGER PRIMARY KEY (rowid=?)
+   |   USE TEMP B-TREE FOR GROUP BY
+   | SCAN runs
+   | SEARCH head USING INTEGER PRIMARY KEY (rowid=?)
+-- list_session_run_events('long', limit=50): 50
+-- list_session_runs(limit=20, scan_limit=200): 20
+-- rows read by both readers: 125
+== PostgreSQL
+-- list_run_events
+   SQL: SELECT e.id, e.session_id, e.event_type, e.payload_json, e.created_at, e.canonical_event_id FROM event_run_facts AS f JOIN events AS e ON e.id = f.event_id WHERE f.session_id = ? AND f.run_key_digest = ? AND f.run_key = ? AND e.event_type LIKE ? ORDER BY f.event_id DESC LIMIT ?
+   parameters: 5
+   | Limit (actual rows=50 loops=1)
+   |   ->  Sort (actual rows=50 loops=1)
+   |         Sort Key: e.id DESC
+   |         Sort Method: top-N heapsort  Memory: 51kB
+   |         ->  Nested Loop (actual rows=200 loops=1)
+   |               ->  Bitmap Heap Scan on event_run_facts f (actual rows=200 loops=1)
+   |                     Recheck Cond: ((session_id = '597f7214eb9b461496ecafcdb90c97cd'::text) AND (run_key_digest = 'c32c497df6730c97'::text))
+   |                     Filter: (run_key = '"long"'::text)
+   |                     Heap Blocks: exact=40
+   |                     ->  Bitmap Index Scan on idx_event_run_facts_run (actual rows=200 loops=1)
+   |                           Index Cond: ((session_id = '597f7214eb9b461496ecafcdb90c97cd'::text) AND (run_key_digest = 'c32c497df6730c97'::text))
+   |               ->  Index Scan using events_pkey on events e (actual rows=1 loops=200)
+   |                     Index Cond: (id = f.event_id)
+   |                     Filter: (event_type ~~ 'run.%'::text)
+-- summarize_recent_runs
+   SQL: SELECT runs.run_key, runs.event_count, runs.last_id, runs.step_id, runs.error_id, runs.terminal_id, head.created_at AS started_at FROM ( SELECT f.run_key, COUNT(*) AS event_count, MIN(f.event_id) AS first_id, MAX(f.event_id) AS last_id, MAX(CASE WHEN f.has_step = 1 THEN f.event_id END) AS step_id, MAX(CASE WHEN f.has_error = 1 THEN f.event_id END) AS error_id, MAX(CASE WHEN f.run_state IN (?, ?, ?) THEN f.event_id END) AS terminal_id FROM ( SELECT DISTINCT recent.run_key_digest, recent.run_key FROM ( SELECT w.run_key_digest, w.run_key FROM event_run_facts AS w JOIN events AS we ON we.id = w.event_id WHERE w.session_id = ? AND we.event_type LIKE ? ORDER BY w.event_id DESC LIMIT ? ) AS recent WHERE recent.run_key <> '' ) AS listed JOIN event_run_facts AS f ON f.session_id = ? AND f.run_key_digest = listed.run_key_digest AND f.run_key = listed.run_key JOIN events AS e ON e.id = f.event_id WHERE e.event_type LIKE ? GROUP BY f.run_key ) AS runs JOIN events AS head ON head.id = runs.first_id
+   parameters: 8
+   | Nested Loop (actual rows=36 loops=1)
+   |   ->  GroupAggregate (actual rows=36 loops=1)
+   |         Group Key: f.run_key
+   |         ->  Sort (actual rows=368 loops=1)
+   |               Sort Key: f.run_key
+   |               Sort Method: quicksort  Memory: 47kB
+   |               ->  Nested Loop (actual rows=368 loops=1)
+   |                     ->  Hash Join (actual rows=515 loops=1)
+   |                           Hash Cond: ((f.run_key_digest = recent.run_key_digest) AND (f.run_key = recent.run_key))
+   |                           ->  Seq Scan on event_run_facts f (actual rows=2400 loops=1)
+   |                                 Filter: (session_id = '597f7214eb9b461496ecafcdb90c97cd'::text)
+   |                                 Rows Removed by Filter: 2400
+   |                           ->  Hash (actual rows=36 loops=1)
+   |                                 Buckets: 1024  Batches: 1  Memory Usage: 11kB
+   |                                 ->  HashAggregate (actual rows=36 loops=1)
+   |                                       Group Key: recent.run_key_digest, recent.run_key
+   |                                       Batches: 1  Memory Usage: 40kB
+   |                                       ->  Subquery Scan on recent (actual rows=200 loops=1)
+   |                                             Filter: (recent.run_key <> ''::text)
+   |                                             ->  Limit (actual rows=200 loops=1)
+   |                                                   ->  Merge Join (actual rows=200 loops=1)
+   |                                                         Merge Cond: (w.event_id = we.id)
+   |                                                         ->  Index Scan Backward using event_run_facts_pkey on event_run_facts w (actual rows=414 loops=1)
+   |                                                               Filter: (session_id = '597f7214eb9b461496ecafcdb90c97cd'::text)
+   |                                                         ->  Index Scan Backward using events_pkey on events we (actual rows=200 loops=1)
+   |                                                               Filter: (event_type ~~ 'run.%'::text)
+   |                                                               Rows Removed by Filter: 214
+   |                     ->  Index Scan using events_pkey on events e (actual rows=1 loops=515)
+   |                           Index Cond: (id = f.event_id)
+   |                           Filter: (event_type ~~ 'run.%'::text)
+   |                           Rows Removed by Filter: 0
+   |   ->  Index Scan using events_pkey on events head (actual rows=1 loops=36)
+   |         Index Cond: (id = (min(f.event_id)))
+-- list_session_run_events('long', limit=50): 50
+-- list_session_runs(limit=20, scan_limit=200): 20
+-- rows read by both readers: 126
+
+== back to the branch head
+
+== ruff check .
+All checks passed!
+
+== make format-check
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m ruff format --check "/home/runner/work/linux-runner/linux-runner"
+5111 files already formatted
+
+== make workflow-check
+[INFO] This may take a few minutes...
+Lint GitHub Actions workflow files.......................................Passed
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/action_pins.py
+workflow action pins: clean
+
+== make lint
+[coo-10] clean — webhook secret-required contract preserved
+Skipping workspace browser tool-family contract validator (not present in standalone checkout).
+make typecheck
+make[1]: Entering directory '/home/runner/work/linux-runner/linux-runner'
+cd "/home/runner/work/linux-runner/linux-runner" && /home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4309; baseline total: 4309
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 290
+[tcr] api: 77 / 77 | monthly quota -50 | next target <= 27 | headroom 0
+[tcr] cli: 309 / 309 | monthly quota -50 | next target <= 259 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 222 / 222 | monthly quota -50 | next target <= 172 | headroom 0
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+make lint exit: 0
+
+== make test-critical
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+482 passed, 4 skipped, 1 warning in 14.94s
