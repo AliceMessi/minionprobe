@@ -1,0 +1,222 @@
+version: PostgreSQL 17.11 (Debian 17.11-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+server_version_num: 170011
+server_encoding: UTF8
+
+## plain: '{"k": "x"}'
+  json cast: True
+  jsonb cast: True
+  json -> k (text): '"x"'
+  json ->> k: 'x'
+  json_typeof(json -> k): 'string'
+  jsonb -> k: '"x"'
+  pg_input_is_valid json: True
+  pg_input_is_valid jsonb: True
+  CASE guard: True
+
+## NUL in another value: '{"k": "x", "n": "a\\u0000b"}'
+  json cast: True
+  jsonb cast: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  json -> k (text): ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  json ->> k: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  json_typeof(json -> k): ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  jsonb -> k: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  pg_input_is_valid json: True
+  pg_input_is_valid jsonb: False
+  CASE guard: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+
+## NUL in the filtered value: '{"k": "a\\u0000b"}'
+  json cast: True
+  jsonb cast: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  json -> k (text): ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  json ->> k: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  json_typeof(json -> k): ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  jsonb -> k: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  pg_input_is_valid json: True
+  pg_input_is_valid jsonb: False
+  CASE guard: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+
+## lone high surrogate in another value: '{"k": "x", "n": "\\ud800"}'
+  json cast: True
+  jsonb cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json -> k (text): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json ->> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json_typeof(json -> k): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb -> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  pg_input_is_valid json: True
+  pg_input_is_valid jsonb: False
+  CASE guard: ERROR InvalidTextRepresentation: invalid input syntax for type json
+
+## lone low surrogate in another value: '{"k": "x", "n": "\\udc00"}'
+  json cast: True
+  jsonb cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json -> k (text): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json ->> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json_typeof(json -> k): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb -> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  pg_input_is_valid json: True
+  pg_input_is_valid jsonb: False
+  CASE guard: ERROR InvalidTextRepresentation: invalid input syntax for type json
+
+## lone surrogate in the filtered value: '{"k": "\\ud800"}'
+  json cast: True
+  jsonb cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json -> k (text): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json ->> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json_typeof(json -> k): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb -> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  pg_input_is_valid json: True
+  pg_input_is_valid jsonb: False
+  CASE guard: ERROR InvalidTextRepresentation: invalid input syntax for type json
+
+## surrogate pair (emoji) in another value: '{"k": "x", "n": "\\ud83d\\ude00"}'
+  json cast: True
+  jsonb cast: True
+  json -> k (text): '"x"'
+  json ->> k: 'x'
+  json_typeof(json -> k): 'string'
+  jsonb -> k: '"x"'
+  pg_input_is_valid json: True
+  pg_input_is_valid jsonb: True
+  CASE guard: True
+
+## NaN in another value: '{"k": "x", "n": NaN}'
+  json cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json -> k (text): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json ->> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json_typeof(json -> k): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb -> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  pg_input_is_valid json: False
+  pg_input_is_valid jsonb: False
+  CASE guard: ERROR InvalidTextRepresentation: invalid input syntax for type json
+
+## Infinity in another value: '{"k": "x", "n": Infinity}'
+  json cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json -> k (text): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json ->> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json_typeof(json -> k): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb -> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  pg_input_is_valid json: False
+  pg_input_is_valid jsonb: False
+  CASE guard: ERROR InvalidTextRepresentation: invalid input syntax for type json
+
+## -Infinity in another value: '{"k": "x", "n": -Infinity}'
+  json cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json -> k (text): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json ->> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json_typeof(json -> k): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb -> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  pg_input_is_valid json: False
+  pg_input_is_valid jsonb: False
+  CASE guard: ERROR InvalidTextRepresentation: invalid input syntax for type json
+
+## NaN as the filtered value: '{"k": NaN}'
+  json cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json -> k (text): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json ->> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json_typeof(json -> k): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb -> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  pg_input_is_valid json: False
+  pg_input_is_valid jsonb: False
+  CASE guard: ERROR InvalidTextRepresentation: invalid input syntax for type json
+
+## non-ASCII in another value: '{"k": "x", "n": "caf\\u00e9"}'
+  json cast: True
+  jsonb cast: True
+  json -> k (text): '"x"'
+  json ->> k: 'x'
+  json_typeof(json -> k): 'string'
+  jsonb -> k: '"x"'
+  pg_input_is_valid json: True
+  pg_input_is_valid jsonb: True
+  CASE guard: True
+
+## CJK in another value: '{"k": "x", "n": "\\u4e2d"}'
+  json cast: True
+  jsonb cast: True
+  json -> k (text): '"x"'
+  json ->> k: 'x'
+  json_typeof(json -> k): 'string'
+  jsonb -> k: '"x"'
+  pg_input_is_valid json: True
+  pg_input_is_valid jsonb: True
+  CASE guard: True
+
+## NUL in another key: '{"a\\u0000b": 1, "k": "x"}'
+  json cast: True
+  jsonb cast: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  json -> k (text): ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  json ->> k: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  json_typeof(json -> k): ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  jsonb -> k: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  pg_input_is_valid json: True
+  pg_input_is_valid jsonb: False
+  CASE guard: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+
+## NaN-looking string: '{"k": "x", "n": "trace: NaN"}'
+  json cast: True
+  jsonb cast: True
+  json -> k (text): '"x"'
+  json ->> k: 'x'
+  json_typeof(json -> k): 'string'
+  jsonb -> k: '"x"'
+  pg_input_is_valid json: True
+  pg_input_is_valid jsonb: True
+  CASE guard: True
+
+## object as the filtered value: '{"k": {"a": [1, "x"], "b": 1}}'
+  json cast: True
+  jsonb cast: True
+  json -> k (text): '{"a": [1, "x"], "b": 1}'
+  json ->> k: '{"a": [1, "x"], "b": 1}'
+  json_typeof(json -> k): 'object'
+  jsonb -> k: '{"a": [1, "x"], "b": 1}'
+  pg_input_is_valid json: True
+  pg_input_is_valid jsonb: True
+  CASE guard: False
+
+## duplicate member k: '{"k": "first", "k": "x"}'
+  json cast: True
+  jsonb cast: True
+  json -> k (text): '"x"'
+  json ->> k: 'x'
+  json_typeof(json -> k): 'string'
+  jsonb -> k: '"x"'
+  pg_input_is_valid json: True
+  pg_input_is_valid jsonb: True
+  CASE guard: True
+
+## CASE guard over a table column (not a bound constant)
+  CJK in another value: True
+  duplicate member k: True
+  -Infinity in another value: None
+  Infinity in another value: None
+  lone high surrogate in another value: None
+  lone low surrogate in another value: None
+  lone surrogate in the filtered value: None
+  NaN as the filtered value: None
+  NaN in another value: None
+  NaN-looking string: True
+  non-ASCII in another value: True
+  NUL in another key: None
+  NUL in another value: None
+  NUL in the filtered value: None
+  object as the filtered value: False
+  plain: True
+  surrogate pair (emoji) in another value: True
+
+## LIMIT with a scalar subquery over a CTE
+   5
+
+## database encoding SQL_ASCII: create ok
+  plain: jsonb cast True; json -> k b'"x"'; pg_input_is_valid jsonb True
+  non-ASCII in another value: jsonb cast ERROR UntranslatableCharacter: unsupported Unicode escape sequence; json -> k ERROR UntranslatableCharacter: unsupported Unicode escape sequence; pg_input_is_valid jsonb False
+  CJK in another value: jsonb cast ERROR UntranslatableCharacter: unsupported Unicode escape sequence; json -> k ERROR UntranslatableCharacter: unsupported Unicode escape sequence; pg_input_is_valid jsonb False
+
+## database encoding LATIN1: create ok
+  plain: jsonb cast True; json -> k '"x"'; pg_input_is_valid jsonb True
+  non-ASCII in another value: jsonb cast True; json -> k '"x"'; pg_input_is_valid jsonb True
+  CJK in another value: jsonb cast ERROR UntranslatableCharacter: unsupported Unicode escape sequence; json -> k ERROR UntranslatableCharacter: unsupported Unicode escape sequence; pg_input_is_valid jsonb False

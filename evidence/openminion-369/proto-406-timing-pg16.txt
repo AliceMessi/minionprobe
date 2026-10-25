@@ -1,0 +1,32 @@
+Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill
+Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress
+Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve
+Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry
+Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory
+Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane
+Postgres module 'secret' has pending migrations. Run: openminion storage migrate --module secret
+Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy
+Postgres module 'task' has pending migrations. Run: openminion storage migrate --module task
+Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact
+Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity
+Postgres module 'session' has pending migrations. Run: openminion storage migrate --module session
+Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a
+Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry
+## no stored document jsonb rejects: 50000 sessions, 0 that jsonb rejects, 0 the pattern routes
+surface=acp, limit 100 | this head (whole-document jsonb cast) | median 95.6 ms | rows fetched 100 | returned 100
+surface=acp, limit 100 | (a) two-tier, pg_input_is_valid | median 147.4 ms | rows fetched 100 | returned 100
+surface=acp, limit 100 | (b) two-tier, pattern | median 172.0 ms | rows fetched 100 | returned 100
+surface=acp, limit 100 | (c) Python, keyset pages | median 468.8 ms | rows fetched 1700 | returned 100
+working_dir (25 matches), limit 100 | this head (whole-document jsonb cast) | median 80.2 ms | rows fetched 19 | returned 19
+working_dir (25 matches), limit 100 | (a) two-tier, pg_input_is_valid | median 134.2 ms | rows fetched 19 | returned 19
+working_dir (25 matches), limit 100 | (b) two-tier, pattern | median 161.3 ms | rows fetched 19 | returned 19
+working_dir (25 matches), limit 100 | (c) Python, keyset pages | median 13629.8 ms | rows fetched 50000 | returned 19
+## 0.5% of the documents hold NaN, Infinity, NUL or a lone surrogate: 50000 sessions, 250 that jsonb rejects, 250 the pattern routes
+surface=acp, limit 100 | this head (whole-document jsonb cast) | DataError: (psycopg.errors.InvalidTextRepresentation) invalid input syntax for type json
+surface=acp, limit 100 | (a) two-tier, pg_input_is_valid | median 152.4 ms | rows fetched 350 | returned 100
+surface=acp, limit 100 | (b) two-tier, pattern | median 175.4 ms | rows fetched 350 | returned 100
+surface=acp, limit 100 | (c) Python, keyset pages | median 471.9 ms | rows fetched 1700 | returned 100
+working_dir (25 matches), limit 100 | this head (whole-document jsonb cast) | DataError: (psycopg.errors.InvalidTextRepresentation) invalid input syntax for type json
+working_dir (25 matches), limit 100 | (a) two-tier, pg_input_is_valid | median 139.5 ms | rows fetched 269 | returned 19
+working_dir (25 matches), limit 100 | (b) two-tier, pattern | median 164.4 ms | rows fetched 269 | returned 19
+working_dir (25 matches), limit 100 | (c) Python, keyset pages | median 13736.0 ms | rows fetched 50000 | returned 19

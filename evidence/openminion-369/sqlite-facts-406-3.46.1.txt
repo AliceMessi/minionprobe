@@ -1,0 +1,58 @@
+Unable to find image 'python:3.13-slim-trixie' locally
+3.13-slim-trixie: Pulling from library/python
+f2be67225471: Already exists
+bec94cf691b4: Pulling fs layer
+e1f7d490169d: Pulling fs layer
+1972997cb127: Pulling fs layer
+1972997cb127: Download complete
+bec94cf691b4: Verifying Checksum
+bec94cf691b4: Download complete
+e1f7d490169d: Verifying Checksum
+e1f7d490169d: Download complete
+bec94cf691b4: Pull complete
+e1f7d490169d: Pull complete
+1972997cb127: Pull complete
+Digest: sha256:d98cc29d3266e535dd9da1099688d9cb3ca4753813571e071763d17725460962
+Status: Downloaded newer image for python:3.13-slim-trixie
+sqlite 3.46.1
+
+## keys: json_extract(doc, '$.' || key)
+  dotted key, literal and nested both stored: key 'a.b' doc '{"a": {"b": "nested"}, "a.b": "lit"}' -> "'nested' (text)"
+  dotted key, literal only: key 'a.b' doc '{"a.b": "lit"}' -> 'None (null)'
+  bracketed key, literal and array both stored: key 'a[0]' doc '{"a": ["idx"], "a[0]": "lit"}' -> "'idx' (text)"
+  quoted key: key '"a"' doc '{"\\"a\\"": "lit", "a": "plain"}' -> "'plain' (text)"
+  quoted key with a dot inside: key '"a.b"' doc '{"a.b": "lit"}' -> "'lit' (text)"
+  key ending in a dot: key 'a.' doc '{"a": "plain", "a.": "lit"}' -> "ERROR OperationalError: bad JSON path: '$.a.'"
+  key with an unclosed bracket: key 'a[' doc '{"a[": "lit"}' -> 'None (null)'
+  key with a bracket and text: key 'a[x' doc '{"a[x": "lit"}' -> 'None (null)'
+  key with a closing bracket: key 'a]' doc '{"a]": "lit"}' -> "'lit' (text)"
+  key with an inner quote: key 'a"b' doc '{"a\\"b": "lit"}' -> "'lit' (text)"
+  key with a leading quote, unclosed: key '"ab' doc '{"\\"ab": "lit"}' -> 'ERROR OperationalError: bad JSON path: \'$."ab\''
+  key with a backslash: key 'a\\b' doc '{"a\\\\b": "lit"}' -> "'lit' (text)"
+  non-ASCII key: key 'caf\xe9' doc '{"caf\\u00e9": "lit"}' -> "'lit' (text)"
+  key with a newline: key 'a\nb' doc '{"a\\nb": "lit"}' -> "'lit' (text)"
+  key $: key '$' doc '{"$": "lit"}' -> "'lit' (text)"
+  key *: key '*' doc '{"*": "lit"}' -> "'lit' (text)"
+  key #: key '#' doc '{"#": "lit"}' -> "'lit' (text)"
+  key with a space: key 'a b' doc '{"a b": "lit"}' -> "'lit' (text)"
+  key -1: key '-1' doc '{"-1": "lit"}' -> "'lit' (text)"
+  key with NUL, prefix stored: key 'k\x00z' doc '{"k": "prefix", "k\\u0000z": "lit"}' -> "'prefix' (text)"
+  plain key: key 'surface' doc '{"surface": "acp"}' -> "'acp' (text)"
+
+## object and array values: json_extract(doc, '$.k')
+  object: doc '{"k": {"a": [1, 2.5, "x", null, true], "b": 1}}' -> '\'{"a":[1,2.5,"x",null,true],"b":1}\' (text)'
+  object with escaped strings: doc '{"k": {"s": "q\\"b\\\\c\\u00e9\\n"}}' -> '\'{"s":"q\\\\"b\\\\\\\\c\\\\u00e9\\\\n"}\' (text)'
+  array with NaN and Infinity: doc '{"k": [NaN, Infinity, -Infinity]}' -> "'[null,9e999,-9e999]' (text)"
+  empty object: doc '{"k": {}}' -> "'{}' (text)"
+  float 1e20 and 1.0: doc '{"k": [1e+20, 1.0, 100000000000000000000]}' -> "'[1e+20,1.0,100000000000000000000]' (text)"
+
+## other documents: json_extract(doc, '$.k') = 'x'
+  NaN in another value: '{"k": "x", "n": NaN}' -> 1
+  NUL in another value: '{"k": "x", "n": "a\\u0000b"}' -> 1
+  lone surrogate in another value: '{"k": "x", "n": "\\ud800"}' -> 1
+  duplicate member k in the text: '{"k": "first", "k": "x"}' -> 0
+  two float NaN keys: '{"NaN": "first", "NaN": "second"}' -> $.NaN "'first' (text)"; json.loads {'NaN': 'second'}
+
+## filter values
+  NUL in the value: 1
+  lone surrogate in the value: ERROR UnicodeEncodeError: 'utf-8' codec can't encode character '\ud800' in position 0: surrogates not allowed

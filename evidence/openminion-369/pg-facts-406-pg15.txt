@@ -1,0 +1,206 @@
+version: PostgreSQL 15.19 (Debian 15.19-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+server_version_num: 150019
+server_encoding: UTF8
+
+## plain: '{"k": "x"}'
+  json cast: True
+  jsonb cast: True
+  json -> k (text): '"x"'
+  json ->> k: 'x'
+  json_typeof(json -> k): 'string'
+  jsonb -> k: '"x"'
+  pg_input_is_valid json: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  pg_input_is_valid jsonb: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  CASE guard: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+
+## NUL in another value: '{"k": "x", "n": "a\\u0000b"}'
+  json cast: True
+  jsonb cast: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  json -> k (text): ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  json ->> k: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  json_typeof(json -> k): ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  jsonb -> k: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  pg_input_is_valid json: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  pg_input_is_valid jsonb: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  CASE guard: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+
+## NUL in the filtered value: '{"k": "a\\u0000b"}'
+  json cast: True
+  jsonb cast: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  json -> k (text): ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  json ->> k: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  json_typeof(json -> k): ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  jsonb -> k: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  pg_input_is_valid json: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  pg_input_is_valid jsonb: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  CASE guard: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+
+## lone high surrogate in another value: '{"k": "x", "n": "\\ud800"}'
+  json cast: True
+  jsonb cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json -> k (text): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json ->> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json_typeof(json -> k): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb -> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  pg_input_is_valid json: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  pg_input_is_valid jsonb: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  CASE guard: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+
+## lone low surrogate in another value: '{"k": "x", "n": "\\udc00"}'
+  json cast: True
+  jsonb cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json -> k (text): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json ->> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json_typeof(json -> k): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb -> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  pg_input_is_valid json: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  pg_input_is_valid jsonb: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  CASE guard: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+
+## lone surrogate in the filtered value: '{"k": "\\ud800"}'
+  json cast: True
+  jsonb cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json -> k (text): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json ->> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json_typeof(json -> k): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb -> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  pg_input_is_valid json: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  pg_input_is_valid jsonb: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  CASE guard: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+
+## surrogate pair (emoji) in another value: '{"k": "x", "n": "\\ud83d\\ude00"}'
+  json cast: True
+  jsonb cast: True
+  json -> k (text): '"x"'
+  json ->> k: 'x'
+  json_typeof(json -> k): 'string'
+  jsonb -> k: '"x"'
+  pg_input_is_valid json: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  pg_input_is_valid jsonb: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  CASE guard: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+
+## NaN in another value: '{"k": "x", "n": NaN}'
+  json cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json -> k (text): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json ->> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json_typeof(json -> k): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb -> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  pg_input_is_valid json: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  pg_input_is_valid jsonb: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  CASE guard: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+
+## Infinity in another value: '{"k": "x", "n": Infinity}'
+  json cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json -> k (text): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json ->> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json_typeof(json -> k): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb -> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  pg_input_is_valid json: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  pg_input_is_valid jsonb: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  CASE guard: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+
+## -Infinity in another value: '{"k": "x", "n": -Infinity}'
+  json cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json -> k (text): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json ->> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json_typeof(json -> k): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb -> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  pg_input_is_valid json: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  pg_input_is_valid jsonb: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  CASE guard: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+
+## NaN as the filtered value: '{"k": NaN}'
+  json cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb cast: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json -> k (text): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json ->> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  json_typeof(json -> k): ERROR InvalidTextRepresentation: invalid input syntax for type json
+  jsonb -> k: ERROR InvalidTextRepresentation: invalid input syntax for type json
+  pg_input_is_valid json: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  pg_input_is_valid jsonb: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  CASE guard: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+
+## non-ASCII in another value: '{"k": "x", "n": "caf\\u00e9"}'
+  json cast: True
+  jsonb cast: True
+  json -> k (text): '"x"'
+  json ->> k: 'x'
+  json_typeof(json -> k): 'string'
+  jsonb -> k: '"x"'
+  pg_input_is_valid json: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  pg_input_is_valid jsonb: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  CASE guard: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+
+## CJK in another value: '{"k": "x", "n": "\\u4e2d"}'
+  json cast: True
+  jsonb cast: True
+  json -> k (text): '"x"'
+  json ->> k: 'x'
+  json_typeof(json -> k): 'string'
+  jsonb -> k: '"x"'
+  pg_input_is_valid json: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  pg_input_is_valid jsonb: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  CASE guard: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+
+## NUL in another key: '{"a\\u0000b": 1, "k": "x"}'
+  json cast: True
+  jsonb cast: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  json -> k (text): ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  json ->> k: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  json_typeof(json -> k): ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  jsonb -> k: ERROR UntranslatableCharacter: unsupported Unicode escape sequence
+  pg_input_is_valid json: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  pg_input_is_valid jsonb: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  CASE guard: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+
+## NaN-looking string: '{"k": "x", "n": "trace: NaN"}'
+  json cast: True
+  jsonb cast: True
+  json -> k (text): '"x"'
+  json ->> k: 'x'
+  json_typeof(json -> k): 'string'
+  jsonb -> k: '"x"'
+  pg_input_is_valid json: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  pg_input_is_valid jsonb: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  CASE guard: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+
+## object as the filtered value: '{"k": {"a": [1, "x"], "b": 1}}'
+  json cast: True
+  jsonb cast: True
+  json -> k (text): '{"a": [1, "x"], "b": 1}'
+  json ->> k: '{"a": [1, "x"], "b": 1}'
+  json_typeof(json -> k): 'object'
+  jsonb -> k: '{"a": [1, "x"], "b": 1}'
+  pg_input_is_valid json: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  pg_input_is_valid jsonb: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  CASE guard: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+
+## duplicate member k: '{"k": "first", "k": "x"}'
+  json cast: True
+  jsonb cast: True
+  json -> k (text): '"x"'
+  json ->> k: 'x'
+  json_typeof(json -> k): 'string'
+  jsonb -> k: '"x"'
+  pg_input_is_valid json: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  pg_input_is_valid jsonb: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  CASE guard: ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+
+## CASE guard over a table column (not a bound constant)
+  ERROR UndefinedFunction: function pg_input_is_valid(text, unknown) does not exist
+
+## LIMIT with a scalar subquery over a CTE
+   5
+
+## database encoding SQL_ASCII: create ok
+  plain: jsonb cast True; json -> k b'"x"'; pg_input_is_valid jsonb ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  non-ASCII in another value: jsonb cast ERROR FeatureNotSupported: conversion between UTF8 and SQL_ASCII is not supported; json -> k ERROR FeatureNotSupported: conversion between UTF8 and SQL_ASCII is not supported; pg_input_is_valid jsonb ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  CJK in another value: jsonb cast ERROR FeatureNotSupported: conversion between UTF8 and SQL_ASCII is not supported; json -> k ERROR FeatureNotSupported: conversion between UTF8 and SQL_ASCII is not supported; pg_input_is_valid jsonb ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+
+## database encoding LATIN1: create ok
+  plain: jsonb cast True; json -> k '"x"'; pg_input_is_valid jsonb ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  non-ASCII in another value: jsonb cast True; json -> k '"x"'; pg_input_is_valid jsonb ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist
+  CJK in another value: jsonb cast ERROR UntranslatableCharacter: character with byte sequence 0xe4 0xb8 0xad in encoding "UTF8" has no equivalent in encoding "LATIN1"; json -> k ERROR UntranslatableCharacter: character with byte sequence 0xe4 0xb8 0xad in encoding "UTF8" has no equivalent in encoding "LATIN1"; pg_input_is_valid jsonb ERROR UndefinedFunction: function pg_input_is_valid(unknown, unknown) does not exist

@@ -1,0 +1,26 @@
+Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve
+Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a
+Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry
+Postgres module 'secret' has pending migrations. Run: openminion storage migrate --module secret
+Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity
+Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane
+Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill
+Postgres module 'task' has pending migrations. Run: openminion storage migrate --module task
+Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry
+Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress
+Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact
+Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy
+Postgres module 'session' has pending migrations. Run: openminion storage migrate --module session
+Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory
+probe | count(*) | median 4.5 ms
+probe | count(*) WHERE pg_input_is_valid | median 65.4 ms
+probe | count(*) WHERE jsonb -> surface, parseable rows | median 125.6 ms
+surface=acp, limit 100 | (a) subquery | median 152.4 ms | rows fetched 350 | returned 100 | same ids as subquery: True
+surface=acp, limit 100 | (a) cte | median 206.2 ms | rows fetched 350 | returned 100 | same ids as subquery: True
+surface=acp, limit 100 | (a) window | median 164.5 ms | rows fetched 350 | returned 100 | same ids as subquery: True
+surface=cli (60%), limit 100 | (a) subquery | median 176.8 ms | rows fetched 350 | returned 100 | same ids as subquery: True
+surface=cli (60%), limit 100 | (a) cte | median 215.2 ms | rows fetched 350 | returned 100 | same ids as subquery: True
+surface=cli (60%), limit 100 | (a) window | median 290.2 ms | rows fetched 350 | returned 100 | same ids as subquery: True
+working_dir (rare), limit 100 | (a) subquery | median 140.3 ms | rows fetched 269 | returned 19 | same ids as subquery: True
+working_dir (rare), limit 100 | (a) cte | median 189.6 ms | rows fetched 269 | returned 19 | same ids as subquery: True
+working_dir (rare), limit 100 | (a) window | median 146.3 ms | rows fetched 269 | returned 19 | same ids as subquery: True
