@@ -1,0 +1,358 @@
+Ubuntu 24.04 GitHub-hosted runner, AliceMessi/linux-runner run 40190236823 (https://github.com/AliceMessi/linux-runner/actions/runs/40190236823), preset openminion with the postgres extra and PostgreSQL 16
+head: 529c76c6 docs(changelog): note PostgreSQL retention of items with evidence
+dev:  8b220e14 Merge pull request #409 from openminion/fix/security-recheck
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+packages: psycopg 3.3.6;sophiagraph 0.0.12;SQLAlchemy 2.1.6;
+OPENMINION_TEST_POSTGRES_URL set: yes
+56ddaa06ff8860267c0bff1aac3114786d1a0ea60058d9bf38fd6781722f566e  /tmp/ev/compose399.py
+2b1c3fe5948b3176d2642081a124554c905f2dd49ada32f61122aecba7e72020  /tmp/ev/probe_pg_evidence_refs.py
+0b1b11010aadf01f4e79c36b0196cdc4639772b3f9164b6a1cb88fddf541f3fe  /tmp/ev/run400.sh
+
+== [head] pytest -q -p no:cacheprovider -rf --tb=line <focused>
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+..........................                                               [100%]
+26 passed in 3.30s
+
+== [head] the postgres-memory-retrieval job's commands, each with -m postgres
+-- tests/memory/test_memory_postgres_conformance.py: 19 passed in 2.13s
+-- tests/memory/test_memory_search_quality.py::test_postgres_lexical_score_contributes_to_semantic_order: 1 passed in 0.23s
+-- tests/memory/test_gc_evidence_postgres.py: 7 passed in 0.88s
+-- tests/skill/test_skill_postgres_conformance.py: 6 passed, 6 deselected in 1.18s
+-- tests/integration/test_runtime_storage_postgres.py: 21 passed in 10.74s
+-- tests/integration/test_runtime_memory_postgres.py: 2 passed in 1.92s
+
+== [head] pytest -q -p no:cacheprovider -rf --tb=line <related>
+/home/runner/work/linux-runner/linux-runner/tests/services/agent/test_truth_maintenance.py:189: AssertionError: assert MemoryRecord(id='purge-me', scope='agent:truth-agent', type='fact', content='obsolete fact', created_at='2026-10-25T11...amespace=None, deleted_at=None, deleted_reason=None, tier='working', access_count=0, integrity_hash=None, goal_id=None) is None
+=========================== short test summary info ============================
+FAILED tests/services/agent/test_truth_maintenance.py::test_session_lifecycle_runs_capacity_and_purge_on_postgres - AssertionError: assert MemoryRecord(id='purge-me', scope='agent:truth-agent', type='fact', content='obsolete fact', created_at='2026-10-25T11...amespace=None, deleted_at=None, deleted_reason=None, tier='working', access_count=0, integrity_hash=None, goal_id=None) is None
+ +  where MemoryRecord(id='purge-me', scope='agent:truth-agent', type='fact', content='obsolete fact', created_at='2026-10-25T11...amespace=None, deleted_at=None, deleted_reason=None, tier='working', access_count=0, integrity_hash=None, goal_id=None) = get('purge-me')
+ +    where get = <openminion.modules.memory.storage.postgres.store.PostgresMemoryStore object at 0x7f8c9d50f450>.get
+1 failed, 60 passed in 2.59s
+
+== [head] the issue's probe: PYTHONPATH=src:. python probe_pg_evidence_refs.py
+{
+  "SQLite, bare SQLiteMemoryStore (control)": {
+    "apply_confidence_decay": {
+      "result": "(3, 3)",
+      "artifact-ref": "confidence 0.15, soft-deleted (confidence_below_threshold)",
+      "capture-evidence": "confidence 0.15, soft-deleted (confidence_below_threshold)",
+      "no-evidence": "confidence 0.15, soft-deleted (confidence_below_threshold)",
+      "artifact ref removals": [
+        "artifact-ref"
+      ]
+    },
+    "compress_old_summaries": {
+      "result": "(0, 3)",
+      "artifact-ref": "confidence 0.80, soft-deleted (summary_retention)",
+      "capture-evidence": "confidence 0.80, soft-deleted (summary_retention)",
+      "no-evidence": "confidence 0.80, soft-deleted (summary_retention)",
+      "artifact ref removals": [
+        "artifact-ref"
+      ]
+    },
+    "enforce_scope_capacity": {
+      "result": "{'agent:a': 3}",
+      "artifact-ref": "confidence 0.10, soft-deleted (scope_capacity)",
+      "capture-evidence": "confidence 0.20, soft-deleted (scope_capacity)",
+      "no-evidence": "confidence 0.30, soft-deleted (scope_capacity)",
+      "artifact ref removals": [
+        "artifact-ref"
+      ]
+    },
+    "evict_stale_insights": {
+      "result": "3",
+      "artifact-ref": "confidence 0.80, soft-deleted (stale_insight)",
+      "capture-evidence": "confidence 0.80, soft-deleted (stale_insight)",
+      "no-evidence": "confidence 0.80, soft-deleted (stale_insight)",
+      "artifact ref removals": [
+        "artifact-ref"
+      ]
+    },
+    "purge_soft_deleted, records": {
+      "result": "GCResult(deleted_records=3, deleted_candidates=0, ...)",
+      "artifact-ref": "row purged",
+      "capture-evidence": "row purged",
+      "no-evidence": "row purged",
+      "artifact ref removals": [
+        "artifact-ref"
+      ]
+    },
+    "purge_soft_deleted, candidates": {
+      "result": "GCResult(deleted_records=0, deleted_candidates=3, ...)",
+      "artifact-ref": "row purged",
+      "capture-evidence": "row purged",
+      "no-evidence": "row purged",
+      "artifact ref removals": [
+        "artifact-ref"
+      ]
+    }
+  },
+  "PostgreSQL, bare PostgresMemoryStore": {
+    "apply_confidence_decay": {
+      "result": "(3, 3)",
+      "artifact-ref": "confidence 0.15, soft-deleted (confidence_below_threshold)",
+      "capture-evidence": "confidence 0.15, soft-deleted (confidence_below_threshold)",
+      "no-evidence": "confidence 0.15, soft-deleted (confidence_below_threshold)",
+      "artifact ref removals": [
+        "artifact-ref"
+      ]
+    },
+    "compress_old_summaries": {
+      "result": "(0, 3)",
+      "artifact-ref": "confidence 0.80, soft-deleted (summary_retention)",
+      "capture-evidence": "confidence 0.80, soft-deleted (summary_retention)",
+      "no-evidence": "confidence 0.80, soft-deleted (summary_retention)",
+      "artifact ref removals": [
+        "artifact-ref"
+      ]
+    },
+    "enforce_scope_capacity": {
+      "result": "{'agent:a': 3}",
+      "artifact-ref": "confidence 0.10, soft-deleted (scope_capacity)",
+      "capture-evidence": "confidence 0.20, soft-deleted (scope_capacity)",
+      "no-evidence": "confidence 0.30, soft-deleted (scope_capacity)",
+      "artifact ref removals": [
+        "artifact-ref"
+      ]
+    },
+    "evict_stale_insights": {
+      "result": "3",
+      "artifact-ref": "confidence 0.80, soft-deleted (stale_insight)",
+      "capture-evidence": "confidence 0.80, soft-deleted (stale_insight)",
+      "no-evidence": "confidence 0.80, soft-deleted (stale_insight)",
+      "artifact ref removals": [
+        "artifact-ref"
+      ]
+    },
+    "purge_soft_deleted, records": {
+      "result": "GCResult(deleted_records=3, deleted_candidates=0, ...)",
+      "artifact-ref": "row purged",
+      "capture-evidence": "row purged",
+      "no-evidence": "row purged",
+      "artifact ref removals": [
+        "artifact-ref"
+      ]
+    },
+    "purge_soft_deleted, candidates": {
+      "result": "GCResult(deleted_records=0, deleted_candidates=3, ...)",
+      "artifact-ref": "row purged",
+      "capture-evidence": "row purged",
+      "no-evidence": "row purged",
+      "artifact ref removals": [
+        "artifact-ref"
+      ]
+    }
+  }
+}
+3.11.17 linux
+
+== dev sources from here on: git checkout 8b220e14 -- src
+M  src/openminion/modules/memory/runtime/purge.py
+
+== [dev] pytest -q -p no:cacheprovider -rf --tb=line <focused>
+/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/json/decoder.py:353: json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)
+/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/json/decoder.py:353: json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)
+/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/json/decoder.py:353: json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)
+=========================== short test summary info ============================
+FAILED tests/memory/test_gc_evidence.py::test_decode_evidence_ref_values_keeps_an_already_decoded_list[decoded0] - json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)
+FAILED tests/memory/test_gc_evidence.py::test_decode_evidence_ref_values_keeps_an_already_decoded_list[decoded1] - json.decoder.JSONDecodeError: Expecting value: line 1 column 2 (char 1)
+FAILED tests/memory/test_gc_evidence_postgres.py::test_retention_step_removes_postgres_items_with_evidence[apply_confidence_decay] - json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)
+FAILED tests/memory/test_gc_evidence_postgres.py::test_retention_step_removes_postgres_items_with_evidence[compress_old_summaries] - json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)
+FAILED tests/memory/test_gc_evidence_postgres.py::test_retention_step_removes_postgres_items_with_evidence[enforce_scope_capacity] - json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)
+FAILED tests/memory/test_gc_evidence_postgres.py::test_retention_step_removes_postgres_items_with_evidence[evict_stale_insights] - json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)
+FAILED tests/memory/test_gc_evidence_postgres.py::test_retention_step_removes_postgres_items_with_evidence[purge_soft_deleted records] - json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)
+FAILED tests/memory/test_gc_evidence_postgres.py::test_retention_step_removes_postgres_items_with_evidence[purge_soft_deleted promoted candidates] - json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)
+FAILED tests/memory/test_gc_evidence_postgres.py::test_retention_step_removes_postgres_items_with_evidence[purge_soft_deleted rejected candidates] - json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)
+9 failed, 17 passed in 1.52s
+
+== [dev] the postgres-memory-retrieval job's commands, each with -m postgres
+-- tests/memory/test_memory_postgres_conformance.py: 19 passed in 1.98s
+-- tests/memory/test_memory_search_quality.py::test_postgres_lexical_score_contributes_to_semantic_order: 1 passed in 0.22s
+-- tests/memory/test_gc_evidence_postgres.py: 7 failed in 1.49s
+-- tests/skill/test_skill_postgres_conformance.py: 6 passed, 6 deselected in 0.74s
+-- tests/integration/test_runtime_storage_postgres.py: 21 passed in 8.70s
+-- tests/integration/test_runtime_memory_postgres.py: 2 passed in 1.36s
+
+== [dev] pytest -q -p no:cacheprovider -rf --tb=line <related>
+/home/runner/work/linux-runner/linux-runner/tests/services/agent/test_truth_maintenance.py:189: AssertionError: assert MemoryRecord(id='purge-me', scope='agent:truth-agent', type='fact', content='obsolete fact', created_at='2026-10-25T11...amespace=None, deleted_at=None, deleted_reason=None, tier='working', access_count=0, integrity_hash=None, goal_id=None) is None
+=========================== short test summary info ============================
+FAILED tests/services/agent/test_truth_maintenance.py::test_session_lifecycle_runs_capacity_and_purge_on_postgres - AssertionError: assert MemoryRecord(id='purge-me', scope='agent:truth-agent', type='fact', content='obsolete fact', created_at='2026-10-25T11...amespace=None, deleted_at=None, deleted_reason=None, tier='working', access_count=0, integrity_hash=None, goal_id=None) is None
+ +  where MemoryRecord(id='purge-me', scope='agent:truth-agent', type='fact', content='obsolete fact', created_at='2026-10-25T11...amespace=None, deleted_at=None, deleted_reason=None, tier='working', access_count=0, integrity_hash=None, goal_id=None) = get('purge-me')
+ +    where get = <openminion.modules.memory.storage.postgres.store.PostgresMemoryStore object at 0x7f67c55482d0>.get
+1 failed, 60 passed in 2.46s
+
+== [dev] the issue's probe: PYTHONPATH=src:. python probe_pg_evidence_refs.py
+{
+  "SQLite, bare SQLiteMemoryStore (control)": {
+    "apply_confidence_decay": {
+      "result": "(3, 3)",
+      "artifact-ref": "confidence 0.15, soft-deleted (confidence_below_threshold)",
+      "capture-evidence": "confidence 0.15, soft-deleted (confidence_below_threshold)",
+      "no-evidence": "confidence 0.15, soft-deleted (confidence_below_threshold)",
+      "artifact ref removals": [
+        "artifact-ref"
+      ]
+    },
+    "compress_old_summaries": {
+      "result": "(0, 3)",
+      "artifact-ref": "confidence 0.80, soft-deleted (summary_retention)",
+      "capture-evidence": "confidence 0.80, soft-deleted (summary_retention)",
+      "no-evidence": "confidence 0.80, soft-deleted (summary_retention)",
+      "artifact ref removals": [
+        "artifact-ref"
+      ]
+    },
+    "enforce_scope_capacity": {
+      "result": "{'agent:a': 3}",
+      "artifact-ref": "confidence 0.10, soft-deleted (scope_capacity)",
+      "capture-evidence": "confidence 0.20, soft-deleted (scope_capacity)",
+      "no-evidence": "confidence 0.30, soft-deleted (scope_capacity)",
+      "artifact ref removals": [
+        "artifact-ref"
+      ]
+    },
+    "evict_stale_insights": {
+      "result": "3",
+      "artifact-ref": "confidence 0.80, soft-deleted (stale_insight)",
+      "capture-evidence": "confidence 0.80, soft-deleted (stale_insight)",
+      "no-evidence": "confidence 0.80, soft-deleted (stale_insight)",
+      "artifact ref removals": [
+        "artifact-ref"
+      ]
+    },
+    "purge_soft_deleted, records": {
+      "result": "GCResult(deleted_records=3, deleted_candidates=0, ...)",
+      "artifact-ref": "row purged",
+      "capture-evidence": "row purged",
+      "no-evidence": "row purged",
+      "artifact ref removals": [
+        "artifact-ref"
+      ]
+    },
+    "purge_soft_deleted, candidates": {
+      "result": "GCResult(deleted_records=0, deleted_candidates=3, ...)",
+      "artifact-ref": "row purged",
+      "capture-evidence": "row purged",
+      "no-evidence": "row purged",
+      "artifact ref removals": [
+        "artifact-ref"
+      ]
+    }
+  },
+  "PostgreSQL, bare PostgresMemoryStore": {
+    "apply_confidence_decay": {
+      "result": "raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)",
+      "artifact-ref": "confidence 0.35, active",
+      "capture-evidence": "confidence 0.35, active",
+      "no-evidence": "confidence 0.35, active",
+      "artifact ref removals": []
+    },
+    "compress_old_summaries": {
+      "result": "raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)",
+      "artifact-ref": "confidence 0.80, active",
+      "capture-evidence": "confidence 0.80, active",
+      "no-evidence": "confidence 0.80, active",
+      "artifact ref removals": []
+    },
+    "enforce_scope_capacity": {
+      "result": "raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)",
+      "artifact-ref": "confidence 0.10, active",
+      "capture-evidence": "confidence 0.20, active",
+      "no-evidence": "confidence 0.30, active",
+      "artifact ref removals": []
+    },
+    "evict_stale_insights": {
+      "result": "raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)",
+      "artifact-ref": "confidence 0.80, active",
+      "capture-evidence": "confidence 0.80, active",
+      "no-evidence": "confidence 0.80, active",
+      "artifact ref removals": []
+    },
+    "purge_soft_deleted, records": {
+      "result": "raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)",
+      "artifact-ref": "confidence 0.80, soft-deleted",
+      "capture-evidence": "confidence 0.80, soft-deleted",
+      "no-evidence": "confidence 0.80, soft-deleted",
+      "artifact ref removals": []
+    },
+    "purge_soft_deleted, candidates": {
+      "result": "raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)",
+      "artifact-ref": "row purged",
+      "capture-evidence": "row purged",
+      "no-evidence": "row purged",
+      "artifact ref removals": []
+    }
+  }
+}
+3.11.17 linux
+
+== back to the branch head
+?? .deps/
+
+== composition with PR #399: merge pull/399/head into the branch head (CHANGELOG.md conflict resolved with the branch side; no other conflict)
+PR #399 head: fdcf4de7 docs(changelog): note session lifecycle retention on PostgreSQL
+Auto-merging .github/workflows/ci.yml
+Auto-merging CHANGELOG.md
+CONFLICT (content): Merge conflict in CHANGELOG.md
+Automatic merge failed; fix conflicts and then commit the result.
+Updated 1 path from the index
+A  tests/_memory_retention_scenarios.py
+A  tests/integration/test_runtime_memory_lifecycle.py
+A  tests/memory/test_gc_audited_store.py
+-- with #399 and #400:
+apply_confidence_decay through AuditedMemoryStore(PostgresMemoryStore): as expected
+compress_old_summaries through AuditedMemoryStore(PostgresMemoryStore): as expected
+enforce_scope_capacity through AuditedMemoryStore(PostgresMemoryStore): as expected
+evict_stale_insights through AuditedMemoryStore(PostgresMemoryStore): as expected
+3.11.17 linux
+-- with #399 only (purge.py from #399's head):
+apply_confidence_decay through AuditedMemoryStore(PostgresMemoryStore): raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)
+compress_old_summaries through AuditedMemoryStore(PostgresMemoryStore): raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)
+enforce_scope_capacity through AuditedMemoryStore(PostgresMemoryStore): raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)
+evict_stale_insights through AuditedMemoryStore(PostgresMemoryStore): raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)
+3.11.17 linux
+-- #399 and #400 PostgreSQL tests on the merge: 17 passed in 1.96s
+
+== merge aborted
+?? .deps/
+
+== ruff check .
+All checks passed!
+
+== make format-check
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m ruff format --check "/home/runner/work/linux-runner/linux-runner"
+5110 files already formatted
+
+== make workflow-check
+[INFO] This may take a few minutes...
+Lint GitHub Actions workflow files.......................................Passed
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/action_pins.py
+workflow action pins: clean
+
+== make lint
+[coo-10] clean — webhook secret-required contract preserved
+Skipping workspace browser tool-family contract validator (not present in standalone checkout).
+make typecheck
+make[1]: Entering directory '/home/runner/work/linux-runner/linux-runner'
+cd "/home/runner/work/linux-runner/linux-runner" && /home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4309; baseline total: 4309
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 290
+[tcr] api: 77 / 77 | monthly quota -50 | next target <= 27 | headroom 0
+[tcr] cli: 309 / 309 | monthly quota -50 | next target <= 259 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 222 / 222 | monthly quota -50 | next target <= 172 | headroom 0
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+make lint exit: 0
+
+== make test-critical
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+482 passed, 4 skipped, 1 warning in 11.93s
