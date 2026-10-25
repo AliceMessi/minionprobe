@@ -1,0 +1,53 @@
+Ubuntu 24.04 GitHub-hosted runner, AliceMessi/linux-runner run 40191238041 (https://github.com/AliceMessi/linux-runner/actions/runs/40191238041), preset openminion
+checkout: the #402 branch with src/ reset to dev: git checkout 8b220e14 -- src (git status: M src/openminion/modules/memory/diagnostics/cli.py, the only file of the branch under src/)
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+packages: psycopg 3.3.6;sophiagraph 0.0.12;SQLAlchemy 2.1.6;typer 0.27.3;
+018563278ec9de76c3612adcf9e876175a30d9117b3f84e84686bd9b1a39be53  probe_inspect_scope.py
+
+$ PYTHONPATH=src:. python probe_inspect_scope.py
+{
+  "memctl inspect no --scope --json": {
+    "exit code": 1,
+    "last stderr line": "sophiagraph.contracts.errors.InvalidArgumentError: invalid scope: ''"
+  },
+  "memctl inspect --scope \"\" --json": {
+    "exit code": 1,
+    "last stderr line": "sophiagraph.contracts.errors.InvalidArgumentError: invalid scope: ''"
+  },
+  "memctl inspect --scope agent:a (control) --json": {
+    "exit code": 0,
+    "last stderr line": "",
+    "scope": "agent:a",
+    "stats.active_record_count": 1
+  },
+  "memctl inspect --scope not-a-scope --json": {
+    "exit code": 1,
+    "last stderr line": "sophiagraph.contracts.errors.InvalidArgumentError: invalid scope: 'not-a-scope'"
+  },
+  "memctl inspect no --scope": {
+    "exit code": 1,
+    "last stderr line": "sophiagraph.contracts.errors.InvalidArgumentError: invalid scope: ''",
+    "prints 'Memory inspect'": false
+  },
+  "memctl inspect --scope \"\"": {
+    "exit code": 1,
+    "last stderr line": "sophiagraph.contracts.errors.InvalidArgumentError: invalid scope: ''",
+    "prints 'Memory inspect'": false
+  },
+  "memctl inspect --scope agent:a (control)": {
+    "exit code": 0,
+    "last stderr line": "",
+    "prints 'Memory inspect'": true
+  },
+  "memctl inspect --scope not-a-scope": {
+    "exit code": 1,
+    "last stderr line": "sophiagraph.contracts.errors.InvalidArgumentError: invalid scope: 'not-a-scope'",
+    "prints 'Memory inspect'": false
+  },
+  "memctl stats --json, no --scope (control)": {
+    "exit code": 0,
+    "last stderr line": "",
+    "active_record_count": 1
+  }
+}
+3.11.17 linux
