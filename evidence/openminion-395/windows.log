@@ -1,0 +1,71 @@
+fix/395-freshness-continuation-retention @ ad35d25868690005444bc9c1f9e41776504fcd23 (worktree clean: True) and dev @ b670bbb61a3e7a67eeeb90cfa40e28ccf58c1726
+native Windows 11 Pro 10.0.22631, CPython 3.11.11, PYTHONPATH="src;."; pytest output without progress dots and log lines
+
+== [head] pytest -q -p no:cacheprovider -p no:logging -rf --tb=line <focused: tests/brain/test_freshness_entry_retention.py tests/api/test_freshness_continuation.py tests/architecture/test_marker_discipline.py>
+19 passed in 28.31s
+
+== [head] pytest -q -p no:cacheprovider -p no:logging -rf --tb=line <related: tests/brain/test_freshness_routing.py tests/brain/test_freshness_enforcement.py tests/brain/test_unified_turn_entry.py tests/services/brain/test_current_date_evidence_grounding.py tests/brain/test_runner_context.py tests/test_cted_regression.py>
+110 passed in 5.13s
+
+== [head] the issue's probe: python probe_freshness_continuation.py (result lines)
+openminion 0.1.11, checkout ad35d258, python 3.11.11 win32
+== B_continuation_text
+tool executions: ['A-104']
+result.text for 'Check order A-104': 'openminion: [continuation] Order A-104 is ready for pickup, code ZEBRA-42.'
+== E_continuation_tool
+tool executions: ['A-104', 'A-104', 'A-104', 'A-104', 'A-104', 'A-104', 'A-104', 'A-104', 'A-104', 'A-104']
+result.text for 'Check order A-104': 'openminion: I hit an internal decision error before I could continue safely on this turn.'
+== A1_control_valid_contract_on_continuation
+tool executions: ['A-104', 'A-104']
+result.text for 'Check order A-104': 'openminion: [continuation] Order A-104 is ready for pickup, code ZEBRA-42.'
+== N1_control_new_user_input
+tool executions: ['A-104', 'B-205']
+result.text for 'Check order A-104': 'openminion: [continuation] Order A-104 is ready for pickup, code ZEBRA-42.'
+result.text for 'Check order B-205': 'openminion: [judge] Order B-205 is ready for pickup, code ZEBRA-42.'
+non-loopback connections attempted: 0
+
+== dev sources from here on: git checkout b670bbb6 -- src
+
+== [dev] pytest -q -p no:cacheprovider -p no:logging -rf --tb=line <focused: tests/brain/test_freshness_entry_retention.py tests/api/test_freshness_continuation.py tests/architecture/test_marker_discipline.py>
+C:\Users\User\Downloads\agentprize\projects\cortensor-hackathon-5\om-395\tests\brain\test_freshness_entry_retention.py:168: AssertionError: assert FreshnessContract(intent='', domain=<FreshnessDomain.GENERAL: 'general'>, time_sensitive=False, needs_live_data=False,...=False, needs_exact_date=False, answer_mode=<FreshnessAnswerMode.LOCAL_ONLY: 'local_only'>, reason='', confidence=None) is FreshnessContract(intent='order_status_inquiry', domain=<FreshnessDomain.SHOPPING: 'shopping'>, time_sensitive=True, n...xact_date=True, answer_mode=<FreshnessAnswerMode.BROWSE_THEN_ANSWER: 'browse_then_answer'>, reason='', confidence=None)
+C:\Users\User\Downloads\agentprize\projects\cortensor-hackathon-5\om-395\tests\api\test_freshness_continuation.py:357: AssertionError: assert {'after': {'c..._input': None} == {'after': {'c..._input': None}
+C:\Users\User\Downloads\agentprize\projects\cortensor-hackathon-5\om-395\tests\api\test_freshness_continuation.py:372: AssertionError: assert {'after': {'c..._input': None} == {'after': {'c..._input': None}
+=========================== short test summary info ===========================
+FAILED tests/brain/test_freshness_entry_retention.py::test_step_without_input_or_contract_keeps_the_turn_contract[text-None]
+FAILED tests/brain/test_freshness_entry_retention.py::test_step_without_input_or_contract_keeps_the_turn_contract[text-]
+FAILED tests/brain/test_freshness_entry_retention.py::test_step_without_input_or_contract_keeps_the_turn_contract[text- \n\t]
+FAILED tests/brain/test_freshness_entry_retention.py::test_step_without_input_or_contract_keeps_the_turn_contract[tool call without a contract-None]
+FAILED tests/brain/test_freshness_entry_retention.py::test_step_without_input_or_contract_keeps_the_turn_contract[tool call without a contract-]
+FAILED tests/brain/test_freshness_entry_retention.py::test_step_without_input_or_contract_keeps_the_turn_contract[tool call without a contract- \n\t]
+FAILED tests/brain/test_freshness_entry_retention.py::test_step_without_input_or_contract_keeps_the_turn_contract[tool call with an invalid contract-None]
+FAILED tests/brain/test_freshness_entry_retention.py::test_step_without_input_or_contract_keeps_the_turn_contract[tool call with an invalid contract-]
+FAILED tests/brain/test_freshness_entry_retention.py::test_step_without_input_or_contract_keeps_the_turn_contract[tool call with an invalid contract- \n\t]
+FAILED tests/api/test_freshness_continuation.py::test_text_continuation_keeps_the_exact_date_obligation
+FAILED tests/api/test_freshness_continuation.py::test_tool_continuation_keeps_the_obligation_and_the_guard_blocks_again
+11 failed, 8 passed in 13.75s
+
+== [dev] pytest -q -p no:cacheprovider -p no:logging -rf --tb=line <related: tests/brain/test_freshness_routing.py tests/brain/test_freshness_enforcement.py tests/brain/test_unified_turn_entry.py tests/services/brain/test_current_date_evidence_grounding.py tests/brain/test_runner_context.py tests/test_cted_regression.py>
+110 passed in 5.17s
+
+== [dev] the issue's probe: python probe_freshness_continuation.py (result lines)
+openminion 0.1.11, checkout ad35d258, python 3.11.11 win32
+== B_continuation_text
+tool executions: ['A-104']
+result.text for 'Check order A-104': 'openminion: [continuation] Order A-104 is ready for pickup, code ZEBRA-42.'
+== E_continuation_tool
+tool executions: ['A-104', 'A-104']
+result.text for 'Check order A-104': 'openminion: [judge] Order A-104 is ready for pickup, code ZEBRA-42.'
+== A1_control_valid_contract_on_continuation
+tool executions: ['A-104', 'A-104']
+result.text for 'Check order A-104': 'openminion: [continuation] Order A-104 is ready for pickup, code ZEBRA-42.'
+== N1_control_new_user_input
+tool executions: ['A-104', 'B-205']
+result.text for 'Check order A-104': 'openminion: [continuation] Order A-104 is ready for pickup, code ZEBRA-42.'
+result.text for 'Check order B-205': 'openminion: [judge] Order B-205 is ready for pickup, code ZEBRA-42.'
+non-loopback connections attempted: 0
+
+== back to the head: git status --short
+
+== ruff check / ruff format --check on the 3 changed Python files
+All checks passed!
+3 files already formatted
