@@ -1,0 +1,34 @@
+Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry
+Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane
+Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory
+Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a
+Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact
+Postgres module 'task' has pending migrations. Run: openminion storage migrate --module task
+Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy
+Postgres module 'secret' has pending migrations. Run: openminion storage migrate --module secret
+Postgres module 'session' has pending migrations. Run: openminion storage migrate --module session
+Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress
+Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve
+Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry
+Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill
+Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity
+backfill (migration 15 simulation): 50000 sessions, 160052 rows, 4788 ms
+size: session_metadata_strings 33832 KiB (with indexes), sessions 21528 KiB
+surface=acp, limit 100 | derived table 14.7 ms | this head's cast 75.6 ms | returned 100 | same ids: True
+surface=cli (60%), limit 100 | derived table 42.5 ms | this head's cast 89.9 ms | returned 100 | same ids: True
+working_dir (rare), limit 100 | derived table 1.2 ms | this head's cast 65.4 ms | returned 19 | same ids: True
+plan (rare working_dir):
+    Limit
+      ->  Sort
+            Sort Key: sessions.updated_at DESC, sessions.id DESC
+            ->  Nested Loop
+                  ->  HashAggregate
+                        Group Key: m.session_id
+                        ->  Bitmap Heap Scan on session_metadata_strings m
+                              Recheck Cond: (entry_digest = '5d9dc3604c57edd4'::text)
+                              Filter: ((key = '"working_dir"'::text) AND (value = '"/home/user/projects/p007"'::text))
+                              ->  Bitmap Index Scan on idx_session_metadata_strings_entry
+                                    Index Cond: (entry_digest = '5d9dc3604c57edd4'::text)
+                  ->  Index Scan using sessions_pkey on sessions
+                        Index Cond: (id = m.session_id)
+metadata write, median of 300: with derived rows 1.27 ms, row update only 0.64 ms
