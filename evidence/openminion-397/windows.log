@@ -1,0 +1,120 @@
+fix/397-external-capture-unsupported @ 62a8819cc8d6d80d8d5fb620236306d320eb0e78 (worktree clean: True) and dev @ b670bbb61a3e7a67eeeb90cfa40e28ccf58c1726
+native Windows 11 Pro 10.0.22631, CPython 3.11.11 SQLite 3.47.1, PYTHONPATH="src;."; pytest output without progress dots and log lines
+
+== [head] pytest -q -p no:cacheprovider -p no:logging -rf --tb=line <focused: tests/memory/test_external_backend_capture.py tests/memory/test_backend_interfaces_kce01.py tests/memory/test_external_backend_contract_kce09.py tests/runtime/test_bootstrap_memory_retrieve_di.py tests/memory/runtime/test_capture_recovery.py tests/architecture/test_marker_discipline.py>
+50 passed in 11.91s
+
+== [head] the issue's probe: python probe_external_capture.py
+{
+  "default provider (control)": {
+    "memory service store": "AuditedMemoryStore",
+    "memory service store wraps": "SQLiteMemoryStore",
+    "service store has callable apply_capture_bundle": true,
+    "turns": [
+      {
+        "run_state": "completed"
+      },
+      {
+        "run_state": "completed"
+      }
+    ],
+    "capture intents (turn.outcome, capture_state pending)": 2,
+    "capture results (memory.capture.result)": 2
+  },
+  "external provider, reference-sqlite adapter": {
+    "memory service store": "BackendMemoryStoreAdapter",
+    "adapter backend": "SophiaGraphSqliteStore",
+    "backend has apply_capture_bundle": false,
+    "service store has callable apply_capture_bundle": true,
+    "turns": [
+      {
+        "run_state": "completed"
+      },
+      {
+        "run_state": "completed"
+      }
+    ],
+    "capture intents (turn.outcome, capture_state pending)": 2,
+    "capture results (memory.capture.result)": 0
+  }
+}
+openminion 0.1.11 from checkout 62a8819c | python 3.11.11 win32
+
+== dev sources from here on: git checkout b670bbb6 -- src
+
+== [dev] pytest -q -p no:cacheprovider -p no:logging -rf --tb=line <focused: tests/memory/test_external_backend_capture.py tests/memory/test_backend_interfaces_kce01.py tests/memory/test_external_backend_contract_kce09.py tests/runtime/test_bootstrap_memory_retrieve_di.py tests/memory/runtime/test_capture_recovery.py tests/architecture/test_marker_discipline.py>
+================================== FAILURES ===================================
+C:\Users\User\Downloads\agentprize\projects\cortensor-hackathon-5\om-397\src\openminion\modules\memory\backends\builtin.py:467: NotImplementedError: backend SophiaGraphSqliteStore does not expose apply_capture_bundle()
+C:\Users\User\Downloads\agentprize\projects\cortensor-hackathon-5\om-397\tests\memory\test_external_backend_capture.py:218: AssertionError: NotImplementedError('backend SophiaGraphSqliteStore does not expose apply_capture_bundle()')
+=========================== short test summary info ===========================
+FAILED tests/memory/test_external_backend_capture.py::test_adapter_reports_a_backend_without_capture_as_unsupported
+FAILED tests/memory/test_external_backend_capture.py::test_sdk_turns_with_the_reference_backend_complete_with_capture_unsupported
+2 failed, 48 passed in 11.61s
+
+== [dev] the issue's probe: python probe_external_capture.py
+{
+  "default provider (control)": {
+    "memory service store": "AuditedMemoryStore",
+    "memory service store wraps": "SQLiteMemoryStore",
+    "service store has callable apply_capture_bundle": true,
+    "turns": [
+      {
+        "run_state": "completed"
+      },
+      {
+        "run_state": "completed"
+      }
+    ],
+    "capture intents (turn.outcome, capture_state pending)": 2,
+    "capture results (memory.capture.result)": 2
+  },
+  "external provider, reference-sqlite adapter": {
+    "memory service store": "BackendMemoryStoreAdapter",
+    "adapter backend": "SophiaGraphSqliteStore",
+    "backend has apply_capture_bundle": false,
+    "service store has callable apply_capture_bundle": true,
+    "turns": [
+      {
+        "raised": "NotImplementedError: backend SophiaGraphSqliteStore does not expose apply_capture_bundle()",
+        "handled by the capture step": false,
+        "openminion frames": [
+          "openminion/api/agent.py:378 run",
+          "...",
+          "openminion/modules/brain/runner/coordinator.py:575 run",
+          "openminion/modules/brain/runner/coordinator.py:457 _emit_turn_outcome",
+          "openminion/modules/brain/runner/coordinator.py:372 _append_turn_outcome_event",
+          "openminion/modules/brain/runner/coordinator.py:249 _apply_pending_capture_bundle",
+          "openminion/modules/brain/adapters/memory/runtime.py:255 apply_capture_bundle",
+          "openminion/modules/memory/service/mutations.py:101 apply_capture_bundle",
+          "openminion/modules/memory/backends/builtin.py:454 apply_capture_bundle",
+          "openminion/modules/memory/backends/builtin.py:467 _call_backend_extra"
+        ]
+      },
+      {
+        "raised": "NotImplementedError: backend SophiaGraphSqliteStore does not expose apply_capture_bundle()",
+        "handled by the capture step": false,
+        "openminion frames": [
+          "openminion/api/agent.py:378 run",
+          "...",
+          "openminion/modules/brain/runner/coordinator.py:575 run",
+          "openminion/modules/brain/runner/coordinator.py:457 _emit_turn_outcome",
+          "openminion/modules/brain/runner/coordinator.py:372 _append_turn_outcome_event",
+          "openminion/modules/brain/runner/coordinator.py:249 _apply_pending_capture_bundle",
+          "openminion/modules/brain/adapters/memory/runtime.py:255 apply_capture_bundle",
+          "openminion/modules/memory/service/mutations.py:101 apply_capture_bundle",
+          "openminion/modules/memory/backends/builtin.py:454 apply_capture_bundle",
+          "openminion/modules/memory/backends/builtin.py:467 _call_backend_extra"
+        ]
+      }
+    ],
+    "capture intents (turn.outcome, capture_state pending)": 2,
+    "capture results (memory.capture.result)": 0
+  }
+}
+openminion 0.1.11 from checkout 62a8819c | python 3.11.11 win32
+
+== back to the head: git status --short
+
+== ruff check / ruff format --check on the 3 changed Python files
+All checks passed!
+3 files already formatted

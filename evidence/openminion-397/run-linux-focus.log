@@ -1,0 +1,220 @@
+head: 62a8819c docs(changelog): note SDK turns with external backends without capture
+dev:  b670bbb6 Merge pull request #415 from AliceMessi/fix/400-pg-evidence-ref-decode
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+packages: psycopg 3.3.6;sophiagraph 0.0.12;SQLAlchemy 2.1.6;
+OPENMINION_TEST_POSTGRES_URL set: yes
+3cfac3d4e0d2e1edaccd1931d52ec29ee3fc01b4d15859ef3d5bbef3d6e96550  /tmp/ev/probe_external_capture.py
+6f5e2709542b59f04eb9a5a7432a75b136dd0b61c0689cfb9ae8bf5140df0f1f  /tmp/ev/run397.sh
+
+== [head] pytest -q -p no:cacheprovider -rf --tb=line <focused>
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+..................................................                       [100%]
+50 passed in 4.69s
+
+== [head] pytest -q -p no:cacheprovider -rf --tb=line <related>
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+........................................................................ [ 55%]
+..........................................................               [100%]
+130 passed in 3.72s
+
+== [head] the PostgreSQL capture bundle tests, with -m postgres
+
+...................                                                      [100%]
+19 passed, 4 deselected in 1.91s
+
+== [head] the issue's probe: PYTHONPATH=src:. python probe_external_capture.py
+{
+  "default provider (control)": {
+    "memory service store": "AuditedMemoryStore",
+    "memory service store wraps": "SQLiteMemoryStore",
+    "service store has callable apply_capture_bundle": true,
+    "turns": [
+      {
+        "run_state": "completed"
+      },
+      {
+        "run_state": "completed"
+      }
+    ],
+    "capture intents (turn.outcome, capture_state pending)": 2,
+    "capture results (memory.capture.result)": 2
+  },
+  "external provider, reference-sqlite adapter": {
+    "memory service store": "BackendMemoryStoreAdapter",
+    "adapter backend": "SophiaGraphSqliteStore",
+    "backend has apply_capture_bundle": false,
+    "service store has callable apply_capture_bundle": true,
+    "turns": [
+      {
+        "run_state": "completed"
+      },
+      {
+        "run_state": "completed"
+      }
+    ],
+    "capture intents (turn.outcome, capture_state pending)": 2,
+    "capture results (memory.capture.result)": 0
+  }
+}
+openminion 0.1.11 from checkout 62a8819c | python 3.11.17 linux
+
+== dev sources from here on: git checkout b670bbb6 -- src
+M  src/openminion/modules/memory/README.md
+M  src/openminion/modules/memory/backends/builtin.py
+M  src/openminion/modules/memory/backends/interfaces.py
+
+== [dev] pytest -q -p no:cacheprovider -rf --tb=line <focused>
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+F..F..............................................                       [100%]
+=================================== FAILURES ===================================
+/home/runner/work/linux-runner/linux-runner/src/openminion/modules/memory/backends/builtin.py:467: NotImplementedError: backend SophiaGraphSqliteStore does not expose apply_capture_bundle()
+/home/runner/work/linux-runner/linux-runner/tests/memory/test_external_backend_capture.py:218: AssertionError: NotImplementedError('backend SophiaGraphSqliteStore does not expose apply_capture_bundle()')
+=========================== short test summary info ============================
+FAILED tests/memory/test_external_backend_capture.py::test_adapter_reports_a_backend_without_capture_as_unsupported - NotImplementedError: backend SophiaGraphSqliteStore does not expose apply_capture_bundle()
+FAILED tests/memory/test_external_backend_capture.py::test_sdk_turns_with_the_reference_backend_complete_with_capture_unsupported - AssertionError: NotImplementedError('backend SophiaGraphSqliteStore does not expose apply_capture_bundle()')
+assert not True
+ +  where True = isinstance(NotImplementedError('backend SophiaGraphSqliteStore does not expose apply_capture_bundle()'), Exception)
+2 failed, 48 passed in 5.25s
+
+== [dev] pytest -q -p no:cacheprovider -rf --tb=line <related>
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+........................................................................ [ 55%]
+..........................................................               [100%]
+130 passed in 3.60s
+
+== [dev] the PostgreSQL capture bundle tests, with -m postgres
+
+...................                                                      [100%]
+19 passed, 4 deselected in 1.95s
+
+== [dev] the issue's probe: PYTHONPATH=src:. python probe_external_capture.py
+{
+  "default provider (control)": {
+    "memory service store": "AuditedMemoryStore",
+    "memory service store wraps": "SQLiteMemoryStore",
+    "service store has callable apply_capture_bundle": true,
+    "turns": [
+      {
+        "run_state": "completed"
+      },
+      {
+        "run_state": "completed"
+      }
+    ],
+    "capture intents (turn.outcome, capture_state pending)": 2,
+    "capture results (memory.capture.result)": 2
+  },
+  "external provider, reference-sqlite adapter": {
+    "memory service store": "BackendMemoryStoreAdapter",
+    "adapter backend": "SophiaGraphSqliteStore",
+    "backend has apply_capture_bundle": false,
+    "service store has callable apply_capture_bundle": true,
+    "turns": [
+      {
+        "raised": "NotImplementedError: backend SophiaGraphSqliteStore does not expose apply_capture_bundle()",
+        "handled by the capture step": false,
+        "openminion frames": [
+          "openminion/api/agent.py:378 run",
+          "...",
+          "openminion/modules/brain/runner/coordinator.py:575 run",
+          "openminion/modules/brain/runner/coordinator.py:457 _emit_turn_outcome",
+          "openminion/modules/brain/runner/coordinator.py:372 _append_turn_outcome_event",
+          "openminion/modules/brain/runner/coordinator.py:249 _apply_pending_capture_bundle",
+          "openminion/modules/brain/adapters/memory/runtime.py:255 apply_capture_bundle",
+          "openminion/modules/memory/service/mutations.py:101 apply_capture_bundle",
+          "openminion/modules/memory/backends/builtin.py:454 apply_capture_bundle",
+          "openminion/modules/memory/backends/builtin.py:467 _call_backend_extra"
+        ]
+      },
+      {
+        "raised": "NotImplementedError: backend SophiaGraphSqliteStore does not expose apply_capture_bundle()",
+        "handled by the capture step": false,
+        "openminion frames": [
+          "openminion/api/agent.py:378 run",
+          "...",
+          "openminion/modules/brain/runner/coordinator.py:575 run",
+          "openminion/modules/brain/runner/coordinator.py:457 _emit_turn_outcome",
+          "openminion/modules/brain/runner/coordinator.py:372 _append_turn_outcome_event",
+          "openminion/modules/brain/runner/coordinator.py:249 _apply_pending_capture_bundle",
+          "openminion/modules/brain/adapters/memory/runtime.py:255 apply_capture_bundle",
+          "openminion/modules/memory/service/mutations.py:101 apply_capture_bundle",
+          "openminion/modules/memory/backends/builtin.py:454 apply_capture_bundle",
+          "openminion/modules/memory/backends/builtin.py:467 _call_backend_extra"
+        ]
+      }
+    ],
+    "capture intents (turn.outcome, capture_state pending)": 2,
+    "capture results (memory.capture.result)": 0
+  }
+}
+openminion 0.1.11 from checkout 62a8819c | python 3.11.17 linux
+
+== back to the branch head
+
+== composition with PR #398: merge pull/398/head into the branch head
+PR #398 head: 6f1d29bc Merge branch 'dev' into fix/388-external-memory-close
+Auto-merging CHANGELOG.md
+Auto-merging src/openminion/modules/memory/README.md
+Auto-merging src/openminion/modules/memory/backends/builtin.py
+Automatic merge went well; stopped before committing as requested
+-- unmerged paths: 
+-- <focused> on the merge: 53 passed in 4.83s
+-- #398's tests on the merge: 51 passed in 3.31s
+-- #398's PostgreSQL tests on the merge (-m postgres): 3 passed in 1.94s
+-- the issue's probe on the merge:
+        "run_state": "completed"
+        "run_state": "completed"
+    "capture intents (turn.outcome, capture_state pending)": 2,
+    "capture results (memory.capture.result)": 2
+        "run_state": "completed"
+        "run_state": "completed"
+    "capture intents (turn.outcome, capture_state pending)": 2,
+    "capture results (memory.capture.result)": 0
+
+== merge aborted
+
+== ruff check .
+All checks passed!
+
+== make format-check
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m ruff format --check "/home/runner/work/linux-runner/linux-runner"
+5112 files already formatted
+
+== make workflow-check
+[INFO] This may take a few minutes...
+Lint GitHub Actions workflow files.......................................Passed
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/action_pins.py
+workflow action pins: clean
+
+== make lint
+[coo-10] clean — webhook secret-required contract preserved
+Skipping workspace browser tool-family contract validator (not present in standalone checkout).
+make typecheck
+make[1]: Entering directory '/home/runner/work/linux-runner/linux-runner'
+cd "/home/runner/work/linux-runner/linux-runner" && /home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4309; baseline total: 4309
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 290
+[tcr] api: 77 / 77 | monthly quota -50 | next target <= 27 | headroom 0
+[tcr] cli: 309 / 309 | monthly quota -50 | next target <= 259 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 222 / 222 | monthly quota -50 | next target <= 172 | headroom 0
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+make lint exit: 0
+
+== make test-critical
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+482 passed, 4 skipped, 1 warning in 12.48s
