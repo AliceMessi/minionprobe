@@ -7,8 +7,8 @@
 Built for [Cortensor Hackathon #5](https://dorahacks.io/hackathon/2418/detail). MinionProbe is a QA helper for builders who want to know which OpenMinion features work on *their* provider before they build on them.
 
 **Impact so far (25 Oct 2026):**
-- **26 bugs filed upstream** from MinionProbe runs and follow-up probes (the latest, [#408](https://github.com/openminion/openminion/issues/408), on 25 Oct at the maintainer's request in the #385 merge comment).
-- **20 fix PRs by us merged** into OpenMinion `dev` (table in [Fix PRs](#fix-prs-bug-fix-bonus)). The fixes that shipped were re-verified on the released packages: `openminion==0.1.10` ([evidence](evidence/openminion-0.1.10-verification)) and `openminion==0.1.11`, which ships seven more of our fixes ([evidence](evidence/openminion-0.1.11-verification); every check passed for #352, #353, #361, #365, #368, #373, #378).
+- **28 bugs filed upstream** from MinionProbe runs and follow-up probes (the latest, [#412](https://github.com/openminion/openminion/issues/412) and [#413](https://github.com/openminion/openminion/issues/413), on 25 Oct: production cases found while fixing #408 and #402, which the maintainer asked us to report on their own).
+- **21 fix PRs by us merged** into OpenMinion `dev` (table in [Fix PRs](#fix-prs-bug-fix-bonus)). The fixes that shipped were re-verified on the released packages: `openminion==0.1.10` ([evidence](evidence/openminion-0.1.10-verification)) and `openminion==0.1.11`, which ships seven more of our fixes ([evidence](evidence/openminion-0.1.11-verification); every check passed for #352, #353, #361, #365, #368, #373, #378).
 - **8 more issues** opened by the maintainer while reviewing our PRs were taken on: 7 already merged (including #372, the run-status facts table with migration 13, #380 for #368, and #385 for #364 with migration 14), and #369 in review (#406).
 
 ▶ **Demo video (2:10):** https://youtu.be/5aBN0y6YQeA. It shows an offline run, the matrix, bug #324 reproduced live, the triage agent and the filed issues. Terminal scenes are replays of real captured runs.
@@ -54,6 +54,14 @@ The maintainers confirmed all seven reports, and every fix PR below was reviewed
 | [#378](https://github.com/openminion/openminion/issues/378) OMX import leaves the target SQLite connection open until GC, blocking file cleanup on Windows (split out of #373) | [#379](https://github.com/openminion/openminion/pull/379), evidence [`openminion-omx-close`](evidence/openminion-omx-close) |
 | [#368](https://github.com/openminion/openminion/issues/368) runtime memory assembly never closes the store it creates; with PostgreSQL the engine stays open (disclosed in review of #366) | [#380](https://github.com/openminion/openminion/pull/380), live PostgreSQL close-chain evidence in [`openminion-368`](evidence/openminion-368) |
 | [#364](https://github.com/openminion/openminion/issues/364) tied participant join timestamps reorder listings and the active-agent fallback (opened by the maintainer) | [#385](https://github.com/openminion/openminion/pull/385): runtime migration 14 (`join_seq`) and a session-row lock for joins and leaves, evidence [`openminion-364`](evidence/openminion-364). The first-active-agent race was split out as [#393](https://github.com/openminion/openminion/issues/393), and the tests' own Windows cleanup problem as [#408](https://github.com/openminion/openminion/issues/408) (evidence [`openminion-windows-test-cleanup`](evidence/openminion-windows-test-cleanup)), at the maintainer's request |
+| [#400](https://github.com/openminion/openminion/issues/400) PostgreSQL retention and purge fail on any record or candidate that has evidence | [#415](https://github.com/openminion/openminion/pull/415): the shared evidence decoder keeps the list that PostgreSQL returns for JSONB, with SQLite controls, live PostgreSQL tests and a check composed with #399. Evidence [`openminion-400`](evidence/openminion-400) |
+
+Fix PRs opened on 25 Oct, in review:
+
+| Issue | Fix PR |
+|---|---|
+| [#408](https://github.com/openminion/openminion/issues/408) storage tests leave their own SQLite connections open, so they fail on native Windows | [#414](https://github.com/openminion/openminion/pull/414), test-only; evidence [`openminion-408`](evidence/openminion-408). The production `storagectl restore` case is reported as [#412](https://github.com/openminion/openminion/issues/412) (evidence [`openminion-storagectl-restore-target`](evidence/openminion-storagectl-restore-target)) |
+| [#402](https://github.com/openminion/openminion/issues/402) `memctl inspect` never shows the history summary behind the audited store | [#416](https://github.com/openminion/openminion/pull/416); evidence [`openminion-402`](evidence/openminion-402). `memctl inspect` without `--scope` is reported as [#413](https://github.com/openminion/openminion/issues/413) (evidence [`openminion-memctl-inspect-scope`](evidence/openminion-memctl-inspect-scope)) |
 
 ## Quick start
 
