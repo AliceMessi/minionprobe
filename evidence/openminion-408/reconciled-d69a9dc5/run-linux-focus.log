@@ -1,0 +1,239 @@
+Ubuntu 24.04 GitHub-hosted runner, AliceMessi/linux-runner run 40199795261 (https://github.com/AliceMessi/linux-runner/actions/runs/40199795261), preset openminion with the postgres extra and PostgreSQL 16
+head: d69a9dc5 Merge branch 'dev' into fix/408-windows-test-connection-close
+dev:  b670bbb6 Merge pull request #415 from AliceMessi/fix/400-pg-evidence-ref-decode
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+OPENMINION_TEST_POSTGRES_URL set: yes
+ee295c7a48abd09409d57fdbced12afcc60933121fd7bb97706fff4c2a10a7ee  /tmp/ev/probe_storagectl_restore.py
+cb3d13d4ea4e3c19179d210e5c0659ad3b20437a5f57af44e3283af6b3ead39f  /tmp/ev/run408.sh
+
+== [head] the 12 tests of #408, run 1: pytest -q -p no:cacheprovider -rf --tb=short <12 ids>
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+............                                                             [100%]
+12 passed in 2.28s
+
+== [head] the 12 tests of #408, run 2: pytest -q -p no:cacheprovider -rf --tb=short <12 ids>
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+............                                                             [100%]
+12 passed in 1.29s
+
+== [head] the 12 tests of #408, run 3: pytest -q -p no:cacheprovider -rf --tb=short <12 ids>
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+............                                                             [100%]
+12 passed in 1.71s
+
+== [head] the six targets of #408: pytest -q -p no:cacheprovider -rf --tb=short tests/test_storage_migrations.py tests/storage/test_migrations_runner.py tests/storage/test_migration_telemetry.py tests/storage/test_module_ops.py tests/storage/test_storagectl_cli.py tests/test_api_runtime.py::APIRuntimeBootstrapTests
+
+........................................................................ [ 83%]
+..............                                                           [100%]
+86 passed in 2.72s
+
+== [head] tests/storage/test_migrations_runner.py with PostgreSQL (module-level postgres marker; make test-ci deselects it): pytest -q -m postgres
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+............                                                             [100%]
+12 passed in 0.68s
+
+== dev's tests (b670bbb6) from here on: git checkout b670bbb6 -- tests
+M  CHANGELOG.md
+M  tests/storage/test_migration_telemetry.py
+M  tests/storage/test_migrations_runner.py
+M  tests/storage/test_module_ops.py
+M  tests/test_api_runtime.py
+M  tests/test_storage_migrations.py
+?? .deps/
+
+== [dev] the 12 tests of #408, run 1: pytest -q -p no:cacheprovider -rf --tb=short <12 ids>
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+............                                                             [100%]
+12 passed in 1.53s
+
+== [dev] the 12 tests of #408, run 2: pytest -q -p no:cacheprovider -rf --tb=short <12 ids>
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+............                                                             [100%]
+12 passed in 1.29s
+
+== [dev] the 12 tests of #408, run 3: pytest -q -p no:cacheprovider -rf --tb=short <12 ids>
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+............                                                             [100%]
+12 passed in 1.25s
+
+== [dev] the six targets of #408: pytest -q -p no:cacheprovider -rf --tb=short tests/test_storage_migrations.py tests/storage/test_migrations_runner.py tests/storage/test_migration_telemetry.py tests/storage/test_module_ops.py tests/storage/test_storagectl_cli.py tests/test_api_runtime.py::APIRuntimeBootstrapTests
+
+........................................................................ [ 83%]
+..............                                                           [100%]
+86 passed in 2.31s
+
+== [dev] tests/storage/test_migrations_runner.py with PostgreSQL (module-level postgres marker; make test-ci deselects it): pytest -q -m postgres
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+............                                                             [100%]
+12 passed in 0.45s
+
+== back to the branch head
+?? .deps/
+
+== storagectl restore probe (src is unchanged by the branch): PYTHONPATH=src:. python probe_storagectl_restore.py
+{
+  "setup": {
+    "migrate and backup exit codes": [
+      0,
+      0
+    ],
+    "snapshot marker": "before-backup",
+    "snapshot tables": 25
+  },
+  "A. storagectl restore onto the live database": {
+    "exit code": 0,
+    "printed ok": true,
+    "last stderr line": "",
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "B. storagectl restore onto a new path": {
+    "exit code": 0,
+    "printed ok": true,
+    "last stderr line": "",
+    "target afterwards": {
+      "file exists": true,
+      "marker": "(none: no such table: probe_marker)",
+      "bytes equal the snapshot": false,
+      "snapshot tables missing": 22,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "C. control: MigrationRunner.restore onto the live database": {
+    "exit code": 0,
+    "last stderr line": "",
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "D. control: MigrationRunner.restore onto a new path": {
+    "exit code": 0,
+    "last stderr line": "",
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "E. trace: storagectl restore onto the live database, in-process": {
+    "output": [
+      "REPLACE onto the target: 1 connection(s) open on it; -wal: 0 bytes",
+      "  HOLDER openminion/modules/storage/record_store.py:323 __init__ <- openminion/modules/storage/backends/registry.py:157 _sqlite_record_factory <- openminion/modules/storage/backends/registry.py:149 _create_backend <- openminion/modules/storage/backends/registry.py:56 create_record <- openminion/modules/storage/engine.py:339 from_config <- openminion/modules/storage/engine.py:427 from_paths <- openminion/modules/storage/cli.py:102 main",
+      "TARGET right after the replace: equals the snapshot: True",
+      "TARGET after MigrationRunner.detect: equals the snapshot: True",
+      "TARGET after cli.main returned: equals the snapshot: True",
+      "EXIT 0"
+    ],
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "E. trace: storagectl restore onto a new path, in-process": {
+    "output": [
+      "REPLACE onto the target: 1 connection(s) open on it; -wal: 103032 bytes",
+      "  HOLDER openminion/modules/storage/record_store.py:323 __init__ <- openminion/modules/storage/backends/registry.py:157 _sqlite_record_factory <- openminion/modules/storage/backends/registry.py:149 _create_backend <- openminion/modules/storage/backends/registry.py:56 create_record <- openminion/modules/storage/engine.py:339 from_config <- openminion/modules/storage/engine.py:427 from_paths <- openminion/modules/storage/cli.py:102 main",
+      "TARGET right after the replace: equals the snapshot: True",
+      "TARGET after MigrationRunner.detect: equals the snapshot: False",
+      "TARGET after cli.main returned: equals the snapshot: False",
+      "EXIT 0"
+    ],
+    "target afterwards": {
+      "file exists": true,
+      "marker": "(none: no such table: probe_marker)",
+      "bytes equal the snapshot": false,
+      "snapshot tables missing": 22,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  }
+}
+3.11.17 linux SQLite 3.45.1
+
+== ruff check .
+All checks passed!
+
+== make format-check
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m ruff format --check "/home/runner/work/linux-runner/linux-runner"
+5111 files already formatted
+
+== make workflow-check
+[INFO] This may take a few minutes...
+Lint GitHub Actions workflow files.......................................Passed
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/action_pins.py
+workflow action pins: clean
+
+== make lint
+
+[OK] Result
+  - method-LOC baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 111, "ceiling": 100, "checked": 20814, "over_ceiling": 111}, "ok": true, "validator": "method_loc"}
+{
+  "checked": 2646,
+  "ok": true,
+  "violations": []
+}
+broad_exception
+
+[INFO] Summary
+  files: 410
+  handlers: 1101
+  silent pass: 106
+  baseline entries: 410
+
+[OK] Result
+  - broad-exception baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 410, "files_with_handlers": 410, "handler_count": 1101, "silent_pass_count": 106}, "ok": true, "validator": "broad_exception"}
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/controlplane_delivery.py
+[coo-09] clean — no synchronous runner deliver regressions
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/webhook_secret.py
+[coo-10] clean — webhook secret-required contract preserved
+Skipping workspace browser tool-family contract validator (not present in standalone checkout).
+make typecheck
+make[1]: Entering directory '/home/runner/work/linux-runner/linux-runner'
+cd "/home/runner/work/linux-runner/linux-runner" && /home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4309; baseline total: 4309
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 290
+[tcr] api: 77 / 77 | monthly quota -50 | next target <= 27 | headroom 0
+[tcr] cli: 309 / 309 | monthly quota -50 | next target <= 259 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 222 / 222 | monthly quota -50 | next target <= 172 | headroom 0
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+make lint exit: 0
+
+== make test-critical
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+482 passed, 4 skipped, 1 warning in 12.13s

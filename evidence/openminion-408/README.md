@@ -10,3 +10,9 @@ Files:
 - `run-linux-dev-pg-timeout-test.log`: that test alone on a fresh checkout of `dev` @ `8b220e14`. It times out the same way when the `postgres` extra (psycopg) is installed, as in the runs above, and passes without it. It connects to the unroutable `192.0.2.1`, so it depends on the environment, not on the branch.
 
 The Windows logs keep the failing lines and the summary of each run; paths are shortened to `<checkout>`, `<python>` and `<tmp>`, and the localized Windows error text is trimmed.
+
+## Reconciled head `d69a9dc5`
+
+After review, `dev` moved to `b670bbb6` (#405, #415). The PR head became `d69a9dc5`, a merge of `dev` into the branch with no history rewrite; `CHANGELOG.md` was the only conflict, and both entries are kept. The same checks on that head are in [`reconciled-d69a9dc5`](reconciled-d69a9dc5):
+- `windows-12-dev.log`, `windows-12-head.log`, `windows-six-dev.log`, `windows-six-head.log`: the same Windows runs against `dev` @ `b670bbb6` and `d69a9dc5`, with the same results (11 failed, 1 passed -> 12 passed; 14 failed, 69 passed, 3 skipped -> 2 failed, 81 passed, 3 skipped; 5 of 5 each).
+- `run-linux-focus.log` (run 40199795261) and `run-linux-testci.log`: the Linux gates and the full `make test-ci` on `d69a9dc5`.
