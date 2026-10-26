@@ -1,0 +1,191 @@
+{
+  "probe": "probe_369_upgrade normal",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.12",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "backend": "postgres",
+  "postgres_server_version": "PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+  "pre": {
+    "ledger_head": 13,
+    "sessions": 1243,
+    "table": false
+  },
+  "case": "normal",
+  "summary": {
+    "passed": 20,
+    "failed": 0,
+    "total": 20
+  },
+  "checks": [
+    {
+      "check": "pre-upgrade: ledger head 13 written by 0.1.11, no session_metadata_strings, metadata = seed",
+      "pass": true,
+      "observed": {
+        "ledger_head": 13,
+        "sessions": 1243,
+        "table": false
+      }
+    },
+    {
+      "check": "normal: the first 0.1.12 open applies exactly migrations 14 and 15",
+      "pass": true,
+      "observed": [
+        14,
+        15
+      ]
+    },
+    {
+      "check": "normal: ledger has 14 and 15 exactly once (1..15)",
+      "pass": true,
+      "observed": [
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "check": "normal: stored metadata_json unchanged byte for byte (1243 sessions)",
+      "pass": true,
+      "observed": [
+        1243,
+        "001b0eaadd07469b"
+      ]
+    },
+    {
+      "check": "normal: backfilled rows = json.loads-derived rows (3695 rows, incl. NaN/Infinity/NUL/surrogate documents)",
+      "pass": true,
+      "observed": [
+        3695,
+        3695,
+        [],
+        []
+      ]
+    },
+    {
+      "check": "normal: sessions PostgreSQL cannot parse got their string rows",
+      "pass": true,
+      "observed": [
+        "odd-brace-value",
+        "odd-empty-string",
+        "odd-inf-other",
+        "odd-long",
+        "odd-nan-keys",
+        "odd-nan-other",
+        "odd-nul-key",
+        "odd-nul-other",
+        "odd-nul-value",
+        "odd-path-keys",
+        "odd-surrogate-other",
+        "odd-surrogate-value",
+        "odd-unicode"
+      ]
+    },
+    {
+      "check": "normal (postgres): 34 table filters + 23 odd filters select their sessions on the upgraded history",
+      "pass": true,
+      "observed": "57/57"
+    },
+    {
+      "check": "normal: legacy {'surface': 'acp'} limit=25 newest_first=True = reference order",
+      "pass": true,
+      "observed": [
+        25,
+        [
+          "legacy-1197",
+          "legacy-1194",
+          "legacy-1191"
+        ]
+      ]
+    },
+    {
+      "check": "normal: legacy {'surface': 'acp'} limit=25 newest_first=False = reference order",
+      "pass": true,
+      "observed": [
+        25,
+        [
+          "legacy-0000",
+          "legacy-0003",
+          "legacy-0006"
+        ]
+      ]
+    },
+    {
+      "check": "normal: legacy {'surface': 'cli', 'workspace_root': '/work/3'} limit=10 newest_first=True = reference order",
+      "pass": true,
+      "observed": [
+        10,
+        [
+          "legacy-1186",
+          "legacy-1165",
+          "legacy-1144"
+        ]
+      ]
+    },
+    {
+      "check": "normal: legacy {'surface': 'cli', 'workspace_root': '/work/3'} limit=10 newest_first=False = reference order",
+      "pass": true,
+      "observed": [
+        10,
+        [
+          "legacy-0010",
+          "legacy-0031",
+          "legacy-0052"
+        ]
+      ]
+    },
+    {
+      "check": "normal (postgres): legacy lone-surrogate value filter selects the 24 sessions that carry it",
+      "pass": true,
+      "observed": 24
+    },
+    {
+      "check": "normal (postgres): legacy escaped-NUL value filter selects the 24 sessions that carry it",
+      "pass": true,
+      "observed": 24
+    },
+    {
+      "check": "normal: the pre-upgrade ACP-style session is found by the ACP surface filter",
+      "pass": true,
+      "observed": [
+        "legacy-acp-client"
+      ]
+    },
+    {
+      "check": "normal: the pre-upgrade Focus-style session is found by agent+target+working_dir",
+      "pass": true,
+      "observed": [
+        "legacy-focus-client"
+      ]
+    },
+    {
+      "check": "normal: reopening applies no migration (idempotent)",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "normal: ledger unchanged after reopen",
+      "pass": true
+    },
+    {
+      "check": "normal: writes after the upgrade keep rows = stored metadata",
+      "pass": true
+    },
+    {
+      "check": "normal: an updated legacy session matches its new value",
+      "pass": true,
+      "observed": [
+        "legacy-0003"
+      ]
+    },
+    {
+      "check": "normal: deleting a session after the upgrade removes its rows",
+      "pass": true
+    }
+  ]
+}

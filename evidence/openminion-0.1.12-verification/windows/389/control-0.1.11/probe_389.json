@@ -1,0 +1,948 @@
+{
+  "info": {
+    "probe": "probe_389",
+    "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+    "openminion.__version__": "0.1.11",
+    "python": "3.12.11",
+    "platform": "Windows-11-10.0.22631-SP0",
+    "sqlite3.sqlite_version": "3.50.4",
+    "cwd": "<WORK>\\empty-389",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "gc_enabled_at_start": false,
+    "postgres": "not configured: the PostgreSQL cases (P) are not run here",
+    "gc_at_end": {
+      "gc_enabled": false,
+      "gc_collect_calls": 0
+    }
+  },
+  "summary": {
+    "passed": 2,
+    "failed": 11,
+    "total": 13
+  },
+  "all_pass": false,
+  "checks": [
+    {
+      "check": "A1. direct build_agent_memory_service caller: one SQLiteMemoryStore; close() x2 closes store, audit sink and artifact store once each; sink closed and artifact store rejects writes afterwards",
+      "pass": false,
+      "observed": {
+        "closer": "MemoryServiceGatewayAdapter",
+        "record_turn": "accepted",
+        "turn_reply": null,
+        "stores_created": [
+          "SQLiteMemoryStore"
+        ],
+        "audit_sinks_open_after_turn": [
+          true
+        ],
+        "after_each_close": "MemoryServiceGatewayAdapter has no close()",
+        "audit_sinks_open_after_close": [
+          true
+        ],
+        "artifact_store_write_after_close": "accepted"
+      }
+    },
+    {
+      "check": "A1. direct build_agent_memory_service caller: right after close, the fallback's artifact index and audit DB files can be renamed and deleted (GC disabled, no collection)",
+      "pass": false,
+      "observed": {
+        "artifact_index": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db.moved'",
+        "audit_sink_0": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\A-caller\\\\memory\\\\memory.audit.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\A-caller\\\\memory\\\\memory.audit.db.moved'"
+      }
+    },
+    {
+      "check": "A2. gateway service built without agent_memory: one SQLiteMemoryStore; close() x2 closes store, audit sink and artifact store once each; sink closed and artifact store rejects writes afterwards",
+      "pass": false,
+      "observed": {
+        "closer": "GatewayService",
+        "record_turn": null,
+        "turn_reply": "Noted.",
+        "stores_created": [
+          "SQLiteMemoryStore"
+        ],
+        "audit_sinks_open_after_turn": [
+          true
+        ],
+        "after_each_close": [
+          {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          },
+          {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          }
+        ],
+        "audit_sinks_open_after_close": [
+          true
+        ],
+        "artifact_store_write_after_close": "accepted"
+      }
+    },
+    {
+      "check": "A2. gateway service built without agent_memory: right after close, the fallback's artifact index and audit DB files can be renamed and deleted (GC disabled, no collection)",
+      "pass": false,
+      "observed": {
+        "artifact_index": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db.moved'",
+        "audit_sink_0": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\A-gateway\\\\memory\\\\memory.audit.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\A-gateway\\\\memory\\\\memory.audit.db.moved'"
+      }
+    },
+    {
+      "check": "A3. borrowed: a gateway service given the fallback memory as agent_memory closes nothing on two closes (sink stays open); the memory's own close() x2 then closes each once",
+      "pass": false,
+      "observed": {
+        "assemblies_built": 1,
+        "turn_reply": "Noted.",
+        "after_each_close": [
+          {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          },
+          {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          }
+        ],
+        "audit_sinks_open_after_gateway_close": [
+          true
+        ],
+        "then_the_memory_own_close": "MemoryServiceGatewayAdapter has no close()",
+        "audit_sinks_open_after_close": [
+          true
+        ]
+      }
+    },
+    {
+      "check": "A4. SDK control: the runtime's memory gateway (close_owner None) and gateway service close nothing themselves; runtime.close() x2 closes store, sink and artifact store once each",
+      "pass": true,
+      "observed": {
+        "turn": "completed",
+        "runtime_gateway_uses_this_memory_gateway": true,
+        "memory_gateway_close_owner_is_none": true,
+        "after_memory_gateway_and_gateway_service_close": {
+          "store": [
+            0
+          ],
+          "audit_sink": [
+            0
+          ],
+          "artifact_store": 0,
+          "external_backend": 0,
+          "engine_disposals": 0
+        },
+        "after_each_runtime_close": [
+          {
+            "store": [
+              1
+            ],
+            "audit_sink": [
+              1
+            ],
+            "artifact_store": 1,
+            "external_backend": 0,
+            "engine_disposals": 0
+          },
+          {
+            "store": [
+              1
+            ],
+            "audit_sink": [
+              1
+            ],
+            "artifact_store": 1,
+            "external_backend": 0,
+            "engine_disposals": 0
+          }
+        ]
+      }
+    },
+    {
+      "check": "B. external backend, direct caller: no memory store or audit sink is created; close() x2 closes the owned backend once and the artifact store once; a backend without close() closes cleanly",
+      "pass": false,
+      "observed": {
+        "with_close": {
+          "record_turn": "accepted",
+          "turn_reply": null,
+          "stores_created": [
+            "SQLiteMemoryStore"
+          ],
+          "after_each_close": "MemoryServiceGatewayAdapter has no close()"
+        },
+        "without_close": {
+          "record_turn": "accepted",
+          "turn_reply": null,
+          "stores_created": [
+            "SQLiteMemoryStore"
+          ],
+          "after_each_close": "MemoryServiceGatewayAdapter has no close()"
+        }
+      }
+    },
+    {
+      "check": "B. external backend, gateway-built fallback: no memory store or audit sink is created; close() x2 closes the owned backend once and the artifact store once; a backend without close() closes cleanly",
+      "pass": false,
+      "observed": {
+        "with_close": {
+          "record_turn": null,
+          "turn_reply": "Noted.",
+          "stores_created": [
+            "SQLiteMemoryStore"
+          ],
+          "after_each_close": [
+            {
+              "store": [
+                0
+              ],
+              "audit_sink": [
+                0
+              ],
+              "artifact_store": 0,
+              "external_backend": 0,
+              "engine_disposals": 0
+            },
+            {
+              "store": [
+                0
+              ],
+              "audit_sink": [
+                0
+              ],
+              "artifact_store": 0,
+              "external_backend": 0,
+              "engine_disposals": 0
+            }
+          ]
+        },
+        "without_close": {
+          "record_turn": null,
+          "turn_reply": "Noted.",
+          "stores_created": [
+            "SQLiteMemoryStore"
+          ],
+          "after_each_close": [
+            {
+              "store": [
+                0
+              ],
+              "audit_sink": [
+                0
+              ],
+              "artifact_store": 0,
+              "external_backend": 0,
+              "engine_disposals": 0
+            },
+            {
+              "store": [
+                0
+              ],
+              "audit_sink": [
+                0
+              ],
+              "artifact_store": 0,
+              "external_backend": 0,
+              "engine_disposals": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "check": "B. external backend, borrowed adapter: the gateway service given it closes nothing (backend and artifact store stay open); the adapter's own close() x2 then closes each once",
+      "pass": false,
+      "observed": {
+        "with_close": {
+          "after_each_close": [
+            {
+              "store": [
+                0
+              ],
+              "audit_sink": [
+                0
+              ],
+              "artifact_store": 0,
+              "external_backend": 0,
+              "engine_disposals": 0
+            },
+            {
+              "store": [
+                0
+              ],
+              "audit_sink": [
+                0
+              ],
+              "artifact_store": 0,
+              "external_backend": 0,
+              "engine_disposals": 0
+            }
+          ],
+          "then_the_memory_own_close": "MemoryServiceGatewayAdapter has no close()"
+        },
+        "without_close": {
+          "after_each_close": [
+            {
+              "store": [
+                0
+              ],
+              "audit_sink": [
+                0
+              ],
+              "artifact_store": 0,
+              "external_backend": 0,
+              "engine_disposals": 0
+            },
+            {
+              "store": [
+                0
+              ],
+              "audit_sink": [
+                0
+              ],
+              "artifact_store": 0,
+              "external_backend": 0,
+              "engine_disposals": 0
+            }
+          ],
+          "then_the_memory_own_close": "MemoryServiceGatewayAdapter has no close()"
+        }
+      }
+    },
+    {
+      "check": "C. gateway owner, live scheduler: close() closes nothing; after the scheduler stops, close() x2 closes store, sink and artifact store once each",
+      "pass": false,
+      "observed": {
+        "while_alive": {
+          "outcome": "accepted",
+          "counts": {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          }
+        },
+        "after_stop": [
+          {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          },
+          {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          }
+        ]
+      }
+    },
+    {
+      "check": "C. caller owner, live scheduler: close() closes nothing; after the scheduler stops, close() x2 closes store, sink and artifact store once each",
+      "pass": false,
+      "observed": {
+        "while_alive": {
+          "outcome": "accepted",
+          "counts": {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          }
+        },
+        "after_stop": "MemoryServiceGatewayAdapter has no close()"
+      }
+    },
+    {
+      "check": "C. direct caller, external backend, live scheduler: backend and artifact store stay open; after it stops, close() x2 closes each once",
+      "pass": false,
+      "observed": {
+        "while_alive": {
+          "outcome": "accepted",
+          "counts": {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          }
+        },
+        "after_stop": "MemoryServiceGatewayAdapter has no close()"
+      }
+    },
+    {
+      "check": "GC stayed disabled and gc.collect() was never called",
+      "pass": true,
+      "observed": {
+        "gc_enabled": false,
+        "gc_collect_calls": 0
+      }
+    }
+  ],
+  "observed": {
+    "A_sqlite": {
+      "caller": {
+        "owner": "caller",
+        "closer": "MemoryServiceGatewayAdapter",
+        "record_turn": "accepted",
+        "assemblies_built": 1,
+        "stores_created": [
+          "SQLiteMemoryStore"
+        ],
+        "audit_sinks_open_after_turn": [
+          true
+        ],
+        "after_each_close": "MemoryServiceGatewayAdapter has no close()",
+        "audit_sinks_open_after_close": [
+          true
+        ],
+        "artifact_store_write_after_close": "accepted",
+        "rename_delete_after_close": {
+          "artifact_index": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db.moved'",
+          "audit_sink_0": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\A-caller\\\\memory\\\\memory.audit.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\A-caller\\\\memory\\\\memory.audit.db.moved'"
+        }
+      },
+      "gateway": {
+        "owner": "gateway",
+        "closer": "GatewayService",
+        "turn_reply": "Noted.",
+        "assemblies_built": 1,
+        "stores_created": [
+          "SQLiteMemoryStore"
+        ],
+        "audit_sinks_open_after_turn": [
+          true
+        ],
+        "after_each_close": [
+          {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          },
+          {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          }
+        ],
+        "audit_sinks_open_after_close": [
+          true
+        ],
+        "artifact_store_write_after_close": "accepted",
+        "rename_delete_after_close": {
+          "artifact_index": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db.moved'",
+          "audit_sink_0": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\A-gateway\\\\memory\\\\memory.audit.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\A-gateway\\\\memory\\\\memory.audit.db.moved'"
+        }
+      },
+      "borrowed": {
+        "owner": "borrowed",
+        "closer": "GatewayService",
+        "turn_reply": "Noted.",
+        "assemblies_built": 1,
+        "stores_created": [
+          "SQLiteMemoryStore"
+        ],
+        "audit_sinks_open_after_turn": [
+          true
+        ],
+        "after_each_close": [
+          {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          },
+          {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          }
+        ],
+        "audit_sinks_open_after_gateway_close": [
+          true
+        ],
+        "then_the_memory_own_close": "MemoryServiceGatewayAdapter has no close()",
+        "audit_sinks_open_after_close": [
+          true
+        ],
+        "artifact_store_write_after_close": "accepted",
+        "rename_delete_after_close": {
+          "artifact_index": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db.moved'",
+          "audit_sink_0": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\A-borrowed\\\\memory\\\\memory.audit.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\A-borrowed\\\\memory\\\\memory.audit.db.moved'"
+        }
+      }
+    },
+    "A4_sdk_control": {
+      "turn": "completed",
+      "runtime_gateway_uses_this_memory_gateway": true,
+      "memory_gateway_close_owner_is_none": true,
+      "after_memory_gateway_and_gateway_service_close": {
+        "store": [
+          0
+        ],
+        "audit_sink": [
+          0
+        ],
+        "artifact_store": 0,
+        "external_backend": 0,
+        "engine_disposals": 0
+      },
+      "after_each_runtime_close": [
+        {
+          "store": [
+            1
+          ],
+          "audit_sink": [
+            1
+          ],
+          "artifact_store": 1,
+          "external_backend": 0,
+          "engine_disposals": 0
+        },
+        {
+          "store": [
+            1
+          ],
+          "audit_sink": [
+            1
+          ],
+          "artifact_store": 1,
+          "external_backend": 0,
+          "engine_disposals": 0
+        }
+      ]
+    },
+    "B_external_backend": {
+      "caller, external backend with close()": {
+        "owner": "caller",
+        "closer": "MemoryServiceGatewayAdapter",
+        "record_turn": "accepted",
+        "assemblies_built": 1,
+        "stores_created": [
+          "SQLiteMemoryStore"
+        ],
+        "audit_sinks_open_after_turn": [
+          false
+        ],
+        "after_each_close": "MemoryServiceGatewayAdapter has no close()",
+        "audit_sinks_open_after_close": [
+          false
+        ],
+        "artifact_store_write_after_close": "accepted",
+        "rename_delete_after_close": {
+          "artifact_index": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db.moved'",
+          "audit_sink_0": "missing"
+        }
+      },
+      "gateway, external backend with close()": {
+        "owner": "gateway",
+        "closer": "GatewayService",
+        "turn_reply": "Noted.",
+        "assemblies_built": 1,
+        "stores_created": [
+          "SQLiteMemoryStore"
+        ],
+        "audit_sinks_open_after_turn": [
+          false
+        ],
+        "after_each_close": [
+          {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          },
+          {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          }
+        ],
+        "audit_sinks_open_after_close": [
+          false
+        ],
+        "artifact_store_write_after_close": "accepted",
+        "rename_delete_after_close": {
+          "artifact_index": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db.moved'",
+          "audit_sink_0": "missing"
+        }
+      },
+      "borrowed, external backend with close()": {
+        "owner": "borrowed",
+        "closer": "GatewayService",
+        "turn_reply": "Noted.",
+        "assemblies_built": 1,
+        "stores_created": [
+          "SQLiteMemoryStore"
+        ],
+        "audit_sinks_open_after_turn": [
+          false
+        ],
+        "after_each_close": [
+          {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          },
+          {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          }
+        ],
+        "audit_sinks_open_after_gateway_close": [
+          false
+        ],
+        "then_the_memory_own_close": "MemoryServiceGatewayAdapter has no close()",
+        "audit_sinks_open_after_close": [
+          false
+        ],
+        "artifact_store_write_after_close": "accepted",
+        "rename_delete_after_close": {
+          "artifact_index": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db.moved'",
+          "audit_sink_0": "missing"
+        }
+      },
+      "caller, external backend without close()": {
+        "owner": "caller",
+        "closer": "MemoryServiceGatewayAdapter",
+        "record_turn": "accepted",
+        "assemblies_built": 1,
+        "stores_created": [
+          "SQLiteMemoryStore"
+        ],
+        "audit_sinks_open_after_turn": [
+          false
+        ],
+        "after_each_close": "MemoryServiceGatewayAdapter has no close()",
+        "audit_sinks_open_after_close": [
+          false
+        ],
+        "artifact_store_write_after_close": "accepted",
+        "rename_delete_after_close": {
+          "artifact_index": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db.moved'",
+          "audit_sink_0": "missing"
+        }
+      },
+      "gateway, external backend without close()": {
+        "owner": "gateway",
+        "closer": "GatewayService",
+        "turn_reply": "Noted.",
+        "assemblies_built": 1,
+        "stores_created": [
+          "SQLiteMemoryStore"
+        ],
+        "audit_sinks_open_after_turn": [
+          false
+        ],
+        "after_each_close": [
+          {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          },
+          {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          }
+        ],
+        "audit_sinks_open_after_close": [
+          false
+        ],
+        "artifact_store_write_after_close": "accepted",
+        "rename_delete_after_close": {
+          "artifact_index": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db.moved'",
+          "audit_sink_0": "missing"
+        }
+      },
+      "borrowed, external backend without close()": {
+        "owner": "borrowed",
+        "closer": "GatewayService",
+        "turn_reply": "Noted.",
+        "assemblies_built": 1,
+        "stores_created": [
+          "SQLiteMemoryStore"
+        ],
+        "audit_sinks_open_after_turn": [
+          false
+        ],
+        "after_each_close": [
+          {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          },
+          {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          }
+        ],
+        "audit_sinks_open_after_gateway_close": [
+          false
+        ],
+        "then_the_memory_own_close": "MemoryServiceGatewayAdapter has no close()",
+        "audit_sinks_open_after_close": [
+          false
+        ],
+        "artifact_store_write_after_close": "accepted",
+        "rename_delete_after_close": {
+          "artifact_index": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db.moved'",
+          "audit_sink_0": "missing"
+        }
+      }
+    },
+    "C_scheduler_boundary": {
+      "gateway, built-in store": {
+        "owner": "gateway",
+        "closer": "GatewayService",
+        "turn_reply": "Noted.",
+        "assemblies_built": 1,
+        "stores_created": [
+          "SQLiteMemoryStore"
+        ],
+        "audit_sinks_open_after_turn": [
+          true
+        ],
+        "close_while_scheduler_alive": {
+          "outcome": "accepted",
+          "counts": {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          }
+        },
+        "after_each_close": [
+          {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          },
+          {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          }
+        ],
+        "audit_sinks_open_after_close": [
+          true
+        ],
+        "artifact_store_write_after_close": "accepted",
+        "rename_delete_after_close": {
+          "artifact_index": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db.moved'",
+          "audit_sink_0": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\C-gateway\\\\memory\\\\memory.audit.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\C-gateway\\\\memory\\\\memory.audit.db.moved'"
+        }
+      },
+      "caller, built-in store": {
+        "owner": "caller",
+        "closer": "MemoryServiceGatewayAdapter",
+        "record_turn": "accepted",
+        "assemblies_built": 1,
+        "stores_created": [
+          "SQLiteMemoryStore"
+        ],
+        "audit_sinks_open_after_turn": [
+          true
+        ],
+        "close_while_scheduler_alive": {
+          "outcome": "accepted",
+          "counts": {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          }
+        },
+        "after_each_close": "MemoryServiceGatewayAdapter has no close()",
+        "audit_sinks_open_after_close": [
+          true
+        ],
+        "artifact_store_write_after_close": "accepted",
+        "rename_delete_after_close": {
+          "artifact_index": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db.moved'",
+          "audit_sink_0": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\C-caller\\\\memory\\\\memory.audit.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\C-caller\\\\memory\\\\memory.audit.db.moved'"
+        }
+      },
+      "caller, external backend with close()": {
+        "owner": "caller",
+        "closer": "MemoryServiceGatewayAdapter",
+        "record_turn": "accepted",
+        "assemblies_built": 1,
+        "stores_created": [
+          "SQLiteMemoryStore"
+        ],
+        "audit_sinks_open_after_turn": [
+          false
+        ],
+        "close_while_scheduler_alive": {
+          "outcome": "accepted",
+          "counts": {
+            "store": [
+              0
+            ],
+            "audit_sink": [
+              0
+            ],
+            "artifact_store": 0,
+            "external_backend": 0,
+            "engine_disposals": 0
+          }
+        },
+        "after_each_close": "MemoryServiceGatewayAdapter has no close()",
+        "audit_sinks_open_after_close": [
+          false
+        ],
+        "artifact_store_write_after_close": "accepted",
+        "rename_delete_after_close": {
+          "artifact_index": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db' -> '<WORK>\\\\work\\\\win-389-0111\\\\env-home\\\\data\\\\artifact\\\\index.db.moved'",
+          "audit_sink_0": "missing"
+        }
+      }
+    }
+  }
+}

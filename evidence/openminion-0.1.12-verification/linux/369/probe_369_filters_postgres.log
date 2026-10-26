@@ -1,0 +1,166 @@
+=== probe_369_filters_postgres: venv/bin/python -I -X utf8 probes/probe_369_filters.py postgres <RUNNER_TEMP>/work369/f-pg <RUNNER_TEMP>/logs/out/369/probe_369_filters_postgres.json
+{
+  "probe": "probe_369_filters",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.12",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "backend": "postgres"
+}
+postgres: PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+=== fresh
+PASS fresh: first open applies migrations 1..15 in order | observed=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+PASS fresh: ledger has each version 1..15 exactly once | observed=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+PASS fresh: ledger entry 15 is add_session_metadata_strings | observed=[[14, 'add_room_participant_join_seq'], [15, 'add_session_metadata_strings']]
+PASS fresh: session_metadata_strings exists
+PASS fresh: indexes idx_session_metadata_strings_entry and _session exist | observed=['idx_session_metadata_strings_entry', 'idx_session_metadata_strings_session']
+PASS fresh: session_id references sessions ON DELETE CASCADE | observed=[{'delete_rule': 'CASCADE'}]
+PASS fresh: a new session's string members are written with it | observed=[['fresh-a', '"surface"', '"acp"', '2af8a33a99b79ecf']]
+PASS fresh: reopening applies no migration | observed=[]
+PASS fresh: ledger unchanged after reopen
+=== matrix
+PASS matrix: {'surface': 'acp'} selects ['acp-a', 'acp-b'] | observed=['acp-a', 'acp-b']
+PASS matrix: {'surface': 'focus'} selects [] | observed=[]
+PASS matrix: {'surface': 'ACP'} selects [] | observed=[]
+PASS matrix: {'surface': 'acp', 'workspace_root': '/work/a'} selects ['acp-a'] | observed=['acp-a']
+PASS matrix: {'surface': 'acp', 'workspace_root': '/work/c'} selects [] | observed=[]
+PASS matrix: {'surface': 'acp', 'missing': 'acp'} selects [] | observed=[]
+PASS matrix: {'missing': 'acp'} selects [] | observed=[]
+PASS matrix: {'missing': ''} selects [] | observed=[]
+PASS matrix: {'surface': ''} selects ['empty-surface'] | observed=['empty-surface']
+PASS matrix: {'surface': None} selects ['empty-surface'] | observed=['empty-surface']
+PASS matrix: {'  surface  ': 'cli'} selects ['cli-a'] | observed=['cli-a']
+PASS matrix: {'': 'ignored', 'surface': 'cli'} selects ['cli-a'] | observed=['cli-a']
+PASS matrix: {'value': '1'} selects ['text-one'] | observed=['text-one']
+PASS matrix: {'value': '1.5'} selects [] | observed=[]
+PASS matrix: {'value': 'true'} selects ['text-true'] | observed=['text-true']
+PASS matrix: {'value': 'True'} selects [] | observed=[]
+PASS matrix: {'value': 'false'} selects [] | observed=[]
+PASS matrix: {'value': '0'} selects [] | observed=[]
+PASS matrix: {'value': 'null'} selects ['text-null'] | observed=['text-null']
+PASS matrix: {'value': 'None'} selects [] | observed=[]
+PASS matrix: {'value': ''} selects [] | observed=[]
+PASS matrix: {'value': '{"kind": "acp"}'} selects [] | observed=[]
+PASS matrix: {"it's": 'yes'} selects ['quote-key'] | observed=['quote-key']
+PASS matrix: {'100%_done': 'yes'} selects ['like-key'] | observed=['like-key']
+PASS matrix: {'100%': 'yes'} selects [] | observed=[]
+PASS matrix: {'$scope': 'yes'} selects ['dollar-key'] | observed=['dollar-key']
+PASS matrix: {'a b': 'yes'} selects ['space-key'] | observed=['space-key']
+PASS matrix: {"k') OR ('1'='1": 'yes'} selects ['sql-key'] | observed=['sql-key']
+PASS matrix: {"k') OR ('1'='1": 'no'} selects [] | observed=[]
+PASS matrix: {'note': 'say "hi" \\ C:\\work\\a'} selects ['escaped-value'] | observed=['escaped-value']
+PASS matrix: {'note': 'caf\xe9 \U0001f600 \u2028'} selects ['unicode-value'] | observed=['unicode-value']
+PASS matrix: {'note': 'line\nbreak\ttab'} selects ['newline-value'] | observed=['newline-value']
+PASS matrix: {'note': 'a%'} selects ['like-value'] | observed=['like-value']
+PASS matrix: {'note': 'a_'} selects [] | observed=[]
+PASS matrix: no filter lists every session | observed=25
+PASS matrix: stored rows equal the rows derived from stored metadata
+=== differences
+PASS differences (postgres): {'value': '{"kind":"acp"}'} selects [] | observed=[]
+PASS differences (postgres): {'value': '[1,"x"]'} selects [] | observed=[]
+PASS differences (postgres): {'a.b': 'top'} selects ['dotted-top'] | observed=['dotted-top']
+PASS differences (postgres): {'a.b': 'nested'} selects [] | observed=[]
+PASS differences (postgres): {'tags[0]': 'top'} selects ['bracket-top'] | observed=['bracket-top']
+PASS differences (postgres): {'tags[0]': 'first'} selects [] | observed=[]
+PASS differences (postgres): {'"q"': 'top'} selects ['quoted-top'] | observed=['quoted-top']
+PASS differences (postgres): {'"q"': 'plain'} selects [] | observed=[]
+=== odd
+PASS odd: NaN, Infinity and the NUL/surrogate escapes are stored as written (json.dumps text) | observed={'odd-nan-other': '{"score": NaN, "surface": "acp"}', 'odd-inf-other': '{"high": Infinity, "low": -Infinity, "surface": "acp"}', 'odd-nul-other': '{"note": "a\\u0000b", "surface": "acp"}', 'odd-surrogate-other': '{"note": "\\ud800x\\udc00", "surface": "acp"}'}
+PASS odd (postgres): {'surface': 'acp'} selects ['odd-inf-other', 'odd-long', 'odd-nan-other', 'odd-nul-other', 'odd-surrogate-other'] | observed=['odd-inf-other', 'odd-long', 'odd-nan-other', 'odd-nul-other', 'odd-surrogate-other']
+PASS odd (postgres): {'surface': 'a\x00b'} selects ['odd-nul-value'] | observed=['odd-nul-value']
+PASS odd (postgres): {'k\x00z': 'value'} selects ['odd-nul-key'] | observed=['odd-nul-key']
+PASS odd (postgres): {'surface': 'x\ud800'} selects ['odd-surrogate-value'] | observed=['odd-surrogate-value']
+PASS odd (postgres): {'note': '\ud800x\udc00'} selects ['odd-surrogate-other'] | observed=['odd-surrogate-other']
+PASS odd (postgres): {'caf\xe9': '\U0001f600'} selects ['odd-unicode'] | observed=['odd-unicode']
+PASS odd (postgres): {'surface': 'caf\xe9'} selects ['odd-unicode'] | observed=['odd-unicode']
+PASS odd (postgres): {'surface': '{"a":1}'} selects ['odd-brace-value'] | observed=['odd-brace-value']
+PASS odd (postgres): {'working_dir': '[draft]'} selects ['odd-brace-value'] | observed=['odd-brace-value']
+PASS odd (postgres): {'working_dir': '["draft"]'} selects [] | observed=[]
+PASS odd (postgres): {'a.b': 'literal'} selects ['odd-path-keys'] | observed=['odd-path-keys']
+PASS odd (postgres): {'a.b': 'nested'} selects [] | observed=[]
+PASS odd (postgres): {'t[0]': 'x'} selects ['odd-path-keys'] | observed=['odd-path-keys']
+PASS odd (postgres): {'"q"': 'y'} selects ['odd-path-keys'] | observed=['odd-path-keys']
+PASS odd (postgres): {"<5000 x 'k'>": "<100000 x 'v'>"} selects ['odd-long'] | observed=['odd-long']
+PASS odd (postgres): {"<5000 x 'k'>": "<99999 x 'v'>"} selects [] | observed=[]
+PASS odd (postgres): {'NaN': 'second'} selects ['odd-nan-keys'] | observed=['odd-nan-keys']
+PASS odd (postgres): {'NaN': 'first'} selects [] | observed=[]
+PASS odd (postgres): {'surface': '1'} selects [] | observed=[]
+PASS odd (postgres): {'flag': 'true'} selects [] | observed=[]
+PASS odd (postgres): {'none': ''} selects [] | observed=[]
+PASS odd (postgres): {'surface': ''} selects ['odd-empty-string'] | observed=['odd-empty-string']
+PASS odd (postgres): {'surface': 'acp', 'note': 'a\x00b'} selects ['odd-nul-other'] | observed=['odd-nul-other']
+PASS odd: stored rows equal the rows derived with json.loads from stored metadata | observed=20
+PASS odd: every stored name/value is ASCII JSON text without a NUL byte
+PASS odd: the 5,000-char name and 100,000-char value are stored in full | observed=[[5002, 100002]]
+=== bounded
+PASS bounded: limits 1,2,5,23,24,25,1000 x both orders return min(limit,24) sessions in (updated_at,id) order | observed='all 14 match'
+=== collision
+PASS collision: every row shares one forced digest | observed=['0000000000000000']
+PASS collision (postgres): all 23 odd filters still select exactly their sessions | observed='23/23'
+PASS collision (postgres): near-miss value 'acq' selects only 'near' | observed=['near']
+PASS collision (postgres): 'a.b'='literal' does not match 'literals' | observed=['odd-path-keys']
+=== writes
+PASS writes: rows match stored metadata after keyed insert
+PASS writes: rows match stored metadata after keyed metadata replacement
+PASS writes: after replacement the old value no longer matches and the new one does
+PASS writes: resolve without metadata keeps rows
+PASS writes: rows match stored metadata after explicit session and room creation
+PASS writes: an ignored conflicting insert writes no rows and keeps the session
+PASS writes: 'replaced' matches nothing after the ignored insert
+PASS writes: rows match stored metadata after update_session_metadata (changed value, string->number, new member)
+PASS writes: updated filters follow the update
+PASS writes: delete_session returns True
+PASS writes: delete_session removes the session's rows | observed=['e4042c45865240a295f95a52b9867df0', 'explicit-a']
+PASS writes: a direct DELETE FROM sessions cascades to the rows
+PASS writes: rows match stored metadata after all writes
+=== rollback
+PASS rollback: update_session_metadata failing after its rows raises and changes nothing | observed='RuntimeError: injected failure after the metadata strings'
+PASS rollback: keyed resolve_session metadata update failing after its rows changes nothing | observed='RuntimeError: injected failure after the metadata strings'
+PASS rollback: a new session whose rows fail is not stored | observed='RuntimeError: injected failure after the metadata strings'
+PASS rollback: a failing fence check comes before any write | observed='RuntimeSessionTurnFenceError: session turn lease is not active'
+PASS rollback: filters still see the committed values only
+=== falsey
+PASS falsey: {'surface': None} is sent as '' and selects ['f-empty'] | observed=['f-empty']
+PASS falsey: {'surface': 0} is sent as '' and selects ['f-empty'] | observed=['f-empty']
+PASS falsey: {'surface': False} is sent as '' and selects ['f-empty'] | observed=['f-empty']
+PASS falsey: {'surface': ''} is sent as '' and selects ['f-empty'] | observed=['f-empty']
+PASS falsey: {'surface': []} is sent as '' and selects ['f-empty'] | observed=['f-empty']
+PASS falsey: {'surface': {}} is sent as '' and selects ['f-empty'] | observed=['f-empty']
+PASS falsey: {'surface': ()} is sent as '' and selects ['f-empty'] | observed=['f-empty']
+PASS non-string (postgres): {'surface': 1} raises TypeError | observed='TypeError: session metadata filter values must be strings, not int'
+PASS non-string (postgres): {'surface': True} raises TypeError | observed='TypeError: session metadata filter values must be strings, not bool'
+PASS non-string (postgres): {'surface': 1.5} raises TypeError | observed='TypeError: session metadata filter values must be strings, not float'
+=== concurrent
+PASS concurrent: 4 writers x 25 metadata updates on one session complete without errors | observed=[]
+PASS concurrent: rows match the final stored metadata
+PASS concurrent: the final surface value selects the session; no stale value does | observed=['writer-1-24', ['concurrent-a']]
+PASS concurrent: 8 racing creations of one keyed session finish without errors, one session | observed=[[], 1]
+PASS concurrent: the raced session's rows match its stored metadata
+PASS concurrent: a metadata update racing a delete: no deadlock/integrity error, session and rows gone | observed={'errors': [], 'deleted': True, 'update_stopped': 'RuntimeError: Failed to update metadata for session_id=race-delete'}
+PASS concurrent: rows match stored metadata at the end
+PASS concurrent: a failed PostgreSQL update rolls back; another connection sees the old rows and no 'rolled-back' match | observed='injected failure after the metadata strings'
+=== pg-runtime-bootstrap (note)
+NOTE APIRuntime with storage.backend=postgres: RuntimeError: runtime record_store does not expose sqlite connection
+NOTE openminion acp with storage.backend=postgres: no reply (Empty)
+NOTE openminion acp exit code and last stderr line: [2, ['openminion: runtime record_store does not expose sqlite connection']]
+=== acp
+acp path: installed OpenMinionACPAgent in-process (runtime object: sessions + config)
+PASS acp (installed OpenMinionACPAgent in-process (runtime object: sessions + config)): initialize reports the installed version and session/list capability | observed='0.1.12'
+PASS acp: session/list cwd=a lists only ACP sessions of workspace a, newest first (incl. NaN/NUL/surrogate in other fields) | observed=['odd-acp-in-a', '7b7cceeed16542debde72a5452d75054']
+PASS acp: session/list without cwd lists every ACP session newest first; cli/list/True/ACP/missing surfaces excluded | observed=['odd-acp-in-a', 'fb4f8839fdd7405bb265ff0ca756b53f', '7b7cceeed16542debde72a5452d75054']
+PASS acp: session/list cwd=b lists only the workspace-b session | observed=['fb4f8839fdd7405bb265ff0ca756b53f']
+PASS acp: with 108 ACP sessions session/list returns the newest 100 (store limit), in order | observed=100
+=== focus
+focus path: installed Focus OpenMinionRuntime over a PostgreSQL runtime SessionStore (runtime object shim)
+PASS focus: a new Focus session stores working_dir (resolved) and focus_mode | observed={'working_dir': '<WORK>/work369/f-pg/focus-72b29873/project-a', 'focus_mode': True}
+PASS focus: list_directory_sessions = alpha's sessions of project-a, newest first (beta's and project-b's excluded) | observed=['focus-odd', 'focus-bbff93b2bcca4bd59d44c8818d6cb60c', 'focus-97447eac12dc4d3787101e8aa58b8c8d', 'focus-a4325b310be146fdb5d7ba01906eae70']
+PASS focus: limit=2 returns the newest two | observed=['focus-odd', 'focus-bbff93b2bcca4bd59d44c8818d6cb60c']
+PASS focus: find_candidate_session is the newest | observed='focus-odd'
+PASS focus: beta lists only its own project-a session | observed=['focus-6b0f1f88d5374e92a552bb4e3264fafe']
+PASS focus: project-b lists its one session | observed=1
+SUMMARY passed=132 failed=0 total=132 skipped=0
+exit=0

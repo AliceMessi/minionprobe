@@ -1,0 +1,124 @@
+=== probe_396: venv0111/bin/python -I -X utf8 probes/probe_396.py <RUNNER_TEMP>/work369/396-0111 <RUNNER_TEMP>/logs/out/396/control-0.1.11/probe_396.json
+{
+  "probe": "probe_396",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty",
+  "imported_from_site_packages": true,
+  "isolated_mode": true
+}
+PASS sqlite: stored event types are kept as given | observed=['run.queued', 'run.running', 'RUN.failed', 'run.queued', 'Run.completed', 'run.COMPLETED']
+FAIL sqlite: list_session_runs counts only lowercase run. events | observed=[['r3', 'completed', 1, True, ''], ['r2', 'running', 2, False, ''], ['r1', 'failed', 3, True, 'boom']]
+FAIL sqlite: exact-run reads list only lowercase run. events (suffix any case) | observed={'r1': [[1, 'run.queued', 'queued'], [2, 'run.running', 'running'], [3, 'RUN.failed', 'failed']], 'r2': [[4, 'run.queued', 'queued'], [5, 'Run.completed', 'running']], 'r3': [[6, 'run.COMPLETED', 'completed']]}
+PASS sqlite: thread projection and invocation terminal agree (r2 queued; RUN.failed is no terminal) | observed=[['r2', 'queued'], None]
+FAIL sqlite: runs API list_runs matches | observed=[['r3', 'completed', 1], ['r2', 'running', 2], ['r1', 'failed', 3]]
+FAIL sqlite: runs API list_run_events r1 = run.queued, run.running | observed=['run.queued', 'run.running', 'RUN.failed']
+FAIL sqlite: a run with only an upper-case RUN. event is not a run (runs API: run_not_found) | observed="found ['RUN.queued']"
+PASS sqlite: generic list_events/count_events(event_type_prefix='run.') unchanged (7/7) | observed=[7, 7]
+FAIL sqlite: `openminion status runs --json` (installed CLI) matches | observed=[['upper-only', 'running', 1], ['r3', 'completed', 1], ['r2', 'running', 2], ['r1', 'failed', 3]]
+FAIL sqlite: `openminion status run-events --run-id r1 --json` = run.queued, run.running | observed=['run.queued', 'run.running', 'RUN.failed']
+FAIL sqlite: same run ids with run./RUN./Run.: state/step/start/end/count/error from lowercase events only (oracle) | observed=[['m2', 'completed', '', '2026-10-26T10:46:02.674865+00:00', '2026-10-26T10:46:02.675828+00:00', 2, ''], ['m1', 'completed', 's1', '2026-10-26T10:46:02.665956+00:00', '2026-10-26T10:46:02.673904+00:00', 5, 'upper-error']]
+FAIL sqlite: m1 = running, step s1, 2 events, not ended, no error; m2 = completed, 1 event, ended | observed=[['m1', 'completed', 's1', 5, True, 'upper-error'], ['m2', 'completed', '', 2, True, '']]
+FAIL sqlite: m1 exact read = run.queued, run.running | observed=[['run.queued', 'queued'], ['RUN.running', 'running'], ['Run.failed', 'failed'], ['run.running', 'running'], ['RUN.completed', 'completed']]
+PASS sqlite: state from the suffix in any case; payload state wins; unknown suffix -> running | observed={'x7': 'running', 'x6': 'running', 'x5': 'completed', 'x4': 'cancelled', 'x3': 'waiting_tool', 'x2': 'failed', 'x1': 'completed'}
+FAIL sqlite: 60 interleaved events at one timestamp: summaries = oracle (state/step/start/end/count/error), ties by run_id desc | observed=[['t8', 'completed', 'step-35', 6, 'err-44'], ['t7', 'running', 'step-7', 6, ''], ['t6', 'running', 'step-42', 6, 'err-33'], ['t5', 'failed', 'step-14', 7, ''], ['t4', 'completed', 'step-49', 7, 'err-22'], ['t3', 'waiting_tool', 'step-21', 7, ''], ['t2', 'running', 'step-56', 7, 'err-11'], ['t1', 'queued', 'step-28', 7, 'err-55'], ['t0', 'running', 'step-0', 7, 'err-0']]
+FAIL sqlite: tied exact-run read = lowercase events in id order | observed=7
+FAIL sqlite: list_session_runs(limit=2) returns the 2 newest of the oracle | observed=['t8', 't7']
+FAIL sqlite: list_session_run_events(limit=3) returns the newest 3 lowercase events, oldest first | observed=[58, 67, 76]
+FAIL sqlite: a scan window of 10 after 50 newer RUN. events still finds the lowercase run | observed=['noise']
+FAIL sqlite: rows read by the run readers do not grow with 50 -> 500 upper-case events | observed={'runs 50': 2, 'runs 500': 3, 'events 50': 3, 'events 500': 3}
+PASS sqlite: metadata filter {'probe': '396'} lists the 5 sessions after the run events | observed=['mixed-a6cb8dee', 'report-a6cb8dee', 'suffix-a6cb8dee', 'ties-a6cb8dee', 'window-a6cb8dee']
+PASS postgres: stored event types are kept as given | observed=['run.queued', 'run.running', 'RUN.failed', 'run.queued', 'Run.completed', 'run.COMPLETED']
+PASS postgres: list_session_runs counts only lowercase run. events | observed=[['r3', 'completed', 1, True, ''], ['r2', 'queued', 1, False, ''], ['r1', 'running', 2, False, '']]
+PASS postgres: exact-run reads list only lowercase run. events (suffix any case) | observed={'r1': [[1, 'run.queued', 'queued'], [2, 'run.running', 'running']], 'r2': [[4, 'run.queued', 'queued']], 'r3': [[6, 'run.COMPLETED', 'completed']]}
+PASS postgres: thread projection and invocation terminal agree (r2 queued; RUN.failed is no terminal) | observed=[['r2', 'queued'], None]
+PASS postgres: runs API list_runs matches | observed=[['r3', 'completed', 1], ['r2', 'queued', 1], ['r1', 'running', 2]]
+PASS postgres: runs API list_run_events r1 = run.queued, run.running | observed=['run.queued', 'run.running']
+PASS postgres: a run with only an upper-case RUN. event is not a run (runs API: run_not_found) | observed='RunQueryError run_not_found'
+PASS postgres: generic list_events/count_events(event_type_prefix='run.') unchanged (4/4) | observed=[4, 4]
+PASS postgres: same run ids with run./RUN./Run.: state/step/start/end/count/error from lowercase events only (oracle) | observed=[['m2', 'completed', '', '2026-10-26T10:46:03.774782+00:00', '2026-10-26T10:46:03.774782+00:00', 1, ''], ['m1', 'running', 's1', '2026-10-26T10:46:03.759537+00:00', '', 2, '']]
+PASS postgres: m1 = running, step s1, 2 events, not ended, no error; m2 = completed, 1 event, ended | observed=[['m1', 'running', 's1', 2, False, ''], ['m2', 'completed', '', 1, True, '']]
+PASS postgres: m1 exact read = run.queued, run.running | observed=[['run.queued', 'queued'], ['run.running', 'running']]
+PASS postgres: state from the suffix in any case; payload state wins; unknown suffix -> running | observed={'x7': 'running', 'x6': 'running', 'x5': 'completed', 'x4': 'cancelled', 'x3': 'waiting_tool', 'x2': 'failed', 'x1': 'completed'}
+PASS postgres: 60 interleaved events at one timestamp: summaries = oracle (state/step/start/end/count/error), ties by run_id desc | observed=[['t8', 'completed', 'step-35', 3, ''], ['t7', 'completed', '', 2, ''], ['t6', 'completed', '', 2, 'err-33'], ['t5', 'queued', '', 3, ''], ['t4', 'completed', '', 3, ''], ['t3', 'completed', '', 3, ''], ['t2', 'completed', '', 2, ''], ['t1', 'queued', 'step-28', 3, 'err-55'], ['t0', 'queued', 'step-0', 3, 'err-0']]
+PASS postgres: tied exact-run read = lowercase events in id order | observed=3
+PASS postgres: list_session_runs(limit=2) returns the 2 newest of the oracle | observed=['t8', 't7']
+PASS postgres: list_session_run_events(limit=3) returns the newest 3 lowercase events, oldest first | observed=[22, 40, 67]
+PASS postgres: a scan window of 10 after 50 newer RUN. events still finds the lowercase run | observed=['early']
+PASS postgres: rows read by the run readers do not grow with 50 -> 500 upper-case events | observed={'runs 50': 2, 'runs 500': 2, 'events 50': 3, 'events 500': 3}
+Traceback (most recent call last):
+  File "<VENV0111>/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "<VENV0111>/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+  File "<VENV0111>/lib/python3.12/site-packages/psycopg/cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+psycopg.errors.UndefinedFunction: function json_extract(text, unknown) does not exist
+LINE 4:             WHERE target = $1 AND json_extract(metadata_json...
+                                          ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<RUNNER_TEMP>/bundle/probe_396.py", line 328, in run_backend
+    scenario(backend, rt, root, config)
+  File "<RUNNER_TEMP>/bundle/probe_396.py", line 285, in scenario
+    listed = sorted(r.id for r in s.list_sessions(limit=50, target="probe-396", metadata_filter={"probe": "396"}))
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<VENV0111>/lib/python3.12/site-packages/openminion/modules/storage/runtime/session_store/store.py", line 136, in list_sessions
+    return self._sessions.list_sessions(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<VENV0111>/lib/python3.12/site-packages/openminion/modules/storage/runtime/session_store/sessions.py", line 309, in list_sessions
+    rows = self._backend.query_dicts(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<VENV0111>/lib/python3.12/site-packages/openminion/modules/storage/runtime/session_store/backend.py", line 53, in query_dicts
+    return self._record_store.query_dicts(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<VENV0111>/lib/python3.12/site-packages/openminion/modules/storage/backends/postgres.py", line 255, in query_dicts
+    rows = self._execute_mappings(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<VENV0111>/lib/python3.12/site-packages/openminion/modules/storage/backends/postgres.py", line 230, in _execute_mappings
+    result = connection.execute(text(statement_sql), bind_params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<VENV0111>/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1463, in execute
+    return meth(
+           ^^^^^
+  File "<VENV0111>/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 533, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<VENV0111>/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1683, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "<VENV0111>/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1837, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<VENV0111>/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1977, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "<VENV0111>/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2347, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "<VENV0111>/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "<VENV0111>/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+  File "<VENV0111>/lib/python3.12/site-packages/psycopg/cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedFunction) function json_extract(text, unknown) does not exist
+LINE 4:             WHERE target = $1 AND json_extract(metadata_json...
+                                          ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+[SQL: 
+            SELECT id, session_key, channel, target, metadata_json, created_at, updated_at, status, last_activity_at, closed_at, expires_at, active_agent_id
+            FROM sessions
+            WHERE target = %(p0)s AND json_extract(metadata_json, %(p1)s) = %(p2)s
+            ORDER BY updated_at DESC, id DESC
+            LIMIT %(p3)s
+            ]
+[parameters: {'p0': 'probe-396', 'p1': '$.probe', 'p2': '396', 'p3': 50}]
+(Background on this error at: https://sqlalche.me/e/21/f405)
+FAIL postgres: scenario completed without an unexpected exception | observed="ProgrammingError: (psycopg.errors.UndefinedFunction) function json_extract(text, unknown) does not exist\nLINE 4:             WHERE target = $1 AND json_extract(metadata_json...\n                                          ^\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\n[SQL: \n            SELECT id, session_key, channel, target, metadata_json, created_at, updated_at, status, last_activity_at, closed_at, expires_at, active_agent_id\n            FROM sessions\n            WHERE target = %(p0)s AND json_extract(metadata_json, %(p1)s) = %(p2)s\n            ORDER BY updated_at DESC, id DESC\n            LIMIT %(p3)s\n            ]\n[parameters: {'p0': 'probe-396', 'p1': '$.probe', 'p2': '396', 'p3': 50}]\n(Background on this error at: https://sqlalche.me/e/21/f405)"
+SUMMARY passed=23 failed=17 total=40
+exit=1

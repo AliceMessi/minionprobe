@@ -1,0 +1,36 @@
+{
+  "probe": "probe_391",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.12",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty",
+  "imported_from_site_packages": true,
+  "isolated_mode": true
+}
+PASS load_config fills StoreConfig remote fields from the YAML | observed='{"backend": "remote", "remote_endpoint": "http://127.0.0.1:<port>/memory/ok", "remote_timeout_seconds": 2.5, "remote_max_retries": 2}'
+PASS load_config keeps max_retries: 0 | observed=0
+PASS resolve_memory_backend(whole MemctlConfig) -> RemoteMemoryStore with the configured transport | observed='{"store": "RemoteMemoryStore", "endpoint": "http://127.0.0.1:<port>/memory/ok", "timeout_seconds": 2.5, "max_retries": 2}'
+PASS resolve_memory_backend(MemctlConfig.store) -> RemoteMemoryStore with the configured transport | observed='{"store": "RemoteMemoryStore", "endpoint": "http://127.0.0.1:<port>/memory/ok", "timeout_seconds": 2.5, "max_retries": 2}'
+PASS resolve_memory_backend(whole MemctlConfig, max_retries 0) -> RemoteMemoryStore with the configured transport | observed='{"store": "RemoteMemoryStore", "endpoint": "http://127.0.0.1:<port>/memory/ok", "timeout_seconds": 2.5, "max_retries": 0}'
+PASS resolve_memory_backend(MemctlConfig.store, max_retries 0) -> RemoteMemoryStore with the configured transport | observed='{"store": "RemoteMemoryStore", "endpoint": "http://127.0.0.1:<port>/memory/ok", "timeout_seconds": 2.5, "max_retries": 0}'
+PASS no SQLite file was created by resolving the remote backend | observed=False
+PASS store.list max_retries 2 against /fail: 3 request(s), then BACKEND_UNAVAILABLE | observed={'requests': 3, 'result': 'MemoryTransportError: BACKEND_UNAVAILABLE: probe failure'}
+PASS store.list max_retries 0 against /fail: 1 request(s), then BACKEND_UNAVAILABLE | observed={'requests': 1, 'result': 'MemoryTransportError: BACKEND_UNAVAILABLE: probe failure'}
+PASS store.list with timeout_seconds 1.0 and 0 retries: TIMEOUT after about 1 s, 1 request | observed={'result': 'MemoryTransportError: TIMEOUT: remote timeout during list (attempt 1/1)', 'requests': 1, 'elapsed_s': 1.0}
+PASS memctl console script lists the remote store's record (exit 0, no missing-endpoint error) | observed={'exit_code': 0, 'ids': ['remote-1'], 'last_error_line': ''}
+PASS the remote store received exactly one `list` request for agent:alpha | observed=[{'path': '/memory/ok', 'operation': 'list', 'scopes': ['agent:alpha']}]
+PASS memctl console script against /fail with max_retries 0: exit != 0 after 1 request(s) | observed={'exit_code': 1, 'requests': 1, 'last_error_line': '\x1b[1;91mMemoryTransportError: \x1b[0mBACKEND_UNAVAILABLE: probe failure'}
+PASS memctl console script against /fail with max_retries 2: exit != 0 after 3 request(s) | observed={'exit_code': 1, 'requests': 3, 'last_error_line': '\x1b[1;91mMemoryTransportError: \x1b[0mBACKEND_UNAVAILABLE: probe failure'}
+PASS memctl list in process lists the remote record with one request | observed='{"exit_code": 0, "output": "[{\\"id\\": \\"remote-1\\", \\"scope\\": \\"agent:alpha\\", \\"type\\": \\"fact\\", \\"content\\": \\"Prefers vim.\\", \\"created_at\\": \\"2026-10-01T00:00:00Z\\", \\"updated_at\\": \\"2026-10-01T00:00:00Z\\", \\"key\\": \\"pref:editor\\", \\"title\\": \\"Editor\\", \\"tags\\": [], \\"entities\\": [], \\"source\\": \\"imported\\", \\"confidence\\": 0.5, \\"evidence_refs\\": [], \\"expires_at\\": null, \\"visibility\\": null, \\"meta\\": {}, \\"last_hit_at\\": null, \\"event_time\\": \\"2026-10-01T00:00:00Z\\", \\"valid_to\\": null, \\"supersedes_id\\": null, \\"superseded_by_id\\": null, \\"supersession_reason\\": null, \\"is_deleted\\": false, \\"namespace\\": null, \\"deleted_at\\": null, \\"deleted_reason\\": null, \\"tier\\": \\"workin", "exception": null, "requests": [{"path": "/memory/ok", "operation": "list", "scopes": ["agent:alpha"]}]}'
+PASS dict config, top-level remote mapping | observed='{"store": "RemoteMemoryStore", "endpoint": "http://127.0.0.1:<port>/memory/top", "timeout_seconds": 3.5, "max_retries": 4}'
+PASS dict config, store.remote mapping | observed='{"store": "RemoteMemoryStore", "endpoint": "http://127.0.0.1:<port>/memory/nested", "timeout_seconds": 7.0, "max_retries": 6}'
+PASS dict config, both: the top-level mapping wins as a whole | observed='{"store": "RemoteMemoryStore", "endpoint": "http://127.0.0.1:<port>/memory/top", "timeout_seconds": 5.0, "max_retries": 1}'
+PASS dict config, endpoint only: dictionary defaults | observed='{"store": "RemoteMemoryStore", "endpoint": "http://127.0.0.1:<port>/memory/ok", "timeout_seconds": 5.0, "max_retries": 1}'
+PASS dict config, falsey timeout/retries in a dictionary: defaults, as before | observed='{"store": "RemoteMemoryStore", "endpoint": "http://127.0.0.1:<port>/memory/ok", "timeout_seconds": 5.0, "max_retries": 1}'
+PASS load_config rejects a remote config without an endpoint | observed='ConfigError: store.remote.endpoint is required for remote backend'
+PASS resolve_memory_backend(dict without endpoint) raises the missing-endpoint error | observed='InvalidArgumentError: remote backend requires remote.endpoint'
+PASS resolve_memory_backend(StoreConfig(backend='remote') without endpoint) raises the missing-endpoint error | observed='InvalidArgumentError: remote backend requires remote.endpoint'
+PASS memctl console script with no endpoint fails with the endpoint error and sends nothing | observed={'exit_code': 1, 'last_error_line': '\x1b[1;91mConfigError: \x1b[0mstore.remote.endpoint is required for remote backend'}
+SUMMARY passed=24 failed=0 total=24

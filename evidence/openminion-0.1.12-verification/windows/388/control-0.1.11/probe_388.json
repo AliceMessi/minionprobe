@@ -1,0 +1,535 @@
+{
+  "info": {
+    "probe": "probe_388",
+    "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+    "openminion.__version__": "0.1.11",
+    "python": "3.12.11",
+    "platform": "Windows-11-10.0.22631-SP0",
+    "sqlite3.sqlite_version": "3.50.4",
+    "cwd": "<WORK>\\empty-388",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "gc_enabled_at_start": false,
+    "postgres": "not configured: the PostgreSQL case (P) is not run here",
+    "gc_at_end": {
+      "gc_enabled": false,
+      "gc_collect_calls": 0
+    }
+  },
+  "summary": {
+    "passed": 3,
+    "failed": 10,
+    "total": 13
+  },
+  "all_pass": false,
+  "checks": [
+    {
+      "check": "A. external provider builds a real runtime whose memory service holds a BackendMemoryStoreAdapter; no memory.store store and no audit sink are created",
+      "pass": false,
+      "observed": {
+        "build": "ok",
+        "memory_service_store": "BackendMemoryStoreAdapter",
+        "stores_created_by_resolve_memory_backend": [
+          "SQLiteMemoryStore"
+        ],
+        "audit_sinks_created": 1
+      }
+    },
+    {
+      "check": "A. one real echo turn completes",
+      "pass": false,
+      "observed": "raised NotImplementedError: backend ClosingReferenceBackend does not expose apply_capture_bundle()"
+    },
+    {
+      "check": "A. runtime.close() x3: the assembly closes without error; the owned backend closes once and the assembly's artifact store closes once",
+      "pass": false,
+      "observed": {
+        "outcomes": [
+          "raised AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'"
+        ],
+        "after_each_runtime_close": [
+          {
+            "assembly_close_calls": 1,
+            "created_store_closes": [
+              0
+            ],
+            "audit_sink_closes": [
+              0
+            ],
+            "external_backend_closes": 0,
+            "assembly_artifact_store_closes": 0
+          },
+          {
+            "assembly_close_calls": 1,
+            "created_store_closes": [
+              0
+            ],
+            "audit_sink_closes": [
+              0
+            ],
+            "external_backend_closes": 0,
+            "assembly_artifact_store_closes": 0
+          },
+          {
+            "assembly_close_calls": 1,
+            "created_store_closes": [
+              0
+            ],
+            "audit_sink_closes": [
+              0
+            ],
+            "external_backend_closes": 0,
+            "assembly_artifact_store_closes": 0
+          }
+        ]
+      }
+    },
+    {
+      "check": "A. the artifact store rejects a write after shutdown, and its index file can be renamed and deleted right away (GC disabled, no collection)",
+      "pass": false,
+      "observed": {
+        "write": "accepted",
+        "rename_delete": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-388-0111\\\\A\\\\.openminion\\\\artifact\\\\index.db' -> '<WORK>\\\\work\\\\win-388-0111\\\\A\\\\.openminion\\\\artifact\\\\index.db.moved'"
+      }
+    },
+    {
+      "check": "B. reference-sqlite (no close()): runtime builds with no memory.store store or audit sink, one turn completes, runtime.close() x3 closes the assembly without error and its artifact store once",
+      "pass": false,
+      "observed": {
+        "build": "ok",
+        "stores_created_by_resolve_memory_backend": [
+          "SQLiteMemoryStore"
+        ],
+        "audit_sinks_created": 1,
+        "turn": "raised NotImplementedError: backend SophiaGraphSqliteStore does not expose apply_capture_bundle()",
+        "assembly_close_outcomes": [
+          "raised AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'"
+        ],
+        "after_each_runtime_close": [
+          {
+            "assembly_close_calls": 1,
+            "created_store_closes": [
+              0
+            ],
+            "audit_sink_closes": [
+              0
+            ],
+            "external_backend_closes": 0,
+            "assembly_artifact_store_closes": 0
+          },
+          {
+            "assembly_close_calls": 1,
+            "created_store_closes": [
+              0
+            ],
+            "audit_sink_closes": [
+              0
+            ],
+            "external_backend_closes": 0,
+            "assembly_artifact_store_closes": 0
+          },
+          {
+            "assembly_close_calls": 1,
+            "created_store_closes": [
+              0
+            ],
+            "audit_sink_closes": [
+              0
+            ],
+            "external_backend_closes": 0,
+            "assembly_artifact_store_closes": 0
+          }
+        ],
+        "artifact_store_write_after_shutdown": "accepted"
+      }
+    },
+    {
+      "check": "B2. external provider with an unusable memory.store (postgres without URL): the runtime builds, creates no store, and closes cleanly",
+      "pass": false,
+      "observed": {
+        "build": "InvalidArgumentError: postgres backend requires postgres.url or postgres_url",
+        "stores_created_by_resolve_memory_backend": null,
+        "assembly_close_outcomes": null
+      }
+    },
+    {
+      "check": "C. a borrowed backend (MemoryService(backend=b) / BackendMemoryStoreAdapter(b)) is not closed by two closes and stays usable",
+      "pass": false,
+      "observed": {
+        "service": {
+          "backend_closes": 0,
+          "backend_usable_after": "accepted"
+        },
+        "adapter": {
+          "raised": "AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'",
+          "backend_usable_after": "accepted"
+        }
+      }
+    },
+    {
+      "check": "C. an owned backend (owns_backend=True / MemoryService(..., owns_store=True)) is closed once over two closes",
+      "pass": false,
+      "observed": {
+        "adapter": {
+          "raised": "TypeError: BackendMemoryStoreAdapter.__init__() got an unexpected keyword argument 'owns_backend'",
+          "backend_usable_after": "accepted"
+        },
+        "service": {
+          "raised": "AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'",
+          "backend_usable_after": "accepted"
+        }
+      }
+    },
+    {
+      "check": "C. an owned backend without close() closes twice without error and stays usable",
+      "pass": false,
+      "observed": {
+        "raised": "AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'",
+        "backend_usable_after": "accepted"
+      }
+    },
+    {
+      "check": "D. default provider (control): one SQLiteMemoryStore and one audit sink; turn completes; runtime.close() x3 closes store, audit sink and artifact store once each",
+      "pass": true,
+      "observed": {
+        "stores_created_by_resolve_memory_backend": [
+          "SQLiteMemoryStore"
+        ],
+        "audit_sinks_created": 1,
+        "turn": "completed",
+        "assembly_close_outcomes": [
+          "closed"
+        ],
+        "after_each_runtime_close": [
+          {
+            "assembly_close_calls": 1,
+            "created_store_closes": [
+              1
+            ],
+            "audit_sink_closes": [
+              1
+            ],
+            "external_backend_closes": 0,
+            "assembly_artifact_store_closes": 1
+          },
+          {
+            "assembly_close_calls": 1,
+            "created_store_closes": [
+              1
+            ],
+            "audit_sink_closes": [
+              1
+            ],
+            "external_backend_closes": 0,
+            "assembly_artifact_store_closes": 1
+          },
+          {
+            "assembly_close_calls": 1,
+            "created_store_closes": [
+              1
+            ],
+            "audit_sink_closes": [
+              1
+            ],
+            "external_backend_closes": 0,
+            "assembly_artifact_store_closes": 1
+          }
+        ]
+      }
+    },
+    {
+      "check": "E. external backend, live scheduler: close() x2 is scheduler_still_running; backend and artifact store stay open, the service still writes; after the scheduler stops, close succeeds and closes each once",
+      "pass": false,
+      "observed": {
+        "raised": "AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'",
+        "blocked": [],
+        "while_blocked": null,
+        "after_stop": [
+          ""
+        ],
+        "after_stop_closes": null,
+        "same_result_object_after_stop": false,
+        "service_write_while_blocked": null,
+        "scheduler_events": [
+          "stop",
+          "stop",
+          "stop"
+        ]
+      }
+    },
+    {
+      "check": "E. built-in provider, live scheduler (boundary preserved): store and artifact store stay open while it runs; after it stops, each closes once",
+      "pass": true,
+      "observed": {
+        "blocked": [
+          "scheduler_still_running closed=False",
+          "scheduler_still_running closed=False"
+        ],
+        "while_blocked": {
+          "backend_closes": 0,
+          "store_closes": [
+            0
+          ],
+          "artifact_events": []
+        },
+        "service_write_while_blocked": "accepted",
+        "after_stop": [
+          "closed closed=True",
+          "closed closed=True"
+        ],
+        "same_result_object_after_stop": true,
+        "after_stop_closes": {
+          "backend_closes": 0,
+          "store_closes": [
+            1
+          ],
+          "artifact_events": [
+            "artifactctl.close"
+          ]
+        },
+        "scheduler_events": [
+          "stop",
+          "stop",
+          "stop"
+        ]
+      }
+    },
+    {
+      "check": "GC stayed disabled and gc.collect() was never called",
+      "pass": true,
+      "observed": {
+        "gc_enabled": false,
+        "gc_collect_calls": 0
+      }
+    }
+  ],
+  "observed": {
+    "A_external_owned_backend_with_close": {
+      "build": "ok",
+      "memory_service_store": "BackendMemoryStoreAdapter",
+      "stores_created_by_resolve_memory_backend": [
+        "SQLiteMemoryStore"
+      ],
+      "audit_sinks_created": 1,
+      "turn": "raised NotImplementedError: backend ClosingReferenceBackend does not expose apply_capture_bundle()",
+      "after_each_runtime_close": [
+        {
+          "assembly_close_calls": 1,
+          "created_store_closes": [
+            0
+          ],
+          "audit_sink_closes": [
+            0
+          ],
+          "external_backend_closes": 0,
+          "assembly_artifact_store_closes": 0
+        },
+        {
+          "assembly_close_calls": 1,
+          "created_store_closes": [
+            0
+          ],
+          "audit_sink_closes": [
+            0
+          ],
+          "external_backend_closes": 0,
+          "assembly_artifact_store_closes": 0
+        },
+        {
+          "assembly_close_calls": 1,
+          "created_store_closes": [
+            0
+          ],
+          "audit_sink_closes": [
+            0
+          ],
+          "external_backend_closes": 0,
+          "assembly_artifact_store_closes": 0
+        }
+      ],
+      "assembly_close_outcomes": [
+        "raised AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'"
+      ],
+      "assembly_artifact_store_is_runtime_artifactctl": true,
+      "artifact_store_write_after_shutdown": "accepted",
+      "artifact_index_rename_delete_after_shutdown": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-388-0111\\\\A\\\\.openminion\\\\artifact\\\\index.db' -> '<WORK>\\\\work\\\\win-388-0111\\\\A\\\\.openminion\\\\artifact\\\\index.db.moved'"
+    },
+    "B_external_reference_sqlite_no_close": {
+      "build": "ok",
+      "memory_service_store": "BackendMemoryStoreAdapter",
+      "stores_created_by_resolve_memory_backend": [
+        "SQLiteMemoryStore"
+      ],
+      "audit_sinks_created": 1,
+      "turn": "raised NotImplementedError: backend SophiaGraphSqliteStore does not expose apply_capture_bundle()",
+      "after_each_runtime_close": [
+        {
+          "assembly_close_calls": 1,
+          "created_store_closes": [
+            0
+          ],
+          "audit_sink_closes": [
+            0
+          ],
+          "external_backend_closes": 0,
+          "assembly_artifact_store_closes": 0
+        },
+        {
+          "assembly_close_calls": 1,
+          "created_store_closes": [
+            0
+          ],
+          "audit_sink_closes": [
+            0
+          ],
+          "external_backend_closes": 0,
+          "assembly_artifact_store_closes": 0
+        },
+        {
+          "assembly_close_calls": 1,
+          "created_store_closes": [
+            0
+          ],
+          "audit_sink_closes": [
+            0
+          ],
+          "external_backend_closes": 0,
+          "assembly_artifact_store_closes": 0
+        }
+      ],
+      "assembly_close_outcomes": [
+        "raised AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'"
+      ],
+      "assembly_artifact_store_is_runtime_artifactctl": true,
+      "artifact_store_write_after_shutdown": "accepted",
+      "artifact_index_rename_delete_after_shutdown": "PermissionError: [WinError 32] Impossibile accedere al file. Il file \u00e8 utilizzato da un altro processo: '<WORK>\\\\work\\\\win-388-0111\\\\B\\\\.openminion\\\\artifact\\\\index.db' -> '<WORK>\\\\work\\\\win-388-0111\\\\B\\\\.openminion\\\\artifact\\\\index.db.moved'"
+    },
+    "B2_external_with_unusable_memory_store": {
+      "build": "InvalidArgumentError: postgres backend requires postgres.url or postgres_url",
+      "stores_created": []
+    },
+    "C_backend_ownership": {
+      "MemoryService(backend=b) [borrowed]": {
+        "backend_closes": 0,
+        "backend_usable_after": "accepted"
+      },
+      "BackendMemoryStoreAdapter(b) [borrowed]": {
+        "raised": "AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'",
+        "backend_usable_after": "accepted"
+      },
+      "BackendMemoryStoreAdapter(b, owns_backend=True)": {
+        "raised": "TypeError: BackendMemoryStoreAdapter.__init__() got an unexpected keyword argument 'owns_backend'",
+        "backend_usable_after": "accepted"
+      },
+      "MemoryService(backend=b, owns_store=True)": {
+        "raised": "AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'",
+        "backend_usable_after": "accepted"
+      },
+      "MemoryService(backend=reference-no-close, owns_store=True)": {
+        "raised": "AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'",
+        "backend_usable_after": "accepted"
+      }
+    },
+    "D_default_builtin_provider": {
+      "build": "ok",
+      "memory_service_store": "AuditedMemoryStore",
+      "stores_created_by_resolve_memory_backend": [
+        "SQLiteMemoryStore"
+      ],
+      "audit_sinks_created": 1,
+      "turn": "completed",
+      "after_each_runtime_close": [
+        {
+          "assembly_close_calls": 1,
+          "created_store_closes": [
+            1
+          ],
+          "audit_sink_closes": [
+            1
+          ],
+          "external_backend_closes": 0,
+          "assembly_artifact_store_closes": 1
+        },
+        {
+          "assembly_close_calls": 1,
+          "created_store_closes": [
+            1
+          ],
+          "audit_sink_closes": [
+            1
+          ],
+          "external_backend_closes": 0,
+          "assembly_artifact_store_closes": 1
+        },
+        {
+          "assembly_close_calls": 1,
+          "created_store_closes": [
+            1
+          ],
+          "audit_sink_closes": [
+            1
+          ],
+          "external_backend_closes": 0,
+          "assembly_artifact_store_closes": 1
+        }
+      ],
+      "assembly_close_outcomes": [
+        "closed"
+      ],
+      "assembly_artifact_store_is_runtime_artifactctl": true,
+      "artifact_store_write_after_shutdown": "ProgrammingError: Cannot operate on a closed database.",
+      "artifact_index_rename_delete_after_shutdown": "ok"
+    },
+    "E_scheduler_boundary": {
+      "external backend with close()": {
+        "raised": "AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'",
+        "blocked": [],
+        "while_blocked": null,
+        "after_stop": [
+          ""
+        ],
+        "after_stop_closes": null,
+        "same_result_object_after_stop": false,
+        "service_write_while_blocked": null,
+        "scheduler_events": [
+          "stop",
+          "stop",
+          "stop"
+        ]
+      },
+      "built-in provider (SQLite store)": {
+        "blocked": [
+          "scheduler_still_running closed=False",
+          "scheduler_still_running closed=False"
+        ],
+        "while_blocked": {
+          "backend_closes": 0,
+          "store_closes": [
+            0
+          ],
+          "artifact_events": []
+        },
+        "service_write_while_blocked": "accepted",
+        "after_stop": [
+          "closed closed=True",
+          "closed closed=True"
+        ],
+        "same_result_object_after_stop": true,
+        "after_stop_closes": {
+          "backend_closes": 0,
+          "store_closes": [
+            1
+          ],
+          "artifact_events": [
+            "artifactctl.close"
+          ]
+        },
+        "scheduler_events": [
+          "stop",
+          "stop",
+          "stop"
+        ]
+      }
+    }
+  }
+}

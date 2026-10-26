@@ -1,0 +1,543 @@
+{
+  "banner": {
+    "probe": "probe_364",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.12",
+    "python": "3.12.15",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<WORK>/empty",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "backend": "sqlite",
+    "peers": 8,
+    "joins": 10,
+    "rounds": 50
+  },
+  "checks": [
+    {
+      "check": "sqlite fresh database migrated to the package head (15)",
+      "pass": true,
+      "observed": {
+        "applied": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "current": 15
+      }
+    },
+    {
+      "check": "sqlite tied: the three joins share one joined_at and their row ids sort in reverse join order",
+      "pass": true,
+      "observed": [
+        [
+          "first",
+          "fc7",
+          "2026-10-22T01:00:00+00:00"
+        ],
+        [
+          "second",
+          "cc7",
+          "2026-10-22T01:00:00+00:00"
+        ],
+        [
+          "third",
+          "0c7",
+          "2026-10-22T01:00:00+00:00"
+        ]
+      ]
+    },
+    {
+      "check": "sqlite tied: list_participants is in join order",
+      "pass": true,
+      "observed": [
+        "first",
+        "second",
+        "third"
+      ],
+      "expected": [
+        "first",
+        "second",
+        "third"
+      ]
+    },
+    {
+      "check": "sqlite tied: the first agent is active",
+      "pass": true,
+      "observed": "first"
+    },
+    {
+      "check": "sqlite tied: join_seq 1, 2, 3 in join order",
+      "pass": true,
+      "observed": {
+        "first": 1,
+        "second": 2,
+        "third": 3
+      }
+    },
+    {
+      "check": "sqlite tied: removing the active first agent selects the second",
+      "pass": true,
+      "observed": "second",
+      "expected": "second"
+    },
+    {
+      "check": "sqlite tied: remaining participants list in join order",
+      "pass": true,
+      "observed": [
+        "second",
+        "third"
+      ]
+    },
+    {
+      "check": "sqlite upsert: an active participant added again keeps its row id and joined_at, takes the new channel/role/display name",
+      "pass": true,
+      "observed": [
+        "fb5",
+        "2026-10-22T01:00:00+00:00",
+        "cli",
+        "owner",
+        "First again"
+      ]
+    },
+    {
+      "check": "sqlite upsert: it keeps its place",
+      "pass": true,
+      "observed": [
+        "first",
+        "second",
+        "third"
+      ]
+    },
+    {
+      "check": "sqlite upsert: join_seq unchanged (1, 2, 3)",
+      "pass": true,
+      "observed": {
+        "first": 1,
+        "second": 2,
+        "third": 3
+      }
+    },
+    {
+      "check": "sqlite rejoin same tick: same row, new place after every earlier join",
+      "pass": true,
+      "observed": {
+        "row": "fb5",
+        "joined_at": "2026-10-22T01:00:00+00:00",
+        "listed": [
+          "second",
+          "third",
+          "first"
+        ]
+      },
+      "expected": [
+        "second",
+        "third",
+        "first"
+      ]
+    },
+    {
+      "check": "sqlite rejoin same tick: join_seq first=4",
+      "pass": true,
+      "observed": {
+        "second": 2,
+        "third": 3,
+        "first": 4
+      }
+    },
+    {
+      "check": "sqlite rejoin later: the rejoin's joined_at and a new place",
+      "pass": true,
+      "observed": {
+        "row": "cb5",
+        "joined_at": "2026-10-22T01:01:00+00:00",
+        "listed": [
+          "third",
+          "first",
+          "second"
+        ]
+      }
+    },
+    {
+      "check": "sqlite rejoin later: join_seq second=5",
+      "pass": true,
+      "observed": {
+        "third": 3,
+        "first": 4,
+        "second": 5
+      }
+    },
+    {
+      "check": "sqlite explicit: a later join, a re-add and a non-active leave keep the selected agent",
+      "pass": true,
+      "observed": [
+        "third",
+        "third"
+      ]
+    },
+    {
+      "check": "sqlite explicit: the selected agent leaving selects the earliest remaining join",
+      "pass": true,
+      "observed": {
+        "listed": [
+          "first",
+          "fourth"
+        ],
+        "active": "first"
+      }
+    },
+    {
+      "check": "sqlite explicit: a later join can be selected; an agent that left cannot",
+      "pass": true,
+      "observed": {
+        "active": "fourth",
+        "select_left": "ValueError: Agent 'second' is not an active participant"
+      }
+    },
+    {
+      "check": "sqlite legacy: the owner record lists before the first invited agent on one tick",
+      "pass": true,
+      "observed": [
+        "legacy-agent",
+        "guest-agent"
+      ]
+    },
+    {
+      "check": "sqlite legacy: join_seq owner=1, guest=2",
+      "pass": true,
+      "observed": {
+        "legacy-agent": 1,
+        "guest-agent": 2
+      }
+    },
+    {
+      "check": "sqlite legacy: the owner agent from the session key is active before any invite; an agent outside the session cannot be selected (bound to the owner); the owner can be selected again",
+      "pass": true,
+      "observed": {
+        "active_before_invite": "legacy-agent",
+        "active_after_invite": "guest-agent",
+        "select_other": "ValueError: Legacy session '372a84c7d8be45af8e4573dea65eaadb' is bound to agent 'legacy-agent'",
+        "reselect_owner": "legacy-agent"
+      }
+    },
+    {
+      "check": "sqlite session row: a human join changes nothing; the first agent becomes active; later joins and the active agent's re-add change nothing",
+      "pass": true,
+      "observed": {
+        "human_join_unchanged": true,
+        "active": "first"
+      }
+    },
+    {
+      "check": "sqlite clock moved back: a later join with an earlier joined_at lists first (joined_at still orders first)",
+      "pass": true,
+      "observed": [
+        "early-clock",
+        "late-clock"
+      ]
+    },
+    {
+      "check": "sqlite clock moved back: join_seq records the join order (late-clock=1, early-clock=2)",
+      "pass": true,
+      "observed": {
+        "late-clock": 1,
+        "early-clock": 2
+      }
+    },
+    {
+      "check": "sqlite concurrent joins: 8 peers x 10 joins on one tick, no errors, every join has its own place 1..80",
+      "pass": true,
+      "observed": {
+        "errors": [],
+        "joined": 80,
+        "distinct_join_seq": true,
+        "seconds": 0.04
+      }
+    },
+    {
+      "check": "sqlite concurrent joins: each peer's joins list in the order it made them, the listing follows join_seq",
+      "pass": true,
+      "observed": {
+        "own_order": true
+      }
+    },
+    {
+      "check": "sqlite concurrent joins: the active agent is one of the joined agents (#393 not certified)",
+      "pass": true,
+      "observed": "peer-7-0"
+    },
+    {
+      "check": "sqlite overlapping leave/rejoin: both complete (no unique-index error, no deadlock)",
+      "pass": true,
+      "observed": {
+        "leave": true,
+        "rejoin": "fd3",
+        "seconds": 0.53
+      }
+    },
+    {
+      "check": "sqlite overlapping leave/rejoin: the rejoin waits for the leave, takes a new place, and the fallback selects the earliest remaining join",
+      "pass": true,
+      "observed": {
+        "listed": [
+          "second",
+          "first"
+        ],
+        "join_seq": {
+          "second": 2,
+          "first": 3
+        },
+        "active": "second"
+      }
+    },
+    {
+      "check": "sqlite storm: 8 peers each leave and rejoin 50 times on one tick, including the active agent: every operation completes",
+      "pass": true,
+      "observed": {
+        "operations": 800,
+        "errors": [],
+        "error_count": 0,
+        "seconds": 0.19
+      }
+    },
+    {
+      "check": "sqlite storm: afterwards every agent is listed once, places are distinct, the listing follows join_seq and the active agent is a participant",
+      "pass": true,
+      "observed": {
+        "listed": [
+          "agent-5",
+          "agent-1",
+          "agent-3",
+          "agent-0",
+          "agent-6",
+          "agent-4",
+          "agent-7",
+          "agent-2"
+        ],
+        "join_seq": {
+          "agent-5": 192,
+          "agent-1": 265,
+          "agent-3": 289,
+          "agent-0": 316,
+          "agent-6": 336,
+          "agent-4": 369,
+          "agent-7": 392,
+          "agent-2": 408
+        },
+        "active": "agent-5"
+      }
+    },
+    {
+      "check": "sqlite storm: then the active agent leaving selects the earliest remaining join (twice)",
+      "pass": true,
+      "observed": [
+        {
+          "left": "agent-5",
+          "selected": "agent-1",
+          "expected": "agent-1"
+        },
+        {
+          "left": "agent-1",
+          "selected": "agent-3",
+          "expected": "agent-3"
+        }
+      ]
+    },
+    {
+      "check": "sqlite reopen: no migration is applied again",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "sqlite reopen: the tied room still lists second, third with second active",
+      "pass": true,
+      "observed": {
+        "listed": [
+          "second",
+          "third"
+        ],
+        "active": "second"
+      }
+    },
+    {
+      "check": "sqlite reopen: the upsert/rejoin room keeps its listing, join_seq and active agent",
+      "pass": true,
+      "observed": {
+        "listed": [
+          "third",
+          "first",
+          "second"
+        ],
+        "seq": {
+          "third": 3,
+          "first": 4,
+          "second": 5
+        },
+        "active": "third"
+      },
+      "expected": {
+        "listed": [
+          "third",
+          "first",
+          "second"
+        ],
+        "seq": {
+          "third": 3,
+          "first": 4,
+          "second": 5
+        },
+        "active": "third"
+      }
+    },
+    {
+      "check": "sqlite reopen: the explicitly selected agent is still active",
+      "pass": true,
+      "observed": "fourth"
+    },
+    {
+      "check": "sqlite CLI `openminion room create --routing-mode broadcast --agent first --agent second --agent third` (one tick, row ids reverse) via the installed CLI (`openminion.cli.main.main`): exit 0, 3 participants, active first",
+      "pass": true,
+      "observed": {
+        "rc": 0,
+        "stdout": [
+          "room=room-5d9edd5260984e98a1e0ce421b9c9766",
+          "participants=3",
+          "active_agent=first"
+        ],
+        "stderr_tail": []
+      }
+    },
+    {
+      "check": "sqlite CLI `openminion room create --routing-mode sequential --agent first --agent second --agent third` (one tick, row ids reverse) via the installed CLI (`openminion.cli.main.main`): exit 0, 3 participants, active first",
+      "pass": true,
+      "observed": {
+        "rc": 0,
+        "stdout": [
+          "room=room-4a8ef32e10664c8f8149a81a7318a5ca",
+          "participants=3",
+          "active_agent=first"
+        ],
+        "stderr_tail": []
+      }
+    },
+    {
+      "check": "sqlite CLI `openminion room create --routing-mode addressed --agent first --agent second --agent third` (one tick, row ids reverse) via the installed CLI (`openminion.cli.main.main`): exit 0, 3 participants, active first",
+      "pass": true,
+      "observed": {
+        "rc": 0,
+        "stdout": [
+          "room=room-2aa1e9add9864841b1cada50606e4a52",
+          "participants=3",
+          "active_agent=first"
+        ],
+        "stderr_tail": []
+      }
+    },
+    {
+      "check": "sqlite CLI `openminion room invite <room> --agent fourth` on the same tick (row id sorts before two earlier joins): exit 0, 4 participants",
+      "pass": true,
+      "observed": {
+        "rc": 0,
+        "stdout": [
+          "invited agent=fourth",
+          "participants=4"
+        ],
+        "stderr_tail": []
+      }
+    },
+    {
+      "check": "sqlite CLI room (read back by a new runtime): list_participants in join order",
+      "pass": true,
+      "observed": [
+        "first",
+        "second",
+        "third",
+        "fourth"
+      ]
+    },
+    {
+      "check": "sqlite routing (broadcast): the room turn goes to the agents in join order",
+      "pass": true,
+      "observed": [
+        [
+          "first",
+          "second",
+          "third",
+          "fourth"
+        ],
+        "broadcast"
+      ]
+    },
+    {
+      "check": "sqlite routing (sequential, no explicit order): join order",
+      "pass": true,
+      "observed": [
+        [
+          "first",
+          "second",
+          "third"
+        ],
+        "sequential"
+      ]
+    },
+    {
+      "check": "sqlite routing (broadcast): after the active first agent leaves, the second is active and the turn goes to second, third, fourth",
+      "pass": true,
+      "observed": {
+        "active": "second",
+        "routed": [
+          [
+            "second",
+            "third",
+            "fourth"
+          ],
+          "broadcast"
+        ]
+      }
+    },
+    {
+      "check": "sqlite routing (addressed): the active agent answers; after it leaves the fallback (second) answers; a mention still selects its agent",
+      "pass": true,
+      "observed": {
+        "before": [
+          [
+            "first"
+          ],
+          "addressed"
+        ],
+        "active_after_leave": "second",
+        "after": [
+          [
+            "second"
+          ],
+          "addressed"
+        ],
+        "mention_third": [
+          [
+            "third"
+          ],
+          "addressed"
+        ]
+      }
+    }
+  ],
+  "not_run": [],
+  "summary": {
+    "passed": 44,
+    "failed": 0,
+    "total": 44
+  }
+}

@@ -1,0 +1,25 @@
+=== probe_369_upgrade_extraction_sqlite: venv369 -I -X utf8 probes/probe_369_upgrade.py extraction sqlite <WORK>\work\369\extraction <EVIDENCE>\windows\369\probe_369_upgrade_extraction_sqlite.json --db <WORK>\work\369\extraction\runtime.db --seed <EVIDENCE>\windows\369\probe_369_seed_sqlite.json
+{
+  "probe": "probe_369_upgrade extraction",
+  "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+  "openminion.__version__": "0.1.12",
+  "python": "3.12.11",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "sqlite3.sqlite_version": "3.50.4",
+  "cwd": "<WORK>\\empty-369",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "backend": "sqlite"
+}
+PASS pre-upgrade: ledger head 13 written by 0.1.11, no session_metadata_strings, metadata = seed | observed={'ledger_head': 13, 'sessions': 1243, 'table': False}
+open error: RuntimeError: extraction failed for zz-last
+PASS extraction: the 0.1.12 open raises while applying migration 15, naming 'zz-last' | observed='RuntimeError: extraction failed for zz-last'
+PASS extraction: the backfill had read past the first 1,000-session batch before failing (rows of batch 1 were already inserted) | observed=1243
+PASS extraction: ledger has no entry 15 (14 committed in its own transaction before 15) | observed=[12, 13, 14]
+PASS extraction: migration 15 left nothing: no session_metadata_strings table, no rows | observed=False
+PASS extraction: stored metadata unchanged by the failed migration
+PASS extraction: after removing the injected failure the rerun applies 15 once | observed=[15]
+PASS extraction: ledger 1..15, each once | observed=[13, 14, 15]
+PASS extraction: rows = json.loads-derived rows after the rerun | observed=3695
+SUMMARY passed=9 failed=0 total=9
+exit=0

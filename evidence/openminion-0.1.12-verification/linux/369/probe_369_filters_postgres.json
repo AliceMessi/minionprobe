@@ -1,0 +1,1307 @@
+{
+  "probe": "probe_369_filters",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.12",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "backend": "postgres",
+  "postgres_server_version": "PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+  "sections": {
+    "fresh": "ran",
+    "matrix": "ran",
+    "differences": "ran",
+    "odd": "ran",
+    "bounded": "ran",
+    "collision": "ran",
+    "writes": "ran",
+    "rollback": "ran",
+    "falsey": "ran",
+    "concurrent": "ran",
+    "acp": "ran",
+    "focus": "ran"
+  },
+  "skipped": [],
+  "notes": {
+    "APIRuntime with storage.backend=postgres": "RuntimeError: runtime record_store does not expose sqlite connection",
+    "openminion acp with storage.backend=postgres": "no reply (Empty)",
+    "openminion acp exit code and last stderr line": [
+      2,
+      [
+        "openminion: runtime record_store does not expose sqlite connection"
+      ]
+    ]
+  },
+  "summary": {
+    "passed": 132,
+    "failed": 0,
+    "total": 132
+  },
+  "checks": [
+    {
+      "check": "fresh: first open applies migrations 1..15 in order",
+      "pass": true,
+      "observed": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "check": "fresh: ledger has each version 1..15 exactly once",
+      "pass": true,
+      "observed": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "check": "fresh: ledger entry 15 is add_session_metadata_strings",
+      "pass": true,
+      "observed": [
+        [
+          14,
+          "add_room_participant_join_seq"
+        ],
+        [
+          15,
+          "add_session_metadata_strings"
+        ]
+      ]
+    },
+    {
+      "check": "fresh: session_metadata_strings exists",
+      "pass": true
+    },
+    {
+      "check": "fresh: indexes idx_session_metadata_strings_entry and _session exist",
+      "pass": true,
+      "observed": [
+        "idx_session_metadata_strings_entry",
+        "idx_session_metadata_strings_session"
+      ]
+    },
+    {
+      "check": "fresh: session_id references sessions ON DELETE CASCADE",
+      "pass": true,
+      "observed": [
+        {
+          "delete_rule": "CASCADE"
+        }
+      ]
+    },
+    {
+      "check": "fresh: a new session's string members are written with it",
+      "pass": true,
+      "observed": [
+        [
+          "fresh-a",
+          "\"surface\"",
+          "\"acp\"",
+          "2af8a33a99b79ecf"
+        ]
+      ]
+    },
+    {
+      "check": "fresh: reopening applies no migration",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "fresh: ledger unchanged after reopen",
+      "pass": true
+    },
+    {
+      "check": "matrix: {'surface': 'acp'} selects ['acp-a', 'acp-b']",
+      "pass": true,
+      "observed": [
+        "acp-a",
+        "acp-b"
+      ]
+    },
+    {
+      "check": "matrix: {'surface': 'focus'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "matrix: {'surface': 'ACP'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "matrix: {'surface': 'acp', 'workspace_root': '/work/a'} selects ['acp-a']",
+      "pass": true,
+      "observed": [
+        "acp-a"
+      ]
+    },
+    {
+      "check": "matrix: {'surface': 'acp', 'workspace_root': '/work/c'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "matrix: {'surface': 'acp', 'missing': 'acp'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "matrix: {'missing': 'acp'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "matrix: {'missing': ''} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "matrix: {'surface': ''} selects ['empty-surface']",
+      "pass": true,
+      "observed": [
+        "empty-surface"
+      ]
+    },
+    {
+      "check": "matrix: {'surface': None} selects ['empty-surface']",
+      "pass": true,
+      "observed": [
+        "empty-surface"
+      ]
+    },
+    {
+      "check": "matrix: {'  surface  ': 'cli'} selects ['cli-a']",
+      "pass": true,
+      "observed": [
+        "cli-a"
+      ]
+    },
+    {
+      "check": "matrix: {'': 'ignored', 'surface': 'cli'} selects ['cli-a']",
+      "pass": true,
+      "observed": [
+        "cli-a"
+      ]
+    },
+    {
+      "check": "matrix: {'value': '1'} selects ['text-one']",
+      "pass": true,
+      "observed": [
+        "text-one"
+      ]
+    },
+    {
+      "check": "matrix: {'value': '1.5'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "matrix: {'value': 'true'} selects ['text-true']",
+      "pass": true,
+      "observed": [
+        "text-true"
+      ]
+    },
+    {
+      "check": "matrix: {'value': 'True'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "matrix: {'value': 'false'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "matrix: {'value': '0'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "matrix: {'value': 'null'} selects ['text-null']",
+      "pass": true,
+      "observed": [
+        "text-null"
+      ]
+    },
+    {
+      "check": "matrix: {'value': 'None'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "matrix: {'value': ''} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "matrix: {'value': '{\"kind\": \"acp\"}'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "matrix: {\"it's\": 'yes'} selects ['quote-key']",
+      "pass": true,
+      "observed": [
+        "quote-key"
+      ]
+    },
+    {
+      "check": "matrix: {'100%_done': 'yes'} selects ['like-key']",
+      "pass": true,
+      "observed": [
+        "like-key"
+      ]
+    },
+    {
+      "check": "matrix: {'100%': 'yes'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "matrix: {'$scope': 'yes'} selects ['dollar-key']",
+      "pass": true,
+      "observed": [
+        "dollar-key"
+      ]
+    },
+    {
+      "check": "matrix: {'a b': 'yes'} selects ['space-key']",
+      "pass": true,
+      "observed": [
+        "space-key"
+      ]
+    },
+    {
+      "check": "matrix: {\"k') OR ('1'='1\": 'yes'} selects ['sql-key']",
+      "pass": true,
+      "observed": [
+        "sql-key"
+      ]
+    },
+    {
+      "check": "matrix: {\"k') OR ('1'='1\": 'no'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "matrix: {'note': 'say \"hi\" \\\\ C:\\\\work\\\\a'} selects ['escaped-value']",
+      "pass": true,
+      "observed": [
+        "escaped-value"
+      ]
+    },
+    {
+      "check": "matrix: {'note': 'caf\\xe9 \\U0001f600 \\u2028'} selects ['unicode-value']",
+      "pass": true,
+      "observed": [
+        "unicode-value"
+      ]
+    },
+    {
+      "check": "matrix: {'note': 'line\\nbreak\\ttab'} selects ['newline-value']",
+      "pass": true,
+      "observed": [
+        "newline-value"
+      ]
+    },
+    {
+      "check": "matrix: {'note': 'a%'} selects ['like-value']",
+      "pass": true,
+      "observed": [
+        "like-value"
+      ]
+    },
+    {
+      "check": "matrix: {'note': 'a_'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "matrix: no filter lists every session",
+      "pass": true,
+      "observed": 25
+    },
+    {
+      "check": "matrix: stored rows equal the rows derived from stored metadata",
+      "pass": true
+    },
+    {
+      "check": "differences (postgres): {'value': '{\"kind\":\"acp\"}'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "differences (postgres): {'value': '[1,\"x\"]'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "differences (postgres): {'a.b': 'top'} selects ['dotted-top']",
+      "pass": true,
+      "observed": [
+        "dotted-top"
+      ]
+    },
+    {
+      "check": "differences (postgres): {'a.b': 'nested'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "differences (postgres): {'tags[0]': 'top'} selects ['bracket-top']",
+      "pass": true,
+      "observed": [
+        "bracket-top"
+      ]
+    },
+    {
+      "check": "differences (postgres): {'tags[0]': 'first'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "differences (postgres): {'\"q\"': 'top'} selects ['quoted-top']",
+      "pass": true,
+      "observed": [
+        "quoted-top"
+      ]
+    },
+    {
+      "check": "differences (postgres): {'\"q\"': 'plain'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "odd: NaN, Infinity and the NUL/surrogate escapes are stored as written (json.dumps text)",
+      "pass": true,
+      "observed": {
+        "odd-nan-other": "{\"score\": NaN, \"surface\": \"acp\"}",
+        "odd-inf-other": "{\"high\": Infinity, \"low\": -Infinity, \"surface\": \"acp\"}",
+        "odd-nul-other": "{\"note\": \"a\\u0000b\", \"surface\": \"acp\"}",
+        "odd-surrogate-other": "{\"note\": \"\\ud800x\\udc00\", \"surface\": \"acp\"}"
+      }
+    },
+    {
+      "check": "odd (postgres): {'surface': 'acp'} selects ['odd-inf-other', 'odd-long', 'odd-nan-other', 'odd-nul-other', 'odd-surrogate-other']",
+      "pass": true,
+      "observed": [
+        "odd-inf-other",
+        "odd-long",
+        "odd-nan-other",
+        "odd-nul-other",
+        "odd-surrogate-other"
+      ]
+    },
+    {
+      "check": "odd (postgres): {'surface': 'a\\x00b'} selects ['odd-nul-value']",
+      "pass": true,
+      "observed": [
+        "odd-nul-value"
+      ]
+    },
+    {
+      "check": "odd (postgres): {'k\\x00z': 'value'} selects ['odd-nul-key']",
+      "pass": true,
+      "observed": [
+        "odd-nul-key"
+      ]
+    },
+    {
+      "check": "odd (postgres): {'surface': 'x\\ud800'} selects ['odd-surrogate-value']",
+      "pass": true,
+      "observed": [
+        "odd-surrogate-value"
+      ]
+    },
+    {
+      "check": "odd (postgres): {'note': '\\ud800x\\udc00'} selects ['odd-surrogate-other']",
+      "pass": true,
+      "observed": [
+        "odd-surrogate-other"
+      ]
+    },
+    {
+      "check": "odd (postgres): {'caf\\xe9': '\\U0001f600'} selects ['odd-unicode']",
+      "pass": true,
+      "observed": [
+        "odd-unicode"
+      ]
+    },
+    {
+      "check": "odd (postgres): {'surface': 'caf\\xe9'} selects ['odd-unicode']",
+      "pass": true,
+      "observed": [
+        "odd-unicode"
+      ]
+    },
+    {
+      "check": "odd (postgres): {'surface': '{\"a\":1}'} selects ['odd-brace-value']",
+      "pass": true,
+      "observed": [
+        "odd-brace-value"
+      ]
+    },
+    {
+      "check": "odd (postgres): {'working_dir': '[draft]'} selects ['odd-brace-value']",
+      "pass": true,
+      "observed": [
+        "odd-brace-value"
+      ]
+    },
+    {
+      "check": "odd (postgres): {'working_dir': '[\"draft\"]'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "odd (postgres): {'a.b': 'literal'} selects ['odd-path-keys']",
+      "pass": true,
+      "observed": [
+        "odd-path-keys"
+      ]
+    },
+    {
+      "check": "odd (postgres): {'a.b': 'nested'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "odd (postgres): {'t[0]': 'x'} selects ['odd-path-keys']",
+      "pass": true,
+      "observed": [
+        "odd-path-keys"
+      ]
+    },
+    {
+      "check": "odd (postgres): {'\"q\"': 'y'} selects ['odd-path-keys']",
+      "pass": true,
+      "observed": [
+        "odd-path-keys"
+      ]
+    },
+    {
+      "check": "odd (postgres): {\"<5000 x 'k'>\": \"<100000 x 'v'>\"} selects ['odd-long']",
+      "pass": true,
+      "observed": [
+        "odd-long"
+      ]
+    },
+    {
+      "check": "odd (postgres): {\"<5000 x 'k'>\": \"<99999 x 'v'>\"} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "odd (postgres): {'NaN': 'second'} selects ['odd-nan-keys']",
+      "pass": true,
+      "observed": [
+        "odd-nan-keys"
+      ]
+    },
+    {
+      "check": "odd (postgres): {'NaN': 'first'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "odd (postgres): {'surface': '1'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "odd (postgres): {'flag': 'true'} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "odd (postgres): {'none': ''} selects []",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "odd (postgres): {'surface': ''} selects ['odd-empty-string']",
+      "pass": true,
+      "observed": [
+        "odd-empty-string"
+      ]
+    },
+    {
+      "check": "odd (postgres): {'surface': 'acp', 'note': 'a\\x00b'} selects ['odd-nul-other']",
+      "pass": true,
+      "observed": [
+        "odd-nul-other"
+      ]
+    },
+    {
+      "check": "odd: stored rows equal the rows derived with json.loads from stored metadata",
+      "pass": true,
+      "observed": 20
+    },
+    {
+      "check": "odd: every stored name/value is ASCII JSON text without a NUL byte",
+      "pass": true
+    },
+    {
+      "check": "odd: the 5,000-char name and 100,000-char value are stored in full",
+      "pass": true,
+      "observed": [
+        [
+          5002,
+          100002
+        ]
+      ]
+    },
+    {
+      "check": "bounded: limits 1,2,5,23,24,25,1000 x both orders return min(limit,24) sessions in (updated_at,id) order",
+      "pass": true,
+      "observed": "all 14 match"
+    },
+    {
+      "check": "collision: every row shares one forced digest",
+      "pass": true,
+      "observed": [
+        "0000000000000000"
+      ]
+    },
+    {
+      "check": "collision (postgres): all 23 odd filters still select exactly their sessions",
+      "pass": true,
+      "observed": "23/23"
+    },
+    {
+      "check": "collision (postgres): near-miss value 'acq' selects only 'near'",
+      "pass": true,
+      "observed": [
+        "near"
+      ]
+    },
+    {
+      "check": "collision (postgres): 'a.b'='literal' does not match 'literals'",
+      "pass": true,
+      "observed": [
+        "odd-path-keys"
+      ]
+    },
+    {
+      "check": "writes: rows match stored metadata after keyed insert",
+      "pass": true
+    },
+    {
+      "check": "writes: rows match stored metadata after keyed metadata replacement",
+      "pass": true
+    },
+    {
+      "check": "writes: after replacement the old value no longer matches and the new one does",
+      "pass": true
+    },
+    {
+      "check": "writes: resolve without metadata keeps rows",
+      "pass": true
+    },
+    {
+      "check": "writes: rows match stored metadata after explicit session and room creation",
+      "pass": true
+    },
+    {
+      "check": "writes: an ignored conflicting insert writes no rows and keeps the session",
+      "pass": true
+    },
+    {
+      "check": "writes: 'replaced' matches nothing after the ignored insert",
+      "pass": true
+    },
+    {
+      "check": "writes: rows match stored metadata after update_session_metadata (changed value, string->number, new member)",
+      "pass": true
+    },
+    {
+      "check": "writes: updated filters follow the update",
+      "pass": true
+    },
+    {
+      "check": "writes: delete_session returns True",
+      "pass": true
+    },
+    {
+      "check": "writes: delete_session removes the session's rows",
+      "pass": true,
+      "observed": [
+        "e4042c45865240a295f95a52b9867df0",
+        "explicit-a"
+      ]
+    },
+    {
+      "check": "writes: a direct DELETE FROM sessions cascades to the rows",
+      "pass": true
+    },
+    {
+      "check": "writes: rows match stored metadata after all writes",
+      "pass": true
+    },
+    {
+      "check": "rollback: update_session_metadata failing after its rows raises and changes nothing",
+      "pass": true,
+      "observed": "RuntimeError: injected failure after the metadata strings"
+    },
+    {
+      "check": "rollback: keyed resolve_session metadata update failing after its rows changes nothing",
+      "pass": true,
+      "observed": "RuntimeError: injected failure after the metadata strings"
+    },
+    {
+      "check": "rollback: a new session whose rows fail is not stored",
+      "pass": true,
+      "observed": "RuntimeError: injected failure after the metadata strings"
+    },
+    {
+      "check": "rollback: a failing fence check comes before any write",
+      "pass": true,
+      "observed": "RuntimeSessionTurnFenceError: session turn lease is not active"
+    },
+    {
+      "check": "rollback: filters still see the committed values only",
+      "pass": true
+    },
+    {
+      "check": "falsey: {'surface': None} is sent as '' and selects ['f-empty']",
+      "pass": true,
+      "observed": [
+        "f-empty"
+      ]
+    },
+    {
+      "check": "falsey: {'surface': 0} is sent as '' and selects ['f-empty']",
+      "pass": true,
+      "observed": [
+        "f-empty"
+      ]
+    },
+    {
+      "check": "falsey: {'surface': False} is sent as '' and selects ['f-empty']",
+      "pass": true,
+      "observed": [
+        "f-empty"
+      ]
+    },
+    {
+      "check": "falsey: {'surface': ''} is sent as '' and selects ['f-empty']",
+      "pass": true,
+      "observed": [
+        "f-empty"
+      ]
+    },
+    {
+      "check": "falsey: {'surface': []} is sent as '' and selects ['f-empty']",
+      "pass": true,
+      "observed": [
+        "f-empty"
+      ]
+    },
+    {
+      "check": "falsey: {'surface': {}} is sent as '' and selects ['f-empty']",
+      "pass": true,
+      "observed": [
+        "f-empty"
+      ]
+    },
+    {
+      "check": "falsey: {'surface': ()} is sent as '' and selects ['f-empty']",
+      "pass": true,
+      "observed": [
+        "f-empty"
+      ]
+    },
+    {
+      "check": "non-string (postgres): {'surface': 1} raises TypeError",
+      "pass": true,
+      "observed": "TypeError: session metadata filter values must be strings, not int"
+    },
+    {
+      "check": "non-string (postgres): {'surface': True} raises TypeError",
+      "pass": true,
+      "observed": "TypeError: session metadata filter values must be strings, not bool"
+    },
+    {
+      "check": "non-string (postgres): {'surface': 1.5} raises TypeError",
+      "pass": true,
+      "observed": "TypeError: session metadata filter values must be strings, not float"
+    },
+    {
+      "check": "concurrent: 4 writers x 25 metadata updates on one session complete without errors",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "concurrent: rows match the final stored metadata",
+      "pass": true
+    },
+    {
+      "check": "concurrent: the final surface value selects the session; no stale value does",
+      "pass": true,
+      "observed": [
+        "writer-1-24",
+        [
+          "concurrent-a"
+        ]
+      ]
+    },
+    {
+      "check": "concurrent: 8 racing creations of one keyed session finish without errors, one session",
+      "pass": true,
+      "observed": [
+        [],
+        1
+      ]
+    },
+    {
+      "check": "concurrent: the raced session's rows match its stored metadata",
+      "pass": true
+    },
+    {
+      "check": "concurrent: a metadata update racing a delete: no deadlock/integrity error, session and rows gone",
+      "pass": true,
+      "observed": {
+        "errors": [],
+        "deleted": true,
+        "update_stopped": "RuntimeError: Failed to update metadata for session_id=race-delete"
+      }
+    },
+    {
+      "check": "concurrent: rows match stored metadata at the end",
+      "pass": true
+    },
+    {
+      "check": "concurrent: a failed PostgreSQL update rolls back; another connection sees the old rows and no 'rolled-back' match",
+      "pass": true,
+      "observed": "injected failure after the metadata strings"
+    },
+    {
+      "check": "acp (installed OpenMinionACPAgent in-process (runtime object: sessions + config)): initialize reports the installed version and session/list capability",
+      "pass": true,
+      "observed": "0.1.12"
+    },
+    {
+      "check": "acp: session/list cwd=a lists only ACP sessions of workspace a, newest first (incl. NaN/NUL/surrogate in other fields)",
+      "pass": true,
+      "observed": [
+        "odd-acp-in-a",
+        "7b7cceeed16542debde72a5452d75054"
+      ]
+    },
+    {
+      "check": "acp: session/list without cwd lists every ACP session newest first; cli/list/True/ACP/missing surfaces excluded",
+      "pass": true,
+      "observed": [
+        "odd-acp-in-a",
+        "fb4f8839fdd7405bb265ff0ca756b53f",
+        "7b7cceeed16542debde72a5452d75054"
+      ]
+    },
+    {
+      "check": "acp: session/list cwd=b lists only the workspace-b session",
+      "pass": true,
+      "observed": [
+        "fb4f8839fdd7405bb265ff0ca756b53f"
+      ]
+    },
+    {
+      "check": "acp: with 108 ACP sessions session/list returns the newest 100 (store limit), in order",
+      "pass": true,
+      "observed": 100
+    },
+    {
+      "check": "focus: a new Focus session stores working_dir (resolved) and focus_mode",
+      "pass": true,
+      "observed": {
+        "working_dir": "<WORK>/work369/f-pg/focus-72b29873/project-a",
+        "focus_mode": true
+      }
+    },
+    {
+      "check": "focus: list_directory_sessions = alpha's sessions of project-a, newest first (beta's and project-b's excluded)",
+      "pass": true,
+      "observed": [
+        "focus-odd",
+        "focus-bbff93b2bcca4bd59d44c8818d6cb60c",
+        "focus-97447eac12dc4d3787101e8aa58b8c8d",
+        "focus-a4325b310be146fdb5d7ba01906eae70"
+      ]
+    },
+    {
+      "check": "focus: limit=2 returns the newest two",
+      "pass": true,
+      "observed": [
+        "focus-odd",
+        "focus-bbff93b2bcca4bd59d44c8818d6cb60c"
+      ]
+    },
+    {
+      "check": "focus: find_candidate_session is the newest",
+      "pass": true,
+      "observed": "focus-odd"
+    },
+    {
+      "check": "focus: beta lists only its own project-a session",
+      "pass": true,
+      "observed": [
+        "focus-6b0f1f88d5374e92a552bb4e3264fafe"
+      ]
+    },
+    {
+      "check": "focus: project-b lists its one session",
+      "pass": true,
+      "observed": 1
+    }
+  ],
+  "observations": {
+    "matrix {'surface': 'acp'}": [
+      "acp-a",
+      "acp-b"
+    ],
+    "matrix {'surface': 'focus'}": [],
+    "matrix {'surface': 'ACP'}": [],
+    "matrix {'surface': 'acp', 'workspace_root': '/work/a'}": [
+      "acp-a"
+    ],
+    "matrix {'surface': 'acp', 'workspace_root': '/work/c'}": [],
+    "matrix {'surface': 'acp', 'missing': 'acp'}": [],
+    "matrix {'missing': 'acp'}": [],
+    "matrix {'missing': ''}": [],
+    "matrix {'surface': ''}": [
+      "empty-surface"
+    ],
+    "matrix {'surface': None}": [
+      "empty-surface"
+    ],
+    "matrix {'  surface  ': 'cli'}": [
+      "cli-a"
+    ],
+    "matrix {'': 'ignored', 'surface': 'cli'}": [
+      "cli-a"
+    ],
+    "matrix {'value': '1'}": [
+      "text-one"
+    ],
+    "matrix {'value': '1.5'}": [],
+    "matrix {'value': 'true'}": [
+      "text-true"
+    ],
+    "matrix {'value': 'True'}": [],
+    "matrix {'value': 'false'}": [],
+    "matrix {'value': '0'}": [],
+    "matrix {'value': 'null'}": [
+      "text-null"
+    ],
+    "matrix {'value': 'None'}": [],
+    "matrix {'value': ''}": [],
+    "matrix {'value': '{\"kind\": \"acp\"}'}": [],
+    "matrix {\"it's\": 'yes'}": [
+      "quote-key"
+    ],
+    "matrix {'100%_done': 'yes'}": [
+      "like-key"
+    ],
+    "matrix {'100%': 'yes'}": [],
+    "matrix {'$scope': 'yes'}": [
+      "dollar-key"
+    ],
+    "matrix {'a b': 'yes'}": [
+      "space-key"
+    ],
+    "matrix {\"k') OR ('1'='1\": 'yes'}": [
+      "sql-key"
+    ],
+    "matrix {\"k') OR ('1'='1\": 'no'}": [],
+    "matrix {'note': 'say \"hi\" \\\\ C:\\\\work\\\\a'}": [
+      "escaped-value"
+    ],
+    "matrix {'note': 'caf\\xe9 \\U0001f600 \\u2028'}": [
+      "unicode-value"
+    ],
+    "matrix {'note': 'line\\nbreak\\ttab'}": [
+      "newline-value"
+    ],
+    "matrix {'note': 'a%'}": [
+      "like-value"
+    ],
+    "matrix {'note': 'a_'}": [],
+    "differences {'value': '{\"kind\":\"acp\"}'}": [],
+    "differences {'value': '[1,\"x\"]'}": [],
+    "differences {'a.b': 'top'}": [
+      "dotted-top"
+    ],
+    "differences {'a.b': 'nested'}": [],
+    "differences {'tags[0]': 'top'}": [
+      "bracket-top"
+    ],
+    "differences {'tags[0]': 'first'}": [],
+    "differences {'\"q\"': 'top'}": [
+      "quoted-top"
+    ],
+    "differences {'\"q\"': 'plain'}": [],
+    "odd {'surface': 'acp'}": [
+      "odd-inf-other",
+      "odd-long",
+      "odd-nan-other",
+      "odd-nul-other",
+      "odd-surrogate-other"
+    ],
+    "odd {'surface': 'a\\x00b'}": [
+      "odd-nul-value"
+    ],
+    "odd {'k\\x00z': 'value'}": [
+      "odd-nul-key"
+    ],
+    "odd {'surface': 'x\\ud800'}": [
+      "odd-surrogate-value"
+    ],
+    "odd {'note': '\\ud800x\\udc00'}": [
+      "odd-surrogate-other"
+    ],
+    "odd {'caf\\xe9': '\\U0001f600'}": [
+      "odd-unicode"
+    ],
+    "odd {'surface': 'caf\\xe9'}": [
+      "odd-unicode"
+    ],
+    "odd {'surface': '{\"a\":1}'}": [
+      "odd-brace-value"
+    ],
+    "odd {'working_dir': '[draft]'}": [
+      "odd-brace-value"
+    ],
+    "odd {'working_dir': '[\"draft\"]'}": [],
+    "odd {'a.b': 'literal'}": [
+      "odd-path-keys"
+    ],
+    "odd {'a.b': 'nested'}": [],
+    "odd {'t[0]': 'x'}": [
+      "odd-path-keys"
+    ],
+    "odd {'\"q\"': 'y'}": [
+      "odd-path-keys"
+    ],
+    "odd {\"<5000 x 'k'>\": \"<100000 x 'v'>\"}": [
+      "odd-long"
+    ],
+    "odd {\"<5000 x 'k'>\": \"<99999 x 'v'>\"}": [],
+    "odd {'NaN': 'second'}": [
+      "odd-nan-keys"
+    ],
+    "odd {'NaN': 'first'}": [],
+    "odd {'surface': '1'}": [],
+    "odd {'flag': 'true'}": [],
+    "odd {'none': ''}": [],
+    "odd {'surface': ''}": [
+      "odd-empty-string"
+    ],
+    "odd {'surface': 'acp', 'note': 'a\\x00b'}": [
+      "odd-nul-other"
+    ],
+    "bounded limit=1 newest_first=True": [
+      "bounded-23"
+    ],
+    "bounded limit=1 newest_first=False": [
+      "bounded-00"
+    ],
+    "bounded limit=2 newest_first=True": [
+      "bounded-23",
+      "bounded-22"
+    ],
+    "bounded limit=2 newest_first=False": [
+      "bounded-00",
+      "bounded-01"
+    ],
+    "bounded limit=5 newest_first=True": [
+      "bounded-23",
+      "bounded-22",
+      "bounded-21",
+      "bounded-20",
+      "bounded-19"
+    ],
+    "bounded limit=5 newest_first=False": [
+      "bounded-00",
+      "bounded-01",
+      "bounded-02",
+      "bounded-03",
+      "bounded-04"
+    ],
+    "bounded limit=23 newest_first=True": [
+      "bounded-23",
+      "bounded-22",
+      "bounded-21",
+      "bounded-20",
+      "bounded-19",
+      "bounded-18",
+      "bounded-17",
+      "bounded-16",
+      "bounded-15",
+      "bounded-14",
+      "bounded-13",
+      "bounded-12",
+      "bounded-11",
+      "bounded-10",
+      "bounded-09",
+      "bounded-08",
+      "bounded-07",
+      "bounded-06",
+      "bounded-05",
+      "bounded-04",
+      "bounded-03",
+      "bounded-02",
+      "bounded-01"
+    ],
+    "bounded limit=23 newest_first=False": [
+      "bounded-00",
+      "bounded-01",
+      "bounded-02",
+      "bounded-03",
+      "bounded-04",
+      "bounded-05",
+      "bounded-06",
+      "bounded-07",
+      "bounded-08",
+      "bounded-09",
+      "bounded-10",
+      "bounded-11",
+      "bounded-12",
+      "bounded-13",
+      "bounded-14",
+      "bounded-15",
+      "bounded-16",
+      "bounded-17",
+      "bounded-18",
+      "bounded-19",
+      "bounded-20",
+      "bounded-21",
+      "bounded-22"
+    ],
+    "bounded limit=24 newest_first=True": [
+      "bounded-23",
+      "bounded-22",
+      "bounded-21",
+      "bounded-20",
+      "bounded-19",
+      "bounded-18",
+      "bounded-17",
+      "bounded-16",
+      "bounded-15",
+      "bounded-14",
+      "bounded-13",
+      "bounded-12",
+      "bounded-11",
+      "bounded-10",
+      "bounded-09",
+      "bounded-08",
+      "bounded-07",
+      "bounded-06",
+      "bounded-05",
+      "bounded-04",
+      "bounded-03",
+      "bounded-02",
+      "bounded-01",
+      "bounded-00"
+    ],
+    "bounded limit=24 newest_first=False": [
+      "bounded-00",
+      "bounded-01",
+      "bounded-02",
+      "bounded-03",
+      "bounded-04",
+      "bounded-05",
+      "bounded-06",
+      "bounded-07",
+      "bounded-08",
+      "bounded-09",
+      "bounded-10",
+      "bounded-11",
+      "bounded-12",
+      "bounded-13",
+      "bounded-14",
+      "bounded-15",
+      "bounded-16",
+      "bounded-17",
+      "bounded-18",
+      "bounded-19",
+      "bounded-20",
+      "bounded-21",
+      "bounded-22",
+      "bounded-23"
+    ],
+    "bounded limit=25 newest_first=True": [
+      "bounded-23",
+      "bounded-22",
+      "bounded-21",
+      "bounded-20",
+      "bounded-19",
+      "bounded-18",
+      "bounded-17",
+      "bounded-16",
+      "bounded-15",
+      "bounded-14",
+      "bounded-13",
+      "bounded-12",
+      "bounded-11",
+      "bounded-10",
+      "bounded-09",
+      "bounded-08",
+      "bounded-07",
+      "bounded-06",
+      "bounded-05",
+      "bounded-04",
+      "bounded-03",
+      "bounded-02",
+      "bounded-01",
+      "bounded-00"
+    ],
+    "bounded limit=25 newest_first=False": [
+      "bounded-00",
+      "bounded-01",
+      "bounded-02",
+      "bounded-03",
+      "bounded-04",
+      "bounded-05",
+      "bounded-06",
+      "bounded-07",
+      "bounded-08",
+      "bounded-09",
+      "bounded-10",
+      "bounded-11",
+      "bounded-12",
+      "bounded-13",
+      "bounded-14",
+      "bounded-15",
+      "bounded-16",
+      "bounded-17",
+      "bounded-18",
+      "bounded-19",
+      "bounded-20",
+      "bounded-21",
+      "bounded-22",
+      "bounded-23"
+    ],
+    "bounded limit=1000 newest_first=True": [
+      "bounded-23",
+      "bounded-22",
+      "bounded-21",
+      "bounded-20",
+      "bounded-19",
+      "bounded-18",
+      "bounded-17",
+      "bounded-16",
+      "bounded-15",
+      "bounded-14",
+      "bounded-13",
+      "bounded-12",
+      "bounded-11",
+      "bounded-10",
+      "bounded-09",
+      "bounded-08",
+      "bounded-07",
+      "bounded-06",
+      "bounded-05",
+      "bounded-04",
+      "bounded-03",
+      "bounded-02",
+      "bounded-01",
+      "bounded-00"
+    ],
+    "bounded limit=1000 newest_first=False": [
+      "bounded-00",
+      "bounded-01",
+      "bounded-02",
+      "bounded-03",
+      "bounded-04",
+      "bounded-05",
+      "bounded-06",
+      "bounded-07",
+      "bounded-08",
+      "bounded-09",
+      "bounded-10",
+      "bounded-11",
+      "bounded-12",
+      "bounded-13",
+      "bounded-14",
+      "bounded-15",
+      "bounded-16",
+      "bounded-17",
+      "bounded-18",
+      "bounded-19",
+      "bounded-20",
+      "bounded-21",
+      "bounded-22",
+      "bounded-23"
+    ],
+    "falsey {'surface': None}": [
+      "f-empty"
+    ],
+    "falsey {'surface': 0}": [
+      "f-empty"
+    ],
+    "falsey {'surface': False}": [
+      "f-empty"
+    ],
+    "falsey {'surface': ''}": [
+      "f-empty"
+    ],
+    "falsey {'surface': []}": [
+      "f-empty"
+    ],
+    "falsey {'surface': {}}": [
+      "f-empty"
+    ],
+    "falsey {'surface': ()}": [
+      "f-empty"
+    ],
+    "falsey {'surface': 1}": "TypeError: session metadata filter values must be strings, not int",
+    "falsey {'surface': True}": "TypeError: session metadata filter values must be strings, not bool",
+    "falsey {'surface': 1.5}": "TypeError: session metadata filter values must be strings, not float",
+    "acp path": "installed OpenMinionACPAgent in-process (runtime object: sessions + config)",
+    "acp session/list cwd=a": [
+      "odd-acp-in-a",
+      "7b7cceeed16542debde72a5452d75054"
+    ],
+    "acp session/list all": [
+      "odd-acp-in-a",
+      "fb4f8839fdd7405bb265ff0ca756b53f",
+      "7b7cceeed16542debde72a5452d75054"
+    ],
+    "focus path": "installed Focus OpenMinionRuntime over a PostgreSQL runtime SessionStore (runtime object shim)",
+    "focus list_directory_sessions": [
+      "focus-odd",
+      "focus-bbff93b2bcca4bd59d44c8818d6cb60c",
+      "focus-97447eac12dc4d3787101e8aa58b8c8d",
+      "focus-a4325b310be146fdb5d7ba01906eae70"
+    ]
+  }
+}

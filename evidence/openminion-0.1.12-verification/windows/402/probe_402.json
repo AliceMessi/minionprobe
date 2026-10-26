@@ -1,0 +1,287 @@
+{
+  "info": {
+    "probe": "probe_402",
+    "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+    "openminion.__version__": "0.1.12",
+    "python": "3.12.11",
+    "platform": "Windows-11-10.0.22631-SP0",
+    "sqlite3.sqlite_version": "3.50.4",
+    "cwd": "<WORK>\\empty-402",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "gc_enabled": false,
+    "postgres": false
+  },
+  "results": {
+    "memctl history --scope agent:a --type fact --key pref:indent --json": [
+      "Prefer spaces",
+      "Prefer tabs"
+    ],
+    "memctl inspect --scope agent:a --db <db> --trace-file <trace> --json": {
+      "exit_code": 0,
+      "history_summary": {
+        "depth": 2,
+        "active_id": "2b8b090a84ad4d14ab31117a5f41a9cf",
+        "reasons": [
+          "keyed_upsert"
+        ],
+        "scope": "agent:a",
+        "type": "fact",
+        "key": "pref:indent"
+      },
+      "stats.active_record_count": 3,
+      "stats.supersession_chain_count": 1,
+      "stats keys": [
+        "active_record_count",
+        "candidate_counts",
+        "max_chain_depth",
+        "per_type",
+        "scope",
+        "soft_deleted_count",
+        "supersession_chain_count"
+      ],
+      "recent_trace_events": [
+        "memory.context.built",
+        "memory.reflection.completed",
+        "memory.retrieval.completed"
+      ],
+      "last_gc": "2026-10-01T00:00:01Z",
+      "last_reflection": "2026-10-01T00:00:02Z"
+    },
+    "memctl inspect --scope agent:a --db <db> --trace-file <trace> (human)": {
+      "exit_code": 0,
+      "output": "Memory inspect\n  db: <WORK>\\work\\402\\run\\hist\\memory.db\n  scope: agent:a\n  availability: memory=True vector=False degraded=False\n\nScope: agent:a\nActive records: 3\nSoft-deleted records: 1\nSupersession chains: 1 (max depth 2)\nPer-type counts:\n  fact: count=3 avg_confidence=0.50\nCandidate counts:\n  none\n\nDeepest history: agent:a fact pref:indent (depth 2)\n  reasons: keyed_upsert\n\nLast GC-ish event: 2026-10-01T00:00:01Z\nLast reflection: 2026-10-01T00:00:02Z\n\nRecent trace events:\n2026-10-01T00:00:01Z  memory.context.built  agent:a  \n2026-10-01T00:00:02Z  memory.reflection.completed  agent:a  \n2026-10-01T00:00:03Z  memory.retrieval.completed  agent:a  \n"
+    },
+    "memctl inspect, empty database": {
+      "json exit": 0,
+      "history_summary": null,
+      "human exit": 0,
+      "Deepest history line": false
+    },
+    "memctl inspect, unkeyed and single-version keys only": {
+      "json exit": 0,
+      "history_summary": null,
+      "human exit": 0,
+      "Deepest history line": false
+    },
+    "build_inspect_payload with memctl's _get_service(db) (AuditedMemoryStore over SQLiteMemoryStore)": {
+      "scope": "agent:a",
+      "type": "fact",
+      "key": "pref:indent",
+      "depth": 2
+    },
+    "build_inspect_payload with MemoryService over the bare SQLiteMemoryStore": {
+      "scope": "agent:a",
+      "type": "fact",
+      "key": "pref:indent",
+      "depth": 2
+    },
+    "build_inspect_payload with MemoryService over a bare in-memory (mock) store": null,
+    "build_inspect_payload with MemoryService over AuditedMemoryStore(in-memory store)": null,
+    "command lifecycle (in process, cyclic GC disabled)": {
+      "successful inspect": {
+        "exit_code": 0,
+        "exception": null,
+        "services created": 1,
+        "close calls after the command (service, sink, store)": [
+          1,
+          1,
+          1
+        ],
+        "open connections to the database or audit database": [],
+        "gc enabled": false,
+        "files right after the command": {
+          "memory.db": "renamed and deleted"
+        },
+        "close calls after a second service.close() (service, sink, store)": [
+          2,
+          1,
+          1
+        ]
+      },
+      "failing inspect (build_inspect_payload raises)": {
+        "exit_code": 1,
+        "exception": "RuntimeError: inspect failed",
+        "services created": 1,
+        "close calls after the command (service, sink, store)": [
+          1,
+          1,
+          1
+        ],
+        "open connections to the database or audit database": [],
+        "gc enabled": false,
+        "files right after the command": {
+          "memory.db": "renamed and deleted"
+        },
+        "close calls after a second service.close() (service, sink, store)": [
+          2,
+          1,
+          1
+        ]
+      }
+    }
+  },
+  "checks": [
+    {
+      "check": "memctl history shows the key's two versions",
+      "pass": true,
+      "observed": [
+        "Prefer spaces",
+        "Prefer tabs"
+      ]
+    },
+    {
+      "check": "memctl inspect --json: history_summary for agent:a fact pref:indent with depth 2",
+      "pass": true,
+      "observed": {
+        "scope": "agent:a",
+        "type": "fact",
+        "key": "pref:indent",
+        "depth": 2
+      }
+    },
+    {
+      "check": "memctl inspect --json: stats still reported (3 active records)",
+      "pass": true,
+      "observed": 3
+    },
+    {
+      "check": "memctl inspect --json: trace output still reported (3 recent events, last GC-ish and reflection times)",
+      "pass": true,
+      "observed": {
+        "recent_trace_events": [
+          "memory.context.built",
+          "memory.reflection.completed",
+          "memory.retrieval.completed"
+        ],
+        "last_gc": "2026-10-01T00:00:01Z",
+        "last_reflection": "2026-10-01T00:00:02Z"
+      }
+    },
+    {
+      "check": "memctl inspect (human): the Deepest history line for the key, depth 2",
+      "pass": true,
+      "observed": [
+        "Deepest history: agent:a fact pref:indent (depth 2)"
+      ]
+    },
+    {
+      "check": "memctl inspect (human): stats and trace sections still printed",
+      "pass": true,
+      "observed": [
+        "Last GC-ish event: 2026-10-01T00:00:01Z",
+        "Last reflection: 2026-10-01T00:00:02Z",
+        "Recent trace events:"
+      ]
+    },
+    {
+      "check": "empty database: no history summary in JSON or human output",
+      "pass": true,
+      "observed": {
+        "json exit": 0,
+        "history_summary": null,
+        "human exit": 0,
+        "Deepest history line": false
+      }
+    },
+    {
+      "check": "unkeyed and single-version keys only: no history summary in JSON or human output",
+      "pass": true,
+      "observed": {
+        "json exit": 0,
+        "history_summary": null,
+        "human exit": 0,
+        "Deepest history line": false
+      }
+    },
+    {
+      "check": "build_inspect_payload, memctl's _get_service(db) (AuditedMemoryStore over SQLiteMemoryStore): depth 2",
+      "pass": true,
+      "observed": {
+        "scope": "agent:a",
+        "type": "fact",
+        "key": "pref:indent",
+        "depth": 2
+      }
+    },
+    {
+      "check": "build_inspect_payload, MemoryService over the bare SQLiteMemoryStore: depth 2",
+      "pass": true,
+      "observed": {
+        "scope": "agent:a",
+        "type": "fact",
+        "key": "pref:indent",
+        "depth": 2
+      }
+    },
+    {
+      "check": "build_inspect_payload, MemoryService over a bare in-memory (mock) store: no summary",
+      "pass": true
+    },
+    {
+      "check": "build_inspect_payload, MemoryService over AuditedMemoryStore(in-memory store): no summary",
+      "pass": true
+    },
+    {
+      "check": "in process, GC disabled, successful inspect: service, audit sink and store closed once; no open connection; files renamed and deleted",
+      "pass": true,
+      "observed": {
+        "exit_code": 0,
+        "exception": null,
+        "services created": 1,
+        "close calls after the command (service, sink, store)": [
+          1,
+          1,
+          1
+        ],
+        "open connections to the database or audit database": [],
+        "gc enabled": false,
+        "files right after the command": {
+          "memory.db": "renamed and deleted"
+        },
+        "close calls after a second service.close() (service, sink, store)": [
+          2,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "check": "in process, GC disabled, failing inspect (build_inspect_payload raises): service, audit sink and store closed once; no open connection; files renamed and deleted",
+      "pass": true,
+      "observed": {
+        "exit_code": 1,
+        "exception": "RuntimeError: inspect failed",
+        "services created": 1,
+        "close calls after the command (service, sink, store)": [
+          1,
+          1,
+          1
+        ],
+        "open connections to the database or audit database": [],
+        "gc enabled": false,
+        "files right after the command": {
+          "memory.db": "renamed and deleted"
+        },
+        "close calls after a second service.close() (service, sink, store)": [
+          2,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "check": "cyclic GC stayed disabled and gc.collect was never called",
+      "pass": true,
+      "observed": {
+        "gc_enabled": false,
+        "gc.collect calls": 0
+      }
+    }
+  ],
+  "summary": {
+    "passed": 15,
+    "failed": 0,
+    "total": 15
+  }
+}

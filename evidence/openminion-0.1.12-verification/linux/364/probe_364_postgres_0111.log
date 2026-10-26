@@ -1,0 +1,63 @@
+{
+  "probe": "probe_364",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "backend": "postgres",
+  "peers": 12,
+  "joins": 10,
+  "rounds": 100,
+  "postgres_server": "PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit"
+}
+PASS postgres fresh database migrated to the package head (13) | observed={'applied': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'current': 13}
+PASS postgres tied: the three joins share one joined_at and their row ids sort in reverse join order | observed=[['first', 'fb0', '2026-10-22T01:00:00+00:00'], ['second', 'cb0', '2026-10-22T01:00:00+00:00'], ['third', '0b0', '2026-10-22T01:00:00+00:00']]
+FAIL postgres tied: list_participants is in join order | observed=['third', 'second', 'first']
+PASS postgres tied: the first agent is active | observed='first'
+FAIL postgres tied: join_seq 1, 2, 3 in join order | observed='ProgrammingError: (psycopg.errors.UndefinedColumn) column "join_seq" does not exist'
+FAIL postgres tied: removing the active first agent selects the second | observed='third'
+FAIL postgres tied: remaining participants list in join order | observed=['third', 'second']
+PASS postgres upsert: an active participant added again keeps its row id and joined_at, takes the new channel/role/display name | observed=['f4f', '2026-10-22T01:00:00+00:00', 'cli', 'owner', 'First again']
+FAIL postgres upsert: it keeps its place | observed=['third', 'second', 'first']
+FAIL postgres upsert: join_seq unchanged (1, 2, 3) | observed='ProgrammingError: (psycopg.errors.UndefinedColumn) column "join_seq" does not exist'
+FAIL postgres rejoin same tick: same row, new place after every earlier join | observed={'row': 'f4f', 'joined_at': '2026-10-22T01:00:00+00:00', 'listed': ['third', 'second', 'first']}
+FAIL postgres rejoin same tick: join_seq first=4 | observed='ProgrammingError: (psycopg.errors.UndefinedColumn) column "join_seq" does not exist'
+PASS postgres rejoin later: the rejoin's joined_at and a new place | observed={'row': 'c4f', 'joined_at': '2026-10-22T01:01:00+00:00', 'listed': ['third', 'first', 'second']}
+FAIL postgres rejoin later: join_seq second=5 | observed='ProgrammingError: (psycopg.errors.UndefinedColumn) column "join_seq" does not exist'
+PASS postgres explicit: a later join, a re-add and a non-active leave keep the selected agent | observed=['third', 'third']
+FAIL postgres explicit: the selected agent leaving selects the earliest remaining join | observed={'listed': ['fourth', 'first'], 'active': 'fourth'}
+PASS postgres explicit: a later join can be selected; an agent that left cannot | observed={'active': 'fourth', 'select_left': "ValueError: Agent 'second' is not an active participant"}
+FAIL postgres legacy: the owner record lists before the first invited agent on one tick | observed=['guest-agent', 'legacy-agent']
+FAIL postgres legacy: join_seq owner=1, guest=2 | observed='ProgrammingError: (psycopg.errors.UndefinedColumn) column "join_seq" does not exist'
+PASS postgres legacy: the owner agent from the session key is active before any invite; an agent outside the session cannot be selected (bound to the owner); the owner can be selected again | observed={'active_before_invite': 'legacy-agent', 'active_after_invite': 'guest-agent', 'select_other': "ValueError: Legacy session '148dc4b46f8748c7aa2156ef10bcfef8' is bound to agent 'legacy-agent'", 'reselect_owner': 'legacy-agent'}
+PASS postgres session row: a human join changes nothing; the first agent becomes active; later joins and the active agent's re-add change nothing | observed={'human_join_unchanged': True, 'active': 'first'}
+PASS postgres clock moved back: a later join with an earlier joined_at lists first (joined_at still orders first) | observed=['early-clock', 'late-clock']
+FAIL postgres clock moved back: join_seq records the join order (late-clock=1, early-clock=2) | observed='ProgrammingError: (psycopg.errors.UndefinedColumn) column "join_seq" does not exist'
+FAIL postgres concurrent joins: 12 peers x 10 joins on one tick, no errors, every join has its own place 1..120 | observed={'errors': [], 'joined': 120, 'distinct_join_seq': False, 'seconds': 0.55}
+FAIL postgres concurrent joins: each peer's joins list in the order it made them, the listing follows join_seq | observed={'own_order': False}
+PASS postgres concurrent joins: the active agent is one of the joined agents (#393 not certified) | observed='peer-9-0'
+PASS postgres overlapping leave/rejoin: both complete (no unique-index error, no deadlock) | observed={'leave': True, 'rejoin': 'f4c', 'seconds': 0.51}
+FAIL postgres overlapping leave/rejoin: the rejoin waits for the leave, takes a new place, and the fallback selects the earliest remaining join | observed={'listed': ['second', 'first'], 'join_seq': 'ProgrammingError: (psycopg.errors.UndefinedColumn) column "join_seq" does not exist', 'active': 'second'}
+PASS postgres storm: 12 peers each leave and rejoin 100 times on one tick, including the active agent: every operation completes | observed={'operations': 2400, 'errors': [], 'error_count': 0, 'seconds': 8.01}
+FAIL postgres storm: afterwards every agent is listed once, places are distinct, the listing follows join_seq and the active agent is a participant | observed={'listed': ['agent-11', 'agent-10', 'agent-9', 'agent-8', 'agent-7', 'agent-6', 'agent-5', 'agent-4', 'agent-3', 'agent-2', 'agent-1', 'agent-0'], 'join_seq': 'ProgrammingError: (psycopg.errors.UndefinedColumn) column "join_seq" does not exist', 'active': 'agent-8'}
+PASS postgres storm: then the active agent leaving selects the earliest remaining join (twice) | observed=[{'left': 'agent-8', 'selected': 'agent-11', 'expected': 'agent-11'}, {'left': 'agent-11', 'selected': 'agent-10', 'expected': 'agent-10'}]
+PASS postgres reopen: no migration is applied again | observed=[]
+FAIL postgres reopen: the tied room still lists second, third with second active | observed={'listed': ['third', 'second'], 'active': 'third'}
+PASS postgres reopen: the upsert/rejoin room keeps its listing, join_seq and active agent | observed={'listed': ['third', 'first', 'second'], 'seq': 'ProgrammingError: (psycopg.errors.UndefinedColumn) column "join_seq" does not exist', 'active': 'third'}
+PASS postgres reopen: the explicitly selected agent is still active | observed='fourth'
+PASS postgres CLI `openminion room create --routing-mode broadcast --agent first --agent second --agent third` (one tick, row ids reverse) via the installed CLI parser and room handlers, with `_open_room_runtime` returning the PostgreSQL session store: exit 0, 3 participants, active first | observed={'rc': 0, 'stdout': ['room=room-fceecbe737b7413ca949411dd3abf8d8', 'participants=3', 'active_agent=first'], 'stderr_tail': []}
+PASS postgres CLI `openminion room create --routing-mode sequential --agent first --agent second --agent third` (one tick, row ids reverse) via the installed CLI parser and room handlers, with `_open_room_runtime` returning the PostgreSQL session store: exit 0, 3 participants, active first | observed={'rc': 0, 'stdout': ['room=room-03bb838a739840d2b8ca6ada57107f6f', 'participants=3', 'active_agent=first'], 'stderr_tail': []}
+PASS postgres CLI `openminion room create --routing-mode addressed --agent first --agent second --agent third` (one tick, row ids reverse) via the installed CLI parser and room handlers, with `_open_room_runtime` returning the PostgreSQL session store: exit 0, 3 participants, active first | observed={'rc': 0, 'stdout': ['room=room-c4e08082c9e846438e99eb8d2bb3026c', 'participants=3', 'active_agent=first'], 'stderr_tail': []}
+PASS postgres CLI `openminion room invite <room> --agent fourth` on the same tick (row id sorts before two earlier joins): exit 0, 4 participants | observed={'rc': 0, 'stdout': ['invited agent=fourth', 'participants=4'], 'stderr_tail': []}
+FAIL postgres CLI room (read back by the session store): list_participants in join order | observed=['third', 'fourth', 'second', 'first']
+FAIL postgres routing (broadcast): the room turn goes to the agents in join order | observed=[['third', 'fourth', 'second', 'first'], 'broadcast']
+FAIL postgres routing (sequential, no explicit order): join order | observed=[['third', 'second', 'first'], 'sequential']
+FAIL postgres routing (broadcast): after the active first agent leaves, the second is active and the turn goes to second, third, fourth | observed={'active': 'third', 'routed': [['third', 'fourth', 'second'], 'broadcast']}
+FAIL postgres routing (addressed): the active agent answers; after it leaves the fallback (second) answers; a mention still selects its agent | observed={'before': [['first'], 'addressed'], 'active_after_leave': 'third', 'after': [['third'], 'addressed'], 'mention_third': [['third'], 'addressed']}
+NOT RUN room CLI against a PostgreSQL runtime database through APIRuntime: APIRuntime.from_config_path with storage.backend=postgres does not start | observed='RuntimeError: runtime record_store does not expose sqlite connection'
+SUMMARY passed=21 failed=23 total=44 not_run=1
+exit=1

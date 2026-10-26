@@ -1,0 +1,123 @@
+Using Python 3.12.15 environment at: <VENV0111>
+Using Python 3.12.15 environment at: <VENV>
+Using Python 3.12.15 environment at: <VENV>
+provenance: 1 match
+=== probe_388
+exit=0
+PASS A. external provider builds a real runtime whose memory service holds a BackendMemoryStoreAdapter; no memory.store store and no audit sink are created | observed={'build': 'ok', 'memory_service_store': 'BackendMemor
+PASS A. one real echo turn completes | observed='completed'
+PASS A. runtime.close() x3: the assembly closes without error; the owned backend closes once and the assembly's artifact store closes once | observed={'outcomes': ['closed'], 'after_each_runtime_close': [{'assembly_close
+PASS A. the artifact store rejects a write after shutdown, and its index file can be renamed and deleted right away (GC disabled, no collection) | observed={'write': 'ProgrammingError: Cannot operate on a closed database
+PASS B. reference-sqlite (no close()): runtime builds with no memory.store store or audit sink, one turn completes, runtime.close() x3 closes the assembly without error and its artifact store once | observed={'build': 'o
+PASS B2. external provider with an unusable memory.store (postgres without URL): the runtime builds, creates no store, and closes cleanly | observed={'build': 'ok', 'stores_created_by_resolve_memory_backend': [], 'assemb
+PASS C. a borrowed backend (MemoryService(backend=b) / BackendMemoryStoreAdapter(b)) is not closed by two closes and stays usable | observed={'service': {'backend_closes': 0, 'backend_usable_after': 'accepted'}, 'adapter
+PASS C. an owned backend (owns_backend=True / MemoryService(..., owns_store=True)) is closed once over two closes | observed={'adapter': {'backend_closes': 1, 'backend_usable_after': 'accepted'}, 'service': {'backend_clo
+PASS C. an owned backend without close() closes twice without error and stays usable | observed={'backend_closes': 0, 'backend_usable_after': 'accepted'}
+PASS D. default provider (control): one SQLiteMemoryStore and one audit sink; turn completes; runtime.close() x3 closes store, audit sink and artifact store once each | observed={'stores_created_by_resolve_memory_backend
+PASS E. external backend, live scheduler: close() x2 is scheduler_still_running; backend and artifact store stay open, the service still writes; after the scheduler stops, close succeeds and closes each once | observed={
+PASS E. built-in provider, live scheduler (boundary preserved): store and artifact store stay open while it runs; after it stops, each closes once | observed={'blocked': ['scheduler_still_running closed=False', 'schedule
+PASS P. external provider + PostgreSQL memory.store: no memory store is created, 0 server connections after build, after one turn and after close, and no tables in the run's schema | observed={'build': 'ok', 'stores_crea
+PASS P. positive control: the default provider with the same PostgreSQL memory.store opens one engine (server connections > 0 after the turn), disposes it once over two closes, leaves 0 connections | observed={'stores_cr
+PASS GC stayed disabled and gc.collect() was never called | observed={'gc_enabled': False, 'gc_collect_calls': 0}
+SUMMARY passed=15 failed=0 total=15
+=== probe_388_0111
+exit=1
+FAIL A. external provider builds a real runtime whose memory service holds a BackendMemoryStoreAdapter; no memory.store store and no audit sink are created | observed={'build': 'ok', 'memory_service_store': 'BackendMemor
+FAIL A. one real echo turn completes | observed='raised NotImplementedError: backend ClosingReferenceBackend does not expose apply_capture_bundle()'
+FAIL A. runtime.close() x3: the assembly closes without error; the owned backend closes once and the assembly's artifact store closes once | observed={'outcomes': ["raised AttributeError: 'BackendMemoryStoreAdapter' obje
+FAIL A. the artifact store rejects a write after shutdown, and its index file can be renamed and deleted right away (GC disabled, no collection) | observed={'write': 'accepted', 'rename_delete': 'ok'}
+FAIL B. reference-sqlite (no close()): runtime builds with no memory.store store or audit sink, one turn completes, runtime.close() x3 closes the assembly without error and its artifact store once | observed={'build': 'o
+FAIL B2. external provider with an unusable memory.store (postgres without URL): the runtime builds, creates no store, and closes cleanly | observed={'build': 'InvalidArgumentError: postgres backend requires postgres.url
+FAIL C. a borrowed backend (MemoryService(backend=b) / BackendMemoryStoreAdapter(b)) is not closed by two closes and stays usable | observed={'service': {'backend_closes': 0, 'backend_usable_after': 'accepted'}, 'adapter
+FAIL C. an owned backend (owns_backend=True / MemoryService(..., owns_store=True)) is closed once over two closes | observed={'adapter': {'raised': "TypeError: BackendMemoryStoreAdapter.__init__() got an unexpected keywo
+FAIL C. an owned backend without close() closes twice without error and stays usable | observed={'raised': "AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'", 'backend_usable_after': 'accepted'
+PASS D. default provider (control): one SQLiteMemoryStore and one audit sink; turn completes; runtime.close() x3 closes store, audit sink and artifact store once each | observed={'stores_created_by_resolve_memory_backend
+FAIL E. external backend, live scheduler: close() x2 is scheduler_still_running; backend and artifact store stay open, the service still writes; after the scheduler stops, close succeeds and closes each once | observed={
+PASS E. built-in provider, live scheduler (boundary preserved): store and artifact store stay open while it runs; after it stops, each closes once | observed={'blocked': ['scheduler_still_running closed=False', 'schedule
+FAIL P. external provider + PostgreSQL memory.store: no memory store is created, 0 server connections after build, after one turn and after close, and no tables in the run's schema | observed={'build': 'ok', 'stores_crea
+PASS P. positive control: the default provider with the same PostgreSQL memory.store opens one engine (server connections > 0 after the turn), disposes it once over two closes, leaves 0 connections | observed={'stores_cr
+PASS GC stayed disabled and gc.collect() was never called | observed={'gc_enabled': False, 'gc_collect_calls': 0}
+SUMMARY passed=4 failed=11 total=15
+=== probe_389
+exit=0
+PASS A1. direct build_agent_memory_service caller: one SQLiteMemoryStore; close() x2 closes store, audit sink and artifact store once each; sink closed and artifact store rejects writes afterwards | observed={'closer': '
+PASS A1. direct build_agent_memory_service caller: right after close, the fallback's artifact index and audit DB files can be renamed and deleted (GC disabled, no collection) | observed={'artifact_index': 'ok', 'audit_si
+PASS A2. gateway service built without agent_memory: one SQLiteMemoryStore; close() x2 closes store, audit sink and artifact store once each; sink closed and artifact store rejects writes afterwards | observed={'closer':
+PASS A2. gateway service built without agent_memory: right after close, the fallback's artifact index and audit DB files can be renamed and deleted (GC disabled, no collection) | observed={'artifact_index': 'ok', 'audit_
+PASS A3. borrowed: a gateway service given the fallback memory as agent_memory closes nothing on two closes (sink stays open); the memory's own close() x2 then closes each once | observed={'assemblies_built': 1, 'turn_re
+PASS A4. SDK control: the runtime's memory gateway (close_owner None) and gateway service close nothing themselves; runtime.close() x2 closes store, sink and artifact store once each | observed={'turn': 'completed', 'run
+PASS B. external backend, direct caller: no memory store or audit sink is created; close() x2 closes the owned backend once and the artifact store once; a backend without close() closes cleanly | observed={'with_close': 
+PASS B. external backend, gateway-built fallback: no memory store or audit sink is created; close() x2 closes the owned backend once and the artifact store once; a backend without close() closes cleanly | observed={'with
+PASS B. external backend, borrowed adapter: the gateway service given it closes nothing (backend and artifact store stay open); the adapter's own close() x2 then closes each once | observed={'with_close': {'after_each_cl
+PASS C. gateway owner, live scheduler: close() closes nothing; after the scheduler stops, close() x2 closes store, sink and artifact store once each | observed={'while_alive': {'outcome': 'accepted', 'counts': {'store': 
+PASS C. caller owner, live scheduler: close() closes nothing; after the scheduler stops, close() x2 closes store, sink and artifact store once each | observed={'while_alive': {'outcome': 'accepted', 'counts': {'store': [
+PASS C. direct caller, external backend, live scheduler: backend and artifact store stay open; after it stops, close() x2 closes each once | observed={'while_alive': {'outcome': 'accepted', 'counts': {'store': [], 'audit
+PASS P. PostgreSQL, direct caller: one PostgresMemoryStore with server connections after the turn; close() x2 disposes the engine once and closes store, sink and artifact store once each; 0 connections after | observed={
+PASS P. PostgreSQL, gateway-built fallback: one PostgresMemoryStore with server connections after the turn; close() x2 disposes the engine once and closes store, sink and artifact store once each; 0 connections after | o
+PASS P. PostgreSQL, borrowed adapter: the gateway service's two closes dispose nothing and the server connection stays; the adapter's own close() x2 disposes once and leaves 0 connections | observed={'after_each_close': 
+PASS GC stayed disabled and gc.collect() was never called | observed={'gc_enabled': False, 'gc_collect_calls': 0}
+SUMMARY passed=16 failed=0 total=16
+=== probe_389_0111
+exit=1
+FAIL A1. direct build_agent_memory_service caller: one SQLiteMemoryStore; close() x2 closes store, audit sink and artifact store once each; sink closed and artifact store rejects writes afterwards | observed={'closer': '
+PASS A1. direct build_agent_memory_service caller: right after close, the fallback's artifact index and audit DB files can be renamed and deleted (GC disabled, no collection) | observed={'artifact_index': 'ok', 'audit_si
+FAIL A2. gateway service built without agent_memory: one SQLiteMemoryStore; close() x2 closes store, audit sink and artifact store once each; sink closed and artifact store rejects writes afterwards | observed={'closer':
+PASS A2. gateway service built without agent_memory: right after close, the fallback's artifact index and audit DB files can be renamed and deleted (GC disabled, no collection) | observed={'artifact_index': 'ok', 'audit_
+FAIL A3. borrowed: a gateway service given the fallback memory as agent_memory closes nothing on two closes (sink stays open); the memory's own close() x2 then closes each once | observed={'assemblies_built': 1, 'turn_re
+PASS A4. SDK control: the runtime's memory gateway (close_owner None) and gateway service close nothing themselves; runtime.close() x2 closes store, sink and artifact store once each | observed={'turn': 'completed', 'run
+FAIL B. external backend, direct caller: no memory store or audit sink is created; close() x2 closes the owned backend once and the artifact store once; a backend without close() closes cleanly | observed={'with_close': 
+FAIL B. external backend, gateway-built fallback: no memory store or audit sink is created; close() x2 closes the owned backend once and the artifact store once; a backend without close() closes cleanly | observed={'with
+FAIL B. external backend, borrowed adapter: the gateway service given it closes nothing (backend and artifact store stay open); the adapter's own close() x2 then closes each once | observed={'with_close': {'after_each_cl
+FAIL C. gateway owner, live scheduler: close() closes nothing; after the scheduler stops, close() x2 closes store, sink and artifact store once each | observed={'while_alive': {'outcome': 'accepted', 'counts': {'store': 
+FAIL C. caller owner, live scheduler: close() closes nothing; after the scheduler stops, close() x2 closes store, sink and artifact store once each | observed={'while_alive': {'outcome': 'accepted', 'counts': {'store': [
+FAIL C. direct caller, external backend, live scheduler: backend and artifact store stay open; after it stops, close() x2 closes each once | observed={'while_alive': {'outcome': 'accepted', 'counts': {'store': [0], 'audi
+FAIL P. PostgreSQL, direct caller: one PostgresMemoryStore with server connections after the turn; close() x2 disposes the engine once and closes store, sink and artifact store once each; 0 connections after | observed={
+FAIL P. PostgreSQL, gateway-built fallback: one PostgresMemoryStore with server connections after the turn; close() x2 disposes the engine once and closes store, sink and artifact store once each; 0 connections after | o
+FAIL P. PostgreSQL, borrowed adapter: the gateway service's two closes dispose nothing and the server connection stays; the adapter's own close() x2 disposes once and leaves 0 connections | observed={'after_each_close': 
+PASS GC stayed disabled and gc.collect() was never called | observed={'gc_enabled': False, 'gc_collect_calls': 0}
+SUMMARY passed=4 failed=12 total=16
+=== probe_397
+exit=0
+PASS A. two real SDK turns with the reference-sqlite external backend complete (no NotImplementedError) | observed={'backend': 'SophiaGraphSqliteStore', 'turns': [{'run_state': 'completed', 'memory_capture_state': 'pendi
+PASS A. each capture stays pending with CAPTURE_RECOVERY_UNSUPPORTED and no invented receipt; no memory.capture.result event | observed={'bundle_results': [{'capture_id': 'capture:b1275e78138c5e1577da73df2adbe36712690aff
+PASS A. recovery leaves the unsupported intents pending (scanned 2, recovered 0, pending 2; still no result) | observed={'recovery': [2, 0, 2], 'results_after': 0}
+PASS A. runtime.close() x3: the memory assembly closes once, without error | observed={'closes': ['ok', 'ok', 'ok'], 'assembly': ['closed']}
+PASS B. the backend's apply_capture_bundle receives each turn's real bundle (capture_id, root turn and session of that turn's intent); both turns complete | observed={'bundles': [{'capture_id': 'capture:94bdc12f1c4216ef0
+PASS B. each turn's result is the backend's receipt (no error_code), recorded as 2 memory.capture.result events with the same result hashes; recovery finds nothing pending | observed={'receipts': [{'capture_id': 'capture
+PASS B. replaying the first real bundle on the backend returns the same receipt | observed={'replay': {'capture_id': 'capture:94bdc12f1c4216ef0e9201c2826d050a653f726c782f84f6c114294ca84981f5', 'disposition': 'succeeded_n
+PASS B. runtime.close() x3: the memory assembly closes once, without error | observed={'closes': ['ok', 'ok', 'ok'], 'assembly': ['closed']}
+PASS B. adapter level: a bundle with one candidate reaches the backend and returns its receipt with one output; the replay returns the same receipt and stores no second candidate or receipt | observed={'bundles_received'
+PASS C. a backend whose own apply_capture_bundle fails: Agent.run raises that error (CaptureFailed, not CaptureRecoveryUnsupportedError) on both turns; intents stay pending, no result, recovery leaves 2 pending | observe
+PASS C. adapter level: the backend's own error propagates unchanged | observed='CaptureFailed: backend capture failed'
+PASS C. runtime.close() x3: the memory assembly closes once, without error | observed={'closes': ['ok', 'ok', 'ok'], 'assembly': ['closed']}
+PASS D. default memory capture (control): both turns complete with a receipt, 2 results, nothing pending | observed={'turns': [{'run_state': 'completed', 'memory_capture_state': 'succeeded_no_output', 'memory_capture_bun
+PASS D. runtime.close() x3: the memory assembly closes once, without error | observed={'closes': ['ok', 'ok', 'ok'], 'assembly': ['closed']}
+SUMMARY passed=14 failed=0 total=14
+=== probe_397_0111
+exit=1
+FAIL A. two real SDK turns with the reference-sqlite external backend complete (no NotImplementedError) | observed={'backend': 'SophiaGraphSqliteStore', 'turns': [{'raised': 'NotImplementedError: backend SophiaGraphSqlit
+FAIL A. each capture stays pending with CAPTURE_RECOVERY_UNSUPPORTED and no invented receipt; no memory.capture.result event | observed={'bundle_results': [None, None], 'intents': [{'capture_id': 'capture:84927afc24bbebc
+PASS A. recovery leaves the unsupported intents pending (scanned 2, recovered 0, pending 2; still no result) | observed={'recovery': [2, 0, 2], 'results_after': 0}
+FAIL A. runtime.close() x3: the memory assembly closes once, without error | observed={'closes': ['ok', 'ok', 'ok'], 'assembly': ["raised AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'"]}
+PASS B. the backend's apply_capture_bundle receives each turn's real bundle (capture_id, root turn and session of that turn's intent); both turns complete | observed={'bundles': [{'capture_id': 'capture:6e4ce02960fddb1e5
+PASS B. each turn's result is the backend's receipt (no error_code), recorded as 2 memory.capture.result events with the same result hashes; recovery finds nothing pending | observed={'receipts': [{'capture_id': 'capture
+PASS B. replaying the first real bundle on the backend returns the same receipt | observed={'replay': {'capture_id': 'capture:6e4ce02960fddb1e54bc393529ea6387b437b3e38167422d994f52702f3eb2bc', 'disposition': 'succeeded_n
+FAIL B. runtime.close() x3: the memory assembly closes once, without error | observed={'closes': ['ok', 'ok', 'ok'], 'assembly': ["raised AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'"]}
+PASS B. adapter level: a bundle with one candidate reaches the backend and returns its receipt with one output; the replay returns the same receipt and stores no second candidate or receipt | observed={'bundles_received'
+PASS C. a backend whose own apply_capture_bundle fails: Agent.run raises that error (CaptureFailed, not CaptureRecoveryUnsupportedError) on both turns; intents stay pending, no result, recovery leaves 2 pending | observe
+PASS C. adapter level: the backend's own error propagates unchanged | observed='CaptureFailed: backend capture failed'
+FAIL C. runtime.close() x3: the memory assembly closes once, without error | observed={'closes': ['ok', 'ok', 'ok'], 'assembly': ["raised AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'"]}
+PASS D. default memory capture (control): both turns complete with a receipt, 2 results, nothing pending | observed={'turns': [{'run_state': 'completed', 'memory_capture_state': 'succeeded_no_output', 'memory_capture_bun
+PASS D. runtime.close() x3: the memory assembly closes once, without error | observed={'closes': ['ok', 'ok', 'ok'], 'assembly': ['closed']}
+SUMMARY passed=9 failed=5 total=14
+Name: openminion
+Version: 0.1.12
+Location: <VENV>/lib/python3.12/site-packages
+Requires: aiosqlite, alembic, cryptography, httpx, jsonschema, platformdirs, prompt-toolkit, psutil, pydantic, pyyaml, rich, send2trash, sophiagraph, typer, tzdata
+Required-by:
+Linux runnervmtai0g 6.17.0-1022-azure #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+PRETTY_NAME="Ubuntu 24.04.5 LTS"
+VERSION_ID="24.04"
+python 3.12.15 sqlite 3.45.1
+PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+<VENV>/lib/python3.12/site-packages/openminion/__init__.py 0.1.12

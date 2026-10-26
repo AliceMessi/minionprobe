@@ -1,0 +1,634 @@
+{
+  "info": {
+    "probe": "probe_397",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.11",
+    "python": "3.12.15",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<RUNNER_TEMP>/empty",
+    "imported_from_site_packages": true,
+    "isolated_mode": true
+  },
+  "summary": {
+    "passed": 9,
+    "failed": 5,
+    "total": 14
+  },
+  "all_pass": false,
+  "checks": [
+    {
+      "check": "A. two real SDK turns with the reference-sqlite external backend complete (no NotImplementedError)",
+      "pass": false,
+      "observed": {
+        "backend": "SophiaGraphSqliteStore",
+        "turns": [
+          {
+            "raised": "NotImplementedError: backend SophiaGraphSqliteStore does not expose apply_capture_bundle()",
+            "is_capture_failed": false,
+            "is_capture_recovery_unsupported": false
+          },
+          {
+            "raised": "NotImplementedError: backend SophiaGraphSqliteStore does not expose apply_capture_bundle()",
+            "is_capture_failed": false,
+            "is_capture_recovery_unsupported": false
+          }
+        ]
+      }
+    },
+    {
+      "check": "A. each capture stays pending with CAPTURE_RECOVERY_UNSUPPORTED and no invented receipt; no memory.capture.result event",
+      "pass": false,
+      "observed": {
+        "bundle_results": [
+          null,
+          null
+        ],
+        "intents": [
+          {
+            "capture_id": "capture:84927afc24bbebc86b3ca62ecf4bfb2ed58746d27a69e0e1afc041b76ee656c2",
+            "capture_state": "pending",
+            "root_turn_id": "059fa378d16c4987aaea60285c421ae1",
+            "runtime_session_id": "probe-397"
+          },
+          {
+            "capture_id": "capture:05c082f2b186ec9d44c6903c62a1ac154eb5049b31f0b27d1bc9db674298c043",
+            "capture_state": "pending",
+            "root_turn_id": "fc8ccbfbd57041649a38bc2b466692c2",
+            "runtime_session_id": "probe-397"
+          }
+        ],
+        "capture_results": []
+      }
+    },
+    {
+      "check": "A. recovery leaves the unsupported intents pending (scanned 2, recovered 0, pending 2; still no result)",
+      "pass": true,
+      "observed": {
+        "recovery": [
+          2,
+          0,
+          2
+        ],
+        "results_after": 0
+      }
+    },
+    {
+      "check": "A. runtime.close() x3: the memory assembly closes once, without error",
+      "pass": false,
+      "observed": {
+        "closes": [
+          "ok",
+          "ok",
+          "ok"
+        ],
+        "assembly": [
+          "raised AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'"
+        ]
+      }
+    },
+    {
+      "check": "B. the backend's apply_capture_bundle receives each turn's real bundle (capture_id, root turn and session of that turn's intent); both turns complete",
+      "pass": true,
+      "observed": {
+        "bundles": [
+          {
+            "capture_id": "capture:6e4ce02960fddb1e54bc393529ea6387b437b3e38167422d994f52702f3eb2bc",
+            "root_turn_id": "8c8e628084bc4e09b24fac0b4fb0a561",
+            "session_id": "probe-397",
+            "agent_id": "openminion",
+            "candidates": 0
+          },
+          {
+            "capture_id": "capture:282d5321242adc8728f5516ac792af8a1bbf43d3aa2914b334e616bbaacd7783",
+            "root_turn_id": "d1a0ad618a8d4738a24388d22c99ffb6",
+            "session_id": "probe-397",
+            "agent_id": "openminion",
+            "candidates": 0
+          }
+        ],
+        "intents": [
+          {
+            "capture_id": "capture:6e4ce02960fddb1e54bc393529ea6387b437b3e38167422d994f52702f3eb2bc",
+            "capture_state": "pending",
+            "root_turn_id": "8c8e628084bc4e09b24fac0b4fb0a561",
+            "runtime_session_id": "probe-397"
+          },
+          {
+            "capture_id": "capture:282d5321242adc8728f5516ac792af8a1bbf43d3aa2914b334e616bbaacd7783",
+            "capture_state": "pending",
+            "root_turn_id": "d1a0ad618a8d4738a24388d22c99ffb6",
+            "runtime_session_id": "probe-397"
+          }
+        ]
+      }
+    },
+    {
+      "check": "B. each turn's result is the backend's receipt (no error_code), recorded as 2 memory.capture.result events with the same result hashes; recovery finds nothing pending",
+      "pass": true,
+      "observed": {
+        "receipts": [
+          {
+            "capture_id": "capture:6e4ce02960fddb1e54bc393529ea6387b437b3e38167422d994f52702f3eb2bc",
+            "committed_at": "2026-10-26T10:11:26.837545+00:00",
+            "disposition": "succeeded_no_output",
+            "output_ids": [],
+            "report_hash": "98ba87013b435ba3b04d787075db99bca45412fa782817f0eae5322234df5fbd",
+            "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+          },
+          {
+            "capture_id": "capture:282d5321242adc8728f5516ac792af8a1bbf43d3aa2914b334e616bbaacd7783",
+            "committed_at": "2026-10-26T10:11:26.987518+00:00",
+            "disposition": "succeeded_no_output",
+            "output_ids": [],
+            "report_hash": "78db2e72c083c6ef1c962557fc762adb91aae6a337578c2a4e3f1df60d6b83e1",
+            "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+          }
+        ],
+        "capture_results": [
+          {
+            "capture_id": "capture:6e4ce02960fddb1e54bc393529ea6387b437b3e38167422d994f52702f3eb2bc",
+            "committed_at": "2026-10-26T10:11:26.837545+00:00",
+            "disposition": "succeeded_no_output",
+            "output_ids": [],
+            "report_hash": "98ba87013b435ba3b04d787075db99bca45412fa782817f0eae5322234df5fbd",
+            "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80",
+            "root_turn_id": "8c8e628084bc4e09b24fac0b4fb0a561",
+            "runtime_session_id": "probe-397",
+            "schema_version": "mcrr.capture-intent.v1"
+          },
+          {
+            "capture_id": "capture:282d5321242adc8728f5516ac792af8a1bbf43d3aa2914b334e616bbaacd7783",
+            "committed_at": "2026-10-26T10:11:26.987518+00:00",
+            "disposition": "succeeded_no_output",
+            "output_ids": [],
+            "report_hash": "78db2e72c083c6ef1c962557fc762adb91aae6a337578c2a4e3f1df60d6b83e1",
+            "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80",
+            "root_turn_id": "d1a0ad618a8d4738a24388d22c99ffb6",
+            "runtime_session_id": "probe-397",
+            "schema_version": "mcrr.capture-intent.v1"
+          }
+        ],
+        "recovery": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "check": "B. replaying the first real bundle on the backend returns the same receipt",
+      "pass": true,
+      "observed": {
+        "replay": {
+          "capture_id": "capture:6e4ce02960fddb1e54bc393529ea6387b437b3e38167422d994f52702f3eb2bc",
+          "disposition": "succeeded_no_output",
+          "output_ids": [],
+          "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+        },
+        "turn_receipt": {
+          "capture_id": "capture:6e4ce02960fddb1e54bc393529ea6387b437b3e38167422d994f52702f3eb2bc",
+          "committed_at": "2026-10-26T10:11:26.837545+00:00",
+          "disposition": "succeeded_no_output",
+          "output_ids": [],
+          "report_hash": "98ba87013b435ba3b04d787075db99bca45412fa782817f0eae5322234df5fbd",
+          "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+        }
+      }
+    },
+    {
+      "check": "B. runtime.close() x3: the memory assembly closes once, without error",
+      "pass": false,
+      "observed": {
+        "closes": [
+          "ok",
+          "ok",
+          "ok"
+        ],
+        "assembly": [
+          "raised AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'"
+        ]
+      }
+    },
+    {
+      "check": "B. adapter level: a bundle with one candidate reaches the backend and returns its receipt with one output; the replay returns the same receipt and stores no second candidate or receipt",
+      "pass": true,
+      "observed": {
+        "bundles_received": 2,
+        "first_receipt_outputs": [
+          "cand_930c2c37220afe95629d4072"
+        ],
+        "replay_equals_first": true,
+        "rows_in_backend_capture_store": {
+          "memory_candidates": 1,
+          "memory_capture_bundle_receipts": 1
+        }
+      }
+    },
+    {
+      "check": "C. a backend whose own apply_capture_bundle fails: Agent.run raises that error (CaptureFailed, not CaptureRecoveryUnsupportedError) on both turns; intents stay pending, no result, recovery leaves 2 pending",
+      "pass": true,
+      "observed": {
+        "turns": [
+          {
+            "raised": "CaptureFailed: backend capture failed",
+            "is_capture_failed": true,
+            "is_capture_recovery_unsupported": false
+          },
+          {
+            "raised": "CaptureFailed: backend capture failed",
+            "is_capture_failed": true,
+            "is_capture_recovery_unsupported": false
+          }
+        ],
+        "intents": [
+          {
+            "capture_id": "capture:6fc8ade19a3008225a8d3bda611ff7607c961d042ad0223ffb59ee65a32835c9",
+            "capture_state": "pending",
+            "root_turn_id": "2cd60cc31a1f4571bd3168e66a28d8f1",
+            "runtime_session_id": "probe-397"
+          },
+          {
+            "capture_id": "capture:da13fc3b37423a8700b6573867babaddc8aed12ec3443f43c971fe8028a7dd51",
+            "capture_state": "pending",
+            "root_turn_id": "720097e4d95047f08ce272d53ce586d5",
+            "runtime_session_id": "probe-397"
+          }
+        ],
+        "recovery": [
+          2,
+          0,
+          2
+        ]
+      }
+    },
+    {
+      "check": "C. adapter level: the backend's own error propagates unchanged",
+      "pass": true,
+      "observed": "CaptureFailed: backend capture failed"
+    },
+    {
+      "check": "C. runtime.close() x3: the memory assembly closes once, without error",
+      "pass": false,
+      "observed": {
+        "closes": [
+          "ok",
+          "ok",
+          "ok"
+        ],
+        "assembly": [
+          "raised AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'"
+        ]
+      }
+    },
+    {
+      "check": "D. default memory capture (control): both turns complete with a receipt, 2 results, nothing pending",
+      "pass": true,
+      "observed": {
+        "turns": [
+          {
+            "run_state": "completed",
+            "memory_capture_state": "succeeded_no_output",
+            "memory_capture_bundle_result": {
+              "capture_id": "capture:220417ad665523850ebbc590a6087f799ca3cf201186c9fc738f3142b01e9edc",
+              "committed_at": "2026-10-26T10:11:28.159804+00:00",
+              "disposition": "succeeded_no_output",
+              "output_ids": [],
+              "report_hash": "56c08074aaa3cfd04625ec4bb6b9cf96faaa94457bc4009ea713d8ecdd210520",
+              "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+            }
+          },
+          {
+            "run_state": "completed",
+            "memory_capture_state": "succeeded_no_output",
+            "memory_capture_bundle_result": {
+              "capture_id": "capture:1b1ce67b82c25ed75739add781b19b638755dc2326b660952588a19a5efe6b47",
+              "committed_at": "2026-10-26T10:11:28.314180+00:00",
+              "disposition": "succeeded_no_output",
+              "output_ids": [],
+              "report_hash": "a3e1f63e26c2fc159b075c726d3c32a034ceb26d445c7cb445cffc8f636f4fe1",
+              "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+            }
+          }
+        ],
+        "results": 2,
+        "recovery": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "check": "D. runtime.close() x3: the memory assembly closes once, without error",
+      "pass": true,
+      "observed": {
+        "closes": [
+          "ok",
+          "ok",
+          "ok"
+        ],
+        "assembly": [
+          "closed"
+        ]
+      }
+    }
+  ],
+  "observed": {
+    "A_reference_sqlite_without_capture": {
+      "memory_service_store": "BackendMemoryStoreAdapter",
+      "backend": "SophiaGraphSqliteStore",
+      "backend_has_apply_capture_bundle": false,
+      "turns": [
+        {
+          "raised": "NotImplementedError: backend SophiaGraphSqliteStore does not expose apply_capture_bundle()",
+          "is_capture_failed": false,
+          "is_capture_recovery_unsupported": false
+        },
+        {
+          "raised": "NotImplementedError: backend SophiaGraphSqliteStore does not expose apply_capture_bundle()",
+          "is_capture_failed": false,
+          "is_capture_recovery_unsupported": false
+        }
+      ],
+      "intents": [
+        {
+          "capture_id": "capture:84927afc24bbebc86b3ca62ecf4bfb2ed58746d27a69e0e1afc041b76ee656c2",
+          "capture_state": "pending",
+          "root_turn_id": "059fa378d16c4987aaea60285c421ae1",
+          "runtime_session_id": "probe-397"
+        },
+        {
+          "capture_id": "capture:05c082f2b186ec9d44c6903c62a1ac154eb5049b31f0b27d1bc9db674298c043",
+          "capture_state": "pending",
+          "root_turn_id": "fc8ccbfbd57041649a38bc2b466692c2",
+          "runtime_session_id": "probe-397"
+        }
+      ],
+      "capture_results": [],
+      "recovery": [
+        2,
+        0,
+        2
+      ],
+      "capture_results_after_recovery": 0,
+      "bundles_received_by_backend": [],
+      "runtime_close_x3": [
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "assembly_close_outcomes": [
+        "raised AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'"
+      ]
+    },
+    "B_external_backend_with_capture": {
+      "memory_service_store": "BackendMemoryStoreAdapter",
+      "backend": "CapturingReferenceBackend",
+      "backend_has_apply_capture_bundle": true,
+      "turns": [
+        {
+          "run_state": "completed",
+          "memory_capture_state": "succeeded_no_output",
+          "memory_capture_bundle_result": {
+            "capture_id": "capture:6e4ce02960fddb1e54bc393529ea6387b437b3e38167422d994f52702f3eb2bc",
+            "committed_at": "2026-10-26T10:11:26.837545+00:00",
+            "disposition": "succeeded_no_output",
+            "output_ids": [],
+            "report_hash": "98ba87013b435ba3b04d787075db99bca45412fa782817f0eae5322234df5fbd",
+            "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+          }
+        },
+        {
+          "run_state": "completed",
+          "memory_capture_state": "succeeded_no_output",
+          "memory_capture_bundle_result": {
+            "capture_id": "capture:282d5321242adc8728f5516ac792af8a1bbf43d3aa2914b334e616bbaacd7783",
+            "committed_at": "2026-10-26T10:11:26.987518+00:00",
+            "disposition": "succeeded_no_output",
+            "output_ids": [],
+            "report_hash": "78db2e72c083c6ef1c962557fc762adb91aae6a337578c2a4e3f1df60d6b83e1",
+            "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+          }
+        }
+      ],
+      "intents": [
+        {
+          "capture_id": "capture:6e4ce02960fddb1e54bc393529ea6387b437b3e38167422d994f52702f3eb2bc",
+          "capture_state": "pending",
+          "root_turn_id": "8c8e628084bc4e09b24fac0b4fb0a561",
+          "runtime_session_id": "probe-397"
+        },
+        {
+          "capture_id": "capture:282d5321242adc8728f5516ac792af8a1bbf43d3aa2914b334e616bbaacd7783",
+          "capture_state": "pending",
+          "root_turn_id": "d1a0ad618a8d4738a24388d22c99ffb6",
+          "runtime_session_id": "probe-397"
+        }
+      ],
+      "capture_results": [
+        {
+          "capture_id": "capture:6e4ce02960fddb1e54bc393529ea6387b437b3e38167422d994f52702f3eb2bc",
+          "committed_at": "2026-10-26T10:11:26.837545+00:00",
+          "disposition": "succeeded_no_output",
+          "output_ids": [],
+          "report_hash": "98ba87013b435ba3b04d787075db99bca45412fa782817f0eae5322234df5fbd",
+          "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80",
+          "root_turn_id": "8c8e628084bc4e09b24fac0b4fb0a561",
+          "runtime_session_id": "probe-397",
+          "schema_version": "mcrr.capture-intent.v1"
+        },
+        {
+          "capture_id": "capture:282d5321242adc8728f5516ac792af8a1bbf43d3aa2914b334e616bbaacd7783",
+          "committed_at": "2026-10-26T10:11:26.987518+00:00",
+          "disposition": "succeeded_no_output",
+          "output_ids": [],
+          "report_hash": "78db2e72c083c6ef1c962557fc762adb91aae6a337578c2a4e3f1df60d6b83e1",
+          "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80",
+          "root_turn_id": "d1a0ad618a8d4738a24388d22c99ffb6",
+          "runtime_session_id": "probe-397",
+          "schema_version": "mcrr.capture-intent.v1"
+        }
+      ],
+      "recovery": [
+        0,
+        0,
+        0
+      ],
+      "capture_results_after_recovery": 2,
+      "bundles_received_by_backend": [
+        {
+          "capture_id": "capture:6e4ce02960fddb1e54bc393529ea6387b437b3e38167422d994f52702f3eb2bc",
+          "root_turn_id": "8c8e628084bc4e09b24fac0b4fb0a561",
+          "session_id": "probe-397",
+          "agent_id": "openminion",
+          "candidates": 0
+        },
+        {
+          "capture_id": "capture:282d5321242adc8728f5516ac792af8a1bbf43d3aa2914b334e616bbaacd7783",
+          "root_turn_id": "d1a0ad618a8d4738a24388d22c99ffb6",
+          "session_id": "probe-397",
+          "agent_id": "openminion",
+          "candidates": 0
+        }
+      ],
+      "replay_of_first_real_bundle": {
+        "capture_id": "capture:6e4ce02960fddb1e54bc393529ea6387b437b3e38167422d994f52702f3eb2bc",
+        "disposition": "succeeded_no_output",
+        "output_ids": [],
+        "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+      },
+      "runtime_close_x3": [
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "assembly_close_outcomes": [
+        "raised AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'"
+      ]
+    },
+    "B_adapter_level_bundle_with_candidate": {
+      "bundles_received": 2,
+      "first_receipt_outputs": [
+        "cand_930c2c37220afe95629d4072"
+      ],
+      "replay_equals_first": true,
+      "rows_in_backend_capture_store": {
+        "memory_candidates": 1,
+        "memory_capture_bundle_receipts": 1
+      }
+    },
+    "C_external_backend_capture_fails": {
+      "memory_service_store": "BackendMemoryStoreAdapter",
+      "backend": "FailingReferenceBackend",
+      "backend_has_apply_capture_bundle": true,
+      "turns": [
+        {
+          "raised": "CaptureFailed: backend capture failed",
+          "is_capture_failed": true,
+          "is_capture_recovery_unsupported": false
+        },
+        {
+          "raised": "CaptureFailed: backend capture failed",
+          "is_capture_failed": true,
+          "is_capture_recovery_unsupported": false
+        }
+      ],
+      "intents": [
+        {
+          "capture_id": "capture:6fc8ade19a3008225a8d3bda611ff7607c961d042ad0223ffb59ee65a32835c9",
+          "capture_state": "pending",
+          "root_turn_id": "2cd60cc31a1f4571bd3168e66a28d8f1",
+          "runtime_session_id": "probe-397"
+        },
+        {
+          "capture_id": "capture:da13fc3b37423a8700b6573867babaddc8aed12ec3443f43c971fe8028a7dd51",
+          "capture_state": "pending",
+          "root_turn_id": "720097e4d95047f08ce272d53ce586d5",
+          "runtime_session_id": "probe-397"
+        }
+      ],
+      "capture_results": [],
+      "recovery": [
+        2,
+        0,
+        2
+      ],
+      "capture_results_after_recovery": 0,
+      "bundles_received_by_backend": [],
+      "runtime_close_x3": [
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "assembly_close_outcomes": [
+        "raised AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'close'"
+      ]
+    },
+    "C_adapter_level_failure": "CaptureFailed: backend capture failed",
+    "D_default_memory_provider": {
+      "memory_service_store": "AuditedMemoryStore",
+      "backend": null,
+      "backend_has_apply_capture_bundle": false,
+      "turns": [
+        {
+          "run_state": "completed",
+          "memory_capture_state": "succeeded_no_output",
+          "memory_capture_bundle_result": {
+            "capture_id": "capture:220417ad665523850ebbc590a6087f799ca3cf201186c9fc738f3142b01e9edc",
+            "committed_at": "2026-10-26T10:11:28.159804+00:00",
+            "disposition": "succeeded_no_output",
+            "output_ids": [],
+            "report_hash": "56c08074aaa3cfd04625ec4bb6b9cf96faaa94457bc4009ea713d8ecdd210520",
+            "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+          }
+        },
+        {
+          "run_state": "completed",
+          "memory_capture_state": "succeeded_no_output",
+          "memory_capture_bundle_result": {
+            "capture_id": "capture:1b1ce67b82c25ed75739add781b19b638755dc2326b660952588a19a5efe6b47",
+            "committed_at": "2026-10-26T10:11:28.314180+00:00",
+            "disposition": "succeeded_no_output",
+            "output_ids": [],
+            "report_hash": "a3e1f63e26c2fc159b075c726d3c32a034ceb26d445c7cb445cffc8f636f4fe1",
+            "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+          }
+        }
+      ],
+      "intents": [
+        {
+          "capture_id": "capture:220417ad665523850ebbc590a6087f799ca3cf201186c9fc738f3142b01e9edc",
+          "capture_state": "pending",
+          "root_turn_id": "6e84afd24c664ebea67fba44c85a5e3c",
+          "runtime_session_id": "probe-397"
+        },
+        {
+          "capture_id": "capture:1b1ce67b82c25ed75739add781b19b638755dc2326b660952588a19a5efe6b47",
+          "capture_state": "pending",
+          "root_turn_id": "7c38784857784478a0601d8c50cbb984",
+          "runtime_session_id": "probe-397"
+        }
+      ],
+      "capture_results": [
+        {
+          "capture_id": "capture:220417ad665523850ebbc590a6087f799ca3cf201186c9fc738f3142b01e9edc",
+          "committed_at": "2026-10-26T10:11:28.159804+00:00",
+          "disposition": "succeeded_no_output",
+          "output_ids": [],
+          "report_hash": "56c08074aaa3cfd04625ec4bb6b9cf96faaa94457bc4009ea713d8ecdd210520",
+          "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80",
+          "root_turn_id": "6e84afd24c664ebea67fba44c85a5e3c",
+          "runtime_session_id": "probe-397",
+          "schema_version": "mcrr.capture-intent.v1"
+        },
+        {
+          "capture_id": "capture:1b1ce67b82c25ed75739add781b19b638755dc2326b660952588a19a5efe6b47",
+          "committed_at": "2026-10-26T10:11:28.314180+00:00",
+          "disposition": "succeeded_no_output",
+          "output_ids": [],
+          "report_hash": "a3e1f63e26c2fc159b075c726d3c32a034ceb26d445c7cb445cffc8f636f4fe1",
+          "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80",
+          "root_turn_id": "7c38784857784478a0601d8c50cbb984",
+          "runtime_session_id": "probe-397",
+          "schema_version": "mcrr.capture-intent.v1"
+        }
+      ],
+      "recovery": [
+        0,
+        0,
+        0
+      ],
+      "capture_results_after_recovery": 2,
+      "bundles_received_by_backend": [],
+      "runtime_close_x3": [
+        "ok",
+        "ok",
+        "ok"
+      ],
+      "assembly_close_outcomes": [
+        "closed"
+      ]
+    }
+  }
+}

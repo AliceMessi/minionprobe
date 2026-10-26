@@ -1,0 +1,1022 @@
+{
+  "probe": "probe_396",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.12",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "sqlite_path": "real APIRuntime (rt.sessions); runs API with runtime=rt; installed `openminion status` CLI",
+  "postgres_server_version": "PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+  "postgres_path": "build_runtime_storage(record.postgres) SessionStore; runs API with runtime=<object with .sessions>",
+  "summary": {
+    "passed": 42,
+    "failed": 0,
+    "total": 42
+  },
+  "checks": [
+    {
+      "check": "sqlite: stored event types are kept as given",
+      "pass": true,
+      "observed": [
+        "run.queued",
+        "run.running",
+        "RUN.failed",
+        "run.queued",
+        "Run.completed",
+        "run.COMPLETED"
+      ]
+    },
+    {
+      "check": "sqlite: list_session_runs counts only lowercase run. events",
+      "pass": true,
+      "observed": [
+        [
+          "r3",
+          "completed",
+          1,
+          true,
+          ""
+        ],
+        [
+          "r2",
+          "queued",
+          1,
+          false,
+          ""
+        ],
+        [
+          "r1",
+          "running",
+          2,
+          false,
+          ""
+        ]
+      ]
+    },
+    {
+      "check": "sqlite: exact-run reads list only lowercase run. events (suffix any case)",
+      "pass": true,
+      "observed": {
+        "r1": [
+          [
+            1,
+            "run.queued",
+            "queued"
+          ],
+          [
+            2,
+            "run.running",
+            "running"
+          ]
+        ],
+        "r2": [
+          [
+            4,
+            "run.queued",
+            "queued"
+          ]
+        ],
+        "r3": [
+          [
+            6,
+            "run.COMPLETED",
+            "completed"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "sqlite: thread projection and invocation terminal agree (r2 queued; RUN.failed is no terminal)",
+      "pass": true,
+      "observed": [
+        [
+          "r2",
+          "queued"
+        ],
+        null
+      ]
+    },
+    {
+      "check": "sqlite: runs API list_runs matches",
+      "pass": true,
+      "observed": [
+        [
+          "r3",
+          "completed",
+          1
+        ],
+        [
+          "r2",
+          "queued",
+          1
+        ],
+        [
+          "r1",
+          "running",
+          2
+        ]
+      ]
+    },
+    {
+      "check": "sqlite: runs API list_run_events r1 = run.queued, run.running",
+      "pass": true,
+      "observed": [
+        "run.queued",
+        "run.running"
+      ]
+    },
+    {
+      "check": "sqlite: a run with only an upper-case RUN. event is not a run (runs API: run_not_found)",
+      "pass": true,
+      "observed": "RunQueryError run_not_found"
+    },
+    {
+      "check": "sqlite: generic list_events/count_events(event_type_prefix='run.') unchanged (7/7)",
+      "pass": true,
+      "observed": [
+        7,
+        7
+      ]
+    },
+    {
+      "check": "sqlite: `openminion status runs --json` (installed CLI) matches",
+      "pass": true,
+      "observed": [
+        [
+          "r3",
+          "completed",
+          1
+        ],
+        [
+          "r2",
+          "queued",
+          1
+        ],
+        [
+          "r1",
+          "running",
+          2
+        ]
+      ]
+    },
+    {
+      "check": "sqlite: `openminion status run-events --run-id r1 --json` = run.queued, run.running",
+      "pass": true,
+      "observed": [
+        "run.queued",
+        "run.running"
+      ]
+    },
+    {
+      "check": "sqlite: same run ids with run./RUN./Run.: state/step/start/end/count/error from lowercase events only (oracle)",
+      "pass": true,
+      "observed": [
+        [
+          "m2",
+          "completed",
+          "",
+          "2026-10-26T10:45:48.803808+00:00",
+          "2026-10-26T10:45:48.803808+00:00",
+          1,
+          ""
+        ],
+        [
+          "m1",
+          "running",
+          "s1",
+          "2026-10-26T10:45:48.797741+00:00",
+          "",
+          2,
+          ""
+        ]
+      ]
+    },
+    {
+      "check": "sqlite: m1 = running, step s1, 2 events, not ended, no error; m2 = completed, 1 event, ended",
+      "pass": true,
+      "observed": [
+        [
+          "m1",
+          "running",
+          "s1",
+          2,
+          false,
+          ""
+        ],
+        [
+          "m2",
+          "completed",
+          "",
+          1,
+          true,
+          ""
+        ]
+      ]
+    },
+    {
+      "check": "sqlite: m1 exact read = run.queued, run.running",
+      "pass": true,
+      "observed": [
+        [
+          "run.queued",
+          "queued"
+        ],
+        [
+          "run.running",
+          "running"
+        ]
+      ]
+    },
+    {
+      "check": "sqlite: state from the suffix in any case; payload state wins; unknown suffix -> running",
+      "pass": true,
+      "observed": {
+        "x7": "running",
+        "x6": "running",
+        "x5": "completed",
+        "x4": "cancelled",
+        "x3": "waiting_tool",
+        "x2": "failed",
+        "x1": "completed"
+      }
+    },
+    {
+      "check": "sqlite: 60 interleaved events at one timestamp: summaries = oracle (state/step/start/end/count/error), ties by run_id desc",
+      "pass": true,
+      "observed": [
+        [
+          "t8",
+          "completed",
+          "step-35",
+          3,
+          ""
+        ],
+        [
+          "t7",
+          "completed",
+          "",
+          2,
+          ""
+        ],
+        [
+          "t6",
+          "completed",
+          "",
+          2,
+          "err-33"
+        ],
+        [
+          "t5",
+          "queued",
+          "",
+          3,
+          ""
+        ],
+        [
+          "t4",
+          "completed",
+          "",
+          3,
+          ""
+        ],
+        [
+          "t3",
+          "completed",
+          "",
+          3,
+          ""
+        ],
+        [
+          "t2",
+          "completed",
+          "",
+          2,
+          ""
+        ],
+        [
+          "t1",
+          "queued",
+          "step-28",
+          3,
+          "err-55"
+        ],
+        [
+          "t0",
+          "queued",
+          "step-0",
+          3,
+          "err-0"
+        ]
+      ]
+    },
+    {
+      "check": "sqlite: tied exact-run read = lowercase events in id order",
+      "pass": true,
+      "observed": 3
+    },
+    {
+      "check": "sqlite: list_session_runs(limit=2) returns the 2 newest of the oracle",
+      "pass": true,
+      "observed": [
+        "t8",
+        "t7"
+      ]
+    },
+    {
+      "check": "sqlite: list_session_run_events(limit=3) returns the newest 3 lowercase events, oldest first",
+      "pass": true,
+      "observed": [
+        22,
+        40,
+        67
+      ]
+    },
+    {
+      "check": "sqlite: a scan window of 10 after 50 newer RUN. events still finds the lowercase run",
+      "pass": true,
+      "observed": [
+        "early"
+      ]
+    },
+    {
+      "check": "sqlite: rows read by the run readers do not grow with 50 -> 500 upper-case events",
+      "pass": true,
+      "observed": {
+        "runs 50": 2,
+        "runs 500": 2,
+        "events 50": 3,
+        "events 500": 3
+      }
+    },
+    {
+      "check": "sqlite: metadata filter {'probe': '396'} lists the 5 sessions after the run events",
+      "pass": true,
+      "observed": [
+        "mixed-2f563b2d",
+        "report-2f563b2d",
+        "suffix-2f563b2d",
+        "ties-2f563b2d",
+        "window-2f563b2d"
+      ]
+    },
+    {
+      "check": "sqlite: session_metadata_strings rows of these sessions = their stored metadata",
+      "pass": true,
+      "observed": 15
+    },
+    {
+      "check": "postgres: stored event types are kept as given",
+      "pass": true,
+      "observed": [
+        "run.queued",
+        "run.running",
+        "RUN.failed",
+        "run.queued",
+        "Run.completed",
+        "run.COMPLETED"
+      ]
+    },
+    {
+      "check": "postgres: list_session_runs counts only lowercase run. events",
+      "pass": true,
+      "observed": [
+        [
+          "r3",
+          "completed",
+          1,
+          true,
+          ""
+        ],
+        [
+          "r2",
+          "queued",
+          1,
+          false,
+          ""
+        ],
+        [
+          "r1",
+          "running",
+          2,
+          false,
+          ""
+        ]
+      ]
+    },
+    {
+      "check": "postgres: exact-run reads list only lowercase run. events (suffix any case)",
+      "pass": true,
+      "observed": {
+        "r1": [
+          [
+            1,
+            "run.queued",
+            "queued"
+          ],
+          [
+            2,
+            "run.running",
+            "running"
+          ]
+        ],
+        "r2": [
+          [
+            4,
+            "run.queued",
+            "queued"
+          ]
+        ],
+        "r3": [
+          [
+            6,
+            "run.COMPLETED",
+            "completed"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "postgres: thread projection and invocation terminal agree (r2 queued; RUN.failed is no terminal)",
+      "pass": true,
+      "observed": [
+        [
+          "r2",
+          "queued"
+        ],
+        null
+      ]
+    },
+    {
+      "check": "postgres: runs API list_runs matches",
+      "pass": true,
+      "observed": [
+        [
+          "r3",
+          "completed",
+          1
+        ],
+        [
+          "r2",
+          "queued",
+          1
+        ],
+        [
+          "r1",
+          "running",
+          2
+        ]
+      ]
+    },
+    {
+      "check": "postgres: runs API list_run_events r1 = run.queued, run.running",
+      "pass": true,
+      "observed": [
+        "run.queued",
+        "run.running"
+      ]
+    },
+    {
+      "check": "postgres: a run with only an upper-case RUN. event is not a run (runs API: run_not_found)",
+      "pass": true,
+      "observed": "RunQueryError run_not_found"
+    },
+    {
+      "check": "postgres: generic list_events/count_events(event_type_prefix='run.') unchanged (4/4)",
+      "pass": true,
+      "observed": [
+        4,
+        4
+      ]
+    },
+    {
+      "check": "postgres: same run ids with run./RUN./Run.: state/step/start/end/count/error from lowercase events only (oracle)",
+      "pass": true,
+      "observed": [
+        [
+          "m2",
+          "completed",
+          "",
+          "2026-10-26T10:45:49.921733+00:00",
+          "2026-10-26T10:45:49.921733+00:00",
+          1,
+          ""
+        ],
+        [
+          "m1",
+          "running",
+          "s1",
+          "2026-10-26T10:45:49.906285+00:00",
+          "",
+          2,
+          ""
+        ]
+      ]
+    },
+    {
+      "check": "postgres: m1 = running, step s1, 2 events, not ended, no error; m2 = completed, 1 event, ended",
+      "pass": true,
+      "observed": [
+        [
+          "m1",
+          "running",
+          "s1",
+          2,
+          false,
+          ""
+        ],
+        [
+          "m2",
+          "completed",
+          "",
+          1,
+          true,
+          ""
+        ]
+      ]
+    },
+    {
+      "check": "postgres: m1 exact read = run.queued, run.running",
+      "pass": true,
+      "observed": [
+        [
+          "run.queued",
+          "queued"
+        ],
+        [
+          "run.running",
+          "running"
+        ]
+      ]
+    },
+    {
+      "check": "postgres: state from the suffix in any case; payload state wins; unknown suffix -> running",
+      "pass": true,
+      "observed": {
+        "x7": "running",
+        "x6": "running",
+        "x5": "completed",
+        "x4": "cancelled",
+        "x3": "waiting_tool",
+        "x2": "failed",
+        "x1": "completed"
+      }
+    },
+    {
+      "check": "postgres: 60 interleaved events at one timestamp: summaries = oracle (state/step/start/end/count/error), ties by run_id desc",
+      "pass": true,
+      "observed": [
+        [
+          "t8",
+          "completed",
+          "step-35",
+          3,
+          ""
+        ],
+        [
+          "t7",
+          "completed",
+          "",
+          2,
+          ""
+        ],
+        [
+          "t6",
+          "completed",
+          "",
+          2,
+          "err-33"
+        ],
+        [
+          "t5",
+          "queued",
+          "",
+          3,
+          ""
+        ],
+        [
+          "t4",
+          "completed",
+          "",
+          3,
+          ""
+        ],
+        [
+          "t3",
+          "completed",
+          "",
+          3,
+          ""
+        ],
+        [
+          "t2",
+          "completed",
+          "",
+          2,
+          ""
+        ],
+        [
+          "t1",
+          "queued",
+          "step-28",
+          3,
+          "err-55"
+        ],
+        [
+          "t0",
+          "queued",
+          "step-0",
+          3,
+          "err-0"
+        ]
+      ]
+    },
+    {
+      "check": "postgres: tied exact-run read = lowercase events in id order",
+      "pass": true,
+      "observed": 3
+    },
+    {
+      "check": "postgres: list_session_runs(limit=2) returns the 2 newest of the oracle",
+      "pass": true,
+      "observed": [
+        "t8",
+        "t7"
+      ]
+    },
+    {
+      "check": "postgres: list_session_run_events(limit=3) returns the newest 3 lowercase events, oldest first",
+      "pass": true,
+      "observed": [
+        22,
+        40,
+        67
+      ]
+    },
+    {
+      "check": "postgres: a scan window of 10 after 50 newer RUN. events still finds the lowercase run",
+      "pass": true,
+      "observed": [
+        "early"
+      ]
+    },
+    {
+      "check": "postgres: rows read by the run readers do not grow with 50 -> 500 upper-case events",
+      "pass": true,
+      "observed": {
+        "runs 50": 2,
+        "runs 500": 2,
+        "events 50": 3,
+        "events 500": 3
+      }
+    },
+    {
+      "check": "postgres: metadata filter {'probe': '396'} lists the 5 sessions after the run events",
+      "pass": true,
+      "observed": [
+        "mixed-2f563b2d",
+        "report-2f563b2d",
+        "suffix-2f563b2d",
+        "ties-2f563b2d",
+        "window-2f563b2d"
+      ]
+    },
+    {
+      "check": "postgres: session_metadata_strings rows of these sessions = their stored metadata",
+      "pass": true,
+      "observed": 15
+    }
+  ],
+  "results": {
+    "sqlite report runs": [
+      [
+        "r3",
+        "completed",
+        1,
+        true,
+        ""
+      ],
+      [
+        "r2",
+        "queued",
+        1,
+        false,
+        ""
+      ],
+      [
+        "r1",
+        "running",
+        2,
+        false,
+        ""
+      ]
+    ],
+    "sqlite report run events": {
+      "r1": [
+        [
+          1,
+          "run.queued",
+          "queued"
+        ],
+        [
+          2,
+          "run.running",
+          "running"
+        ]
+      ],
+      "r2": [
+        [
+          4,
+          "run.queued",
+          "queued"
+        ]
+      ],
+      "r3": [
+        [
+          6,
+          "run.COMPLETED",
+          "completed"
+        ]
+      ]
+    },
+    "sqlite generic": [
+      7,
+      7
+    ],
+    "sqlite mixed runs": [
+      [
+        "m2",
+        "completed",
+        "",
+        "2026-10-26T10:45:48.803808+00:00",
+        "2026-10-26T10:45:48.803808+00:00",
+        1,
+        ""
+      ],
+      [
+        "m1",
+        "running",
+        "s1",
+        "2026-10-26T10:45:48.797741+00:00",
+        "",
+        2,
+        ""
+      ]
+    ],
+    "sqlite ties runs": [
+      [
+        "t8",
+        "completed",
+        "step-35",
+        "2026-10-26T09:00:00.000001+00:00",
+        "2026-10-26T09:00:00.000001+00:00",
+        3,
+        ""
+      ],
+      [
+        "t7",
+        "completed",
+        "",
+        "2026-10-26T09:00:00.000001+00:00",
+        "2026-10-26T09:00:00.000001+00:00",
+        2,
+        ""
+      ],
+      [
+        "t6",
+        "completed",
+        "",
+        "2026-10-26T09:00:00.000001+00:00",
+        "2026-10-26T09:00:00.000001+00:00",
+        2,
+        "err-33"
+      ],
+      [
+        "t5",
+        "queued",
+        "",
+        "2026-10-26T09:00:00.000001+00:00",
+        "2026-10-26T09:00:00.000001+00:00",
+        3,
+        ""
+      ],
+      [
+        "t4",
+        "completed",
+        "",
+        "2026-10-26T09:00:00.000001+00:00",
+        "2026-10-26T09:00:00.000001+00:00",
+        3,
+        ""
+      ],
+      [
+        "t3",
+        "completed",
+        "",
+        "2026-10-26T09:00:00.000001+00:00",
+        "2026-10-26T09:00:00.000001+00:00",
+        3,
+        ""
+      ],
+      [
+        "t2",
+        "completed",
+        "",
+        "2026-10-26T09:00:00.000001+00:00",
+        "2026-10-26T09:00:00.000001+00:00",
+        2,
+        ""
+      ],
+      [
+        "t1",
+        "queued",
+        "step-28",
+        "2026-10-26T09:00:00.000001+00:00",
+        "2026-10-26T09:00:00.000001+00:00",
+        3,
+        "err-55"
+      ],
+      [
+        "t0",
+        "queued",
+        "step-0",
+        "2026-10-26T09:00:00.000001+00:00",
+        "2026-10-26T09:00:00.000001+00:00",
+        3,
+        "err-0"
+      ]
+    ],
+    "sqlite rows read": {
+      "runs 50": 2,
+      "runs 500": 2,
+      "events 50": 3,
+      "events 500": 3
+    },
+    "postgres report runs": [
+      [
+        "r3",
+        "completed",
+        1,
+        true,
+        ""
+      ],
+      [
+        "r2",
+        "queued",
+        1,
+        false,
+        ""
+      ],
+      [
+        "r1",
+        "running",
+        2,
+        false,
+        ""
+      ]
+    ],
+    "postgres report run events": {
+      "r1": [
+        [
+          1,
+          "run.queued",
+          "queued"
+        ],
+        [
+          2,
+          "run.running",
+          "running"
+        ]
+      ],
+      "r2": [
+        [
+          4,
+          "run.queued",
+          "queued"
+        ]
+      ],
+      "r3": [
+        [
+          6,
+          "run.COMPLETED",
+          "completed"
+        ]
+      ]
+    },
+    "postgres generic": [
+      4,
+      4
+    ],
+    "postgres mixed runs": [
+      [
+        "m2",
+        "completed",
+        "",
+        "2026-10-26T10:45:49.921733+00:00",
+        "2026-10-26T10:45:49.921733+00:00",
+        1,
+        ""
+      ],
+      [
+        "m1",
+        "running",
+        "s1",
+        "2026-10-26T10:45:49.906285+00:00",
+        "",
+        2,
+        ""
+      ]
+    ],
+    "postgres ties runs": [
+      [
+        "t8",
+        "completed",
+        "step-35",
+        "2026-10-26T09:00:00.000001+00:00",
+        "2026-10-26T09:00:00.000001+00:00",
+        3,
+        ""
+      ],
+      [
+        "t7",
+        "completed",
+        "",
+        "2026-10-26T09:00:00.000001+00:00",
+        "2026-10-26T09:00:00.000001+00:00",
+        2,
+        ""
+      ],
+      [
+        "t6",
+        "completed",
+        "",
+        "2026-10-26T09:00:00.000001+00:00",
+        "2026-10-26T09:00:00.000001+00:00",
+        2,
+        "err-33"
+      ],
+      [
+        "t5",
+        "queued",
+        "",
+        "2026-10-26T09:00:00.000001+00:00",
+        "2026-10-26T09:00:00.000001+00:00",
+        3,
+        ""
+      ],
+      [
+        "t4",
+        "completed",
+        "",
+        "2026-10-26T09:00:00.000001+00:00",
+        "2026-10-26T09:00:00.000001+00:00",
+        3,
+        ""
+      ],
+      [
+        "t3",
+        "completed",
+        "",
+        "2026-10-26T09:00:00.000001+00:00",
+        "2026-10-26T09:00:00.000001+00:00",
+        3,
+        ""
+      ],
+      [
+        "t2",
+        "completed",
+        "",
+        "2026-10-26T09:00:00.000001+00:00",
+        "2026-10-26T09:00:00.000001+00:00",
+        2,
+        ""
+      ],
+      [
+        "t1",
+        "queued",
+        "step-28",
+        "2026-10-26T09:00:00.000001+00:00",
+        "2026-10-26T09:00:00.000001+00:00",
+        3,
+        "err-55"
+      ],
+      [
+        "t0",
+        "queued",
+        "step-0",
+        "2026-10-26T09:00:00.000001+00:00",
+        "2026-10-26T09:00:00.000001+00:00",
+        3,
+        "err-0"
+      ]
+    ],
+    "postgres rows read": {
+      "runs 50": 2,
+      "runs 500": 2,
+      "events 50": 3,
+      "events 500": 3
+    }
+  }
+}

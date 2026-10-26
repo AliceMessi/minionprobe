@@ -1,0 +1,37 @@
+=== probe_369_upgrade_via14_postgres: venv/bin/python -I -X utf8 probes/probe_369_upgrade.py via14 postgres <RUNNER_TEMP>/work369/pg-via14 <RUNNER_TEMP>/logs/out/369/probe_369_upgrade_via14_postgres.json --schema s369_via14 --seed <RUNNER_TEMP>/logs/out/369/probe_369_seed_via14_postgres.json
+{
+  "probe": "probe_369_upgrade via14",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.12",
+  "python": "3.12.15",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "backend": "postgres"
+}
+PASS pre-upgrade: ledger head 13 written by 0.1.11, no session_metadata_strings, metadata = seed | observed={'ledger_head': 13, 'sessions': 1243, 'table': False}
+PASS via14: the package's migrations up to 14 apply only 14 | observed=[[14], 14]
+PASS via14: at migration 14 there is no session_metadata_strings and metadata is unchanged
+PASS via14: the next 0.1.12 open applies migration 15 alone | observed=[15]
+PASS via14: ledger has 14 and 15 exactly once (1..15) | observed=[12, 13, 14, 15]
+PASS via14: stored metadata_json unchanged byte for byte (1243 sessions) | observed=[1243, '001b0eaadd07469b']
+PASS via14: backfilled rows = json.loads-derived rows (3695 rows, incl. NaN/Infinity/NUL/surrogate documents) | observed=[3695, 3695, [], []]
+PASS via14: sessions PostgreSQL cannot parse got their string rows | observed=['odd-brace-value', 'odd-empty-string', 'odd-inf-other', 'odd-long', 'odd-nan-keys', 'odd-nan-other', 'odd-nul-key', 'odd-nul-other', 'odd-nul-value', 'odd-path-keys', 'odd-surrogate-other', 'odd-surrogate-value', 'odd-unicode']
+PASS via14 (postgres): 34 table filters + 23 odd filters select their sessions on the upgraded history | observed='57/57'
+PASS via14: legacy {'surface': 'acp'} limit=25 newest_first=True = reference order | observed=[25, ['legacy-1197', 'legacy-1194', 'legacy-1191']]
+PASS via14: legacy {'surface': 'acp'} limit=25 newest_first=False = reference order | observed=[25, ['legacy-0000', 'legacy-0003', 'legacy-0006']]
+PASS via14: legacy {'surface': 'cli', 'workspace_root': '/work/3'} limit=10 newest_first=True = reference order | observed=[10, ['legacy-1186', 'legacy-1165', 'legacy-1144']]
+PASS via14: legacy {'surface': 'cli', 'workspace_root': '/work/3'} limit=10 newest_first=False = reference order | observed=[10, ['legacy-0010', 'legacy-0031', 'legacy-0052']]
+PASS via14 (postgres): legacy lone-surrogate value filter selects the 24 sessions that carry it | observed=24
+PASS via14 (postgres): legacy escaped-NUL value filter selects the 24 sessions that carry it | observed=24
+PASS via14: the pre-upgrade ACP-style session is found by the ACP surface filter | observed=['legacy-acp-client']
+PASS via14: the pre-upgrade Focus-style session is found by agent+target+working_dir | observed=['legacy-focus-client']
+PASS via14: reopening applies no migration (idempotent) | observed=[]
+PASS via14: ledger unchanged after reopen
+PASS via14: writes after the upgrade keep rows = stored metadata
+PASS via14: an updated legacy session matches its new value | observed=['legacy-0003']
+PASS via14: deleting a session after the upgrade removes its rows
+SUMMARY passed=22 failed=0 total=22
+exit=0

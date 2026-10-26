@@ -1,0 +1,92 @@
+{
+  "probe": "probe_369_upgrade malformed",
+  "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+  "openminion.__version__": "0.1.12",
+  "python": "3.12.11",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "sqlite3.sqlite_version": "3.50.4",
+  "cwd": "<WORK>\\empty-369",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "backend": "sqlite",
+  "pre": {
+    "ledger_head": 13,
+    "sessions": 1244,
+    "table": false
+  },
+  "error": "MigrationError: Migration v15 (add_session_metadata_strings) failed: session 'zz-bad' has a metadata_json that is not JSON: Expecting ',' delimiter: line 1 column 18 (char 17)",
+  "extraction_calls_before_failure": 1243,
+  "case": "malformed",
+  "summary": {
+    "passed": 10,
+    "failed": 0,
+    "total": 10
+  },
+  "checks": [
+    {
+      "check": "pre-upgrade: ledger head 13 written by 0.1.11, no session_metadata_strings, metadata = seed",
+      "pass": true,
+      "observed": {
+        "ledger_head": 13,
+        "sessions": 1244,
+        "table": false
+      }
+    },
+    {
+      "check": "malformed: the 0.1.12 open raises while applying migration 15, naming 'zz-bad'",
+      "pass": true,
+      "observed": "MigrationError: Migration v15 (add_session_metadata_strings) failed: session 'zz-bad' has a metadata_json that is not JSON: Expecting ',' delimiter: line 1 column 18 (char 17)"
+    },
+    {
+      "check": "malformed: the backfill had read past the first 1,000-session batch before failing (rows of batch 1 were already inserted)",
+      "pass": true,
+      "observed": 1243
+    },
+    {
+      "check": "malformed: ledger has no entry 15 (14 committed in its own transaction before 15)",
+      "pass": true,
+      "observed": [
+        12,
+        13,
+        14
+      ]
+    },
+    {
+      "check": "malformed: migration 15 left nothing: no session_metadata_strings table, no rows",
+      "pass": true,
+      "observed": false
+    },
+    {
+      "check": "malformed: stored metadata unchanged by the failed migration",
+      "pass": true
+    },
+    {
+      "check": "malformed: after repair the rerun applies 15 once",
+      "pass": true,
+      "observed": [
+        15
+      ]
+    },
+    {
+      "check": "malformed: ledger 1..15, each once",
+      "pass": true,
+      "observed": [
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "check": "malformed: rows = json.loads-derived rows after the rerun",
+      "pass": true,
+      "observed": 3697
+    },
+    {
+      "check": "malformed: the repaired session is filterable",
+      "pass": true,
+      "observed": [
+        "zz-bad"
+      ]
+    }
+  ]
+}

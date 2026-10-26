@@ -1,0 +1,61 @@
+{
+  "probe": "probe_364",
+  "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+  "openminion.__version__": "0.1.11",
+  "python": "3.12.11",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "sqlite3.sqlite_version": "3.50.4",
+  "cwd": "<WORK>\\empty-364",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "backend": "sqlite",
+  "peers": 4,
+  "joins": 5,
+  "rounds": 10
+}
+PASS sqlite fresh database migrated to the package head (13) | observed={'applied': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 'current': 13}
+PASS sqlite tied: the three joins share one joined_at and their row ids sort in reverse join order | observed=[['first', 'fe2', '2026-10-22T01:00:00+00:00'], ['second', 'ce2', '2026-10-22T01:00:00+00:00'], ['third', '0e2', '2026-10-22T01:00:00+00:00']]
+FAIL sqlite tied: list_participants is in join order | observed=['third', 'second', 'first']
+PASS sqlite tied: the first agent is active | observed='first'
+FAIL sqlite tied: join_seq 1, 2, 3 in join order | observed='OperationalError: no such column: join_seq'
+FAIL sqlite tied: removing the active first agent selects the second | observed='third'
+FAIL sqlite tied: remaining participants list in join order | observed=['third', 'second']
+PASS sqlite upsert: an active participant added again keeps its row id and joined_at, takes the new channel/role/display name | observed=['f4b', '2026-10-22T01:00:00+00:00', 'cli', 'owner', 'First again']
+FAIL sqlite upsert: it keeps its place | observed=['third', 'second', 'first']
+FAIL sqlite upsert: join_seq unchanged (1, 2, 3) | observed='OperationalError: no such column: join_seq'
+FAIL sqlite rejoin same tick: same row, new place after every earlier join | observed={'row': 'f4b', 'joined_at': '2026-10-22T01:00:00+00:00', 'listed': ['third', 'second', 'first']}
+FAIL sqlite rejoin same tick: join_seq first=4 | observed='OperationalError: no such column: join_seq'
+PASS sqlite rejoin later: the rejoin's joined_at and a new place | observed={'row': 'c4b', 'joined_at': '2026-10-22T01:01:00+00:00', 'listed': ['third', 'first', 'second']}
+FAIL sqlite rejoin later: join_seq second=5 | observed='OperationalError: no such column: join_seq'
+PASS sqlite explicit: a later join, a re-add and a non-active leave keep the selected agent | observed=['third', 'third']
+FAIL sqlite explicit: the selected agent leaving selects the earliest remaining join | observed={'listed': ['fourth', 'first'], 'active': 'fourth'}
+PASS sqlite explicit: a later join can be selected; an agent that left cannot | observed={'active': 'fourth', 'select_left': "ValueError: Agent 'second' is not an active participant"}
+FAIL sqlite legacy: the owner record lists before the first invited agent on one tick | observed=['guest-agent', 'legacy-agent']
+FAIL sqlite legacy: join_seq owner=1, guest=2 | observed='OperationalError: no such column: join_seq'
+PASS sqlite legacy: the owner agent from the session key is active before any invite; an agent outside the session cannot be selected (bound to the owner); the owner can be selected again | observed={'active_before_invite': 'legacy-agent', 'active_after_invite': 'guest-agent', 'select_other': "ValueError: Legacy session 'e3f73a7f33314a8d9506735f4a74a5d9' is bound to agent 'legacy-agent'", 'reselect_owner': 'legacy-agent'}
+PASS sqlite session row: a human join changes nothing; the first agent becomes active; later joins and the active agent's re-add change nothing | observed={'human_join_unchanged': True, 'active': 'first'}
+PASS sqlite clock moved back: a later join with an earlier joined_at lists first (joined_at still orders first) | observed=['early-clock', 'late-clock']
+FAIL sqlite clock moved back: join_seq records the join order (late-clock=1, early-clock=2) | observed='OperationalError: no such column: join_seq'
+FAIL sqlite concurrent joins: 4 peers x 5 joins on one tick, no errors, every join has its own place 1..20 | observed={'errors': [], 'joined': 20, 'distinct_join_seq': False, 'seconds': 0.04}
+FAIL sqlite concurrent joins: each peer's joins list in the order it made them, the listing follows join_seq | observed={'own_order': False}
+PASS sqlite concurrent joins: the active agent is one of the joined agents (#393 not certified) | observed='peer-3-0'
+PASS sqlite overlapping leave/rejoin: both complete (no unique-index error, no deadlock) | observed={'leave': True, 'rejoin': 'f6f', 'seconds': 0.55}
+FAIL sqlite overlapping leave/rejoin: the rejoin waits for the leave, takes a new place, and the fallback selects the earliest remaining join | observed={'listed': ['second', 'first'], 'join_seq': 'OperationalError: no such column: join_seq', 'active': 'second'}
+PASS sqlite storm: 4 peers each leave and rejoin 10 times on one tick, including the active agent: every operation completes | observed={'operations': 80, 'errors': [], 'error_count': 0, 'seconds': 0.05}
+FAIL sqlite storm: afterwards every agent is listed once, places are distinct, the listing follows join_seq and the active agent is a participant | observed={'listed': ['agent-3', 'agent-2', 'agent-1', 'agent-0'], 'join_seq': 'OperationalError: no such column: join_seq', 'active': 'agent-2'}
+PASS sqlite storm: then the active agent leaving selects the earliest remaining join (twice) | observed=[{'left': 'agent-2', 'selected': 'agent-3', 'expected': 'agent-3'}, {'left': 'agent-3', 'selected': 'agent-1', 'expected': 'agent-1'}]
+PASS sqlite reopen: no migration is applied again | observed=[]
+FAIL sqlite reopen: the tied room still lists second, third with second active | observed={'listed': ['third', 'second'], 'active': 'third'}
+PASS sqlite reopen: the upsert/rejoin room keeps its listing, join_seq and active agent | observed={'listed': ['third', 'first', 'second'], 'seq': 'OperationalError: no such column: join_seq', 'active': 'third'}
+PASS sqlite reopen: the explicitly selected agent is still active | observed='fourth'
+PASS sqlite CLI `openminion room create --routing-mode broadcast --agent first --agent second --agent third` (one tick, row ids reverse) via the installed CLI (`openminion.cli.main.main`): exit 0, 3 participants, active first | observed={'rc': 0, 'stdout': ['room=room-5c1dac9b3e10419cb626a08ee01613cf', 'participants=3', 'active_agent=first'], 'stderr_tail': []}
+PASS sqlite CLI `openminion room create --routing-mode sequential --agent first --agent second --agent third` (one tick, row ids reverse) via the installed CLI (`openminion.cli.main.main`): exit 0, 3 participants, active first | observed={'rc': 0, 'stdout': ['room=room-d8e1c4b876eb45ee94e520e0dcc88f07', 'participants=3', 'active_agent=first'], 'stderr_tail': []}
+PASS sqlite CLI `openminion room create --routing-mode addressed --agent first --agent second --agent third` (one tick, row ids reverse) via the installed CLI (`openminion.cli.main.main`): exit 0, 3 participants, active first | observed={'rc': 0, 'stdout': ['room=room-41ba31d946d142deb6a048fa4216d8b2', 'participants=3', 'active_agent=first'], 'stderr_tail': []}
+PASS sqlite CLI `openminion room invite <room> --agent fourth` on the same tick (row id sorts before two earlier joins): exit 0, 4 participants | observed={'rc': 0, 'stdout': ['invited agent=fourth', 'participants=4'], 'stderr_tail': []}
+FAIL sqlite CLI room (read back by a new runtime): list_participants in join order | observed=['third', 'fourth', 'second', 'first']
+FAIL sqlite routing (broadcast): the room turn goes to the agents in join order | observed=[['third', 'fourth', 'second', 'first'], 'broadcast']
+FAIL sqlite routing (sequential, no explicit order): join order | observed=[['third', 'second', 'first'], 'sequential']
+FAIL sqlite routing (broadcast): after the active first agent leaves, the second is active and the turn goes to second, third, fourth | observed={'active': 'third', 'routed': [['third', 'fourth', 'second'], 'broadcast']}
+FAIL sqlite routing (addressed): the active agent answers; after it leaves the fallback (second) answers; a mention still selects its agent | observed={'before': [['first'], 'addressed'], 'active_after_leave': 'third', 'after': [['third'], 'addressed'], 'mention_third': [['third'], 'addressed']}
+SUMMARY passed=21 failed=23 total=44 not_run=0
+exit=1

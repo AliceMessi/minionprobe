@@ -1,0 +1,37 @@
+=== probe_396 (0.1.12): python -I -X utf8 probes/probe_396.py <work> probe_396.json
+{
+  "probe": "probe_396",
+  "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+  "openminion.__version__": "0.1.12",
+  "python": "3.12.11",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "sqlite3.sqlite_version": "3.50.4",
+  "cwd": "<WORK>\\empty-396",
+  "imported_from_site_packages": true,
+  "isolated_mode": true
+}
+PASS sqlite: stored event types are kept as given | observed=['run.queued', 'run.running', 'RUN.failed', 'run.queued', 'Run.completed', 'run.COMPLETED']
+PASS sqlite: list_session_runs counts only lowercase run. events | observed=[['r3', 'completed', 1, True, ''], ['r2', 'queued', 1, False, ''], ['r1', 'running', 2, False, '']]
+PASS sqlite: exact-run reads list only lowercase run. events (suffix any case) | observed={'r1': [[1, 'run.queued', 'queued'], [2, 'run.running', 'running']], 'r2': [[4, 'run.queued', 'queued']], 'r3': [[6, 'run.COMPLETED', 'completed']]}
+PASS sqlite: thread projection and invocation terminal agree (r2 queued; RUN.failed is no terminal) | observed=[['r2', 'queued'], None]
+PASS sqlite: runs API list_runs matches | observed=[['r3', 'completed', 1], ['r2', 'queued', 1], ['r1', 'running', 2]]
+PASS sqlite: runs API list_run_events r1 = run.queued, run.running | observed=['run.queued', 'run.running']
+PASS sqlite: a run with only an upper-case RUN. event is not a run (runs API: run_not_found) | observed='RunQueryError run_not_found'
+PASS sqlite: generic list_events/count_events(event_type_prefix='run.') unchanged (7/7) | observed=[7, 7]
+PASS sqlite: `openminion status runs --json` (installed CLI) matches | observed=[['r3', 'completed', 1], ['r2', 'queued', 1], ['r1', 'running', 2]]
+PASS sqlite: `openminion status run-events --run-id r1 --json` = run.queued, run.running | observed=['run.queued', 'run.running']
+PASS sqlite: same run ids with run./RUN./Run.: state/step/start/end/count/error from lowercase events only (oracle) | observed=[['m2', 'completed', '', '2026-10-26T10:36:16.246421+00:00', '2026-10-26T10:36:16.246421+00:00', 1, ''], ['m1', 'running', 's1', '2026-10-26T10:36:16.236438+00:00', '', 2, '']]
+PASS sqlite: m1 = running, step s1, 2 events, not ended, no error; m2 = completed, 1 event, ended | observed=[['m1', 'running', 's1', 2, False, ''], ['m2', 'completed', '', 1, True, '']]
+PASS sqlite: m1 exact read = run.queued, run.running | observed=[['run.queued', 'queued'], ['run.running', 'running']]
+PASS sqlite: state from the suffix in any case; payload state wins; unknown suffix -> running | observed={'x7': 'running', 'x6': 'running', 'x5': 'completed', 'x4': 'cancelled', 'x3': 'waiting_tool', 'x2': 'failed', 'x1': 'completed'}
+PASS sqlite: 60 interleaved events at one timestamp: summaries = oracle (state/step/start/end/count/error), ties by run_id desc | observed=[['t8', 'completed', 'step-35', 3, ''], ['t7', 'completed', '', 2, ''], ['t6', 'completed', '', 2, 'err-33'], ['t5', 'queued', '', 3, ''], ['t4', 'completed', '', 3, ''], ['t3', 'completed', '', 3, ''], ['t2', 'completed', '', 2, ''], ['t1', 'queued', 'step-28', 3, 'err-55'], ['t0', 'queued', 'step-0', 3, 'err-0']]
+PASS sqlite: tied exact-run read = lowercase events in id order | observed=3
+PASS sqlite: list_session_runs(limit=2) returns the 2 newest of the oracle | observed=['t8', 't7']
+PASS sqlite: list_session_run_events(limit=3) returns the newest 3 lowercase events, oldest first | observed=[22, 40, 67]
+PASS sqlite: a scan window of 10 after 50 newer RUN. events still finds the lowercase run | observed=['early']
+PASS sqlite: rows read by the run readers do not grow with 50 -> 500 upper-case events | observed={'runs 50': 2, 'runs 500': 2, 'events 50': 3, 'events 500': 3}
+PASS sqlite: metadata filter {'probe': '396'} lists the 5 sessions after the run events | observed=['mixed-d5990e27', 'report-d5990e27', 'suffix-d5990e27', 'ties-d5990e27', 'window-d5990e27']
+PASS sqlite: session_metadata_strings rows of these sessions = their stored metadata | observed=15
+PostgreSQL: not run here (OPENMINION_TEST_POSTGRES_URL not set)
+SUMMARY passed=22 failed=0 total=22
+exit=0

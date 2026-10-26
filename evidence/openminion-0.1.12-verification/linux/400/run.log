@@ -1,0 +1,309 @@
+Using Python 3.12.15 environment at: <VENV0111>
+Using Python 3.12.15 environment at: <VENV>
+Using Python 3.12.15 environment at: <VENV>
+provenance: 1 match
+=== probe_392
+exit=0
+PASS A.sqlite: both turns completed | observed=['completed', 'completed']
+PASS A.sqlite: the lifecycle helpers receive the runtime's AuditedMemoryStore wrapping SQLiteMemoryStore | observed='AuditedMemoryStore wrapping SQLiteMemoryStore'
+PASS A.sqlite: every helper call returned (decay, capacity, insights once; summary compression for the first-turn preamble and the lifecycle), none raised | observed={'apply_confidence_decay | AuditedMemoryStore | ok': 1
+PASS A.sqlite: the second turn of the session runs no lifecycle helper (work is not reapplied) | observed=0
+PASS A.sqlite: no `memory.session_lifecycle failed` warning and no `_connect` text in any WARNING+ log record | observed={'lifecycle': [], '_connect': [], 'all_warnings': 3}
+PASS A.sqlite: confidence decay: `decays` 0.8 -> 0.6 (28 days at 0.05 per 7 days) | observed=0.6
+PASS A.sqlite: summary compression: `summary-old` text compressed to its first sentence | observed='Decided to use pytest'
+PASS A.sqlite: the intended records are soft-deleted with their reason (decay eviction, summary deletion, capacity, stale insight) and the others stay active; `stale-insight-2`, added after turn 1, stays | observed={'dec
+PASS A.sqlite: evidence lists (artifact ref and capture evidence) read back unchanged after the lifecycle, on removed and kept records | observed={'decays': [{'label': None, 'mime': 'text/plain', 'ref': 'artifact://sha25
+PASS A.sqlite: artifact index: the edges of the removed records are removed, the edges of kept records stay (capture evidence makes no edge) | observed={'after_seed': {'cap-0': 'active', 'cap-4': 'active', 'decay-evicted
+PASS A.postgres: both turns completed | observed=['completed', 'completed']
+PASS A.postgres: the lifecycle helpers receive the runtime's AuditedMemoryStore wrapping PostgresMemoryStore | observed='AuditedMemoryStore wrapping PostgresMemoryStore'
+PASS A.postgres: every helper call returned (decay, capacity, insights once; summary compression for the first-turn preamble and the lifecycle), none raised | observed={'apply_confidence_decay | AuditedMemoryStore | ok':
+PASS A.postgres: the second turn of the session runs no lifecycle helper (work is not reapplied) | observed=0
+PASS A.postgres: no `memory.session_lifecycle failed` warning and no `_connect` text in any WARNING+ log record | observed={'lifecycle': [], '_connect': [], 'all_warnings': 3}
+PASS A.postgres: confidence decay: `decays` 0.8 -> 0.6 (28 days at 0.05 per 7 days) | observed=0.6
+PASS A.postgres: summary compression: `summary-old` text compressed to its first sentence | observed='Decided to use pytest'
+PASS A.postgres: the intended records are soft-deleted with their reason (decay eviction, summary deletion, capacity, stale insight) and the others stay active; `stale-insight-2`, added after turn 1, stays | observed={'d
+PASS A.postgres: evidence lists (artifact ref and capture evidence) read back unchanged after the lifecycle, on removed and kept records | observed={'decays': [{'label': None, 'mime': 'text/plain', 'ref': 'artifact://sha
+PASS A.postgres: artifact index: the edges of the removed records are removed, the edges of kept records stay (capture evidence makes no edge) | observed={'after_seed': {'cap-0': 'active', 'cap-4': 'active', 'decay-evict
+PASS A.postgres: the same outcome for the seeded records read server-side from the PostgreSQL schema (memory_records) | observed={'reasons': {'cap-0': 'scope_capacity', 'cap-1': 'scope_capacity', 'cap-2': None, 'cap-3': 
+PASS A.postgres: evidence_json is a JSONB array on the server for the records with evidence | observed={'decays': ['array', 1], 'decay-evicted': ['array', 2], 'summary-expired': ['array', 2], 'cap-0': ['array', 2], 'cap-
+PASS B.sqlite.direct: confidence decay: intended records changed, others untouched, no audit events | observed={'observed': [[2, 1], {'decays': [0.6, None], 'evicted': [0.15, 'confidence_below_threshold'], 'recent': [0.8
+PASS B.sqlite.audited: confidence decay: intended records changed, others untouched, no audit events | observed={'observed': [[2, 1], {'decays': [0.6, None], 'evicted': [0.15, 'confidence_below_threshold'], 'recent': [0.
+PASS B.sqlite.direct: summary compression/deletion: intended records changed, others untouched, no audit events | observed={'observed': [[1, 1], 'Decided to use pytest', ['decided to use pytest'], 'Recent session. Keep e
+PASS B.sqlite.audited: summary compression/deletion: intended records changed, others untouched, no audit events | observed={'observed': [[1, 1], 'Decided to use pytest', ['decided to use pytest'], 'Recent session. Keep 
+PASS B.sqlite.direct: scope capacity: intended records changed, others untouched, no audit events | observed={'observed': [{'agent:capacity': 2}, {'fact-0': 'scope_capacity', 'fact-1': 'scope_capacity', 'fact-2': None, '
+PASS B.sqlite.audited: scope capacity: intended records changed, others untouched, no audit events | observed={'observed': [{'agent:capacity': 2}, {'fact-0': 'scope_capacity', 'fact-1': 'scope_capacity', 'fact-2': None, 
+PASS B.sqlite.direct: stale insight eviction: intended records changed, others untouched, no audit events | observed={'observed': [1, {'stale': 'stale_insight', 'old-but-used': None, 'fresh': None, 'old-fact': None}], 'a
+PASS B.sqlite.audited: stale insight eviction: intended records changed, others untouched, no audit events | observed={'observed': [1, {'stale': 'stale_insight', 'old-but-used': None, 'fresh': None, 'old-fact': None}], '
+PASS B.postgres.direct: confidence decay: intended records changed, others untouched, no audit events | observed={'observed': [[2, 1], {'decays': [0.6, None], 'evicted': [0.15, 'confidence_below_threshold'], 'recent': [0
+PASS B.postgres.audited: confidence decay: intended records changed, others untouched, no audit events | observed={'observed': [[2, 1], {'decays': [0.6, None], 'evicted': [0.15, 'confidence_below_threshold'], 'recent': [
+PASS B.postgres.direct: summary compression/deletion: intended records changed, others untouched, no audit events | observed={'observed': [[1, 1], 'Decided to use pytest', ['decided to use pytest'], 'Recent session. Keep
+PASS B.postgres.audited: summary compression/deletion: intended records changed, others untouched, no audit events | observed={'observed': [[1, 1], 'Decided to use pytest', ['decided to use pytest'], 'Recent session. Kee
+PASS B.postgres.direct: scope capacity: intended records changed, others untouched, no audit events | observed={'observed': [{'agent:capacity': 2}, {'fact-0': 'scope_capacity', 'fact-1': 'scope_capacity', 'fact-2': None,
+PASS B.postgres.audited: scope capacity: intended records changed, others untouched, no audit events | observed={'observed': [{'agent:capacity': 2}, {'fact-0': 'scope_capacity', 'fact-1': 'scope_capacity', 'fact-2': None
+PASS B.postgres.direct: stale insight eviction: intended records changed, others untouched, no audit events | observed={'observed': [1, {'stale': 'stale_insight', 'old-but-used': None, 'fresh': None, 'old-fact': None}], 
+PASS B.postgres.audited: stale insight eviction: intended records changed, others untouched, no audit events | observed={'observed': [1, {'stale': 'stale_insight', 'old-but-used': None, 'fresh': None, 'old-fact': None}],
+SUMMARY passed=38 failed=0 total=38 backends=['sqlite', 'postgres']
+=== probe_392_0111
+exit=1
+PASS A.sqlite: both turns completed | observed=['completed', 'completed']
+PASS A.sqlite: the lifecycle helpers receive the runtime's AuditedMemoryStore wrapping SQLiteMemoryStore | observed='AuditedMemoryStore wrapping SQLiteMemoryStore'
+PASS A.sqlite: every helper call returned (decay, capacity, insights once; summary compression for the first-turn preamble and the lifecycle), none raised | observed={'apply_confidence_decay | AuditedMemoryStore | ok': 1
+PASS A.sqlite: the second turn of the session runs no lifecycle helper (work is not reapplied) | observed=0
+PASS A.sqlite: no `memory.session_lifecycle failed` warning and no `_connect` text in any WARNING+ log record | observed={'lifecycle': [], '_connect': [], 'all_warnings': 3}
+PASS A.sqlite: confidence decay: `decays` 0.8 -> 0.6 (28 days at 0.05 per 7 days) | observed=0.6
+PASS A.sqlite: summary compression: `summary-old` text compressed to its first sentence | observed='Decided to use pytest'
+PASS A.sqlite: the intended records are soft-deleted with their reason (decay eviction, summary deletion, capacity, stale insight) and the others stay active; `stale-insight-2`, added after turn 1, stays | observed={'dec
+PASS A.sqlite: evidence lists (artifact ref and capture evidence) read back unchanged after the lifecycle, on removed and kept records | observed={'decays': [{'label': None, 'mime': 'text/plain', 'ref': 'artifact://sha25
+PASS A.sqlite: artifact index: the edges of the removed records are removed, the edges of kept records stay (capture evidence makes no edge) | observed={'after_seed': {'cap-0': 'active', 'cap-4': 'active', 'decay-evicted
+PASS A.postgres: both turns completed | observed=['completed', 'completed']
+PASS A.postgres: the lifecycle helpers receive the runtime's AuditedMemoryStore wrapping PostgresMemoryStore | observed='AuditedMemoryStore wrapping PostgresMemoryStore'
+FAIL A.postgres: every helper call returned (decay, capacity, insights once; summary compression for the first-turn preamble and the lifecycle), none raised | observed={"apply_confidence_decay | AuditedMemoryStore | rais
+FAIL A.postgres: the second turn of the session runs no lifecycle helper (work is not reapplied) | observed=1
+FAIL A.postgres: no `memory.session_lifecycle failed` warning and no `_connect` text in any WARNING+ log record | observed={'lifecycle': ["openminion.gateway.agent_memory.v2_adapter WARNING: memory.session_lifecycle fail
+FAIL A.postgres: confidence decay: `decays` 0.8 -> 0.6 (28 days at 0.05 per 7 days) | observed=0.8
+FAIL A.postgres: summary compression: `summary-old` text compressed to its first sentence | observed='Decided to use pytest. Actually, wrong fixture scope.'
+FAIL A.postgres: the intended records are soft-deleted with their reason (decay eviction, summary deletion, capacity, stale insight) and the others stay active; `stale-insight-2`, added after turn 1, stays | observed={'d
+PASS A.postgres: evidence lists (artifact ref and capture evidence) read back unchanged after the lifecycle, on removed and kept records | observed={'decays': [{'label': None, 'mime': 'text/plain', 'ref': 'artifact://sha
+FAIL A.postgres: artifact index: the edges of the removed records are removed, the edges of kept records stay (capture evidence makes no edge) | observed={'after_seed': {'cap-0': 'active', 'cap-4': 'active', 'decay-evict
+FAIL A.postgres: the same outcome for the seeded records read server-side from the PostgreSQL schema (memory_records) | observed={'reasons': {'cap-0': None, 'cap-1': None, 'cap-2': None, 'cap-3': None, 'cap-4': None, 'de
+PASS A.postgres: evidence_json is a JSONB array on the server for the records with evidence | observed={'decays': ['array', 1], 'decay-evicted': ['array', 2], 'summary-expired': ['array', 2], 'cap-0': ['array', 2], 'cap-
+PASS B.sqlite.direct: confidence decay: intended records changed, others untouched, no audit events | observed={'observed': [[2, 1], {'decays': [0.6, None], 'evicted': [0.15, 'confidence_below_threshold'], 'recent': [0.8
+PASS B.sqlite.audited: confidence decay: intended records changed, others untouched, no audit events | observed={'observed': [[2, 1], {'decays': [0.6, None], 'evicted': [0.15, 'confidence_below_threshold'], 'recent': [0.
+PASS B.sqlite.direct: summary compression/deletion: intended records changed, others untouched, no audit events | observed={'observed': [[1, 1], 'Decided to use pytest', ['decided to use pytest'], 'Recent session. Keep e
+PASS B.sqlite.audited: summary compression/deletion: intended records changed, others untouched, no audit events | observed={'observed': [[1, 1], 'Decided to use pytest', ['decided to use pytest'], 'Recent session. Keep 
+PASS B.sqlite.direct: scope capacity: intended records changed, others untouched, no audit events | observed={'observed': [{'agent:capacity': 2}, {'fact-0': 'scope_capacity', 'fact-1': 'scope_capacity', 'fact-2': None, '
+PASS B.sqlite.audited: scope capacity: intended records changed, others untouched, no audit events | observed={'observed': [{'agent:capacity': 2}, {'fact-0': 'scope_capacity', 'fact-1': 'scope_capacity', 'fact-2': None, 
+PASS B.sqlite.direct: stale insight eviction: intended records changed, others untouched, no audit events | observed={'observed': [1, {'stale': 'stale_insight', 'old-but-used': None, 'fresh': None, 'old-fact': None}], 'a
+PASS B.sqlite.audited: stale insight eviction: intended records changed, others untouched, no audit events | observed={'observed': [1, {'stale': 'stale_insight', 'old-but-used': None, 'fresh': None, 'old-fact': None}], '
+PASS B.postgres.direct: confidence decay: intended records changed, others untouched, no audit events | observed={'observed': [[2, 1], {'decays': [0.6, None], 'evicted': [0.15, 'confidence_below_threshold'], 'recent': [0
+FAIL B.postgres.audited: confidence decay: intended records changed, others untouched, no audit events | observed="AttributeError: 'PostgresMemoryStore' object has no attribute '_connect'"
+PASS B.postgres.direct: summary compression/deletion: intended records changed, others untouched, no audit events | observed={'observed': [[1, 1], 'Decided to use pytest', ['decided to use pytest'], 'Recent session. Keep
+FAIL B.postgres.audited: summary compression/deletion: intended records changed, others untouched, no audit events | observed="AttributeError: 'PostgresMemoryStore' object has no attribute '_connect'"
+PASS B.postgres.direct: scope capacity: intended records changed, others untouched, no audit events | observed={'observed': [{'agent:capacity': 2}, {'fact-0': 'scope_capacity', 'fact-1': 'scope_capacity', 'fact-2': None,
+FAIL B.postgres.audited: scope capacity: intended records changed, others untouched, no audit events | observed="AttributeError: 'PostgresMemoryStore' object has no attribute '_connect'"
+PASS B.postgres.direct: stale insight eviction: intended records changed, others untouched, no audit events | observed={'observed': [1, {'stale': 'stale_insight', 'old-but-used': None, 'fresh': None, 'old-fact': None}], 
+FAIL B.postgres.audited: stale insight eviction: intended records changed, others untouched, no audit events | observed="AttributeError: 'PostgresMemoryStore' object has no attribute '_connect'"
+SUMMARY passed=26 failed=12 total=38 backends=['sqlite', 'postgres']
+=== probe_400_seed_by_0111
+exit=0
+PASS seed: history written by the installed package | observed={'version': '0.1.11', 'sqlite_cases': 7, 'postgres_cases': 7}
+SUMMARY passed=1 failed=0 total=1
+=== probe_400
+exit=0
+PASS A. decode_evidence_ref_values(already decoded list [artifact, capture] (PostgreSQL JSONB)) | observed=[{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+PASS A. decode_evidence_ref_values(already decoded list [sha]) | observed=['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa']
+PASS A. decode_evidence_ref_values(already decoded empty list) | observed=[]
+PASS A. decode_evidence_ref_values(JSON text [artifact, capture] (SQLite)) | observed=[{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'sha256': 'aaaaaaaaa
+PASS A. decode_evidence_ref_values(JSON text []) | observed=[]
+PASS A. decode_evidence_ref_values(JSON text of an object) | observed=[]
+PASS A. decode_evidence_ref_values(empty string) | observed=[]
+PASS A. decode_evidence_ref_values(None) | observed=[]
+PASS A. decode_evidence_ref_values('not json') still raises JSONDecodeError | observed='raised JSONDecodeError: Expecting value: line 1 column 1 (char 0)'
+PASS B.sqlite: apply_confidence_decay: step result, item states and artifact ref removals | observed={'result': [3, 3], 'items': {'artifact-ref': [0.15, 'confidence_below_threshold'], 'capture-evidence': [0.15, 'confiden
+PASS B.sqlite: apply_confidence_decay: evidence values read back unchanged after the step (not stringified or dropped) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaaaaaaaaaaaaaaaaaaaaa
+PASS B.sqlite: compress_old_summaries: step result, item states and artifact ref removals | observed={'result': [0, 3], 'items': {'artifact-ref': [0.8, 'summary_retention'], 'capture-evidence': [0.8, 'summary_retention']
+PASS B.sqlite: compress_old_summaries: evidence values read back unchanged after the step (not stringified or dropped) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaaaaaaaaaaaaaaaaaaaaa
+PASS B.sqlite: enforce_scope_capacity: step result, item states and artifact ref removals | observed={'result': {'agent:evidence': 3}, 'items': {'artifact-ref': [0.1, 'scope_capacity'], 'capture-evidence': [0.2, 'scope_c
+PASS B.sqlite: enforce_scope_capacity: evidence values read back unchanged after the step (not stringified or dropped) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaaaaaaaaaaaaaaaaaaaaa
+PASS B.sqlite: evict_stale_insights: step result, item states and artifact ref removals | observed={'result': 3, 'items': {'artifact-ref': [0.8, 'stale_insight'], 'capture-evidence': [0.8, 'stale_insight'], 'no-evidence'
+PASS B.sqlite: evict_stale_insights: evidence values read back unchanged after the step (not stringified or dropped) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaa
+PASS B.sqlite: purge_soft_deleted records: step result, item states and artifact ref removals | observed={'result': [3, 0], 'items': {'artifact-ref': 'purged', 'capture-evidence': 'purged', 'no-evidence': 'purged'}, 'art
+PASS B.sqlite: purge_soft_deleted promoted candidates: step result, item states and artifact ref removals | observed={'result': [0, 3], 'items': {'artifact-ref': 'purged', 'capture-evidence': 'purged', 'no-evidence': 'pu
+PASS B.sqlite: purge_soft_deleted rejected candidates: step result, item states and artifact ref removals | observed={'result': [0, 3], 'items': {'artifact-ref': 'purged', 'capture-evidence': 'purged', 'no-evidence': 'pu
+PASS B.postgres: apply_confidence_decay: step result, item states and artifact ref removals | observed={'result': [3, 3], 'items': {'artifact-ref': [0.15, 'confidence_below_threshold'], 'capture-evidence': [0.15, 'confid
+PASS B.postgres: apply_confidence_decay: evidence values read back unchanged after the step (not stringified or dropped) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaaaaaaaaaaaaaaaaaaa
+PASS B.postgres: apply_confidence_decay: evidence_json is a nonempty JSONB array on the server before the step | observed={'artifact-ref': ['array', 1], 'capture-evidence': ['array', 1], 'no-evidence': ['array', 0]}
+PASS B.postgres: compress_old_summaries: step result, item states and artifact ref removals | observed={'result': [0, 3], 'items': {'artifact-ref': [0.8, 'summary_retention'], 'capture-evidence': [0.8, 'summary_retention
+PASS B.postgres: compress_old_summaries: evidence values read back unchanged after the step (not stringified or dropped) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaaaaaaaaaaaaaaaaaaa
+PASS B.postgres: compress_old_summaries: evidence_json is a nonempty JSONB array on the server before the step | observed={'artifact-ref': ['array', 1], 'capture-evidence': ['array', 1], 'no-evidence': ['array', 0]}
+PASS B.postgres: enforce_scope_capacity: step result, item states and artifact ref removals | observed={'result': {'agent:evidence': 3}, 'items': {'artifact-ref': [0.1, 'scope_capacity'], 'capture-evidence': [0.2, 'scope
+PASS B.postgres: enforce_scope_capacity: evidence values read back unchanged after the step (not stringified or dropped) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaaaaaaaaaaaaaaaaaaa
+PASS B.postgres: enforce_scope_capacity: evidence_json is a nonempty JSONB array on the server before the step | observed={'artifact-ref': ['array', 1], 'capture-evidence': ['array', 1], 'keep': ['array', 0], 'no-evidenc
+PASS B.postgres: evict_stale_insights: step result, item states and artifact ref removals | observed={'result': 3, 'items': {'artifact-ref': [0.8, 'stale_insight'], 'capture-evidence': [0.8, 'stale_insight'], 'no-evidenc
+PASS B.postgres: evict_stale_insights: evidence values read back unchanged after the step (not stringified or dropped) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaaaaaaaaaaaaaaaaaaaaa
+PASS B.postgres: evict_stale_insights: evidence_json is a nonempty JSONB array on the server before the step | observed={'artifact-ref': ['array', 1], 'capture-evidence': ['array', 1], 'no-evidence': ['array', 0]}
+PASS B.postgres: purge_soft_deleted records: step result, item states and artifact ref removals | observed={'result': [3, 0], 'items': {'artifact-ref': 'purged', 'capture-evidence': 'purged', 'no-evidence': 'purged'}, 'a
+PASS B.postgres: purge_soft_deleted records: evidence_json is a nonempty JSONB array on the server before the step | observed={'artifact-ref': ['array', 1], 'capture-evidence': ['array', 1], 'no-evidence': ['array', 0]}
+PASS B.postgres: purge_soft_deleted promoted candidates: step result, item states and artifact ref removals | observed={'result': [0, 3], 'items': {'artifact-ref': 'purged', 'capture-evidence': 'purged', 'no-evidence': '
+PASS B.postgres: purge_soft_deleted promoted candidates: evidence_json is a nonempty JSONB array on the server before the step | observed={'artifact-ref': ['array', 1], 'capture-evidence': ['array', 1], 'no-evidence': ['
+PASS B.postgres: purge_soft_deleted rejected candidates: step result, item states and artifact ref removals | observed={'result': [0, 3], 'items': {'artifact-ref': 'purged', 'capture-evidence': 'purged', 'no-evidence': '
+PASS B.postgres: purge_soft_deleted rejected candidates: evidence_json is a nonempty JSONB array on the server before the step | observed={'artifact-ref': ['array', 1], 'capture-evidence': ['array', 1], 'no-evidence': ['
+PASS C. history was written by the published 0.1.11 | observed='0.1.11'
+PASS C.sqlite (history from 0.1.11): apply_confidence_decay: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaa
+PASS C.sqlite (history from 0.1.11): apply_confidence_decay: step result, item states and artifact ref removals | observed={'result': [3, 3], 'items': {'artifact-ref': [0.15, 'confidence_below_threshold'], 'capture-evide
+PASS C.sqlite (history from 0.1.11): compress_old_summaries: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaa
+PASS C.sqlite (history from 0.1.11): compress_old_summaries: step result, item states and artifact ref removals | observed={'result': [0, 3], 'items': {'artifact-ref': [0.8, 'summary_retention'], 'capture-evidence': [0.8
+PASS C.sqlite (history from 0.1.11): enforce_scope_capacity: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaa
+PASS C.sqlite (history from 0.1.11): enforce_scope_capacity: step result, item states and artifact ref removals | observed={'result': {'agent:evidence': 3}, 'items': {'artifact-ref': [0.1, 'scope_capacity'], 'capture-evi
+PASS C.sqlite (history from 0.1.11): evict_stale_insights: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaa
+PASS C.sqlite (history from 0.1.11): evict_stale_insights: step result, item states and artifact ref removals | observed={'result': 3, 'items': {'artifact-ref': [0.8, 'stale_insight'], 'capture-evidence': [0.8, 'stale_in
+PASS C.sqlite (history from 0.1.11): purge_soft_deleted records: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'a
+PASS C.sqlite (history from 0.1.11): purge_soft_deleted records: step result, item states and artifact ref removals | observed={'result': [3, 0], 'items': {'artifact-ref': 'purged', 'capture-evidence': 'purged', 'no-evid
+PASS C.sqlite (history from 0.1.11): purge_soft_deleted promoted candidates: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain
+PASS C.sqlite (history from 0.1.11): purge_soft_deleted promoted candidates: step result, item states and artifact ref removals | observed={'result': [0, 3], 'items': {'artifact-ref': 'purged', 'capture-evidence': 'purge
+PASS C.sqlite (history from 0.1.11): purge_soft_deleted rejected candidates: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain
+PASS C.sqlite (history from 0.1.11): purge_soft_deleted rejected candidates: step result, item states and artifact ref removals | observed={'result': [0, 3], 'items': {'artifact-ref': 'purged', 'capture-evidence': 'purge
+PASS C.postgres (history from 0.1.11): apply_confidence_decay: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaa
+PASS C.postgres (history from 0.1.11): apply_confidence_decay: step result, item states and artifact ref removals | observed={'result': [3, 3], 'items': {'artifact-ref': [0.15, 'confidence_below_threshold'], 'capture-evi
+PASS C.postgres (history from 0.1.11): compress_old_summaries: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaa
+PASS C.postgres (history from 0.1.11): compress_old_summaries: step result, item states and artifact ref removals | observed={'result': [0, 3], 'items': {'artifact-ref': [0.8, 'summary_retention'], 'capture-evidence': [0
+PASS C.postgres (history from 0.1.11): enforce_scope_capacity: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaa
+PASS C.postgres (history from 0.1.11): enforce_scope_capacity: step result, item states and artifact ref removals | observed={'result': {'agent:evidence': 3}, 'items': {'artifact-ref': [0.1, 'scope_capacity'], 'capture-e
+PASS C.postgres (history from 0.1.11): evict_stale_insights: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaa
+PASS C.postgres (history from 0.1.11): evict_stale_insights: step result, item states and artifact ref removals | observed={'result': 3, 'items': {'artifact-ref': [0.8, 'stale_insight'], 'capture-evidence': [0.8, 'stale_
+PASS C.postgres (history from 0.1.11): purge_soft_deleted records: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 
+PASS C.postgres (history from 0.1.11): purge_soft_deleted records: step result, item states and artifact ref removals | observed={'result': [3, 0], 'items': {'artifact-ref': 'purged', 'capture-evidence': 'purged', 'no-ev
+PASS C.postgres (history from 0.1.11): purge_soft_deleted promoted candidates: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/pla
+PASS C.postgres (history from 0.1.11): purge_soft_deleted promoted candidates: step result, item states and artifact ref removals | observed={'result': [0, 3], 'items': {'artifact-ref': 'purged', 'capture-evidence': 'pur
+PASS C.postgres (history from 0.1.11): purge_soft_deleted rejected candidates: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/pla
+PASS C.postgres (history from 0.1.11): purge_soft_deleted rejected candidates: step result, item states and artifact ref removals | observed={'result': [0, 3], 'items': {'artifact-ref': 'purged', 'capture-evidence': 'pur
+PASS D. SQLite: purge_soft_deleted on a record whose stored evidence_json is not JSON raises JSONDecodeError | observed='raised JSONDecodeError: Expecting value: line 1 column 1 (char 0)'
+PASS E.postgres audited wrapper: apply_confidence_decay: same outcome as on the bare store, no audit events | observed={'outcome': {'result': [3, 3], 'items': {'artifact-ref': [0.15, 'confidence_below_threshold'], 'captu
+PASS E.postgres audited wrapper: compress_old_summaries: same outcome as on the bare store, no audit events | observed={'outcome': {'result': [0, 3], 'items': {'artifact-ref': [0.8, 'summary_retention'], 'capture-evidenc
+PASS E.postgres audited wrapper: enforce_scope_capacity: same outcome as on the bare store, no audit events | observed={'outcome': {'result': {'agent:evidence': 3}, 'items': {'artifact-ref': [0.1, 'scope_capacity'], 'cap
+PASS E.postgres audited wrapper: evict_stale_insights: same outcome as on the bare store, no audit events | observed={'outcome': {'result': 3, 'items': {'artifact-ref': [0.8, 'stale_insight'], 'capture-evidence': [0.8, '
+SUMMARY passed=72 failed=0 total=72 backends=['sqlite', 'postgres']
+=== probe_400_0111_seed
+exit=0
+PASS seed: history written by the installed package | observed={'version': '0.1.11', 'sqlite_cases': 7, 'postgres_cases': 7}
+SUMMARY passed=1 failed=0 total=1
+=== probe_400_0111
+exit=1
+FAIL A. decode_evidence_ref_values(already decoded list [artifact, capture] (PostgreSQL JSONB)) | observed='raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)'
+FAIL A. decode_evidence_ref_values(already decoded list [sha]) | observed='raised JSONDecodeError: Expecting value: line 1 column 2 (char 1)'
+PASS A. decode_evidence_ref_values(already decoded empty list) | observed=[]
+PASS A. decode_evidence_ref_values(JSON text [artifact, capture] (SQLite)) | observed=[{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'sha256': 'aaaaaaaaa
+PASS A. decode_evidence_ref_values(JSON text []) | observed=[]
+PASS A. decode_evidence_ref_values(JSON text of an object) | observed=[]
+PASS A. decode_evidence_ref_values(empty string) | observed=[]
+PASS A. decode_evidence_ref_values(None) | observed=[]
+PASS A. decode_evidence_ref_values('not json') still raises JSONDecodeError | observed='raised JSONDecodeError: Expecting value: line 1 column 1 (char 0)'
+PASS B.sqlite: apply_confidence_decay: step result, item states and artifact ref removals | observed={'result': [3, 3], 'items': {'artifact-ref': [0.15, 'confidence_below_threshold'], 'capture-evidence': [0.15, 'confiden
+PASS B.sqlite: apply_confidence_decay: evidence values read back unchanged after the step (not stringified or dropped) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaaaaaaaaaaaaaaaaaaaaa
+PASS B.sqlite: compress_old_summaries: step result, item states and artifact ref removals | observed={'result': [0, 3], 'items': {'artifact-ref': [0.8, 'summary_retention'], 'capture-evidence': [0.8, 'summary_retention']
+PASS B.sqlite: compress_old_summaries: evidence values read back unchanged after the step (not stringified or dropped) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaaaaaaaaaaaaaaaaaaaaa
+PASS B.sqlite: enforce_scope_capacity: step result, item states and artifact ref removals | observed={'result': {'agent:evidence': 3}, 'items': {'artifact-ref': [0.1, 'scope_capacity'], 'capture-evidence': [0.2, 'scope_c
+PASS B.sqlite: enforce_scope_capacity: evidence values read back unchanged after the step (not stringified or dropped) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaaaaaaaaaaaaaaaaaaaaa
+PASS B.sqlite: evict_stale_insights: step result, item states and artifact ref removals | observed={'result': 3, 'items': {'artifact-ref': [0.8, 'stale_insight'], 'capture-evidence': [0.8, 'stale_insight'], 'no-evidence'
+PASS B.sqlite: evict_stale_insights: evidence values read back unchanged after the step (not stringified or dropped) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaa
+PASS B.sqlite: purge_soft_deleted records: step result, item states and artifact ref removals | observed={'result': [3, 0], 'items': {'artifact-ref': 'purged', 'capture-evidence': 'purged', 'no-evidence': 'purged'}, 'art
+PASS B.sqlite: purge_soft_deleted promoted candidates: step result, item states and artifact ref removals | observed={'result': [0, 3], 'items': {'artifact-ref': 'purged', 'capture-evidence': 'purged', 'no-evidence': 'pu
+PASS B.sqlite: purge_soft_deleted rejected candidates: step result, item states and artifact ref removals | observed={'result': [0, 3], 'items': {'artifact-ref': 'purged', 'capture-evidence': 'purged', 'no-evidence': 'pu
+FAIL B.postgres: apply_confidence_decay: step result, item states and artifact ref removals | observed={'result': 'raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)', 'it
+PASS B.postgres: apply_confidence_decay: evidence values read back unchanged after the step (not stringified or dropped) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaaaaaaaaaaaaaaaaaaa
+PASS B.postgres: apply_confidence_decay: evidence_json is a nonempty JSONB array on the server before the step | observed={'artifact-ref': ['array', 1], 'capture-evidence': ['array', 1], 'no-evidence': ['array', 0]}
+FAIL B.postgres: compress_old_summaries: step result, item states and artifact ref removals | observed={'result': 'raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)', 'it
+PASS B.postgres: compress_old_summaries: evidence values read back unchanged after the step (not stringified or dropped) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaaaaaaaaaaaaaaaaaaa
+PASS B.postgres: compress_old_summaries: evidence_json is a nonempty JSONB array on the server before the step | observed={'artifact-ref': ['array', 1], 'capture-evidence': ['array', 1], 'no-evidence': ['array', 0]}
+FAIL B.postgres: enforce_scope_capacity: step result, item states and artifact ref removals | observed={'result': 'raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)', 'it
+PASS B.postgres: enforce_scope_capacity: evidence values read back unchanged after the step (not stringified or dropped) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaaaaaaaaaaaaaaaaaaa
+PASS B.postgres: enforce_scope_capacity: evidence_json is a nonempty JSONB array on the server before the step | observed={'artifact-ref': ['array', 1], 'capture-evidence': ['array', 1], 'keep': ['array', 0], 'no-evidenc
+FAIL B.postgres: evict_stale_insights: step result, item states and artifact ref removals | observed={'result': 'raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)', 'item
+PASS B.postgres: evict_stale_insights: evidence values read back unchanged after the step (not stringified or dropped) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaaaaaaaaaaaaaaaaaaaaa
+PASS B.postgres: evict_stale_insights: evidence_json is a nonempty JSONB array on the server before the step | observed={'artifact-ref': ['array', 1], 'capture-evidence': ['array', 1], 'no-evidence': ['array', 0]}
+FAIL B.postgres: purge_soft_deleted records: step result, item states and artifact ref removals | observed={'result': 'raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)',
+PASS B.postgres: purge_soft_deleted records: evidence_json is a nonempty JSONB array on the server before the step | observed={'artifact-ref': ['array', 1], 'capture-evidence': ['array', 1], 'no-evidence': ['array', 0]}
+FAIL B.postgres: purge_soft_deleted promoted candidates: step result, item states and artifact ref removals | observed={'result': 'raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 
+PASS B.postgres: purge_soft_deleted promoted candidates: evidence_json is a nonempty JSONB array on the server before the step | observed={'artifact-ref': ['array', 1], 'capture-evidence': ['array', 1], 'no-evidence': ['
+FAIL B.postgres: purge_soft_deleted rejected candidates: step result, item states and artifact ref removals | observed={'result': 'raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 
+PASS B.postgres: purge_soft_deleted rejected candidates: evidence_json is a nonempty JSONB array on the server before the step | observed={'artifact-ref': ['array', 1], 'capture-evidence': ['array', 1], 'no-evidence': ['
+PASS C. history was written by the published 0.1.11 | observed='0.1.11'
+PASS C.sqlite (history from 0.1.11): apply_confidence_decay: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaa
+PASS C.sqlite (history from 0.1.11): apply_confidence_decay: step result, item states and artifact ref removals | observed={'result': [3, 3], 'items': {'artifact-ref': [0.15, 'confidence_below_threshold'], 'capture-evide
+PASS C.sqlite (history from 0.1.11): compress_old_summaries: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaa
+PASS C.sqlite (history from 0.1.11): compress_old_summaries: step result, item states and artifact ref removals | observed={'result': [0, 3], 'items': {'artifact-ref': [0.8, 'summary_retention'], 'capture-evidence': [0.8
+PASS C.sqlite (history from 0.1.11): enforce_scope_capacity: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaa
+PASS C.sqlite (history from 0.1.11): enforce_scope_capacity: step result, item states and artifact ref removals | observed={'result': {'agent:evidence': 3}, 'items': {'artifact-ref': [0.1, 'scope_capacity'], 'capture-evi
+PASS C.sqlite (history from 0.1.11): evict_stale_insights: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaaaa
+PASS C.sqlite (history from 0.1.11): evict_stale_insights: step result, item states and artifact ref removals | observed={'result': 3, 'items': {'artifact-ref': [0.8, 'stale_insight'], 'capture-evidence': [0.8, 'stale_in
+PASS C.sqlite (history from 0.1.11): purge_soft_deleted records: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'a
+PASS C.sqlite (history from 0.1.11): purge_soft_deleted records: step result, item states and artifact ref removals | observed={'result': [3, 0], 'items': {'artifact-ref': 'purged', 'capture-evidence': 'purged', 'no-evid
+PASS C.sqlite (history from 0.1.11): purge_soft_deleted promoted candidates: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain
+PASS C.sqlite (history from 0.1.11): purge_soft_deleted promoted candidates: step result, item states and artifact ref removals | observed={'result': [0, 3], 'items': {'artifact-ref': 'purged', 'capture-evidence': 'purge
+PASS C.sqlite (history from 0.1.11): purge_soft_deleted rejected candidates: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain
+PASS C.sqlite (history from 0.1.11): purge_soft_deleted rejected candidates: step result, item states and artifact ref removals | observed={'result': [0, 3], 'items': {'artifact-ref': 'purged', 'capture-evidence': 'purge
+PASS C.postgres (history from 0.1.11): apply_confidence_decay: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaa
+FAIL C.postgres (history from 0.1.11): apply_confidence_decay: step result, item states and artifact ref removals | observed={'result': 'raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 c
+PASS C.postgres (history from 0.1.11): compress_old_summaries: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaa
+FAIL C.postgres (history from 0.1.11): compress_old_summaries: step result, item states and artifact ref removals | observed={'result': 'raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 c
+PASS C.postgres (history from 0.1.11): enforce_scope_capacity: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaa
+FAIL C.postgres (history from 0.1.11): enforce_scope_capacity: step result, item states and artifact ref removals | observed={'result': 'raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 c
+PASS C.postgres (history from 0.1.11): evict_stale_insights: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 'aaaaa
+FAIL C.postgres (history from 0.1.11): evict_stale_insights: step result, item states and artifact ref removals | observed={'result': 'raised JSONDecodeError: Expecting property name enclosed in double quotes: line 1 col
+PASS C.postgres (history from 0.1.11): purge_soft_deleted records: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/plain', 'ref': 
+FAIL C.postgres (history from 0.1.11): purge_soft_deleted records: step result, item states and artifact ref removals | observed={'result': 'raised JSONDecodeError: Expecting property name enclosed in double quotes: line
+PASS C.postgres (history from 0.1.11): purge_soft_deleted promoted candidates: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/pla
+FAIL C.postgres (history from 0.1.11): purge_soft_deleted promoted candidates: step result, item states and artifact ref removals | observed={'result': 'raised JSONDecodeError: Expecting property name enclosed in double 
+PASS C.postgres (history from 0.1.11): purge_soft_deleted rejected candidates: 0.1.11-written evidence reads back unchanged through 0.1.12 (no decoder error) | observed={'artifact-ref': [{'label': None, 'mime': 'text/pla
+FAIL C.postgres (history from 0.1.11): purge_soft_deleted rejected candidates: step result, item states and artifact ref removals | observed={'result': 'raised JSONDecodeError: Expecting property name enclosed in double 
+PASS D. SQLite: purge_soft_deleted on a record whose stored evidence_json is not JSON raises JSONDecodeError | observed='raised JSONDecodeError: Expecting value: line 1 column 1 (char 0)'
+FAIL E.postgres audited wrapper: apply_confidence_decay: same outcome as on the bare store, no audit events | observed={'outcome': {'result': "raised AttributeError: 'PostgresMemoryStore' object has no attribute '_connec
+FAIL E.postgres audited wrapper: compress_old_summaries: same outcome as on the bare store, no audit events | observed={'outcome': {'result': "raised AttributeError: 'PostgresMemoryStore' object has no attribute '_connec
+FAIL E.postgres audited wrapper: enforce_scope_capacity: same outcome as on the bare store, no audit events | observed={'outcome': {'result': "raised AttributeError: 'PostgresMemoryStore' object has no attribute '_connec
+FAIL E.postgres audited wrapper: evict_stale_insights: same outcome as on the bare store, no audit events | observed={'outcome': {'result': "raised AttributeError: 'PostgresMemoryStore' object has no attribute '_connect'
+SUMMARY passed=52 failed=20 total=72 backends=['sqlite', 'postgres']
+=== probe_395
+exit=0
+PASS B: first entry step classifies the user input (exact date required) | observed=['Check order A-104', None, {'needs_exact_date': True, 'time_sensitive': True, 'require_exact_date': True, 'classifier_mode': 'llm'}]
+PASS B: the closure freshness guard blocks the judge's close (missing exact-date evidence) and the gate continues the turn | observed={'guard': [{'require_exact_date': True, 'result': ['Missing exact-date evidence for an
+PASS B: continuation entry (no user input, no typed contract) keeps the contract: before == after == exact date required, classifier_mode llm | observed=[None, {'needs_exact_date': True, 'time_sensitive': True, 'require_
+PASS B: the contract, obligations and diagnostics are the same objects with identical full dumps (classifier_model, classified_at, notes, all obligations) | observed={'same_objects': True, 'equal': True, 'obligations_aft
+PASS B: that step emits brain.freshness.entry_fallback with reason retained_turn_contract | observed=[{'reason': 'retained_turn_contract', 'llm_call_id': '82e60f16-212c-4df2-bfd8-e8d0e30341c8'}]
+PASS B: the freshness classifier is called once in the turn (no reclassification) | observed=1
+PASS B: run completes | observed=[{'run_state': 'completed', 'text': 'openminion: [continuation] Order A-104 is ready, code ZEBRA-42.'}]
+PASS E: first entry step classifies the user input (exact date required) | observed=['Check order A-104', None, {'needs_exact_date': True, 'time_sensitive': True, 'require_exact_date': True, 'classifier_mode': 'llm'}]
+PASS E: the closure freshness guard blocks the judge's close (missing exact-date evidence) and the gate continues the turn | observed={'guard': [{'require_exact_date': True, 'result': ['Missing exact-date evidence for an
+PASS E: continuation entry (no user input, no typed contract) keeps the contract: before == after == exact date required, classifier_mode llm | observed=[None, {'needs_exact_date': True, 'time_sensitive': True, 'require_
+PASS E: the contract, obligations and diagnostics are the same objects with identical full dumps (classifier_model, classified_at, notes, all obligations) | observed={'same_objects': True, 'equal': True, 'obligations_aft
+PASS E: that step emits brain.freshness.entry_fallback with reason retained_turn_contract | observed=[{'reason': 'retained_turn_contract', 'llm_call_id': '2eb0840a-4b56-4c51-9d01-df46a45e8f68'}]
+PASS E: the freshness classifier is called once in the turn (no reclassification) | observed=1
+PASS E: the second close, on the same undated lookup_order output, is blocked too | observed={'guard': [{'require_exact_date': True, 'result': ['Missing exact-date evidence for an exact-date freshness answer.']}], 'gate'
+PASS E: lookup_order ran twice and the judge's unverified answer is not the result | observed={'calls': ['A-104', 'A-104'], 'text': 'openminion: [continuation] Order A-104 is ready, code ZEBRA-42.'}
+PASS A1: first entry step classifies the user input (exact date required) | observed=['Check order A-104', None, {'needs_exact_date': True, 'time_sensitive': True, 'require_exact_date': True, 'classifier_mode': 'llm'}]
+PASS A1: the closure freshness guard blocks the judge's close (missing exact-date evidence) and the gate continues the turn | observed={'guard': [{'require_exact_date': True, 'result': ['Missing exact-date evidence for a
+PASS A1 (control): a valid typed contract on the continuation entry replaces the turn's contract | observed=[{'needs_exact_date': True, 'time_sensitive': True, 'require_exact_date': True, 'classifier_mode': 'llm'}, {'nee
+PASS A1 (control): the replaced contract needs no exact date, so the second close passes and the judge answers | observed={'guard': [{'require_exact_date': False, 'result': []}], 'text': 'openminion: [judge] Order A-104 
+PASS A1 (control): no retained_turn_contract fallback on the typed-contract step | observed=[{'reason': 'missing_or_invalid_contract', 'llm_call_id': '2a25b850-f1f1-4957-91ef-df7b3b2251ac'}]
+PASS N1 (control): new user input on the next turn is classified again (no exact date for B-205) | observed=[{'user_input': 'Check order B-205', 'before': None, 'after': {'needs_exact_date': False, 'time_sensitive': True
+PASS N1 (control): two classifier calls, both lookups, the second turn answered by the judge | observed={'freshness_calls': 2, 'calls': ['A-104', 'B-205'], 'text': 'openminion: [judge] Order B-205 is ready, code ZEBRA-42
+PASS F (SDK agent.run('')): rejected before any entry step (TurnRequestError: empty message); no entry step, no classifier call | observed={'result': [{'error': 'TurnRequestError: `message` is required and must be a non-
+PASS F (control, installed _apply_entry_freshness on a fresh WorkingState, user_input None): default contract, skipped_empty_request, reason missing_or_invalid_contract | observed={'contract_is_default': True, 'require_e
+SUMMARY passed=24 failed=0 total=24 models=['gpt-4.1-mini']
+=== probe_395_0111
+exit=1
+PASS B: first entry step classifies the user input (exact date required) | observed=['Check order A-104', None, {'needs_exact_date': True, 'time_sensitive': True, 'require_exact_date': True, 'classifier_mode': 'llm'}]
+PASS B: the closure freshness guard blocks the judge's close (missing exact-date evidence) and the gate continues the turn | observed={'guard': [{'require_exact_date': True, 'result': ['Missing exact-date evidence for an
+FAIL B: continuation entry (no user input, no typed contract) keeps the contract: before == after == exact date required, classifier_mode llm | observed=[None, {'needs_exact_date': True, 'time_sensitive': True, 'require_
+FAIL B: the contract, obligations and diagnostics are the same objects with identical full dumps (classifier_model, classified_at, notes, all obligations) | observed={'same_objects': False, 'equal': False, 'obligations_a
+FAIL B: that step emits brain.freshness.entry_fallback with reason retained_turn_contract | observed=[{'reason': 'missing_or_invalid_contract', 'llm_call_id': '3c55ebd9-0155-4598-a01b-4e06183a6627'}]
+PASS B: the freshness classifier is called once in the turn (no reclassification) | observed=1
+PASS B: run completes | observed=[{'run_state': 'completed', 'text': 'openminion: [continuation] Order A-104 is ready, code ZEBRA-42.'}]
+PASS E: first entry step classifies the user input (exact date required) | observed=['Check order A-104', None, {'needs_exact_date': True, 'time_sensitive': True, 'require_exact_date': True, 'classifier_mode': 'llm'}]
+PASS E: the closure freshness guard blocks the judge's close (missing exact-date evidence) and the gate continues the turn | observed={'guard': [{'require_exact_date': True, 'result': ['Missing exact-date evidence for an
+FAIL E: continuation entry (no user input, no typed contract) keeps the contract: before == after == exact date required, classifier_mode llm | observed=[None, {'needs_exact_date': True, 'time_sensitive': True, 'require_
+FAIL E: the contract, obligations and diagnostics are the same objects with identical full dumps (classifier_model, classified_at, notes, all obligations) | observed={'same_objects': False, 'equal': False, 'obligations_a
+FAIL E: that step emits brain.freshness.entry_fallback with reason retained_turn_contract | observed=[{'reason': 'missing_or_invalid_contract', 'llm_call_id': '2e4f399c-10f7-4e68-a7f4-8ccc290ab369'}]
+PASS E: the freshness classifier is called once in the turn (no reclassification) | observed=1
+FAIL E: the second close, on the same undated lookup_order output, is blocked too | observed={'guard': [{'require_exact_date': False, 'result': []}], 'gate': [{'next_action': 'close', 'reason': ''}]}
+FAIL E: lookup_order ran twice and the judge's unverified answer is not the result | observed={'calls': ['A-104', 'A-104'], 'text': 'openminion: [judge] Order A-104 is ready, code ZEBRA-42.'}
+PASS A1: first entry step classifies the user input (exact date required) | observed=['Check order A-104', None, {'needs_exact_date': True, 'time_sensitive': True, 'require_exact_date': True, 'classifier_mode': 'llm'}]
+PASS A1: the closure freshness guard blocks the judge's close (missing exact-date evidence) and the gate continues the turn | observed={'guard': [{'require_exact_date': True, 'result': ['Missing exact-date evidence for a
+PASS A1 (control): a valid typed contract on the continuation entry replaces the turn's contract | observed=[{'needs_exact_date': True, 'time_sensitive': True, 'require_exact_date': True, 'classifier_mode': 'llm'}, {'nee
+PASS A1 (control): the replaced contract needs no exact date, so the second close passes and the judge answers | observed={'guard': [{'require_exact_date': False, 'result': []}], 'text': 'openminion: [judge] Order A-104 
+PASS A1 (control): no retained_turn_contract fallback on the typed-contract step | observed=[{'reason': 'missing_or_invalid_contract', 'llm_call_id': 'ab090ed2-8d6e-4a45-aec7-ccea43e4fb97'}]
+PASS N1 (control): new user input on the next turn is classified again (no exact date for B-205) | observed=[{'user_input': 'Check order B-205', 'before': None, 'after': {'needs_exact_date': False, 'time_sensitive': True
+PASS N1 (control): two classifier calls, both lookups, the second turn answered by the judge | observed={'freshness_calls': 2, 'calls': ['A-104', 'B-205'], 'text': 'openminion: [judge] Order B-205 is ready, code ZEBRA-42
+PASS F (SDK agent.run('')): rejected before any entry step (TurnRequestError: empty message); no entry step, no classifier call | observed={'result': [{'error': 'TurnRequestError: `message` is required and must be a non-
+PASS F (control, installed _apply_entry_freshness on a fresh WorkingState, user_input None): default contract, skipped_empty_request, reason missing_or_invalid_contract | observed={'contract_is_default': True, 'require_e
+SUMMARY passed=16 failed=8 total=24 models=['gpt-4.1-mini']
+Name: openminion
+Version: 0.1.12
+Location: <VENV>/lib/python3.12/site-packages
+Requires: aiosqlite, alembic, cryptography, httpx, jsonschema, platformdirs, prompt-toolkit, psutil, pydantic, pyyaml, rich, send2trash, sophiagraph, typer, tzdata
+Required-by:
+Linux runnervmtai0g 6.17.0-1022-azure #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+PRETTY_NAME="Ubuntu 24.04.5 LTS"
+VERSION_ID="24.04"
+python 3.12.15 sqlite 3.45.1
+PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+<VENV>/lib/python3.12/site-packages/openminion/__init__.py 0.1.12
