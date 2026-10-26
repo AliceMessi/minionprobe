@@ -1,0 +1,187 @@
+Ubuntu 24.04 GitHub-hosted runner, AliceMessi/linux-runner run 40301583958 (https://github.com/AliceMessi/linux-runner/actions/runs/40301583958), preset openminion with the postgres extra and PostgreSQL 16 (OPENMINION_TEST_POSTGRES_URL set); the script is run401.sh
+head: 375db861 docs(changelog): note memctl gc purge with a PostgreSQL store
+dev:  8c0568f7 Merge pull request #425 from openminion/release/0.1.12
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+packages: psycopg 3.3.6;sophiagraph 0.0.12;SQLAlchemy 2.1.6;typer 0.27.3;
+OPENMINION_TEST_POSTGRES_URL set: yes
+adeeb6a0d3acdfb324d086e52a184db37933a3c4fe0a9125a92fbeaae7e0cb4d  /tmp/ev/probe_gc_purge_pg.py
+
+== [head] pytest <focused>
+46 passed in 3.41s
+
+== [head] pytest -m "not benchmark and not e2e and not postgres and not memory_eval_benchmark and not mcp_live and not package_integration and not telegram_live and not slack_live and not slow" tests/memory tests/services/agent
+1317 passed, 2 skipped, 62 deselected in 32.33s
+
+== [head] pytest -m postgres <postgres>
+41 passed in 5.00s
+
+== [head] the issue's probe: PYTHONPATH=src:. python probe_gc_purge_pg.py
+{
+  "SQLite memory store (control)": {
+    "memctl gc": {
+      "exit code": 0,
+      "output": [
+        "GC: deleted_records=1, deleted_candidates=0"
+      ],
+      "rows after": {
+        "old": "confidence 0.600, active",
+        "deleted": "row purged"
+      }
+    }
+  },
+  "PostgreSQL memory store": {
+    "memctl gc": {
+      "exit code": 0,
+      "output": [
+        "GC: deleted_records=1, deleted_candidates=0"
+      ],
+      "rows after": {
+        "old": "confidence 0.600, active",
+        "deleted": "row purged"
+      }
+    },
+    "run_gc as memctl gc calls it": {
+      "store passed to run_gc": "AuditedMemoryStore wrapping PostgresMemoryStore",
+      "result": "ok (decayed_records=1, deleted_records=1)",
+      "rows after": {
+        "old": "confidence 0.600, active",
+        "deleted": "row purged"
+      }
+    },
+    "run_gc on the PostgresMemoryStore inside it": {
+      "store passed to run_gc": "PostgresMemoryStore",
+      "result": "ok (decayed_records=1, deleted_records=1)",
+      "rows after": {
+        "old": "confidence 0.600, active",
+        "deleted": "row purged"
+      }
+    }
+  }
+}
+3.11.17 linux
+
+== dev sources from here on: git checkout 8c0568f70bd54190411da9926861543f166ebcb4 -- src (6 paths differ)
+
+== [dev] pytest <focused>
+46 passed in 2.58s
+
+== [dev] pytest -m "not benchmark and not e2e and not postgres and not memory_eval_benchmark and not mcp_live and not package_integration and not telegram_live and not slack_live and not slow" tests/memory tests/services/agent
+1317 passed, 2 skipped, 62 deselected in 30.34s
+
+== [dev] pytest -m postgres <postgres>
+FAILED tests/memory/test_gc_postgres.py::test_retention_helper_changes_seeded_postgres_records[purge-audited] - AttributeError: 'PostgresMemoryStore' object has no attribute '_connect'
+FAILED tests/memory/test_gc_postgres.py::test_memctl_gc_with_a_typed_postgres_config - AssertionError: Error: gc is not supported for this memory store ('PostgresMemoryStore' object has no attribute '_connect')
+2 failed, 39 passed in 5.03s
+
+== [dev] the issue's probe: PYTHONPATH=src:. python probe_gc_purge_pg.py
+{
+  "SQLite memory store (control)": {
+    "memctl gc": {
+      "exit code": 0,
+      "output": [
+        "GC: deleted_records=1, deleted_candidates=0"
+      ],
+      "rows after": {
+        "old": "confidence 0.600, active",
+        "deleted": "row purged"
+      }
+    }
+  },
+  "PostgreSQL memory store": {
+    "memctl gc": {
+      "exit code": 1,
+      "output": [
+        "Error: gc is not supported for this memory store ('PostgresMemoryStore' object has no attribute '_connect')"
+      ],
+      "rows after": {
+        "old": "confidence 0.600, active",
+        "deleted": "confidence 0.800, soft-deleted"
+      }
+    },
+    "run_gc as memctl gc calls it": {
+      "store passed to run_gc": "AuditedMemoryStore wrapping PostgresMemoryStore",
+      "result": "raised AttributeError: 'PostgresMemoryStore' object has no attribute '_connect'",
+      "raised at": [
+        "openminion/modules/memory/runtime/purge.py:330 purge_soft_deleted",
+        "openminion/modules/memory/runtime/purge.py:279 _purge_sqlite_soft_deleted",
+        "openminion/modules/memory/storage/audit.py:152 __getattr__"
+      ],
+      "rows after": {
+        "old": "confidence 0.600, active",
+        "deleted": "confidence 0.800, soft-deleted"
+      }
+    },
+    "run_gc on the PostgresMemoryStore inside it": {
+      "store passed to run_gc": "PostgresMemoryStore",
+      "result": "ok (decayed_records=1, deleted_records=1)",
+      "rows after": {
+        "old": "confidence 0.600, active",
+        "deleted": "row purged"
+      }
+    }
+  }
+}
+3.11.17 linux
+
+== back to the branch head: 0 paths differ
+
+== ruff check .
+All checks passed!
+
+== make format-check
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m ruff format --check "/home/runner/work/linux-runner/linux-runner"
+5124 files already formatted
+
+== make workflow-check
+[INFO] This may take a few minutes...
+Lint GitHub Actions workflow files.......................................Passed
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/action_pins.py
+workflow action pins: clean
+
+== make lint
+
+[OK] Result
+  - method-LOC baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 111, "ceiling": 100, "checked": 20827, "over_ceiling": 111}, "ok": true, "validator": "method_loc"}
+{
+  "checked": 2647,
+  "ok": true,
+  "violations": []
+}
+broad_exception
+
+[INFO] Summary
+  files: 410
+  handlers: 1101
+  silent pass: 106
+  baseline entries: 410
+
+[OK] Result
+  - broad-exception baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 410, "files_with_handlers": 410, "handler_count": 1101, "silent_pass_count": 106}, "ok": true, "validator": "broad_exception"}
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/controlplane_delivery.py
+[coo-09] clean — no synchronous runner deliver regressions
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/webhook_secret.py
+[coo-10] clean — webhook secret-required contract preserved
+Skipping workspace browser tool-family contract validator (not present in standalone checkout).
+make typecheck
+make[1]: Entering directory '/home/runner/work/linux-runner/linux-runner'
+cd "/home/runner/work/linux-runner/linux-runner" && /home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4309; baseline total: 4309
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 290
+[tcr] api: 77 / 77 | monthly quota -50 | next target <= 27 | headroom 0
+[tcr] cli: 309 / 309 | monthly quota -50 | next target <= 259 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 222 / 222 | monthly quota -50 | next target <= 172 | headroom 0
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+make lint exit: 0
+
+== make test-critical
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+482 passed, 4 skipped, 1 warning in 15.02s

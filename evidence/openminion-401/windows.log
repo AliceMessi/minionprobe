@@ -1,0 +1,49 @@
+fix/401-memctl-gc-purge-wrapped-store @ 375db86199cbb38fe891012edb5f6de83e97b714 (worktree clean: True) and dev @ 8c0568f70bd54190411da9926861543f166ebcb4
+native Windows 11 Pro 10.0.22631.6199, CPython 3.11.11 SQLite 3.47.1, PYTHONPATH="src;."
+adeeb6a0d3acdfb324d086e52a184db37933a3c4fe0a9125a92fbeaae7e0cb4d *probe_gc_purge_pg.py
+
+== [head] pytest -q -p no:cacheprovider --show-capture=no -rfE --tb=line <focused: tests/memory/test_gc_audited_store.py tests/memory/test_gc.py tests/memory/test_gc_evidence.py tests/memory/test_operability.py tests/integration/test_runtime_memory_lifecycle.py>
+46 passed in 10.10s
+
+== [head] python probe_gc_purge_pg.py
+{
+  "SQLite memory store (control)": {
+    "memctl gc": {
+      "exit code": 0,
+      "output": [
+        "GC: deleted_records=1, deleted_candidates=0"
+      ],
+      "rows after": {
+        "old": "confidence 0.600, active",
+        "deleted": "row purged"
+      }
+    }
+  },
+  "PostgreSQL memory store": "skipped: OPENMINION_TEST_POSTGRES_URL not set"
+}
+3.11.11 win32
+
+== dev sources from here on: git checkout 8c0568f7 -- src (6 path differs)
+
+== [dev] pytest -q -p no:cacheprovider --show-capture=no -rfE --tb=line <focused: tests/memory/test_gc_audited_store.py tests/memory/test_gc.py tests/memory/test_gc_evidence.py tests/memory/test_operability.py tests/integration/test_runtime_memory_lifecycle.py>
+46 passed in 6.67s
+
+== [dev] python probe_gc_purge_pg.py
+{
+  "SQLite memory store (control)": {
+    "memctl gc": {
+      "exit code": 0,
+      "output": [
+        "GC: deleted_records=1, deleted_candidates=0"
+      ],
+      "rows after": {
+        "old": "confidence 0.600, active",
+        "deleted": "row purged"
+      }
+    }
+  },
+  "PostgreSQL memory store": "skipped: OPENMINION_TEST_POSTGRES_URL not set"
+}
+3.11.11 win32
+
+== back to the branch head: 0 paths differ
