@@ -1,0 +1,106 @@
+Ubuntu 24.04 GitHub-hosted runner, AliceMessi/linux-runner run 40300312790 (https://github.com/AliceMessi/linux-runner/actions/runs/40300312790), preset openminion with the postgres extra and PostgreSQL 16 (OPENMINION_TEST_POSTGRES_URL set); the script is run390.sh
+head: e0e7b440 docs(changelog): note cleanup after a failed memory assembly build
+dev:  8c0568f7 Merge pull request #425 from openminion/release/0.1.12
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+packages: psycopg 3.3.6;sophiagraph 0.0.12;SQLAlchemy 2.1.6;typer 0.27.3;
+OPENMINION_TEST_POSTGRES_URL set: yes
+
+== [head] pytest <focused>
+77 passed in 7.96s
+
+== [head] pytest -m "not benchmark and not e2e and not postgres and not memory_eval_benchmark and not mcp_live and not package_integration and not telegram_live and not slack_live and not slow" tests/services tests/runtime tests/memory/runtime tests/api
+2657 passed, 7 deselected, 11 warnings in 242.74s (0:04:02)
+
+== [head] pytest -m postgres <postgres>
+26 passed in 6.11s
+
+== dev sources from here on: git checkout 8c0568f70bd54190411da9926861543f166ebcb4 -- src (1 paths differ)
+
+== [dev] pytest <focused>
+FAILED tests/services/runtime/test_memory_assembly.py::test_store_resolution_failure_closes_the_artifact_store - AssertionError: assert [] == ['artifactctl.close']
+FAILED tests/services/runtime/test_memory_assembly.py::test_audit_sink_failure_closes_the_store_it_created_once - AssertionError: assert [] == ['store.close...actctl.close']
+FAILED tests/services/runtime/test_memory_assembly.py::test_later_failure_closes_the_store_through_the_service_once[sqlite] - AssertionError: assert [] == ['store.close...actctl.close']
+FAILED tests/services/runtime/test_memory_assembly.py::test_later_failure_closes_the_store_through_the_service_once[mock] - AssertionError: assert [] == ['store.close...actctl.close']
+FAILED tests/services/runtime/test_memory_assembly.py::test_later_failure_closes_the_store_through_the_service_once[remote] - AssertionError: assert [] == ['store.close...actctl.close']
+FAILED tests/services/runtime/test_memory_assembly.py::test_unregistered_external_adapter_closes_the_artifact_store - AssertionError: assert [] == ['artifactctl.close']
+FAILED tests/services/runtime/test_memory_assembly.py::test_failed_build_keeps_its_error_when_a_close_fails - AssertionError: assert [] == ['store.close...actctl.close']
+FAILED tests/services/runtime/test_memory_assembly.py::test_failed_build_leaves_borrowed_runtime_objects_open - AssertionError: assert [] == ['store.close...actctl.close']
+8 failed, 69 passed in 6.98s
+
+== [dev] pytest -m "not benchmark and not e2e and not postgres and not memory_eval_benchmark and not mcp_live and not package_integration and not telegram_live and not slack_live and not slow" tests/services tests/runtime tests/memory/runtime tests/api
+FAILED tests/services/runtime/test_memory_assembly.py::test_store_resolution_failure_closes_the_artifact_store - AssertionError: assert [] == ['artifactctl.close']
+FAILED tests/services/runtime/test_memory_assembly.py::test_audit_sink_failure_closes_the_store_it_created_once - AssertionError: assert [] == ['store.close...actctl.close']
+FAILED tests/services/runtime/test_memory_assembly.py::test_later_failure_closes_the_store_through_the_service_once[sqlite] - AssertionError: assert [] == ['store.close...actctl.close']
+FAILED tests/services/runtime/test_memory_assembly.py::test_later_failure_closes_the_store_through_the_service_once[mock] - AssertionError: assert [] == ['store.close...actctl.close']
+FAILED tests/services/runtime/test_memory_assembly.py::test_later_failure_closes_the_store_through_the_service_once[remote] - AssertionError: assert [] == ['store.close...actctl.close']
+FAILED tests/services/runtime/test_memory_assembly.py::test_unregistered_external_adapter_closes_the_artifact_store - AssertionError: assert [] == ['artifactctl.close']
+FAILED tests/services/runtime/test_memory_assembly.py::test_failed_build_keeps_its_error_when_a_close_fails - AssertionError: assert [] == ['store.close...actctl.close']
+FAILED tests/services/runtime/test_memory_assembly.py::test_failed_build_leaves_borrowed_runtime_objects_open - AssertionError: assert [] == ['store.close...actctl.close']
+8 failed, 2649 passed, 7 deselected, 11 warnings in 238.59s (0:03:58)
+
+== [dev] pytest -m postgres <postgres>
+FAILED tests/integration/test_runtime_memory_postgres.py::test_failed_memory_assembly_build_disposes_its_postgres_engine_once - assert 0 == 1
+1 failed, 25 passed in 10.81s
+
+== back to the branch head: 0 paths differ
+
+== ruff check .
+All checks passed!
+
+== make format-check
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m ruff format --check "/home/runner/work/linux-runner/linux-runner"
+5124 files already formatted
+
+== make workflow-check
+[INFO] This may take a few minutes...
+Lint GitHub Actions workflow files.......................................Passed
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/action_pins.py
+workflow action pins: clean
+
+== make lint
+
+[OK] Result
+  - method-LOC baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 111, "ceiling": 100, "checked": 20831, "over_ceiling": 111}, "ok": true, "validator": "method_loc"}
+{
+  "checked": 2647,
+  "ok": true,
+  "violations": []
+}
+broad_exception
+
+[INFO] Summary
+  files: 410
+  handlers: 1101
+  silent pass: 106
+  baseline entries: 410
+
+[OK] Result
+  - broad-exception baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 410, "files_with_handlers": 410, "handler_count": 1101, "silent_pass_count": 106}, "ok": true, "validator": "broad_exception"}
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/controlplane_delivery.py
+[coo-09] clean — no synchronous runner deliver regressions
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/webhook_secret.py
+[coo-10] clean — webhook secret-required contract preserved
+Skipping workspace browser tool-family contract validator (not present in standalone checkout).
+make typecheck
+make[1]: Entering directory '/home/runner/work/linux-runner/linux-runner'
+cd "/home/runner/work/linux-runner/linux-runner" && /home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4309; baseline total: 4309
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 290
+[tcr] api: 77 / 77 | monthly quota -50 | next target <= 27 | headroom 0
+[tcr] cli: 309 / 309 | monthly quota -50 | next target <= 259 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 222 / 222 | monthly quota -50 | next target <= 172 | headroom 0
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+make lint exit: 0
+
+== make test-critical
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+482 passed, 4 skipped, 1 warning in 16.85s
