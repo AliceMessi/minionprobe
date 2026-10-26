@@ -1,0 +1,31 @@
+head: 8d71ac50 Merge branch 'dev' into fix/419-text-answer-freshness-finalization
+dev:  a213dcd2 Merge pull request #431 from AliceMessi/fix/413-memctl-inspect-scope
+CPython 3.11.11 SQLite 3.47.1 Windows-10-10.0.22631-SP0
+
+== [head 8d71ac50d5742860334b368e4e82e432eb5ced76] pytest <focused>
+23 passed in 35.53s
+
+== [dev a213dcd247c5b48fa8ee823a9f169236a54ac231] the head's tests/api/test_text_answer_freshness.py on a dev tree, pytest <focused>
+FAILED tests/api/test_text_answer_freshness.py::test_first_entry_text_without_the_required_evidence_is_a_freshness_failure
+FAILED tests/api/test_text_answer_freshness.py::test_continuation_text_without_the_required_evidence_is_a_freshness_failure
+FAILED tests/api/test_text_answer_freshness.py::test_first_entry_text_meeting_its_obligations_is_kept
+FAILED tests/api/test_text_answer_freshness.py::test_first_entry_text_without_freshness_obligations_is_kept
+FAILED tests/api/test_text_answer_freshness.py::test_continuation_text_with_the_turns_live_evidence_is_kept
+FAILED tests/api/test_text_answer_freshness.py::test_evidence_from_an_earlier_turn_does_not_satisfy_the_next_turn
+6 failed, 17 passed in 34.80s
+
+== [ablation A] head without the trace check in _same_turn_evidence (dispatch.py)
+removed: if not trace_id or getattr(state, "turn_evidence_trace_id", None) != trace_id:
+FAILED tests/api/test_text_answer_freshness.py::test_evidence_from_an_earlier_turn_does_not_satisfy_the_next_turn
+1 failed, 6 passed in 22.93s
+
+== [ablation B] head without the record in _autonomous_seeded_result (seeded.py)
+removed: the two turn_evidence assignments
+FAILED tests/api/test_text_answer_freshness.py::test_continuation_text_without_the_required_evidence_is_a_freshness_failure
+FAILED tests/api/test_text_answer_freshness.py::test_continuation_text_with_the_turns_live_evidence_is_kept
+FAILED tests/api/test_text_answer_freshness.py::test_evidence_from_an_earlier_turn_does_not_satisfy_the_next_turn
+3 failed, 4 passed in 23.50s
+
+== ruff check / format --check on the changed Python files (head)
+All checks passed!
+4 files already formatted

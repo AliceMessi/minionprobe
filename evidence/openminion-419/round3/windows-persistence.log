@@ -1,0 +1,39 @@
+head: 8d71ac50 Merge branch 'dev' into fix/419-text-answer-freshness-finalization
+dev:  a213dcd2 Merge pull request #431 from AliceMessi/fix/413-memctl-inspect-scope
+CPython 3.11.11 SQLite 3.47.1 Windows-10-10.0.22631-SP0
+
+== [head 8d71ac50d5742860334b368e4e82e432eb5ced76] pytest <focused> <persistence>
+31 passed in 36.86s
+
+== [dev a213dcd247c5b48fa8ee823a9f169236a54ac231] the head's two test files on a dev tree, pytest <focused> <persistence>
+FAILED tests/api/test_text_answer_freshness.py::test_first_entry_text_without_the_required_evidence_is_a_freshness_failure
+FAILED tests/api/test_text_answer_freshness.py::test_continuation_text_without_the_required_evidence_is_a_freshness_failure
+FAILED tests/api/test_text_answer_freshness.py::test_first_entry_text_meeting_its_obligations_is_kept
+FAILED tests/api/test_text_answer_freshness.py::test_first_entry_text_without_freshness_obligations_is_kept
+FAILED tests/api/test_text_answer_freshness.py::test_continuation_text_with_the_turns_live_evidence_is_kept
+FAILED tests/api/test_text_answer_freshness.py::test_evidence_from_an_earlier_turn_does_not_satisfy_the_next_turn
+ERROR tests/brain/test_turn_evidence_persistence.py
+6 failed, 17 passed, 1 error in 35.45s
+
+== [ablation C] head with both fields excluded from the saved state
+edited: turn_evidence_trace_id: str | None = None -> turn_evidence_trace_id: str | None = Field(default=None, exclude=True)
+edited: turn_evidence: ActionResult | None = None -> turn_evidence: ActionResult | None = Field(default=None, exclude=True)
+FAILED tests/brain/test_turn_evidence_persistence.py::test_a_state_saved_before_turn_evidence_loads_without_evidence[sqlite]
+FAILED tests/brain/test_turn_evidence_persistence.py::test_a_state_saved_before_turn_evidence_loads_without_evidence[local]
+FAILED tests/brain/test_turn_evidence_persistence.py::test_saved_turn_evidence_keeps_its_trace_id[sqlite]
+FAILED tests/brain/test_turn_evidence_persistence.py::test_saved_turn_evidence_keeps_its_trace_id[local]
+FAILED tests/brain/test_turn_evidence_persistence.py::test_every_saved_state_writes_both_fields[sqlite]
+FAILED tests/brain/test_turn_evidence_persistence.py::test_every_saved_state_writes_both_fields[local]
+6 failed, 2 passed in 0.64s
+
+== [ablation D] head with WorkingState ignoring unknown fields
+edited: class WorkingState(BaseModel):
+    model_config = ConfigDict(extra="forbid") -> class WorkingState(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+FAILED tests/brain/test_turn_evidence_persistence.py::test_a_field_the_reader_does_not_define_is_still_rejected[sqlite]
+FAILED tests/brain/test_turn_evidence_persistence.py::test_a_field_the_reader_does_not_define_is_still_rejected[local]
+2 failed, 6 passed in 0.59s
+
+== ruff check / format --check on the new test file (head)
+All checks passed!
+1 file already formatted
