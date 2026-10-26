@@ -11,3 +11,5 @@ Files:
   - `ruff check .`, `make format-check`, `make workflow-check`, `make lint`, `make test-critical`.
 - `windows.log`, from `windows419.sh`: native Windows 11, CPython 3.11.11: the focused tests plus the freshness enforcement and routing tests (39 passed on the head; the same 4 failed on `dev` sources) and the issue's probe on both trees.
 - `run-linux-testci.log`, from `testci.sh`: the full `make test-ci` on the branch head. Run 40297718824: 1 failed, 20357 passed, 29 skipped, 1361 deselected. The failure is `test_unreachable_db_raises_with_redacted_url`, which times out (60 s, unroutable `192.0.2.1`) only when the `postgres` extra (psycopg) is installed, on `dev` too (see `../openminion-408/run-linux-dev-pg-timeout-test.log`).
+
+Round 2 (review of `7e8eba5e`: same-turn evidence for a continuation's text answer, head `1d4d4d15` on `dev` @ `773491f2`): [`round2/`](round2).

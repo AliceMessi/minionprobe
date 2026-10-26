@@ -1,0 +1,33 @@
+head: 1d4d4d15 Merge remote-tracking branch 'upstream/dev' into fix/419-text-answer-freshness-finalization
+dev:  773491f2 Merge pull request #428 from AliceMessi/fix/412-storagectl-restore-dispatch
+CPython 3.12.11 SQLite 3.50.4 Windows-11-10.0.22631-SP0
+
+== [head 1d4d4d155803ed8c00a60f44e480c1c184cff9a3] pytest <focused>
+23 passed, 1 warning in 30.87s
+
+== [dev 773491f299815677e3dc0872a0ddc79a769d0927] the head's tests/api/test_text_answer_freshness.py on a dev tree, pytest <focused>
+FAILED tests/api/test_text_answer_freshness.py::test_first_entry_text_without_the_required_evidence_is_a_freshness_failure
+FAILED tests/api/test_text_answer_freshness.py::test_continuation_text_without_the_required_evidence_is_a_freshness_failure
+FAILED tests/api/test_text_answer_freshness.py::test_first_entry_text_meeting_its_obligations_is_kept
+FAILED tests/api/test_text_answer_freshness.py::test_first_entry_text_without_freshness_obligations_is_kept
+FAILED tests/api/test_text_answer_freshness.py::test_continuation_text_with_the_turns_live_evidence_is_kept
+FAILED tests/api/test_text_answer_freshness.py::test_evidence_from_an_earlier_turn_does_not_satisfy_the_next_turn
+6 failed, 17 passed, 1 warning in 30.58s
+
+== [ablation A] head without the trace check in _same_turn_evidence (dispatch.py)
+removed: if not trace_id or getattr(state, "turn_evidence_trace_id", None) != trace_id:
+FAILED tests/api/test_text_answer_freshness.py::test_evidence_from_an_earlier_turn_does_not_satisfy_the_next_turn
+1 failed, 6 passed, 1 warning in 20.73s
+
+== [ablation B] head without the record in _autonomous_seeded_result (seeded.py)
+removed: the two turn_evidence assignments
+     +      where "openminion: I couldn't provide a grounded current shopping answer because Missing live-data evidence for a freshness-sensitive answer.. Please retry with live data available so I ca ...
+FAILED tests/api/test_text_answer_freshness.py::test_continuation_text_without_the_required_evidence_is_a_freshness_failure
+FAILED tests/api/test_text_answer_freshness.py::test_continuation_text_with_the_turns_live_evidence_is_kept
+FAILED tests/api/test_text_answer_freshness.py::test_evidence_from_an_earlier_turn_does_not_satisfy_the_next_turn
+3 failed, 4 passed, 1 warning in 21.31s
+
+== ruff check / format --check on the changed Python files (head; ruff from another local venv, the test venv has none)
+ruff ruff 0.15.22
+All checks passed!
+4 files already formatted
