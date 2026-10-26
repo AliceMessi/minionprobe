@@ -1,0 +1,227 @@
+fix/412-storagectl-restore-dispatch @ 962005ab0ef03dc7c739738d4e8cfca0489ec0f6 (worktree clean: True) and dev @ 8c0568f70bd54190411da9926861543f166ebcb4
+native Windows 11 Pro 10.0.22631.6199, CPython 3.11.11 SQLite 3.47.1, PYTHONPATH="src;."
+probe sha256: ee295c7a48abd09409d57fdbced12afcc60933121fd7bb97706fff4c2a10a7ee
+
+== [head] pytest -q -p no:cacheprovider -p no:logging --show-capture=no -rfE --tb=line <focused: tests/storage/test_storagectl_restore.py tests/storage/test_storagectl_cli.py tests/storage/test_module_ops.py tests/storage/test_cli_progress_wiring.py tests/storage/test_omx_roundtrip.py tests/storage/test_dr_drill.py tests/modules/test_modules_layout_characterization.py>
+92 passed in 7.88s
+
+== [head] the issue's probe: python probe_storagectl_restore.py
+{
+  "setup": {
+    "migrate and backup exit codes": [
+      0,
+      0
+    ],
+    "snapshot marker": "before-backup",
+    "snapshot tables": 25
+  },
+  "A. storagectl restore onto the live database": {
+    "exit code": 0,
+    "printed ok": true,
+    "last stderr line": "",
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "B. storagectl restore onto a new path": {
+    "exit code": 0,
+    "printed ok": true,
+    "last stderr line": "",
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "C. control: MigrationRunner.restore onto the live database": {
+    "exit code": 0,
+    "last stderr line": "",
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "D. control: MigrationRunner.restore onto a new path": {
+    "exit code": 0,
+    "last stderr line": "",
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "E. trace: storagectl restore onto the live database, in-process": {
+    "output": [
+      "REPLACE onto the target: 0 connection(s) open on it; -wal: none bytes",
+      "TARGET right after the replace: equals the snapshot: True",
+      "TARGET after MigrationRunner.detect: equals the snapshot: True",
+      "TARGET after cli.main returned: equals the snapshot: True",
+      "EXIT 0"
+    ],
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "E. trace: storagectl restore onto a new path, in-process": {
+    "output": [
+      "REPLACE onto the target: 0 connection(s) open on it; -wal: none bytes",
+      "TARGET right after the replace: equals the snapshot: True",
+      "TARGET after MigrationRunner.detect: equals the snapshot: True",
+      "TARGET after cli.main returned: equals the snapshot: True",
+      "EXIT 0"
+    ],
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  }
+}
+3.11.11 win32 SQLite 3.47.1
+
+== dev sources from here on: git checkout 8c0568f7 -- src (1 path differs)
+
+== [dev] pytest -q -p no:cacheprovider -p no:logging --show-capture=no -rfE --tb=line <focused: tests/storage/test_storagectl_restore.py tests/storage/test_storagectl_cli.py tests/storage/test_module_ops.py tests/storage/test_cli_progress_wiring.py tests/storage/test_omx_roundtrip.py tests/storage/test_dr_drill.py tests/modules/test_modules_layout_characterization.py>
+C:\Users\User\AppData\Roaming\uv\python\cpython-3.11.11-windows-x86_64-none\Lib\pathlib.py:1188: PermissionError: [WinError 5] (localized message trimmed): 'C:\\Users\\User\\AppData\\Local\\Temp\\pytest-of-User\\pytest-1031\\test_storagectl_restore_replac0\\session.db.restore.tmp' -> 'C:\\Users\\Use
+C:\Users\User\AppData\Roaming\uv\python\cpython-3.11.11-windows-x86_64-none\Lib\pathlib.py:1188: PermissionError: [WinError 5] (localized message trimmed): 'C:\\Users\\User\\AppData\\Local\\Temp\\pytest-of-User\\pytest-1031\\test_storagectl_restore_replac1\\restored.db.restore.tmp' -> 'C:\\Users\\Us
+C:\Users\User\Downloads\agentprize\projects\cortensor-hackathon-5\om-412\tests\storage\test_storagectl_restore.py:180: AssertionError: assert not True
+C:\Users\User\AppData\Roaming\uv\python\cpython-3.11.11-windows-x86_64-none\Lib\pathlib.py:1188: PermissionError: [WinError 5] (localized message trimmed): 'C:\\Users\\User\\AppData\\Local\\Temp\\pytest-of-User\\pytest-1031\\test_storagectl_backup_restore0\\restored.db.restore.tmp' -> 'C:\\Users\\Us
+C:\Users\User\AppData\Roaming\uv\python\cpython-3.11.11-windows-x86_64-none\Lib\pathlib.py:1188: PermissionError: [WinError 5] (localized message trimmed): 'C:\\Users\\User\\AppData\\Local\\Temp\\pytest-of-User\\pytest-1031\\test_backup_restore_round_trip0\\secrets.db.restore.tmp' -> 'C:\\Users\\Use
+FAILED tests/storage/test_storagectl_restore.py::test_storagectl_restore_replaces_the_target_with_the_snapshot[existing-target]
+FAILED tests/storage/test_storagectl_restore.py::test_storagectl_restore_replaces_the_target_with_the_snapshot[new-target]
+FAILED tests/storage/test_storagectl_restore.py::test_storagectl_restore_from_a_missing_snapshot_leaves_the_target_alone[new-target]
+FAILED tests/storage/test_storagectl_cli.py::test_storagectl_backup_restore_roundtrip
+FAILED tests/storage/test_module_ops.py::TestCLIOpsWiring::test_backup_restore_round_trip
+5 failed, 87 passed in 6.21s
+
+== [dev] the issue's probe: python probe_storagectl_restore.py
+{
+  "setup": {
+    "migrate and backup exit codes": [
+      0,
+      0
+    ],
+    "snapshot marker": "before-backup",
+    "snapshot tables": 25
+  },
+  "A. storagectl restore onto the live database": {
+    "exit code": 1,
+    "printed ok": null,
+    "last stderr line": "PermissionError: [WinError 5] (localized message trimmed)",
+    "target afterwards": {
+      "file exists": true,
+      "marker": "after-backup",
+      "bytes equal the snapshot": false,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": [
+        "session.db.restore.tmp"
+      ]
+    }
+  },
+  "B. storagectl restore onto a new path": {
+    "exit code": 1,
+    "printed ok": null,
+    "last stderr line": "PermissionError: [WinError 5] (localized message trimmed)",
+    "target afterwards": {
+      "file exists": true,
+      "marker": "(none: no such table: probe_marker)",
+      "bytes equal the snapshot": false,
+      "snapshot tables missing": 22,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": [
+        "restored-b.db.restore.tmp"
+      ]
+    }
+  },
+  "C. control: MigrationRunner.restore onto the live database": {
+    "exit code": 0,
+    "last stderr line": "",
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "D. control: MigrationRunner.restore onto a new path": {
+    "exit code": 0,
+    "last stderr line": "",
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "E. trace: storagectl restore onto the live database, in-process": {
+    "output": [
+      "REPLACE onto the target: 1 connection(s) open on it; -wal: 0 bytes",
+      "  HOLDER openminion/modules/storage/record_store.py:323 __init__ <- openminion/modules/storage/backends/registry.py:157 _sqlite_record_factory <- openminion/modules/storage/backends/registry.py:149 _create_backend <- openminion/modules/storage/backends/registry.py:56 create_record <- openminion/modules/storage/engine.py:339 from_config <- openminion/modules/storage/engine.py:427 from_paths <- openminion/modules/storage/cli.py:102 main",
+      "REPLACE raised PermissionError winerror=5",
+      "RAISED PermissionError",
+      "TARGET after cli.main returned: equals the snapshot: False",
+      "EXIT 1"
+    ],
+    "target afterwards": {
+      "file exists": true,
+      "marker": "after-backup",
+      "bytes equal the snapshot": false,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": [
+        "session.db.restore.tmp"
+      ]
+    }
+  },
+  "E. trace: storagectl restore onto a new path, in-process": {
+    "output": [
+      "REPLACE onto the target: 1 connection(s) open on it; -wal: 103032 bytes",
+      "  HOLDER openminion/modules/storage/record_store.py:323 __init__ <- openminion/modules/storage/backends/registry.py:157 _sqlite_record_factory <- openminion/modules/storage/backends/registry.py:149 _create_backend <- openminion/modules/storage/backends/registry.py:56 create_record <- openminion/modules/storage/engine.py:339 from_config <- openminion/modules/storage/engine.py:427 from_paths <- openminion/modules/storage/cli.py:102 main",
+      "REPLACE raised PermissionError winerror=5",
+      "RAISED PermissionError",
+      "TARGET after cli.main returned: equals the snapshot: False",
+      "EXIT 1"
+    ],
+    "target afterwards": {
+      "file exists": true,
+      "marker": "(none: no such table: probe_marker)",
+      "bytes equal the snapshot": false,
+      "snapshot tables missing": 22,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": [
+        "restored-e.db.restore.tmp"
+      ]
+    }
+  }
+}
+3.11.11 win32 SQLite 3.47.1
+
+== back to the branch head: 0 paths differ

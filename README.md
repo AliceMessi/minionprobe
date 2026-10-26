@@ -8,7 +8,7 @@ Built for [Cortensor Hackathon #5](https://dorahacks.io/hackathon/2418/detail). 
 
 **Impact so far (25 Oct 2026):**
 - **28 bugs filed upstream** from MinionProbe runs and follow-up probes (the latest, [#412](https://github.com/openminion/openminion/issues/412) and [#413](https://github.com/openminion/openminion/issues/413), on 25 Oct: production cases found while fixing #408 and #402, which the maintainer asked us to report on their own).
-- **21 fix PRs by us merged** into OpenMinion `dev` (table in [Fix PRs](#fix-prs-bug-fix-bonus)). The fixes that shipped were re-verified on the released packages: `openminion==0.1.10` ([evidence](evidence/openminion-0.1.10-verification)) and `openminion==0.1.11`, which ships seven more of our fixes ([evidence](evidence/openminion-0.1.11-verification); every check passed for #352, #353, #361, #365, #368, #373, #378).
+- **32 fix PRs by us merged** into OpenMinion `dev` (table in [Fix PRs](#fix-prs-bug-fix-bonus)). The fixes that shipped were re-verified on the released packages: `openminion==0.1.10` ([evidence](evidence/openminion-0.1.10-verification)) and `openminion==0.1.11`, which ships seven more of our fixes ([evidence](evidence/openminion-0.1.11-verification); every check passed for #352, #353, #361, #365, #368, #373, #378).
 - **8 more issues** opened by the maintainer while reviewing our PRs were taken on: all 8 merged (including #372, the run-status facts table with migration 13, #380 for #368, #385 for #364 with migration 14, and #406 for #369 with migration 15).
 
 ▶ **Demo video (2:10):** https://youtu.be/5aBN0y6YQeA. It shows an offline run, the matrix, bug #324 reproduced live, the triage agent and the filed issues. Terminal scenes are replays of real captured runs.

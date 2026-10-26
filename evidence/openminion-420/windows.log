@@ -1,0 +1,59 @@
+fix/420-cron-capture-extractor-adapter @ 14f1fbe7b82509b469b4a25b24886516112011de (worktree clean: True) and dev @ 8c0568f70bd54190411da9926861543f166ebcb4
+native Windows 11 Pro 10.0.22631.6199, CPython 3.11.11 SQLite 3.47.1, PYTHONPATH="src;."
+415e2755eaa9118e75a47bbabc7d5df1e67066f272523162f687940965731563 *probe_cron_capture_recovery.py
+f9ec8e8226e2f2da825631a37383d29412cb22a5b0eebd56611da1ba11ecbead *probe_cron_recovery_turn.py
+
+== [head] pytest -q -p no:cacheprovider -p no:logging --show-capture=no -rfE --tb=line <focused: tests/runtime/test_cron_capture_recovery.py tests/runtime/test_cron_turn_executor.py tests/memory/runtime/test_capture_recovery.py tests/memory/test_external_backend_capture.py tests/services/agent/test_execution_resources_memory.py>
+53 passed in 25.37s
+
+== [head] python probe_cron_capture_recovery.py
+turn: completed
+runtime_manager: AgentRuntimeManager
+has list_registered_agents: True
+agent_id: openminion
+execute raised: KeyError 'run_id'
+  frames: ['probe_cron_capture_recovery.py:41 <module>', 'executor.py:152 execute', 'executor.py:514 _execute_agent_turn', 'executor.py:755 _request_payload', 'cron_payloads.py:403 build_cron_request_payload']
+recovery with keyword arguments raised: TypeError SessionStore.append_event() got an unexpected keyword argument 'actor_type'
+  frames: ['afe.py:33 extract_user_message_candidates', 'afe.py:75 _build_afe_config_data', 'afe.py:277 _emit_afe_skipped', 'events.py:127 emit']
+
+== [head] python probe_cron_recovery_turn.py
+turn: completed
+runtime_manager: AgentRuntimeManager
+has list_registered_agents: True
+agent_id: openminion
+recovery result: CaptureRecoveryResult(scanned=1, recovered=0, pending=1)
+[09:07:39Z] openminion: consolidate (thinking=minimal)
+execute returned: summary 'openminion: consolidate (thinking=minimal)' isolated_session_id cron-session watermark scope agent:openminion
+recovery with keyword arguments raised: TypeError SessionStore.append_event() got an unexpected keyword argument 'actor_type'
+  frames: ['afe.py:33 extract_user_message_candidates', 'afe.py:75 _build_afe_config_data', 'afe.py:277 _emit_afe_skipped', 'events.py:127 emit']
+
+== dev sources from here on: git checkout 8c0568f7 -- src (1 path differs)
+
+== [dev] pytest -q -p no:cacheprovider -p no:logging --show-capture=no -rfE --tb=line <focused: tests/runtime/test_cron_capture_recovery.py tests/runtime/test_cron_turn_executor.py tests/memory/runtime/test_capture_recovery.py tests/memory/test_external_backend_capture.py tests/services/agent/test_execution_resources_memory.py>
+C:\Users\User\Downloads\agentprize\projects\cortensor-hackathon-5\om-420\tests\runtime\test_cron_capture_recovery.py:131: TypeError: BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given
+C:\Users\User\Downloads\agentprize\projects\cortensor-hackathon-5\om-420\tests\runtime\test_cron_capture_recovery.py:131: TypeError: BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given
+FAILED tests/runtime/test_cron_capture_recovery.py::test_consolidation_run_recovers_a_pending_intent_and_runs_its_turn
+FAILED tests/runtime/test_cron_capture_recovery.py::test_consolidation_run_keeps_an_unsupported_capture_pending
+2 failed, 51 passed in 24.10s
+
+== [dev] python probe_cron_capture_recovery.py
+turn: completed
+runtime_manager: AgentRuntimeManager
+has list_registered_agents: True
+agent_id: openminion
+execute raised: TypeError BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given
+  frames: ['executor.py:126 execute', 'executor.py:475 _execute_agent_turn', 'assembly.py:84 recover_pending_captures', 'capture_recovery.py:40 recover_pending_capture_bundles', 'capture_recovery.py:143 _recover_capture']
+recovery with keyword arguments raised: TypeError SessionStore.append_event() got an unexpected keyword argument 'actor_type'
+  frames: ['afe.py:33 extract_user_message_candidates', 'afe.py:75 _build_afe_config_data', 'afe.py:277 _emit_afe_skipped', 'events.py:127 emit']
+
+== [dev] python probe_cron_recovery_turn.py
+turn: completed
+runtime_manager: AgentRuntimeManager
+has list_registered_agents: True
+agent_id: openminion
+execute raised: TypeError BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given
+  frames: ['executor.py:475 _execute_agent_turn', 'probe_cron_recovery_turn.py:49 <lambda>', 'assembly.py:84 recover_pending_captures', 'capture_recovery.py:40 recover_pending_capture_bundles', 'capture_recovery.py:143 _recover_capture']
+recovery with keyword arguments raised: TypeError SessionStore.append_event() got an unexpected keyword argument 'actor_type'
+  frames: ['afe.py:33 extract_user_message_candidates', 'afe.py:75 _build_afe_config_data', 'afe.py:277 _emit_afe_skipped', 'events.py:127 emit']
+
+== back to the branch head: 0 paths differ

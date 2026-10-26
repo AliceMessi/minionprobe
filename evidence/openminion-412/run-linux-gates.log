@@ -1,0 +1,294 @@
+Ubuntu 24.04 GitHub-hosted runner, AliceMessi/linux-runner run 40297616770 (https://github.com/AliceMessi/linux-runner/actions/runs/40297616770), preset openminion with the postgres extra and PostgreSQL 16; the script is run412.sh
+head: 962005ab docs(changelog): note storagectl restore without the engine on the target
+dev:  8c0568f7 Merge pull request #425 from openminion/release/0.1.12
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+packages: psycopg 3.3.6;sophiagraph 0.0.12;SQLAlchemy 2.1.6;typer 0.27.3;
+OPENMINION_TEST_POSTGRES_URL set: yes
+ee295c7a48abd09409d57fdbced12afcc60933121fd7bb97706fff4c2a10a7ee  /tmp/ev/probe_storagectl_restore.py
+
+== [head] pytest <focused>
+92 passed in 1.41s
+
+== [head] pytest -m "not benchmark and not e2e and not postgres and not memory_eval_benchmark and not mcp_live and not package_integration and not telegram_live and not slack_live and not slow" tests/storage tests/cli
+tests/cli/test_status_telemetry_command.py::test_status_telemetry_failed_and_opaque_lookup
+  /home/runner/work/linux-runner/linux-runner/src/openminion/base/config/paths.py:54: RuntimeWarning: telemetry_db_path must be under data_root (/tmp/pytest-of-runner/pytest-1/test_status_telemetry_failed_a0/.openminion), got /tmp/pytest-of ...
+FAILED tests/storage/test_startup_validation.py::TestValidatePostgresConnectionFailure::test_unreachable_db_raises_with_redacted_url - Failed: Timeout (>60.0s) from pytest-timeout.
+1 failed, 2118 passed, 3 skipped, 57 deselected, 8 warnings in 102.36s (0:01:42)
+
+== [head] the issue's probe: PYTHONPATH=src:. python probe_storagectl_restore.py
+{
+  "setup": {
+    "migrate and backup exit codes": [
+      0,
+      0
+    ],
+    "snapshot marker": "before-backup",
+    "snapshot tables": 25
+  },
+  "A. storagectl restore onto the live database": {
+    "exit code": 0,
+    "printed ok": true,
+    "last stderr line": "",
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "B. storagectl restore onto a new path": {
+    "exit code": 0,
+    "printed ok": true,
+    "last stderr line": "",
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "C. control: MigrationRunner.restore onto the live database": {
+    "exit code": 0,
+    "last stderr line": "",
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "D. control: MigrationRunner.restore onto a new path": {
+    "exit code": 0,
+    "last stderr line": "",
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "E. trace: storagectl restore onto the live database, in-process": {
+    "output": [
+      "REPLACE onto the target: 0 connection(s) open on it; -wal: none bytes",
+      "TARGET right after the replace: equals the snapshot: True",
+      "TARGET after MigrationRunner.detect: equals the snapshot: True",
+      "TARGET after cli.main returned: equals the snapshot: True",
+      "EXIT 0"
+    ],
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "E. trace: storagectl restore onto a new path, in-process": {
+    "output": [
+      "REPLACE onto the target: 0 connection(s) open on it; -wal: none bytes",
+      "TARGET right after the replace: equals the snapshot: True",
+      "TARGET after MigrationRunner.detect: equals the snapshot: True",
+      "TARGET after cli.main returned: equals the snapshot: True",
+      "EXIT 0"
+    ],
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  }
+}
+3.11.17 linux SQLite 3.45.1
+
+== dev sources from here on: git checkout 8c0568f70bd54190411da9926861543f166ebcb4 -- src (1 paths differ)
+
+== [dev] pytest <focused>
+FAILED tests/storage/test_storagectl_restore.py::test_storagectl_restore_replaces_the_target_with_the_snapshot[new-target] - assert {'application...r_version': 0} == {'application...r_version': 0}
+  -         '      error_json           TEXT,\n'
+  -         '      error_json          TEXT,\n'
+FAILED tests/storage/test_storagectl_restore.py::test_storagectl_restore_from_a_missing_snapshot_leaves_the_target_alone[new-target] - AssertionError: assert not True
+2 failed, 90 passed in 1.12s
+
+== [dev] pytest -m "not benchmark and not e2e and not postgres and not memory_eval_benchmark and not mcp_live and not package_integration and not telegram_live and not slack_live and not slow" tests/storage tests/cli
+tests/cli/test_status_telemetry_command.py::test_status_telemetry_failed_and_opaque_lookup
+  /home/runner/work/linux-runner/linux-runner/src/openminion/base/config/paths.py:54: RuntimeWarning: telemetry_db_path must be under data_root (/tmp/pytest-of-runner/pytest-3/test_status_telemetry_failed_a0/.openminion), got /tmp/pytest-of ...
+FAILED tests/storage/test_startup_validation.py::TestValidatePostgresConnectionFailure::test_unreachable_db_raises_with_redacted_url - Failed: Timeout (>60.0s) from pytest-timeout.
+FAILED tests/storage/test_storagectl_restore.py::test_storagectl_restore_replaces_the_target_with_the_snapshot[new-target] - assert {'application...r_version': 0} == {'application...r_version': 0}
+  -         '      error_json           TEXT,\n'
+  -         '      error_json          TEXT,\n'
+FAILED tests/storage/test_storagectl_restore.py::test_storagectl_restore_from_a_missing_snapshot_leaves_the_target_alone[new-target] - AssertionError: assert not True
+3 failed, 2116 passed, 3 skipped, 57 deselected, 8 warnings in 97.50s (0:01:37)
+
+== [dev] the issue's probe: PYTHONPATH=src:. python probe_storagectl_restore.py
+{
+  "setup": {
+    "migrate and backup exit codes": [
+      0,
+      0
+    ],
+    "snapshot marker": "before-backup",
+    "snapshot tables": 25
+  },
+  "A. storagectl restore onto the live database": {
+    "exit code": 0,
+    "printed ok": true,
+    "last stderr line": "",
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "B. storagectl restore onto a new path": {
+    "exit code": 0,
+    "printed ok": true,
+    "last stderr line": "",
+    "target afterwards": {
+      "file exists": true,
+      "marker": "(none: no such table: probe_marker)",
+      "bytes equal the snapshot": false,
+      "snapshot tables missing": 22,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "C. control: MigrationRunner.restore onto the live database": {
+    "exit code": 0,
+    "last stderr line": "",
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "D. control: MigrationRunner.restore onto a new path": {
+    "exit code": 0,
+    "last stderr line": "",
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "E. trace: storagectl restore onto the live database, in-process": {
+    "output": [
+      "REPLACE onto the target: 1 connection(s) open on it; -wal: 0 bytes",
+      "  HOLDER openminion/modules/storage/record_store.py:323 __init__ <- openminion/modules/storage/backends/registry.py:157 _sqlite_record_factory <- openminion/modules/storage/backends/registry.py:149 _create_backend <- openminion/modules/storage/backends/registry.py:56 create_record <- openminion/modules/storage/engine.py:339 from_config <- openminion/modules/storage/engine.py:427 from_paths <- openminion/modules/storage/cli.py:102 main",
+      "TARGET right after the replace: equals the snapshot: True",
+      "TARGET after MigrationRunner.detect: equals the snapshot: True",
+      "TARGET after cli.main returned: equals the snapshot: True",
+      "EXIT 0"
+    ],
+    "target afterwards": {
+      "file exists": true,
+      "marker": "before-backup",
+      "bytes equal the snapshot": true,
+      "snapshot tables missing": 0,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  },
+  "E. trace: storagectl restore onto a new path, in-process": {
+    "output": [
+      "REPLACE onto the target: 1 connection(s) open on it; -wal: 103032 bytes",
+      "  HOLDER openminion/modules/storage/record_store.py:323 __init__ <- openminion/modules/storage/backends/registry.py:157 _sqlite_record_factory <- openminion/modules/storage/backends/registry.py:149 _create_backend <- openminion/modules/storage/backends/registry.py:56 create_record <- openminion/modules/storage/engine.py:339 from_config <- openminion/modules/storage/engine.py:427 from_paths <- openminion/modules/storage/cli.py:102 main",
+      "TARGET right after the replace: equals the snapshot: True",
+      "TARGET after MigrationRunner.detect: equals the snapshot: False",
+      "TARGET after cli.main returned: equals the snapshot: False",
+      "EXIT 0"
+    ],
+    "target afterwards": {
+      "file exists": true,
+      "marker": "(none: no such table: probe_marker)",
+      "bytes equal the snapshot": false,
+      "snapshot tables missing": 22,
+      "tables not in the snapshot": 0,
+      "leftover *.restore.tmp": []
+    }
+  }
+}
+3.11.17 linux SQLite 3.45.1
+
+== back to the branch head: 0 paths differ
+
+== ruff check .
+All checks passed!
+
+== make format-check
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m ruff format --check "/home/runner/work/linux-runner/linux-runner"
+5125 files already formatted
+
+== make workflow-check
+[INFO] This may take a few minutes...
+Lint GitHub Actions workflow files.......................................Passed
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/action_pins.py
+workflow action pins: clean
+
+== make lint
+
+[OK] Result
+  - method-LOC baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 111, "ceiling": 100, "checked": 20828, "over_ceiling": 111}, "ok": true, "validator": "method_loc"}
+{
+  "checked": 2647,
+  "ok": true,
+  "violations": []
+}
+broad_exception
+
+[INFO] Summary
+  files: 410
+  handlers: 1101
+  silent pass: 106
+  baseline entries: 410
+
+[OK] Result
+  - broad-exception baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 410, "files_with_handlers": 410, "handler_count": 1101, "silent_pass_count": 106}, "ok": true, "validator": "broad_exception"}
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/controlplane_delivery.py
+[coo-09] clean — no synchronous runner deliver regressions
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/webhook_secret.py
+[coo-10] clean — webhook secret-required contract preserved
+Skipping workspace browser tool-family contract validator (not present in standalone checkout).
+make typecheck
+make[1]: Entering directory '/home/runner/work/linux-runner/linux-runner'
+cd "/home/runner/work/linux-runner/linux-runner" && /home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4309; baseline total: 4309
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 290
+[tcr] api: 77 / 77 | monthly quota -50 | next target <= 27 | headroom 0
+[tcr] cli: 309 / 309 | monthly quota -50 | next target <= 259 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 222 / 222 | monthly quota -50 | next target <= 172 | headroom 0
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+make lint exit: 0
+
+== make test-critical
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+482 passed, 4 skipped, 1 warning in 10.79s
