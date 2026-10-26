@@ -1,0 +1,171 @@
+Ubuntu 24.04 GitHub-hosted runner, AliceMessi/linux-runner run 40297698475 (https://github.com/AliceMessi/linux-runner/actions/runs/40297698475), preset openminion with the postgres extra and PostgreSQL 16; the script is run419.sh
+head: 7e8eba5e docs(changelog): note freshness checks for text entry answers
+dev:  8c0568f7 Merge pull request #425 from openminion/release/0.1.12
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+packages: psycopg 3.3.6;sophiagraph 0.0.12;SQLAlchemy 2.1.6;typer 0.27.3;
+OPENMINION_TEST_POSTGRES_URL set: yes
+452ed05e549bc954ddb3f2506a610829abb401f1fb79f27ef5e8d999301f29ea  /tmp/ev/probe_text_answer_freshness.py
+
+== [head] pytest <focused>
+21 passed in 13.17s
+
+== [head] pytest <related>
+469 passed, 1 warning in 21.55s
+
+== [head] pytest -m "not benchmark and not e2e and not postgres and not memory_eval_benchmark and not mcp_live and not package_integration and not telegram_live and not slack_live and not slow" tests/brain tests/api tests/modules/brain
+4914 passed, 1 skipped, 2 warnings in 200.44s (0:03:20)
+
+== [head] the issue's probe: PYTHONPATH=src:. python probe_text_answer_freshness.py
+openminion 0.1.12, checkout 7e8eba5e, python 3.11.17 linux
+
+== T0_first_entry_text
+  {"at": "entry freshness", "user_input": "Check order A-104", "entry_response": "text", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "respond", "reason_code": "entry_text_response"}
+  {"at": "verify_freshness_answer", "module": "execution.closure.base", "caller": "final_close_message", "result": ["Missing live-data evidence for a freshness-sensitive answer.", "Missing exact-date evidence for an exact-date freshness answer."]}
+tool executions: []
+result.text: "openminion: I couldn't provide a grounded current shopping answer because Missing live-data evidence for a freshness-sensitive answer.; Missing exact-date evidence for an exact-date freshness answer.. Please retry with live data available so I can answer with sources and an exact date."
+
+== T1_continuation_text
+  {"at": "entry freshness", "user_input": "Check order A-104", "entry_response": "tool call", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "act", "reason_code": "entry_tool_call"}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_apply_freshness_guard", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_emit_closure_completed", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "entry freshness", "user_input": null, "entry_response": "text", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "respond", "reason_code": "entry_text_response"}
+  {"at": "verify_freshness_answer", "module": "execution.closure.base", "caller": "final_close_message", "result": ["Missing live-data evidence for a freshness-sensitive answer.", "Missing exact-date evidence for an exact-date freshness answer."]}
+tool executions: ['A-104']
+result.text: "openminion: I couldn't provide a grounded current shopping answer because Missing live-data evidence for a freshness-sensitive answer.; Missing exact-date evidence for an exact-date freshness answer.. Please retry with live data available so I can answer with sources and an exact date."
+
+== C_control_continuation_tool
+  {"at": "entry freshness", "user_input": "Check order A-104", "entry_response": "tool call", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "act", "reason_code": "entry_tool_call"}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_apply_freshness_guard", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_emit_closure_completed", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "entry freshness", "user_input": null, "entry_response": "tool call", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "act", "reason_code": "entry_tool_call"}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_apply_freshness_guard", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_emit_closure_completed", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "entry freshness", "user_input": null, "entry_response": "text", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "respond", "reason_code": "entry_text_response"}
+  {"at": "verify_freshness_answer", "module": "execution.closure.base", "caller": "final_close_message", "result": ["Missing live-data evidence for a freshness-sensitive answer.", "Missing exact-date evidence for an exact-date freshness answer."]}
+tool executions: ['A-104', 'A-104']
+result.text: "openminion: I couldn't provide a grounded current shopping answer because Missing live-data evidence for a freshness-sensitive answer.; Missing exact-date evidence for an exact-date freshness answer.. Please retry with live data available so I can answer with sources and an exact date."
+
+non-loopback connections attempted: 0
+
+== dev sources from here on: git checkout 8c0568f70bd54190411da9926861543f166ebcb4 -- src (1 paths differ)
+
+== [dev] pytest <focused>
+FAILED tests/api/test_text_answer_freshness.py::test_first_entry_text_without_the_required_evidence_is_a_freshness_failure - AssertionError: assert [] == [{'answer': '...itive': True}]
+FAILED tests/api/test_text_answer_freshness.py::test_continuation_text_without_the_required_evidence_is_a_freshness_failure - AssertionError: assert [] == [{'answer': '...itive': True}]
+FAILED tests/api/test_text_answer_freshness.py::test_first_entry_text_meeting_its_obligations_is_kept - AssertionError: assert [] == [{'answer': '...itive': True}]
+FAILED tests/api/test_text_answer_freshness.py::test_first_entry_text_without_freshness_obligations_is_kept - AssertionError: assert [] == [{'answer': '...tive': False}]
+4 failed, 17 passed in 12.10s
+
+== [dev] pytest <related>
+469 passed, 1 warning in 20.63s
+
+== [dev] pytest -m "not benchmark and not e2e and not postgres and not memory_eval_benchmark and not mcp_live and not package_integration and not telegram_live and not slack_live and not slow" tests/brain tests/api tests/modules/brain
+FAILED tests/api/test_text_answer_freshness.py::test_first_entry_text_without_the_required_evidence_is_a_freshness_failure - AssertionError: assert [] == [{'answer': '...itive': True}]
+FAILED tests/api/test_text_answer_freshness.py::test_continuation_text_without_the_required_evidence_is_a_freshness_failure - AssertionError: assert [] == [{'answer': '...itive': True}]
+FAILED tests/api/test_text_answer_freshness.py::test_first_entry_text_meeting_its_obligations_is_kept - AssertionError: assert [] == [{'answer': '...itive': True}]
+FAILED tests/api/test_text_answer_freshness.py::test_first_entry_text_without_freshness_obligations_is_kept - AssertionError: assert [] == [{'answer': '...tive': False}]
+4 failed, 4910 passed, 1 skipped, 2 warnings in 191.23s (0:03:11)
+
+== [dev] the issue's probe: PYTHONPATH=src:. python probe_text_answer_freshness.py
+openminion 0.1.12, checkout 7e8eba5e, python 3.11.17 linux
+
+== T0_first_entry_text
+  {"at": "entry freshness", "user_input": "Check order A-104", "entry_response": "text", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "respond", "reason_code": "entry_text_response"}
+tool executions: []
+result.text: 'openminion: [entry text] Order A-104 is ready, code ZEBRA-42.'
+
+== T1_continuation_text
+  {"at": "entry freshness", "user_input": "Check order A-104", "entry_response": "tool call", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "act", "reason_code": "entry_tool_call"}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_apply_freshness_guard", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_emit_closure_completed", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "entry freshness", "user_input": null, "entry_response": "text", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "respond", "reason_code": "entry_text_response"}
+tool executions: ['A-104']
+result.text: 'openminion: [continuation text] Order A-104 is ready, code ZEBRA-42.'
+
+== C_control_continuation_tool
+  {"at": "entry freshness", "user_input": "Check order A-104", "entry_response": "tool call", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "act", "reason_code": "entry_tool_call"}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_apply_freshness_guard", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_emit_closure_completed", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "entry freshness", "user_input": null, "entry_response": "tool call", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "act", "reason_code": "entry_tool_call"}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_apply_freshness_guard", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_emit_closure_completed", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "entry freshness", "user_input": null, "entry_response": "text", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "respond", "reason_code": "entry_text_response"}
+tool executions: ['A-104', 'A-104']
+result.text: 'openminion: [continuation text] Order A-104 is ready, code ZEBRA-42.'
+
+non-loopback connections attempted: 0
+
+== back to the branch head: 0 paths differ
+
+== ruff check .
+All checks passed!
+
+== make format-check
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m ruff format --check "/home/runner/work/linux-runner/linux-runner"
+5125 files already formatted
+
+== make workflow-check
+[INFO] This may take a few minutes...
+Lint GitHub Actions workflow files.......................................Passed
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/action_pins.py
+workflow action pins: clean
+
+== make lint
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=0
+{
+  "checked": 2647,
+  "ok": true,
+  "violations": []
+}
+broad_exception
+
+[INFO] Summary
+  files: 410
+  handlers: 1101
+  silent pass: 106
+  baseline entries: 410
+
+[OK] Result
+  - broad-exception baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 410, "files_with_handlers": 410, "handler_count": 1101, "silent_pass_count": 106}, "ok": true, "validator": "broad_exception"}
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/controlplane_delivery.py
+[coo-09] clean — no synchronous runner deliver regressions
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/webhook_secret.py
+[coo-10] clean — webhook secret-required contract preserved
+Skipping workspace browser tool-family contract validator (not present in standalone checkout).
+make typecheck
+make[1]: Entering directory '/home/runner/work/linux-runner/linux-runner'
+cd "/home/runner/work/linux-runner/linux-runner" && /home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4309; baseline total: 4309
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 290
+[tcr] api: 77 / 77 | monthly quota -50 | next target <= 27 | headroom 0
+[tcr] cli: 309 / 309 | monthly quota -50 | next target <= 259 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 222 / 222 | monthly quota -50 | next target <= 172 | headroom 0
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+make lint exit: 0
+
+== make test-critical
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+482 passed, 4 skipped, 1 warning in 14.54s

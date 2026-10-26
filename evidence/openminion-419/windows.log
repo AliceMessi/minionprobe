@@ -1,0 +1,94 @@
+fix/419-text-answer-freshness-finalization @ 7e8eba5ecafa2ec4ab4350773c68bbba479b9d9f (worktree clean: True) and dev @ 8c0568f70bd54190411da9926861543f166ebcb4
+native Windows 11 Pro 10.0.22631.6199, CPython 3.11.11 SQLite 3.47.1, PYTHONPATH="src;."
+452ed05e549bc954ddb3f2506a610829abb401f1fb79f27ef5e8d999301f29ea *probe_text_answer_freshness.py
+
+== [head] pytest -q -p no:cacheprovider -p no:logging --show-capture=no -rfE --tb=line <focused: tests/api/test_text_answer_freshness.py tests/api/test_freshness_continuation.py tests/brain/test_freshness_entry_retention.py tests/brain/test_freshness_enforcement.py tests/brain/test_freshness_routing.py>
+39 passed in 34.41s
+
+== [head] python probe_text_answer_freshness.py
+openminion 0.1.12, checkout 7e8eba5e, python 3.11.11 win32
+
+== T0_first_entry_text
+  {"at": "entry freshness", "user_input": "Check order A-104", "entry_response": "text", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "respond", "reason_code": "entry_text_response"}
+  {"at": "verify_freshness_answer", "module": "execution.closure.base", "caller": "final_close_message", "result": ["Missing live-data evidence for a freshness-sensitive answer.", "Missing exact-date evidence for an exact-date freshness answer."]}
+tool executions: []
+result.text: "openminion: I couldn't provide a grounded current shopping answer because Missing live-data evidence for a freshness-sensitive answer.; Missing exact-date evidence for an exact-date freshness answer.. Please retry with live data available so I can answer with sources and an exact date."
+
+== T1_continuation_text
+  {"at": "entry freshness", "user_input": "Check order A-104", "entry_response": "tool call", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "act", "reason_code": "entry_tool_call"}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_apply_freshness_guard", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_emit_closure_completed", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "entry freshness", "user_input": null, "entry_response": "text", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "respond", "reason_code": "entry_text_response"}
+  {"at": "verify_freshness_answer", "module": "execution.closure.base", "caller": "final_close_message", "result": ["Missing live-data evidence for a freshness-sensitive answer.", "Missing exact-date evidence for an exact-date freshness answer."]}
+tool executions: ['A-104']
+result.text: "openminion: I couldn't provide a grounded current shopping answer because Missing live-data evidence for a freshness-sensitive answer.; Missing exact-date evidence for an exact-date freshness answer.. Please retry with live data available so I can answer with sources and an exact date."
+
+== C_control_continuation_tool
+  {"at": "entry freshness", "user_input": "Check order A-104", "entry_response": "tool call", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "act", "reason_code": "entry_tool_call"}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_apply_freshness_guard", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_emit_closure_completed", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "entry freshness", "user_input": null, "entry_response": "tool call", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "act", "reason_code": "entry_tool_call"}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_apply_freshness_guard", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_emit_closure_completed", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "entry freshness", "user_input": null, "entry_response": "text", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "respond", "reason_code": "entry_text_response"}
+  {"at": "verify_freshness_answer", "module": "execution.closure.base", "caller": "final_close_message", "result": ["Missing live-data evidence for a freshness-sensitive answer.", "Missing exact-date evidence for an exact-date freshness answer."]}
+tool executions: ['A-104', 'A-104']
+result.text: "openminion: I couldn't provide a grounded current shopping answer because Missing live-data evidence for a freshness-sensitive answer.; Missing exact-date evidence for an exact-date freshness answer.. Please retry with live data available so I can answer with sources and an exact date."
+
+non-loopback connections attempted: 0
+
+== dev sources from here on: git checkout 8c0568f7 -- src (1 path differs)
+
+== [dev] pytest -q -p no:cacheprovider -p no:logging --show-capture=no -rfE --tb=line <focused: tests/api/test_text_answer_freshness.py tests/api/test_freshness_continuation.py tests/brain/test_freshness_entry_retention.py tests/brain/test_freshness_enforcement.py tests/brain/test_freshness_routing.py>
+C:\Users\User\Downloads\agentprize\projects\cortensor-hackathon-5\om-419\tests\api\test_text_answer_freshness.py:327: AssertionError: assert [] == [{'answer': '...itive': True}]
+C:\Users\User\Downloads\agentprize\projects\cortensor-hackathon-5\om-419\tests\api\test_text_answer_freshness.py:363: AssertionError: assert [] == [{'answer': '...itive': True}]
+C:\Users\User\Downloads\agentprize\projects\cortensor-hackathon-5\om-419\tests\api\test_text_answer_freshness.py:387: AssertionError: assert [] == [{'answer': '...itive': True}]
+C:\Users\User\Downloads\agentprize\projects\cortensor-hackathon-5\om-419\tests\api\test_text_answer_freshness.py:405: AssertionError: assert [] == [{'answer': '...tive': False}]
+FAILED tests/api/test_text_answer_freshness.py::test_first_entry_text_without_the_required_evidence_is_a_freshness_failure
+FAILED tests/api/test_text_answer_freshness.py::test_continuation_text_without_the_required_evidence_is_a_freshness_failure
+FAILED tests/api/test_text_answer_freshness.py::test_first_entry_text_meeting_its_obligations_is_kept
+FAILED tests/api/test_text_answer_freshness.py::test_first_entry_text_without_freshness_obligations_is_kept
+4 failed, 35 passed in 34.98s
+
+== [dev] python probe_text_answer_freshness.py
+openminion 0.1.12, checkout 7e8eba5e, python 3.11.11 win32
+
+== T0_first_entry_text
+  {"at": "entry freshness", "user_input": "Check order A-104", "entry_response": "text", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "respond", "reason_code": "entry_text_response"}
+tool executions: []
+result.text: 'openminion: [entry text] Order A-104 is ready, code ZEBRA-42.'
+
+== T1_continuation_text
+  {"at": "entry freshness", "user_input": "Check order A-104", "entry_response": "tool call", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "act", "reason_code": "entry_tool_call"}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_apply_freshness_guard", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_emit_closure_completed", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "entry freshness", "user_input": null, "entry_response": "text", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "respond", "reason_code": "entry_text_response"}
+tool executions: ['A-104']
+result.text: 'openminion: [continuation text] Order A-104 is ready, code ZEBRA-42.'
+
+== C_control_continuation_tool
+  {"at": "entry freshness", "user_input": "Check order A-104", "entry_response": "tool call", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "act", "reason_code": "entry_tool_call"}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_apply_freshness_guard", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_emit_closure_completed", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "entry freshness", "user_input": null, "entry_response": "tool call", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "act", "reason_code": "entry_tool_call"}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_apply_freshness_guard", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "verify_freshness_answer", "module": "execution.runtime.closure.evaluator", "caller": "_emit_closure_completed", "result": ["Missing exact-date evidence for an exact-date freshness answer."]}
+  {"at": "entry freshness", "user_input": null, "entry_response": "text", "obligations after": {"require_live_data": true, "require_sources": true, "require_exact_date": true}, "classifier_mode": "llm"}
+  {"at": "brain.entry", "route": "respond", "reason_code": "entry_text_response"}
+tool executions: ['A-104', 'A-104']
+result.text: 'openminion: [continuation text] Order A-104 is ready, code ZEBRA-42.'
+
+non-loopback connections attempted: 0
+
+== back to the branch head: 0 paths differ
