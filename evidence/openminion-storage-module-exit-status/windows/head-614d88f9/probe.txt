@@ -1,0 +1,118 @@
+# branch head 614d88f9: openminion 0.1.13, Python 3.12.11, Windows-11-10.0.22631-SP0
+# package: <USER_HOME>\Downloads\agentprize\projects\cortensor-hackathon-5\om-storage-exit\src\openminion
+# modules/storage/__main__.py sha256 7aaf4d3f070b8fc50a08a1f4ce392ebde67fda50e3a27cc008ec38b734707217:
+#   from openminion.modules.storage.cli import main
+#   
+#   
+#   if __name__ == "__main__":
+#       raise SystemExit(main())
+
+[1] plan (success control)
+    args: plan --namespace session --sqlite <WORK>\paths\plan\session.db
+    main(): returned 0
+    python -m openminion.modules.storage     -> exit 0
+    python -m openminion.modules.storage.cli -> exit 0
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": true,
+              "module_id": "session",
+              "plan": [
+                {
+                  "module_id": "session",
+                  "action": "migrate",
+                  "reason": "active module migration"
+                }
+              ]
+            }
+
+[2] pool-stats without a Postgres URL
+    args: pool-stats
+    main(): returned 2
+    python -m openminion.modules.storage     -> exit 2
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": false,
+              "error": "pool-stats requires a Postgres URL. Pass --postgres-url or set OPENMINION_STORAGE_POSTGRES_URL. SQLite backends have no pool."
+            }
+
+[3] a2a-archive-old --older-than-days 0
+    args: a2a-archive-old --older-than-days 0 --audit-root <WORK>\paths\audit
+    main(): returned 2
+    python -m openminion.modules.storage     -> exit 2
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": false,
+              "error": "a2a-archive-old requires --older-than-days >= 1."
+            }
+
+[4] a2a-archive-old without a Postgres URL
+    args: a2a-archive-old --older-than-days 7 --audit-root <WORK>\paths\audit
+    main(): returned 2
+    python -m openminion.modules.storage     -> exit 2
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": false,
+              "error": "a2a-archive-old requires a Postgres URL. Pass --postgres-url or set OPENMINION_STORAGE_POSTGRES_URL."
+            }
+
+[5] export --backend postgres without a Postgres URL
+    args: export --namespace task --sqlite <WORK>\paths\x.db --out <WORK>\paths\omx-out --backend postgres
+    main(): returned 2
+    python -m openminion.modules.storage     -> exit 2
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": false,
+              "error": "export --backend postgres requires a Postgres URL. Pass --postgres-url or set OPENMINION_STORAGE_POSTGRES_URL."
+            }
+
+[6] import --backend postgres without a Postgres URL
+    args: import --namespace task --sqlite <WORK>\paths\x.db --input <WORK>\paths\omx-in --backend postgres
+    main(): returned 2
+    python -m openminion.modules.storage     -> exit 2
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": false,
+              "error": "import --backend postgres requires a Postgres URL. Pass --postgres-url or set OPENMINION_STORAGE_POSTGRES_URL."
+            }
+
+[7] dr-drill on a file that is not SQLite
+    args: dr-drill --namespace session --sqlite <WORK>\paths\not-sqlite.db
+    main(): returned 2
+    python -m openminion.modules.storage     -> exit 2
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": false,
+              "error": "identity setup failed: file is not a database"
+            }
+
+[8] plan with an unknown module (raises)
+    args: plan --namespace unknown-module --sqlite <WORK>\paths\u.db
+    main(): raised ValueError
+    python -m openminion.modules.storage     -> exit 1
+    python -m openminion.modules.storage.cli -> exit 1
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): False
+    stderr last line: ValueError: Unknown module_id='unknown-module'; known: a2a, artifact, authoring, brain, commerce, compress, controlplane, controlplane_telegram, identity, memory, policy, registry, retrieve, secret, session, skill, storage, task, telemetry
+
+[9] restore from a missing snapshot (raises)
+    args: restore --namespace session --sqlite <WORK>\paths\r.db --snapshot-path <WORK>\paths\missing-snapshot.db
+    main(): raised BackupError
+    python -m openminion.modules.storage     -> exit 1
+    python -m openminion.modules.storage.cli -> exit 1
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): False
+    stderr last line: openminion.modules.storage.migrations.errors.BackupError: Snapshot not found: <WORK>\paths\missing-snapshot.db
+
+[10] unknown option (argparse control)
+    args: pool-stats --bogus
+    main(): raised SystemExit(2)
+    python -m openminion.modules.storage     -> exit 2
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stderr last line: storagectl: error: unrecognized arguments: --bogus
+
+# cases where the module exit differs from cli.py's raise SystemExit(main()): 0 of 10

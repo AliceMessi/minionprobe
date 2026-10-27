@@ -1,0 +1,348 @@
+head: 614d88f9 docs(changelog): note the storage module exit status
+dev:  691a1d54 Merge pull request #439 from openminion/dependabot/github_actions/dev/actions/setup-python-7.1.0
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+packages: psycopg 3.3.6;sophiagraph 0.0.12;SQLAlchemy 2.1.6;typer 0.27.3;
+OPENMINION_TEST_POSTGRES_URL set: yes
+bf5fb7dcc5c52f137256b2eedc54d4357fd7fb4da3de2ac7cf6efe67ee7a2811  /tmp/ev/probe_linux.py
+941c2d08d1d9ca6645832ec883720d9c74d53b0c5719c6ae8a73034307b50366  /tmp/ev/probe_storage_exit.py
+
+== [head] pytest <focused>
+23 passed in 1.85s
+
+== [head] pytest -m "not benchmark and not e2e and not postgres and not memory_eval_benchmark and not mcp_live and not package_integration and not telegram_live and not slack_live and not slow" tests/storage tests/modules
+FAILED tests/storage/test_startup_validation.py::TestValidatePostgresConnectionFailure::test_unreachable_db_raises_with_redacted_url - Failed: Timeout (>60.0s) from pytest-timeout.
+1 failed, 1087 passed, 3 skipped, 57 deselected in 75.09s (0:01:15)
+
+== [head] the issue's probe: PYTHONPATH=src:. python probe_linux.py
+# runner: openminion 0.1.13, Python 3.11.17, Linux-7.0.0-1017-azure-x86_64-with-glibc2.39
+# package: <USER_HOME>/work/linux-runner/linux-runner/src/openminion
+# modules/storage/__main__.py sha256 5e67c6e6d52c4712d8fdaeeffb93154556d540a16886cf3cce6df9d322278e20:
+#   from openminion.modules.storage.cli import main
+#   
+#   
+#   if __name__ == "__main__":
+#       raise SystemExit(main())
+
+[1] plan (success control)
+    args: plan --namespace session --sqlite <WORK>/paths/plan/session.db
+    main(): returned 0
+    python -m openminion.modules.storage     -> exit 0
+    python -m openminion.modules.storage.cli -> exit 0
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": true,
+              "module_id": "session",
+              "plan": [
+                {
+                  "module_id": "session",
+                  "action": "migrate",
+                  "reason": "active module migration"
+                }
+              ]
+            }
+
+[2] pool-stats without a Postgres URL
+    args: pool-stats
+    main(): returned 2
+    python -m openminion.modules.storage     -> exit 2
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": false,
+              "error": "pool-stats requires a Postgres URL. Pass --postgres-url or set OPENMINION_STORAGE_POSTGRES_URL. SQLite backends have no pool."
+            }
+
+[3] a2a-archive-old --older-than-days 0
+    args: a2a-archive-old --older-than-days 0 --audit-root <WORK>/paths/audit
+    main(): returned 2
+    python -m openminion.modules.storage     -> exit 2
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": false,
+              "error": "a2a-archive-old requires --older-than-days >= 1."
+            }
+
+[4] a2a-archive-old without a Postgres URL
+    args: a2a-archive-old --older-than-days 7 --audit-root <WORK>/paths/audit
+    main(): returned 2
+    python -m openminion.modules.storage     -> exit 2
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": false,
+              "error": "a2a-archive-old requires a Postgres URL. Pass --postgres-url or set OPENMINION_STORAGE_POSTGRES_URL."
+            }
+
+[5] export --backend postgres without a Postgres URL
+    args: export --namespace task --sqlite <WORK>/paths/x.db --out <WORK>/paths/omx-out --backend postgres
+    main(): returned 2
+    python -m openminion.modules.storage     -> exit 2
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": false,
+              "error": "export --backend postgres requires a Postgres URL. Pass --postgres-url or set OPENMINION_STORAGE_POSTGRES_URL."
+            }
+
+[6] import --backend postgres without a Postgres URL
+    args: import --namespace task --sqlite <WORK>/paths/x.db --input <WORK>/paths/omx-in --backend postgres
+    main(): returned 2
+    python -m openminion.modules.storage     -> exit 2
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": false,
+              "error": "import --backend postgres requires a Postgres URL. Pass --postgres-url or set OPENMINION_STORAGE_POSTGRES_URL."
+            }
+
+[7] dr-drill on a file that is not SQLite
+    args: dr-drill --namespace session --sqlite <WORK>/paths/not-sqlite.db
+    main(): returned 2
+    python -m openminion.modules.storage     -> exit 2
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": false,
+              "error": "identity setup failed: file is not a database"
+            }
+
+[8] plan with an unknown module (raises)
+    args: plan --namespace unknown-module --sqlite <WORK>/paths/u.db
+    main(): raised ValueError
+    python -m openminion.modules.storage     -> exit 1
+    python -m openminion.modules.storage.cli -> exit 1
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): False
+    stderr last line: ValueError: Unknown module_id='unknown-module'; known: a2a, artifact, authoring, brain, commerce, compress, controlplane, controlplane_telegram, identity, memory, policy, registry, retrieve, secret, session, skill, storage, task, telemetry
+
+[9] restore from a missing snapshot (raises)
+    args: restore --namespace session --sqlite <WORK>/paths/r.db --snapshot-path <WORK>/paths/missing-snapshot.db
+    main(): raised BackupError
+    python -m openminion.modules.storage     -> exit 1
+    python -m openminion.modules.storage.cli -> exit 1
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): False
+    stderr last line: openminion.modules.storage.migrations.errors.BackupError: Snapshot not found: <WORK>/paths/missing-snapshot.db
+
+[10] unknown option (argparse control)
+    args: pool-stats --bogus
+    main(): raised SystemExit(2)
+    python -m openminion.modules.storage     -> exit 2
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stderr last line: storagectl: error: unrecognized arguments: --bogus
+
+# cases where the module exit differs from cli.py's raise SystemExit(main()): 0 of 10
+probe exit: 0
+
+[pg] pool-stats --postgres-url <OPENMINION_TEST_POSTGRES_URL> (success control)
+    python -m openminion.modules.storage      -> exit 0; ok=True pool keys=['backend', 'checked_out', 'oldest_connection_age_seconds', 'overflow', 'pool_size']; stderr lines=0
+    python -m openminion.modules.storage.cli  -> exit 0; ok=True pool keys=['backend', 'checked_out', 'oldest_connection_age_seconds', 'overflow', 'pool_size']; stderr lines=0
+
+== dev sources from here on: git checkout 691a1d543822522bc7208d45dd3be9e602b8e5ce -- src (1 paths differ)
+
+== [dev] pytest <focused>
+FAILED tests/storage/test_storagectl_module_exit_status.py::test_module_exits_with_main_nonzero_status_and_same_output[pool-stats-without-postgres-url] - assert 0 == 2
+FAILED tests/storage/test_storagectl_module_exit_status.py::test_module_exits_with_main_nonzero_status_and_same_output[a2a-archive-old-zero-days] - assert 0 == 2
+ +  where 0 = CompletedProcess(args=['/home/runner/work/linux-runner/linux-runner/.venv/bin/python', '-m', 'openminion.modules.stora...eturncode=0, stdout='{\n  "ok": false,\n  "error": "a2a-archive-old requires --older-than-days >= 1."\n}\ ...
+2 failed, 21 passed in 1.50s
+
+== [dev] pytest -m "not benchmark and not e2e and not postgres and not memory_eval_benchmark and not mcp_live and not package_integration and not telegram_live and not slack_live and not slow" tests/storage tests/modules
+FAILED tests/storage/test_startup_validation.py::TestValidatePostgresConnectionFailure::test_unreachable_db_raises_with_redacted_url - Failed: Timeout (>60.0s) from pytest-timeout.
+FAILED tests/storage/test_storagectl_module_exit_status.py::test_module_exits_with_main_nonzero_status_and_same_output[pool-stats-without-postgres-url] - assert 0 == 2
+FAILED tests/storage/test_storagectl_module_exit_status.py::test_module_exits_with_main_nonzero_status_and_same_output[a2a-archive-old-zero-days] - assert 0 == 2
+ +  where 0 = CompletedProcess(args=['/home/runner/work/linux-runner/linux-runner/.venv/bin/python', '-m', 'openminion.modules.stora...eturncode=0, stdout='{\n  "ok": false,\n  "error": "a2a-archive-old requires --older-than-days >= 1."\n}\ ...
+3 failed, 1085 passed, 3 skipped, 57 deselected in 72.08s (0:01:12)
+
+== [dev] the issue's probe: PYTHONPATH=src:. python probe_linux.py
+# runner: openminion 0.1.13, Python 3.11.17, Linux-7.0.0-1017-azure-x86_64-with-glibc2.39
+# package: <USER_HOME>/work/linux-runner/linux-runner/src/openminion
+# modules/storage/__main__.py sha256 0c348d64d1b2ffffc1fa8bf6748c929b4bf1bb456536075d2d62c3f5899b258b:
+#   from openminion.modules.storage.cli import main
+#   
+#   
+#   if __name__ == "__main__":
+#       main()
+
+[1] plan (success control)
+    args: plan --namespace session --sqlite <WORK>/paths/plan/session.db
+    main(): returned 0
+    python -m openminion.modules.storage     -> exit 0
+    python -m openminion.modules.storage.cli -> exit 0
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": true,
+              "module_id": "session",
+              "plan": [
+                {
+                  "module_id": "session",
+                  "action": "migrate",
+                  "reason": "active module migration"
+                }
+              ]
+            }
+
+[2] pool-stats without a Postgres URL
+    args: pool-stats
+    main(): returned 2
+    python -m openminion.modules.storage     -> exit 0
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": false,
+              "error": "pool-stats requires a Postgres URL. Pass --postgres-url or set OPENMINION_STORAGE_POSTGRES_URL. SQLite backends have no pool."
+            }
+
+[3] a2a-archive-old --older-than-days 0
+    args: a2a-archive-old --older-than-days 0 --audit-root <WORK>/paths/audit
+    main(): returned 2
+    python -m openminion.modules.storage     -> exit 0
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": false,
+              "error": "a2a-archive-old requires --older-than-days >= 1."
+            }
+
+[4] a2a-archive-old without a Postgres URL
+    args: a2a-archive-old --older-than-days 7 --audit-root <WORK>/paths/audit
+    main(): returned 2
+    python -m openminion.modules.storage     -> exit 0
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": false,
+              "error": "a2a-archive-old requires a Postgres URL. Pass --postgres-url or set OPENMINION_STORAGE_POSTGRES_URL."
+            }
+
+[5] export --backend postgres without a Postgres URL
+    args: export --namespace task --sqlite <WORK>/paths/x.db --out <WORK>/paths/omx-out --backend postgres
+    main(): returned 2
+    python -m openminion.modules.storage     -> exit 0
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": false,
+              "error": "export --backend postgres requires a Postgres URL. Pass --postgres-url or set OPENMINION_STORAGE_POSTGRES_URL."
+            }
+
+[6] import --backend postgres without a Postgres URL
+    args: import --namespace task --sqlite <WORK>/paths/x.db --input <WORK>/paths/omx-in --backend postgres
+    main(): returned 2
+    python -m openminion.modules.storage     -> exit 0
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": false,
+              "error": "import --backend postgres requires a Postgres URL. Pass --postgres-url or set OPENMINION_STORAGE_POSTGRES_URL."
+            }
+
+[7] dr-drill on a file that is not SQLite
+    args: dr-drill --namespace session --sqlite <WORK>/paths/not-sqlite.db
+    main(): returned 2
+    python -m openminion.modules.storage     -> exit 0
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stdout: {
+              "ok": false,
+              "error": "identity setup failed: file is not a database"
+            }
+
+[8] plan with an unknown module (raises)
+    args: plan --namespace unknown-module --sqlite <WORK>/paths/u.db
+    main(): raised ValueError
+    python -m openminion.modules.storage     -> exit 1
+    python -m openminion.modules.storage.cli -> exit 1
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): False
+    stderr last line: ValueError: Unknown module_id='unknown-module'; known: a2a, artifact, authoring, brain, commerce, compress, controlplane, controlplane_telegram, identity, memory, policy, registry, retrieve, secret, session, skill, storage, task, telemetry
+
+[9] restore from a missing snapshot (raises)
+    args: restore --namespace session --sqlite <WORK>/paths/r.db --snapshot-path <WORK>/paths/missing-snapshot.db
+    main(): raised BackupError
+    python -m openminion.modules.storage     -> exit 1
+    python -m openminion.modules.storage.cli -> exit 1
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): False
+    stderr last line: openminion.modules.storage.migrations.errors.BackupError: Snapshot not found: <WORK>/paths/missing-snapshot.db
+
+[10] unknown option (argparse control)
+    args: pool-stats --bogus
+    main(): raised SystemExit(2)
+    python -m openminion.modules.storage     -> exit 2
+    python -m openminion.modules.storage.cli -> exit 2
+    stdout identical (main()/module/cli): True; stderr identical (module/cli): True
+    stderr last line: storagectl: error: unrecognized arguments: --bogus
+
+# cases where the module exit differs from cli.py's raise SystemExit(main()): 6 of 10
+#   - pool-stats without a Postgres URL
+#   - a2a-archive-old --older-than-days 0
+#   - a2a-archive-old without a Postgres URL
+#   - export --backend postgres without a Postgres URL
+#   - import --backend postgres without a Postgres URL
+#   - dr-drill on a file that is not SQLite
+probe exit: 0
+
+[pg] pool-stats --postgres-url <OPENMINION_TEST_POSTGRES_URL> (success control)
+    python -m openminion.modules.storage      -> exit 0; ok=True pool keys=['backend', 'checked_out', 'oldest_connection_age_seconds', 'overflow', 'pool_size']; stderr lines=0
+    python -m openminion.modules.storage.cli  -> exit 0; ok=True pool keys=['backend', 'checked_out', 'oldest_connection_age_seconds', 'overflow', 'pool_size']; stderr lines=0
+
+== back to the branch head: 0 paths differ
+
+== ruff check .
+All checks passed!
+
+== make format-check
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m ruff format --check "/home/runner/work/linux-runner/linux-runner"
+5130 files already formatted
+
+== make workflow-check
+[INFO] This may take a few minutes...
+Lint GitHub Actions workflow files.......................................Passed
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/action_pins.py
+workflow action pins: clean
+
+== make lint
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=0
+[type-ignore-hygiene] clean — 0 bare ignores; 93 qualified ignores across 14 codes
+{
+  "checked": 2647,
+  "ok": true,
+  "violations": []
+}
+broad_exception
+
+[INFO] Summary
+  files: 410
+  handlers: 1101
+  silent pass: 106
+  baseline entries: 410
+
+[OK] Result
+  - broad-exception baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 410, "files_with_handlers": 410, "handler_count": 1101, "silent_pass_count": 106}, "ok": true, "validator": "broad_exception"}
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/controlplane_delivery.py
+[coo-09] clean — no synchronous runner deliver regressions
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/webhook_secret.py
+[coo-10] clean — webhook secret-required contract preserved
+Skipping workspace browser tool-family contract validator (not present in standalone checkout).
+make typecheck
+make[1]: Entering directory '/home/runner/work/linux-runner/linux-runner'
+cd "/home/runner/work/linux-runner/linux-runner" && /home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4309; baseline total: 4309
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 290
+[tcr] api: 77 / 77 | monthly quota -50 | next target <= 27 | headroom 0
+[tcr] cli: 309 / 309 | monthly quota -50 | next target <= 259 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 222 / 222 | monthly quota -50 | next target <= 172 | headroom 0
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+make lint exit: 0
+
+== make test-critical
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+486 passed, 4 skipped, 1 warning in 17.32s
