@@ -1,0 +1,95 @@
+PROBE migrate_ledger label=0.1.13 {"alembic": "1.18.4", "openminion": "0.1.13", "openminion_file": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py", "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39", "postgres_server": "16.15 (Debian 16.15-1.pgdg13+2)", "psycopg": "3.3.6", "python": "3.12.15", "sqlalchemy": "2.1.6", "sqlite": "3.45.1"}
+Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill
+Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve
+Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry
+Postgres module 'secret' has pending migrations. Run: openminion storage migrate --module secret
+Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity
+Postgres module 'session' has pending migrations. Run: openminion storage migrate --module session
+Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact
+Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane
+Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress
+Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a
+Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry
+Postgres module 'task' has pending migrations. Run: openminion storage migrate --module task
+Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory
+Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy
+CASE runtime_only: database_after: tables=19 runtime_ledger={'exists': True, 'rows': 15, 'max_version': 15} alembic_version=None om_meta=None conns=0
+CASE module_alone: {"a2a": [0, "ok", ["0005_job_idempotency_scope"]], "artifact": [0, "ok", ["0001_baseline"]], "compress": [1, "error", null], "controlplane": [1, "error", null], "identity": [0, "ok", ["0001_baseline"]], "memory": [0, "ok", ["0004_namespace"]], "policy": [0, "ok", ["0002_blockchain_confirmations"]], "registry": [0, "ok", ["0001_baseline"]], "retrieve": [0, "ok", ["0002_index"]], "secret": [0, "ok", ["0001_baseline"]], "session": [0, "ok", ["0005_cron_scheduler_control"]], "skill": [0, "ok", ["0007_workflow_observations"]], "task": [0, "ok", ["0001_baseline"]], "telemetry": [1, "error", null]}
+CASE cli_migrate_all: cli: exit=1 counts={'skipped': 5, 'ok': 1, 'error': 13} no_message=13 | database_after: tables=21 runtime_ledger={'exists': False} alembic_version=['0005_cron_scheduler_control'] om_meta={'module_id': 'session', 'schema_head': '0005_cron_scheduler_control'} conns=0
+CASE runner_messages: session success=True rolled_back=False before=None after=0005_cron_scheduler_control error=''
+CASE runner_messages: artifact success=False rolled_back=True before=0005_cron_scheduler_control after=0005_cron_scheduler_control error="Alembic upgrade failed for module 'artifact': Can't locate revision identified by '0005_cron_scheduler_control'"
+CASE runner_messages: registry success=False rolled_back=True before=0005_cron_scheduler_control after=0005_cron_scheduler_control error="Alembic upgrade failed for module 'registry': Can't locate revision identified by '0005_cron_scheduler_control'"
+CASE runner_messages: identity success=False rolled_back=True before=0005_cron_scheduler_control after=0005_cron_scheduler_control error="Alembic upgrade failed for module 'identity': Can't locate revision identified by '0005_cron_scheduler_control'"
+CASE runner_messages: policy success=False rolled_back=True before=0005_cron_scheduler_control after=0005_cron_scheduler_control error="Alembic upgrade failed for module 'policy': Can't locate revision identified by '0005_cron_scheduler_control'"
+CASE runner_messages: secret success=False rolled_back=True before=0005_cron_scheduler_control after=0005_cron_scheduler_control error="Alembic upgrade failed for module 'secret': Can't locate revision identified by '0005_cron_scheduler_control'"
+CASE runner_messages: telemetry success=False rolled_back=True before=0005_cron_scheduler_control after=0005_cron_scheduler_control error="Alembic upgrade failed for module 'telemetry': Can't locate revision identified by '0005_cron_scheduler_control'"
+CASE runner_messages: controlplane success=False rolled_back=True before=0005_cron_scheduler_control after=0005_cron_scheduler_control error="Alembic upgrade failed for module 'controlplane': Can't locate revision identified by '0005_cron_scheduler_control'"
+CASE runner_messages: retrieve success=False rolled_back=True before=0005_cron_scheduler_control after=0005_cron_scheduler_control error="Alembic upgrade failed for module 'retrieve': Can't locate revision identified by '0005_cron_scheduler_control'"
+CASE runner_messages: memory success=False rolled_back=True before=0005_cron_scheduler_control after=0005_cron_scheduler_control error="Alembic upgrade failed for module 'memory': Can't locate revision identified by '0005_cron_scheduler_control'"
+CASE runner_messages: skill success=False rolled_back=True before=0005_cron_scheduler_control after=0005_cron_scheduler_control error="Alembic upgrade failed for module 'skill': Can't locate revision identified by '0005_cron_scheduler_control'"
+CASE runner_messages: a2a success=False rolled_back=True before=0005_cron_scheduler_control after=0005_cron_scheduler_control error="Alembic upgrade failed for module 'a2a': Can't locate revision identified by '0005_cron_scheduler_control'"
+CASE runner_messages: compress success=False rolled_back=True before=0005_cron_scheduler_control after=0005_cron_scheduler_control error='Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.'
+CASE runner_messages: task success=False rolled_back=True before=0005_cron_scheduler_control after=0005_cron_scheduler_control error="Alembic upgrade failed for module 'task': Can't locate revision identified by '0005_cron_scheduler_control'"
+CASE migrate_then_runtime: cli: exit=1 counts={'skipped': 5, 'ok': 1, 'error': 13} no_message=13 | runtime_storage: failed MigrationError: Migration v1 (bootstrap_core_tables) failed: (psycopg.errors.DuplicateTable) relation "sessions" already exists | database_after_cli: tables=21 runtime_ledger={'exists': False} alembic_version=['0005_cron_scheduler_control'] om_meta={'module_id': 'session', 'schema_head': '0005_cron_scheduler_control'} conns=0 | database_after_runtime_storage: tables=25 runtime_ledger={'exists': True, 'rows': 0, 'max_version': None} alembic_version=['0005_cron_scheduler_control'] om_meta={'module_id': 'session', 'schema_head': '0005_cron_scheduler_control'} conns=0
+CASE session_then_runtime: cli: exit=0 counts={'ok': 1} no_message=0 | runtime_storage: failed MigrationError: Migration v1 (bootstrap_core_tables) failed: (psycopg.errors.DuplicateTable) relation "sessions" already exists | database_after_cli: tables=21 runtime_ledger={'exists': False} alembic_version=['0005_cron_scheduler_control'] om_meta={'module_id': 'session', 'schema_head': '0005_cron_scheduler_control'} conns=0 | database_after_runtime_storage: tables=25 runtime_ledger={'exists': True, 'rows': 0, 'max_version': None} alembic_version=['0005_cron_scheduler_control'] om_meta={'module_id': 'session', 'schema_head': '0005_cron_scheduler_control'} conns=0
+Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill
+Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve
+Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry
+Postgres module 'secret' has pending migrations. Run: openminion storage migrate --module secret
+Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity
+Postgres module 'session' has pending migrations. Run: openminion storage migrate --module session
+Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact
+Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane
+Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress
+Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a
+Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry
+Postgres module 'task' has pending migrations. Run: openminion storage migrate --module task
+Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory
+Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy
+Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill
+Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve
+Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry
+Postgres module 'secret' has pending migrations. Run: openminion storage migrate --module secret
+Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity
+Postgres module 'session' has pending migrations. Run: openminion storage migrate --module session
+Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact
+Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane
+Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress
+Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a
+Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry
+Postgres module 'task' has pending migrations. Run: openminion storage migrate --module task
+Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory
+Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy
+CASE runtime_then_migrate: runtime_storage_first: built 15 | cli: exit=1 counts={'skipped': 5, 'error': 9, 'ok': 5} no_message=9 | runtime_storage_again: built 15 | database_after_cli: tables=25 runtime_ledger={'exists': True, 'rows': 15, 'max_version': 15} alembic_version=['0004_namespace'] om_meta={'module_id': 'memory', 'schema_head': '0004_namespace'} conns=0 | database_after_runtime_storage: tables=19 runtime_ledger={'exists': True, 'rows': 15, 'max_version': 15} alembic_version=None om_meta=None conns=0
+CASE pair_session_then_artifact: first: session exit=0 status={'session': 'ok'} entry=[{'module_id': 'session', 'status': 'ok', 'applied': [], 'success': True}] | second: artifact exit=1 status={'artifact': 'error'} entry=[{'module_id': 'artifact', 'status': 'error', 'applied': [], 'success': False}] | database_after_first: tables=21 alembic_version=['0005_cron_scheduler_control'] om_meta={'module_id': 'session', 'schema_head': '0005_cron_scheduler_control'} | database_after_second: tables=21 alembic_version=['0005_cron_scheduler_control'] om_meta={'module_id': 'session', 'schema_head': '0005_cron_scheduler_control'}
+CASE pair_artifact_then_registry: first: artifact exit=0 status={'artifact': 'ok'} entry=[{'module_id': 'artifact', 'status': 'ok', 'applied': [], 'success': True}] | second: registry exit=0 status={'registry': 'ok'} entry=[{'module_id': 'registry', 'status': 'ok', 'applied': [], 'success': True}] | database_after_first: tables=6 alembic_version=['0001_baseline'] om_meta={'module_id': 'artifact', 'schema_head': '0001_baseline'} | database_after_second: tables=6 alembic_version=['0001_baseline'] om_meta={'module_id': 'registry', 'schema_head': '0001_baseline'}
+Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill
+Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve
+Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry
+Postgres module 'secret' has pending migrations. Run: openminion storage migrate --module secret
+Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity
+Postgres module 'session' has pending migrations. Run: openminion storage migrate --module session
+Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact
+Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane
+Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress
+Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a
+Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry
+Postgres module 'task' has pending migrations. Run: openminion storage migrate --module task
+Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory
+Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy
+CASE runtime_then_session: runtime_storage_first: built 15 | cli: exit=1 counts={'error': 1} no_message=1 | database_after_cli: tables=19 runtime_ledger={'exists': True, 'rows': 15, 'max_version': 15} alembic_version=None om_meta=None conns=0 | database_after_runtime_storage: tables=19 runtime_ledger={'exists': True, 'rows': 15, 'max_version': 15} alembic_version=None om_meta=None conns=0
+OWN-TABLES cli_migrate_all.cli: {"session": {"missing": [], "own_tables": 19}}
+OWN-TABLES migrate_then_runtime.cli: {"session": {"missing": [], "own_tables": 19}}
+OWN-TABLES session_then_runtime.cli: {"session": {"missing": [], "own_tables": 19}}
+OWN-TABLES runtime_then_migrate.cli: {"artifact": {"missing": [], "own_tables": 4}, "identity": {"missing": ["identity_profiles", "identity_snippet_cache"], "own_tables": 2}, "memory": {"missing": ["memory_candidates", "memory_entities", "memory_tier_transitions"], "own_tables": 5}, "registry": {"missing": ["agent_methods", "agent_status", "agents"], "own_tables": 3}, "secret": {"missing": ["secrets"], "own_tables": 1}}
+OWN-TABLES pair_session_then_artifact.first: {"session": {"missing": [], "own_tables": 19}}
+OWN-TABLES pair_session_then_artifact.second: {}
+RERUN pair_session_then_artifact.second: artifact success=False before=0005_cron_scheduler_control error="Alembic upgrade failed for module 'artifact': Can't locate revision identified by '0005_cron_scheduler_control'"
+OWN-TABLES pair_artifact_then_registry.first: {"artifact": {"missing": [], "own_tables": 4}}
+OWN-TABLES pair_artifact_then_registry.second: {"registry": {"missing": ["agent_methods", "agent_status", "agents"], "own_tables": 3}}
+OWN-TABLES runtime_then_session.cli: {}
+RERUN runtime_then_session.cli: session success=False before=None error='Alembic upgrade failed for module \'session\': (psycopg.errors.UndefinedColumn) column "session_id" referenced in foreign key constraint does not exist'
+RERUN module_alone: telemetry error='Alembic upgrade failed for module \'telemetry\': (psycopg.errors.SyntaxError) syntax error at or near "AUTOINCREMENT"'
+RERUN module_alone: controlplane error='Alembic upgrade failed for module \'controlplane\': (psycopg.errors.SyntaxError) syntax error at or near "AUTOINCREMENT"'
+RERUN module_alone: compress error='Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.'
+exit=0

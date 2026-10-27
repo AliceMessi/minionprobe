@@ -1,0 +1,71 @@
+### 1. sessions
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/repro_dev_1 --module session --json
+{
+  "modules": [
+    {
+      "module_id": "session",
+      "status": "ok",
+      "applied": [],
+      "success": true
+    }
+  ]
+}
+  exit=0
+$ python - "$URL" <<'EOF' ... build_runtime_storage ... EOF
+  exit=1
+psycopg.errors.DuplicateTable: relation "sessions" already exists
+sqlalchemy.exc.ProgrammingError: (psycopg.errors.DuplicateTable) relation "sessions" already exists
+openminion.modules.storage.runtime.migrations.MigrationError: Migration v1 (bootstrap_core_tables) failed: (psycopg.errors.DuplicateTable) relation "sessions" already exists
+### 2a. session, then artifact
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/repro_dev_2a --module session --json
+{
+  "modules": [
+    {
+      "module_id": "session",
+      "status": "ok",
+      "applied": [],
+      "success": true
+    }
+  ]
+}
+  exit=0
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/repro_dev_2a --module artifact --json
+{
+  "modules": [
+    {
+      "module_id": "artifact",
+      "status": "error",
+      "applied": [],
+      "success": false
+    }
+  ]
+}
+  exit=1
+  facts: 21 tables; registry tables present: []; alembic_version=['0005_cron_scheduler_control']; om_meta.module_id=session
+### 2b. artifact, then registry
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/repro_dev_2b --module artifact --json
+{
+  "modules": [
+    {
+      "module_id": "artifact",
+      "status": "ok",
+      "applied": [],
+      "success": true
+    }
+  ]
+}
+  exit=0
+  facts: 6 tables; registry tables present: []; alembic_version=['0001_baseline']; om_meta.module_id=artifact
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/repro_dev_2b --module registry --json
+{
+  "modules": [
+    {
+      "module_id": "registry",
+      "status": "ok",
+      "applied": [],
+      "success": true
+    }
+  ]
+}
+  exit=0
+  facts: 6 tables; registry tables present: []; alembic_version=['0001_baseline']; om_meta.module_id=registry
