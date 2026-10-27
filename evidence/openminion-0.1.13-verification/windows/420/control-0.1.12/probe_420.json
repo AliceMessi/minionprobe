@@ -1,0 +1,2304 @@
+{
+  "info": {
+    "probe": "probe_420",
+    "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+    "openminion.__version__": "0.1.12",
+    "python": "3.12.11",
+    "platform": "Windows-11-10.0.22631-SP0",
+    "sqlite3.sqlite_version": "3.50.4",
+    "cwd": "<WORK>\\empty-420",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "provider": "openai (OpenAI-compatible HTTP) -> scripted ThreadingHTTPServer on 127.0.0.1",
+    "dist_versions": {
+      "openminion": "0.1.12",
+      "sophiagraph": "0.0.12",
+      "SQLAlchemy": "2.1.6",
+      "psycopg": null,
+      "httpx": "0.28.1",
+      "pydantic": "2.14.1"
+    },
+    "postgres": "not run: OPENMINION_TEST_POSTGRES_URL is not set"
+  },
+  "summary": {
+    "passed": 12,
+    "failed": 10,
+    "total": 22
+  },
+  "all_pass": false,
+  "checks": [
+    {
+      "check": "S. setup: the SDK turn completes; its capture bundle write fails once (injected StoreWriteError), leaving one pending terminal capture intent (turn.outcome, canonical capture identity) and no memory.capture.result",
+      "pass": true,
+      "observed": {
+        "turn": {
+          "run_state": "completed",
+          "text": "openminion: Noted: tabs over spaces.",
+          "memory_capture_state": "pending",
+          "memory_capture_bundle_result": {
+            "capture_id": "capture:b12544d253b85238cc1771a8ef0a5bb9821aae56e7e4272a24f67f4dc4c47f30",
+            "disposition": "pending",
+            "error_code": "STORE_WRITE_FAILED"
+          }
+        },
+        "intents": [
+          {
+            "canonical_event_id": "turn.outcome:b12544d253b85238cc1771a8ef0a5bb9821aae56e7e4272a24f67f4dc4c47f30",
+            "capture_id": "capture:b12544d253b85238cc1771a8ef0a5bb9821aae56e7e4272a24f67f4dc4c47f30",
+            "capture_state": "pending",
+            "root_turn_id": "1044d339b6ad43488e983533a77d6ab1",
+            "runtime_session_id": "capture",
+            "agent_id": "openminion"
+          }
+        ],
+        "canonical_identity": {
+          "capture_id": "capture:b12544d253b85238cc1771a8ef0a5bb9821aae56e7e4272a24f67f4dc4c47f30",
+          "event_id": "turn.outcome:b12544d253b85238cc1771a8ef0a5bb9821aae56e7e4272a24f67f4dc4c47f30"
+        },
+        "results": [],
+        "turn_bundle_writes": [
+          "StoreWriteError"
+        ]
+      }
+    },
+    {
+      "check": "S. the job comes from the installed task.consolidate_memory handler (agentTurn, consolidation target agent:openminion) and runs through the daemon's attach_cron_scheduler CronScheduler (run_task_now, claimed, cron.run.started, then the outcome persisted and cron.run.finished)",
+      "pass": true,
+      "observed": {
+        "job": {
+          "created": {
+            "ok": true,
+            "task_id": "c0bb8e3ac7664de79e66a3f85149c242",
+            "name": "memory consolidation",
+            "enabled": true,
+            "schedule": {
+              "every_ms": 43200000,
+              "jitter_ms": 0,
+              "kind": "every"
+            },
+            "batch_limit": 8,
+            "target_scope": "agent:openminion",
+            "consolidation_session_id": "consolidate:c0bb8e3ac7664de79e66a3f85149c242"
+          },
+          "payload": {
+            "_openminion_memory_consolidation": {
+              "batch_limit": 8,
+              "max_iterations": 2,
+              "target_scope": "agent:openminion",
+              "timeout_seconds": 30
+            },
+            "kind": "agentTurn",
+            "message": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+            "session_id": "consolidate:c0bb8e3ac7664de79e66a3f85149c242"
+          },
+          "session_target": "isolated",
+          "concurrency_key": "memory-consolidation:agent:openminion",
+          "max_attempts": 3
+        },
+        "scheduler": "CronScheduler",
+        "run1": {
+          "state": "failed",
+          "summary": null,
+          "isolated_session_id": null,
+          "error": {
+            "code": "cron_failed",
+            "message": "BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given",
+            "retryable": false
+          },
+          "attempts": 1,
+          "watermark_target_scope": null,
+          "probe_wait": null
+        },
+        "events": [
+          {
+            "event": "cron.run.started",
+            "run_id": "73d20dcaabed4b2e9e8d7e3e83b9eab0",
+            "job_id": "c0bb8e3ac7664de79e66a3f85149c242"
+          },
+          {
+            "event": "cron.run.finished",
+            "run_id": "73d20dcaabed4b2e9e8d7e3e83b9eab0",
+            "job_id": "c0bb8e3ac7664de79e66a3f85149c242",
+            "state": "failed",
+            "summary": "",
+            "error": {
+              "code": "cron_failed",
+              "message": "BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given",
+              "retryable": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "check": "S. run 1: recovery gets the runtime session store as `sessions` and the cron adapter as extractor (not the service method); it recovers the intent once: scanned 1, recovered 1, pending 0",
+      "pass": false,
+      "observed": [
+        {
+          "sessions_is_runtime_session_store": true,
+          "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+          "extract_candidates_is_service_method": true,
+          "limit": 8,
+          "raised": "TypeError: BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given"
+        }
+      ]
+    },
+    {
+      "check": "S. run 1: the agent's extractor is called once, by keyword only, with the brain runner's session API (SessctlAdapter, the runner's own object, not the runtime SessionStore), for the intent's session, root turn and original user message; it returns the extracted candidate",
+      "pass": false,
+      "observed": [
+        {
+          "positional_args": 4,
+          "keywords": [],
+          "session_api_type": "NoneType",
+          "session_api_is_brain_runner_session_api": false,
+          "session_api_is_runtime_session_store": false,
+          "session_id": null,
+          "root_turn_id": null,
+          "user_message": null,
+          "raised": "TypeError: BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given"
+        }
+      ]
+    },
+    {
+      "check": "S. run 1: the extraction's events go through the brain session API (brain.auto_fact_extraction.started and .completed with 1 item, trace = the root turn; none before the run), none in the runtime session store; the provider gets exactly one extraction request during recovery",
+      "pass": false,
+      "observed": {
+        "before": [],
+        "after_run1": [],
+        "runtime_store": 0,
+        "provider_during_recovery": []
+      }
+    },
+    {
+      "check": "S. run 1: capture identity is preserved: the recovery's bundle write carries the intent's capture_id, root turn, session and agent; the memory.capture.result has the same capture_id, root turn and runtime session, canonical id memory.capture.result:<capture_id>; the capture_id is the canonical one for (session, root turn)",
+      "pass": false,
+      "observed": {
+        "write": [],
+        "result": [],
+        "canonical_identity": {
+          "capture_id": "capture:b12544d253b85238cc1771a8ef0a5bb9821aae56e7e4272a24f67f4dc4c47f30",
+          "event_id": "turn.outcome:b12544d253b85238cc1771a8ef0a5bb9821aae56e7e4272a24f67f4dc4c47f30"
+        },
+        "intent_after": [
+          {
+            "canonical_event_id": "turn.outcome:b12544d253b85238cc1771a8ef0a5bb9821aae56e7e4272a24f67f4dc4c47f30",
+            "capture_id": "capture:b12544d253b85238cc1771a8ef0a5bb9821aae56e7e4272a24f67f4dc4c47f30",
+            "capture_state": "pending",
+            "root_turn_id": "1044d339b6ad43488e983533a77d6ab1",
+            "runtime_session_id": "capture",
+            "agent_id": "openminion"
+          }
+        ]
+      }
+    },
+    {
+      "check": "S. run 1: the bundle is written once with the extracted candidate: receipt disposition succeeded with one output id; the memory store holds that candidate (capture_id, source root turn and session of the intent) and one bundle receipt row with the result's hashes",
+      "pass": false,
+      "observed": {
+        "receipt": {},
+        "result": [],
+        "memory_rows": {
+          "receipts": [],
+          "candidates": []
+        }
+      }
+    },
+    {
+      "check": "S. run 1: after recovery the scheduled turn is submitted once (consolidation session) and completes; the run finishes with the turn's text and the consolidation watermark",
+      "pass": false,
+      "observed": {
+        "row": {
+          "state": "failed",
+          "summary": null,
+          "isolated_session_id": null,
+          "error": {
+            "code": "cron_failed",
+            "message": "BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given",
+            "retryable": false
+          },
+          "attempts": 1,
+          "watermark_target_scope": null,
+          "probe_wait": null
+        },
+        "recoveries": [
+          {
+            "sessions_is_runtime_session_store": true,
+            "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+            "extract_candidates_is_service_method": true,
+            "limit": 8,
+            "raised": "TypeError: BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given"
+          }
+        ],
+        "timeline": [
+          "cron.run.started",
+          "recovery.start",
+          "policy.decision",
+          "extractor.call",
+          "recovery.raised",
+          "cron.task_outcomes.reconciled",
+          "cron.run.finished"
+        ],
+        "submitted_turns": [],
+        "extractor_calls": 1
+      }
+    },
+    {
+      "check": "S. run 2: nothing pending (scanned 0), no extractor call, no new bundle write for the capture; still exactly one memory.capture.result, one receipt and one candidate for it; the second scheduled turn runs",
+      "pass": false,
+      "observed": {
+        "recoveries": [
+          {
+            "sessions_is_runtime_session_store": true,
+            "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+            "extract_candidates_is_service_method": true,
+            "limit": 8,
+            "raised": "TypeError: BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given"
+          }
+        ],
+        "results": 0,
+        "memory_rows": {
+          "receipts": [],
+          "candidates": []
+        },
+        "run": {
+          "state": "failed",
+          "summary": null,
+          "isolated_session_id": null,
+          "error": {
+            "code": "cron_failed",
+            "message": "BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given",
+            "retryable": false
+          },
+          "attempts": 1,
+          "watermark_target_scope": null,
+          "probe_wait": null
+        }
+      }
+    },
+    {
+      "check": "D. setup: the identity profile's hard constraint is loaded into the agent's security policy; the turn leaves a pending intent as in S",
+      "pass": true,
+      "observed": {
+        "constraints": [
+          "NEVER write memory records"
+        ],
+        "turn": {
+          "run_state": "completed",
+          "text": "openminion: Noted: tabs over spaces.",
+          "memory_capture_state": "pending",
+          "memory_capture_bundle_result": {
+            "capture_id": "capture:d755b9ed0fa4eb69315b9298f2a102b456be809c00f632a8418970ed2de375f6",
+            "disposition": "pending",
+            "error_code": "STORE_WRITE_FAILED"
+          }
+        },
+        "intents": [
+          {
+            "canonical_event_id": "turn.outcome:d755b9ed0fa4eb69315b9298f2a102b456be809c00f632a8418970ed2de375f6",
+            "capture_id": "capture:d755b9ed0fa4eb69315b9298f2a102b456be809c00f632a8418970ed2de375f6",
+            "capture_state": "pending",
+            "root_turn_id": "402fa8f1da8a45f58ac15faa01e2d8ad",
+            "runtime_session_id": "capture",
+            "agent_id": "openminion"
+          }
+        ]
+      }
+    },
+    {
+      "check": "D. run 1: the recovery authorization (memory.write, channel cron, target memory-capture-recovery) is not allowed (identity_hard_constraint_restricted); recovery leaves the intent pending: scanned 1, recovered 0, pending 1",
+      "pass": true,
+      "observed": {
+        "policy": [
+          {
+            "tool_name": "memory.write",
+            "channel": "cron",
+            "target": "memory-capture-recovery",
+            "session_id": "capture",
+            "run_id": "402fa8f1da8a45f58ac15faa01e2d8ad",
+            "decision": "require_approval",
+            "reason_code": "identity_hard_constraint_restricted",
+            "allowed": false,
+            "details": {
+              "identity_constraint_violated": "NEVER write memory records",
+              "tool_name": "memory.write",
+              "action": "execute tool"
+            }
+          }
+        ],
+        "recoveries": [
+          {
+            "sessions_is_runtime_session_store": true,
+            "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+            "extract_candidates_is_service_method": true,
+            "limit": 8,
+            "result": [
+              1,
+              0,
+              1
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "check": "D. run 1: no extraction: the extractor is not called, the provider gets no request during recovery, and no brain.auto_fact_extraction event exists for the root turn",
+      "pass": true,
+      "observed": {
+        "extractor_calls": [],
+        "provider": [],
+        "events": []
+      }
+    },
+    {
+      "check": "D. no write: no bundle write for the capture, no memory.capture.result, no candidate or receipt for it in the memory store, in either run; the intent stays pending (run 2 scans it again and leaves it pending)",
+      "pass": true,
+      "observed": {
+        "writes": [],
+        "results": [],
+        "memory_rows": {
+          "receipts": [],
+          "candidates": []
+        },
+        "run2_recoveries": [
+          {
+            "sessions_is_runtime_session_store": true,
+            "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+            "extract_candidates_is_service_method": true,
+            "limit": 8,
+            "result": [
+              1,
+              0,
+              1
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "check": "D. the scheduled turn still runs after the denied recovery, in both runs",
+      "pass": true,
+      "observed": {
+        "run1": {
+          "row": {
+            "state": "finished",
+            "summary": "openminion: Consolidation reviewed; nothing to change.",
+            "isolated_session_id": "consolidate:f1c977cf898346d8bffbdaa6e78118c9",
+            "error": null,
+            "attempts": 1,
+            "watermark_target_scope": "agent:openminion",
+            "probe_wait": null
+          },
+          "recoveries": [
+            {
+              "sessions_is_runtime_session_store": true,
+              "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+              "extract_candidates_is_service_method": true,
+              "limit": 8,
+              "result": [
+                1,
+                0,
+                1
+              ]
+            }
+          ],
+          "timeline": [
+            "cron.run.started",
+            "recovery.start",
+            "policy.decision",
+            "recovery.end",
+            "submit_turn",
+            "bundle_write",
+            "cron.task_outcomes.reconciled",
+            "cron.run.finished"
+          ],
+          "submitted_turns": [
+            {
+              "session_id": "consolidate:f1c977cf898346d8bffbdaa6e78118c9",
+              "agent_id": "openminion",
+              "input_text": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+              "thread": "openminion-cron-run-84ae053a"
+            }
+          ],
+          "extractor_calls": 0
+        },
+        "run2": {
+          "row": {
+            "state": "finished",
+            "summary": "openminion: Consolidation reviewed; nothing to change.",
+            "isolated_session_id": "consolidate:f1c977cf898346d8bffbdaa6e78118c9",
+            "error": null,
+            "attempts": 1,
+            "watermark_target_scope": "agent:openminion",
+            "probe_wait": null
+          },
+          "recoveries": [
+            {
+              "sessions_is_runtime_session_store": true,
+              "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+              "extract_candidates_is_service_method": true,
+              "limit": 8,
+              "result": [
+                1,
+                0,
+                1
+              ]
+            }
+          ],
+          "timeline": [
+            "cron.run.started",
+            "recovery.start",
+            "policy.decision",
+            "recovery.end",
+            "submit_turn",
+            "bundle_write",
+            "cron.task_outcomes.reconciled",
+            "cron.run.finished"
+          ],
+          "submitted_turns": [
+            {
+              "session_id": "consolidate:f1c977cf898346d8bffbdaa6e78118c9",
+              "agent_id": "openminion",
+              "input_text": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+              "thread": "openminion-cron-run-55f7f544"
+            }
+          ],
+          "extractor_calls": 0
+        }
+      }
+    },
+    {
+      "check": "U. setup: with the bundled reference-sqlite external backend (no atomic capture) the turn completes and its intent stays pending with CAPTURE_RECOVERY_UNSUPPORTED",
+      "pass": true,
+      "observed": {
+        "classes": {
+          "runtime_session_store": "SessionStore",
+          "brain_session_api": "SessctlAdapter",
+          "brain_session_api_store": "SQLiteSessionStore",
+          "memory_store": "BackendMemoryStoreAdapter",
+          "memory_store_inner": null,
+          "memory_backend": "SophiaGraphSqliteStore",
+          "memctl": "MemctlAdapter",
+          "agent_service": "BrainBridgeService",
+          "runtime_manager": "AgentRuntimeManager",
+          "security_policy": "SecurityPolicyEngine"
+        },
+        "turn": {
+          "run_state": "completed",
+          "text": "openminion: Noted: tabs over spaces.",
+          "memory_capture_state": "pending",
+          "memory_capture_bundle_result": {
+            "capture_id": "capture:b245d3ea0986769a48e39c17624c7a3bdaa781f515bb20467bdff5b129e8e72a",
+            "disposition": "pending",
+            "error_code": "CAPTURE_RECOVERY_UNSUPPORTED"
+          }
+        },
+        "intents": [
+          {
+            "canonical_event_id": "turn.outcome:b245d3ea0986769a48e39c17624c7a3bdaa781f515bb20467bdff5b129e8e72a",
+            "capture_id": "capture:b245d3ea0986769a48e39c17624c7a3bdaa781f515bb20467bdff5b129e8e72a",
+            "capture_state": "pending",
+            "root_turn_id": "f5c455e036ab45ea82d23ec3af7e8abf",
+            "runtime_session_id": "capture",
+            "agent_id": "openminion"
+          }
+        ]
+      }
+    },
+    {
+      "check": "U. run 1: recovery calls the extractor once by keyword with the brain session API for the intent; the bundle write for the same capture raises CaptureRecoveryUnsupportedError; scanned 1, recovered 0, pending 1",
+      "pass": false,
+      "observed": {
+        "extractor": [
+          {
+            "positional_args": 4,
+            "keywords": [],
+            "session_api_type": "NoneType",
+            "session_api_is_brain_runner_session_api": false,
+            "session_api_is_runtime_session_store": false,
+            "session_id": null,
+            "root_turn_id": null,
+            "user_message": null,
+            "raised": "TypeError: BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given"
+          }
+        ],
+        "write": [],
+        "recoveries": [
+          {
+            "sessions_is_runtime_session_store": true,
+            "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+            "extract_candidates_is_service_method": true,
+            "limit": 8,
+            "raised": "TypeError: BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given"
+          }
+        ]
+      }
+    },
+    {
+      "check": "U. the capture remains pending: no memory.capture.result after either run; run 2 scans it again with the first scheduled turn's own unsupported intent (scanned 2, recovered 0, pending 2)",
+      "pass": false,
+      "observed": {
+        "run2_recoveries": [
+          {
+            "sessions_is_runtime_session_store": true,
+            "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+            "extract_candidates_is_service_method": true,
+            "limit": 8,
+            "raised": "TypeError: BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given"
+          }
+        ],
+        "results": [],
+        "run1_cron_session_outcomes": []
+      }
+    },
+    {
+      "check": "U. the scheduled turn still runs after the unsupported recovery, in both runs",
+      "pass": false,
+      "observed": {
+        "run1": {
+          "row": {
+            "state": "failed",
+            "summary": null,
+            "isolated_session_id": null,
+            "error": {
+              "code": "cron_failed",
+              "message": "BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given",
+              "retryable": false
+            },
+            "attempts": 1,
+            "watermark_target_scope": null,
+            "probe_wait": null
+          },
+          "recoveries": [
+            {
+              "sessions_is_runtime_session_store": true,
+              "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+              "extract_candidates_is_service_method": true,
+              "limit": 8,
+              "raised": "TypeError: BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given"
+            }
+          ],
+          "timeline": [
+            "cron.run.started",
+            "recovery.start",
+            "policy.decision",
+            "extractor.call",
+            "recovery.raised",
+            "cron.task_outcomes.reconciled",
+            "cron.run.finished"
+          ],
+          "submitted_turns": [],
+          "extractor_calls": 1
+        },
+        "run2": {
+          "row": {
+            "state": "failed",
+            "summary": null,
+            "isolated_session_id": null,
+            "error": {
+              "code": "cron_failed",
+              "message": "BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given",
+              "retryable": false
+            },
+            "attempts": 1,
+            "watermark_target_scope": null,
+            "probe_wait": null
+          },
+          "recoveries": [
+            {
+              "sessions_is_runtime_session_store": true,
+              "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+              "extract_candidates_is_service_method": true,
+              "limit": 8,
+              "raised": "TypeError: BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given"
+            }
+          ],
+          "timeline": [
+            "cron.run.started",
+            "recovery.start",
+            "policy.decision",
+            "extractor.call",
+            "recovery.raised",
+            "cron.task_outcomes.reconciled",
+            "cron.run.finished"
+          ],
+          "submitted_turns": [],
+          "extractor_calls": 1
+        }
+      }
+    },
+    {
+      "check": "N. setup (control): the turn's own capture succeeds: its intent has one memory.capture.result before any run",
+      "pass": true,
+      "observed": {
+        "turn": {
+          "run_state": "completed",
+          "text": "openminion: Noted: tabs over spaces.",
+          "memory_capture_state": "succeeded",
+          "memory_capture_bundle_result": {
+            "capture_id": "capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+            "committed_at": "2026-10-27T04:32:34.443434+00:00",
+            "disposition": "succeeded",
+            "output_ids": [
+              "cand_4ef874c0c5b5d55edfd6d70f"
+            ],
+            "report_hash": "6a172f6f262e18e0009307c24ce954ee5347be28c93646ffa3990c5ded5f9610",
+            "result_hash": "200ef875fb72bf72622219499820c8d7f84776bac9929ad8638a339c85a25ee0"
+          }
+        },
+        "results_before": [
+          {
+            "capture_id": "capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+            "committed_at": "2026-10-27T04:32:34.443434+00:00",
+            "disposition": "succeeded",
+            "output_ids": [
+              "cand_4ef874c0c5b5d55edfd6d70f"
+            ],
+            "report_hash": "6a172f6f262e18e0009307c24ce954ee5347be28c93646ffa3990c5ded5f9610",
+            "result_hash": "200ef875fb72bf72622219499820c8d7f84776bac9929ad8638a339c85a25ee0",
+            "root_turn_id": "32ac212543a6420e8f7970a6e1123cff",
+            "runtime_session_id": "capture",
+            "schema_version": "mcrr.capture-intent.v1",
+            "canonical_event_id": "memory.capture.result:capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e"
+          }
+        ]
+      }
+    },
+    {
+      "check": "N. both runs: recovery scans nothing (0, 0, 0), no extractor call, no bundle write for the capture, the result is unchanged",
+      "pass": true,
+      "observed": {
+        "run1": [
+          {
+            "sessions_is_runtime_session_store": true,
+            "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+            "extract_candidates_is_service_method": true,
+            "limit": 8,
+            "result": [
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "run2": [
+          {
+            "sessions_is_runtime_session_store": true,
+            "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+            "extract_candidates_is_service_method": true,
+            "limit": 8,
+            "result": [
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "result": [
+          {
+            "capture_id": "capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+            "committed_at": "2026-10-27T04:32:34.443434+00:00",
+            "disposition": "succeeded",
+            "output_ids": [
+              "cand_4ef874c0c5b5d55edfd6d70f"
+            ],
+            "report_hash": "6a172f6f262e18e0009307c24ce954ee5347be28c93646ffa3990c5ded5f9610",
+            "result_hash": "200ef875fb72bf72622219499820c8d7f84776bac9929ad8638a339c85a25ee0",
+            "root_turn_id": "32ac212543a6420e8f7970a6e1123cff",
+            "runtime_session_id": "capture",
+            "schema_version": "mcrr.capture-intent.v1",
+            "canonical_event_id": "memory.capture.result:capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e"
+          }
+        ]
+      }
+    },
+    {
+      "check": "N. the scheduled turn runs in both runs",
+      "pass": true,
+      "observed": {
+        "run1": {
+          "row": {
+            "state": "finished",
+            "summary": "openminion: Consolidation reviewed; nothing to change.",
+            "isolated_session_id": "consolidate:e1961ae060f9402a89319b75ddffc67d",
+            "error": null,
+            "attempts": 1,
+            "watermark_target_scope": "agent:openminion",
+            "probe_wait": null
+          },
+          "recoveries": [
+            {
+              "sessions_is_runtime_session_store": true,
+              "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+              "extract_candidates_is_service_method": true,
+              "limit": 8,
+              "result": [
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "timeline": [
+            "cron.run.started",
+            "recovery.start",
+            "recovery.end",
+            "submit_turn",
+            "bundle_write",
+            "cron.task_outcomes.reconciled",
+            "cron.run.finished"
+          ],
+          "submitted_turns": [
+            {
+              "session_id": "consolidate:e1961ae060f9402a89319b75ddffc67d",
+              "agent_id": "openminion",
+              "input_text": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+              "thread": "openminion-cron-run-6aa17525"
+            }
+          ],
+          "extractor_calls": 0
+        },
+        "run2": {
+          "row": {
+            "state": "finished",
+            "summary": "openminion: Consolidation reviewed; nothing to change.",
+            "isolated_session_id": "consolidate:e1961ae060f9402a89319b75ddffc67d",
+            "error": null,
+            "attempts": 1,
+            "watermark_target_scope": "agent:openminion",
+            "probe_wait": null
+          },
+          "recoveries": [
+            {
+              "sessions_is_runtime_session_store": true,
+              "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+              "extract_candidates_is_service_method": true,
+              "limit": 8,
+              "result": [
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "timeline": [
+            "cron.run.started",
+            "recovery.start",
+            "recovery.end",
+            "submit_turn",
+            "bundle_write",
+            "cron.task_outcomes.reconciled",
+            "cron.run.finished"
+          ],
+          "submitted_turns": [
+            {
+              "session_id": "consolidate:e1961ae060f9402a89319b75ddffc67d",
+              "agent_id": "openminion",
+              "input_text": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+              "thread": "openminion-cron-run-d953e221"
+            }
+          ],
+          "extractor_calls": 0
+        }
+      }
+    },
+    {
+      "check": "Offline provider: each case's openai provider base URL is the scripted server on 127.0.0.1, which answered every model request of the turns, extractions and scheduled turns",
+      "pass": true,
+      "observed": {
+        "hosts": [
+          "127.0.0.1"
+        ],
+        "requests_served": {
+          "S": 4,
+          "D": 12,
+          "U": 4,
+          "N": 12
+        }
+      }
+    }
+  ],
+  "observed": {
+    "S_recovery": {
+      "classes": {
+        "runtime_session_store": "SessionStore",
+        "brain_session_api": "SessctlAdapter",
+        "brain_session_api_store": "SQLiteSessionStore",
+        "memory_store": "AuditedMemoryStore",
+        "memory_store_inner": "SQLiteMemoryStore",
+        "memory_backend": null,
+        "memctl": "MemctlAdapter",
+        "agent_service": "BrainBridgeService",
+        "runtime_manager": "AgentRuntimeManager",
+        "security_policy": "SecurityPolicyEngine"
+      },
+      "identity_constraints_loaded": [],
+      "turn": {
+        "run_state": "completed",
+        "text": "openminion: Noted: tabs over spaces.",
+        "memory_capture_state": "pending",
+        "memory_capture_bundle_result": {
+          "capture_id": "capture:b12544d253b85238cc1771a8ef0a5bb9821aae56e7e4272a24f67f4dc4c47f30",
+          "disposition": "pending",
+          "error_code": "STORE_WRITE_FAILED"
+        }
+      },
+      "turn_bundle_writes": [
+        {
+          "capture_id": "capture:b12544d253b85238cc1771a8ef0a5bb9821aae56e7e4272a24f67f4dc4c47f30",
+          "root_turn_id": "1044d339b6ad43488e983533a77d6ab1",
+          "session_id": "capture",
+          "agent_id": "openminion",
+          "candidates": [
+            {
+              "kind": "user_preference",
+              "normalized_key": "user_preference:indentation",
+              "title": "Prefers tabs for indentation",
+              "content": "The user prefers tabs over spaces for indentation.",
+              "tags": [
+                "probe-420"
+              ],
+              "confidence": 0.3
+            }
+          ],
+          "thread": "asyncio_1",
+          "injected": "StoreWriteError",
+          "raised": "StoreWriteError: probe: transient memory store write failure"
+        }
+      ],
+      "intents_before": [
+        {
+          "canonical_event_id": "turn.outcome:b12544d253b85238cc1771a8ef0a5bb9821aae56e7e4272a24f67f4dc4c47f30",
+          "capture_id": "capture:b12544d253b85238cc1771a8ef0a5bb9821aae56e7e4272a24f67f4dc4c47f30",
+          "capture_state": "pending",
+          "root_turn_id": "1044d339b6ad43488e983533a77d6ab1",
+          "runtime_session_id": "capture",
+          "agent_id": "openminion"
+        }
+      ],
+      "canonical_identity": {
+        "capture_id": "capture:b12544d253b85238cc1771a8ef0a5bb9821aae56e7e4272a24f67f4dc4c47f30",
+        "event_id": "turn.outcome:b12544d253b85238cc1771a8ef0a5bb9821aae56e7e4272a24f67f4dc4c47f30"
+      },
+      "results_before": [],
+      "memory_rows_before": {
+        "receipts": [],
+        "candidates": []
+      },
+      "brain_extraction_events_before": [],
+      "job": {
+        "created": {
+          "ok": true,
+          "task_id": "c0bb8e3ac7664de79e66a3f85149c242",
+          "name": "memory consolidation",
+          "enabled": true,
+          "schedule": {
+            "every_ms": 43200000,
+            "jitter_ms": 0,
+            "kind": "every"
+          },
+          "batch_limit": 8,
+          "target_scope": "agent:openminion",
+          "consolidation_session_id": "consolidate:c0bb8e3ac7664de79e66a3f85149c242"
+        },
+        "payload": {
+          "_openminion_memory_consolidation": {
+            "batch_limit": 8,
+            "max_iterations": 2,
+            "target_scope": "agent:openminion",
+            "timeout_seconds": 30
+          },
+          "kind": "agentTurn",
+          "message": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+          "session_id": "consolidate:c0bb8e3ac7664de79e66a3f85149c242"
+        },
+        "session_target": "isolated",
+        "concurrency_key": "memory-consolidation:agent:openminion",
+        "max_attempts": 3
+      },
+      "scheduler": "CronScheduler",
+      "runs": [
+        {
+          "queued": {
+            "run_id": "73d20dcaabed4b2e9e8d7e3e83b9eab0",
+            "job_id": "c0bb8e3ac7664de79e66a3f85149c242",
+            "state": "queued"
+          },
+          "row": {
+            "state": "failed",
+            "summary": null,
+            "isolated_session_id": null,
+            "error": {
+              "code": "cron_failed",
+              "message": "BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given",
+              "retryable": false
+            },
+            "attempts": 1,
+            "watermark_target_scope": null,
+            "probe_wait": null
+          },
+          "cron_events": [
+            {
+              "event": "cron.run.started",
+              "run_id": "73d20dcaabed4b2e9e8d7e3e83b9eab0",
+              "job_id": "c0bb8e3ac7664de79e66a3f85149c242"
+            },
+            {
+              "event": "cron.run.finished",
+              "run_id": "73d20dcaabed4b2e9e8d7e3e83b9eab0",
+              "job_id": "c0bb8e3ac7664de79e66a3f85149c242",
+              "state": "failed",
+              "summary": "",
+              "error": {
+                "code": "cron_failed",
+                "message": "BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given",
+                "retryable": false
+              }
+            }
+          ],
+          "recoveries": [
+            {
+              "sessions_is_runtime_session_store": true,
+              "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+              "extract_candidates_is_service_method": true,
+              "limit": 8,
+              "raised": "TypeError: BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given"
+            }
+          ],
+          "provider_requests_during_recovery": [],
+          "provider_requests": [],
+          "extractor_calls": [
+            {
+              "positional_args": 4,
+              "keywords": [],
+              "session_api_type": "NoneType",
+              "session_api_is_brain_runner_session_api": false,
+              "session_api_is_runtime_session_store": false,
+              "session_id": null,
+              "root_turn_id": null,
+              "user_message": null,
+              "raised": "TypeError: BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given"
+            }
+          ],
+          "bundle_writes": [],
+          "policy_decisions": [
+            {
+              "tool_name": "memory.write",
+              "channel": "cron",
+              "target": "memory-capture-recovery",
+              "session_id": "capture",
+              "run_id": "1044d339b6ad43488e983533a77d6ab1",
+              "decision": "allow",
+              "reason_code": "allowed",
+              "allowed": true,
+              "details": {}
+            }
+          ],
+          "submitted_turns": [],
+          "timeline": [
+            "cron.run.started",
+            "recovery.start",
+            "policy.decision",
+            "extractor.call",
+            "recovery.raised",
+            "cron.task_outcomes.reconciled",
+            "cron.run.finished"
+          ],
+          "results_for_intent": [],
+          "cron_session_outcomes": [],
+          "memory_rows": {
+            "receipts": [],
+            "candidates": []
+          },
+          "brain_extraction_events": [],
+          "runtime_store_extraction_events": 0
+        },
+        {
+          "queued": {
+            "run_id": "7f2e6e50ad8f4715ba8458a54a9928b5",
+            "job_id": "c0bb8e3ac7664de79e66a3f85149c242",
+            "state": "queued"
+          },
+          "row": {
+            "state": "failed",
+            "summary": null,
+            "isolated_session_id": null,
+            "error": {
+              "code": "cron_failed",
+              "message": "BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given",
+              "retryable": false
+            },
+            "attempts": 1,
+            "watermark_target_scope": null,
+            "probe_wait": null
+          },
+          "cron_events": [
+            {
+              "event": "cron.run.started",
+              "run_id": "7f2e6e50ad8f4715ba8458a54a9928b5",
+              "job_id": "c0bb8e3ac7664de79e66a3f85149c242"
+            },
+            {
+              "event": "cron.run.finished",
+              "run_id": "7f2e6e50ad8f4715ba8458a54a9928b5",
+              "job_id": "c0bb8e3ac7664de79e66a3f85149c242",
+              "state": "failed",
+              "summary": "",
+              "error": {
+                "code": "cron_failed",
+                "message": "BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given",
+                "retryable": false
+              }
+            }
+          ],
+          "recoveries": [
+            {
+              "sessions_is_runtime_session_store": true,
+              "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+              "extract_candidates_is_service_method": true,
+              "limit": 8,
+              "raised": "TypeError: BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given"
+            }
+          ],
+          "provider_requests_during_recovery": [],
+          "provider_requests": [],
+          "extractor_calls": [
+            {
+              "positional_args": 4,
+              "keywords": [],
+              "session_api_type": "NoneType",
+              "session_api_is_brain_runner_session_api": false,
+              "session_api_is_runtime_session_store": false,
+              "session_id": null,
+              "root_turn_id": null,
+              "user_message": null,
+              "raised": "TypeError: BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given"
+            }
+          ],
+          "bundle_writes": [],
+          "policy_decisions": [
+            {
+              "tool_name": "memory.write",
+              "channel": "cron",
+              "target": "memory-capture-recovery",
+              "session_id": "capture",
+              "run_id": "1044d339b6ad43488e983533a77d6ab1",
+              "decision": "allow",
+              "reason_code": "allowed",
+              "allowed": true,
+              "details": {}
+            }
+          ],
+          "submitted_turns": [],
+          "timeline": [
+            "cron.run.started",
+            "recovery.start",
+            "policy.decision",
+            "extractor.call",
+            "recovery.raised",
+            "cron.task_outcomes.reconciled",
+            "cron.run.finished"
+          ],
+          "results_for_intent": [],
+          "cron_session_outcomes": [],
+          "memory_rows": {
+            "receipts": [],
+            "candidates": []
+          },
+          "brain_extraction_events": [],
+          "runtime_store_extraction_events": 0
+        }
+      ],
+      "intents_after": [
+        {
+          "canonical_event_id": "turn.outcome:b12544d253b85238cc1771a8ef0a5bb9821aae56e7e4272a24f67f4dc4c47f30",
+          "capture_id": "capture:b12544d253b85238cc1771a8ef0a5bb9821aae56e7e4272a24f67f4dc4c47f30",
+          "capture_state": "pending",
+          "root_turn_id": "1044d339b6ad43488e983533a77d6ab1",
+          "runtime_session_id": "capture",
+          "agent_id": "openminion"
+        }
+      ],
+      "provider_requests_total": 4,
+      "provider_hosts": [
+        "127.0.0.1"
+      ],
+      "scheduler_events": [
+        {
+          "event": "cron.scheduler.started"
+        },
+        {
+          "event": "cron.task_outcomes.reconciled",
+          "job_id": "c0bb8e3ac7664de79e66a3f85149c242"
+        },
+        {
+          "event": "cron.task_outcomes.reconciled",
+          "job_id": "c0bb8e3ac7664de79e66a3f85149c242"
+        }
+      ],
+      "capture_id": "capture:b12544d253b85238cc1771a8ef0a5bb9821aae56e7e4272a24f67f4dc4c47f30",
+      "root_turn_id": "1044d339b6ad43488e983533a77d6ab1",
+      "cron_session": "consolidate:c0bb8e3ac7664de79e66a3f85149c242"
+    },
+    "D_authorization_denied": {
+      "classes": {
+        "runtime_session_store": "SessionStore",
+        "brain_session_api": "SessctlAdapter",
+        "brain_session_api_store": "SQLiteSessionStore",
+        "memory_store": "AuditedMemoryStore",
+        "memory_store_inner": "SQLiteMemoryStore",
+        "memory_backend": null,
+        "memctl": "MemctlAdapter",
+        "agent_service": "BrainBridgeService",
+        "runtime_manager": "AgentRuntimeManager",
+        "security_policy": "SecurityPolicyEngine"
+      },
+      "identity_constraints_loaded": [
+        "NEVER write memory records"
+      ],
+      "turn": {
+        "run_state": "completed",
+        "text": "openminion: Noted: tabs over spaces.",
+        "memory_capture_state": "pending",
+        "memory_capture_bundle_result": {
+          "capture_id": "capture:d755b9ed0fa4eb69315b9298f2a102b456be809c00f632a8418970ed2de375f6",
+          "disposition": "pending",
+          "error_code": "STORE_WRITE_FAILED"
+        }
+      },
+      "turn_bundle_writes": [
+        {
+          "capture_id": "capture:d755b9ed0fa4eb69315b9298f2a102b456be809c00f632a8418970ed2de375f6",
+          "root_turn_id": "402fa8f1da8a45f58ac15faa01e2d8ad",
+          "session_id": "capture",
+          "agent_id": "openminion",
+          "candidates": [
+            {
+              "kind": "user_preference",
+              "normalized_key": "user_preference:indentation",
+              "title": "Prefers tabs for indentation",
+              "content": "The user prefers tabs over spaces for indentation.",
+              "tags": [
+                "probe-420"
+              ],
+              "confidence": 0.3
+            }
+          ],
+          "thread": "asyncio_2",
+          "injected": "StoreWriteError",
+          "raised": "StoreWriteError: probe: transient memory store write failure"
+        }
+      ],
+      "intents_before": [
+        {
+          "canonical_event_id": "turn.outcome:d755b9ed0fa4eb69315b9298f2a102b456be809c00f632a8418970ed2de375f6",
+          "capture_id": "capture:d755b9ed0fa4eb69315b9298f2a102b456be809c00f632a8418970ed2de375f6",
+          "capture_state": "pending",
+          "root_turn_id": "402fa8f1da8a45f58ac15faa01e2d8ad",
+          "runtime_session_id": "capture",
+          "agent_id": "openminion"
+        }
+      ],
+      "canonical_identity": {
+        "capture_id": "capture:d755b9ed0fa4eb69315b9298f2a102b456be809c00f632a8418970ed2de375f6",
+        "event_id": "turn.outcome:d755b9ed0fa4eb69315b9298f2a102b456be809c00f632a8418970ed2de375f6"
+      },
+      "results_before": [],
+      "memory_rows_before": {
+        "receipts": [],
+        "candidates": []
+      },
+      "brain_extraction_events_before": [],
+      "job": {
+        "created": {
+          "ok": true,
+          "task_id": "f1c977cf898346d8bffbdaa6e78118c9",
+          "name": "memory consolidation",
+          "enabled": true,
+          "schedule": {
+            "every_ms": 43200000,
+            "jitter_ms": 0,
+            "kind": "every"
+          },
+          "batch_limit": 8,
+          "target_scope": "agent:openminion",
+          "consolidation_session_id": "consolidate:f1c977cf898346d8bffbdaa6e78118c9"
+        },
+        "payload": {
+          "_openminion_memory_consolidation": {
+            "batch_limit": 8,
+            "max_iterations": 2,
+            "target_scope": "agent:openminion",
+            "timeout_seconds": 30
+          },
+          "kind": "agentTurn",
+          "message": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+          "session_id": "consolidate:f1c977cf898346d8bffbdaa6e78118c9"
+        },
+        "session_target": "isolated",
+        "concurrency_key": "memory-consolidation:agent:openminion",
+        "max_attempts": 3
+      },
+      "scheduler": "CronScheduler",
+      "runs": [
+        {
+          "queued": {
+            "run_id": "84ae053a45b6492597f6b72242d0c825",
+            "job_id": "f1c977cf898346d8bffbdaa6e78118c9",
+            "state": "queued"
+          },
+          "row": {
+            "state": "finished",
+            "summary": "openminion: Consolidation reviewed; nothing to change.",
+            "isolated_session_id": "consolidate:f1c977cf898346d8bffbdaa6e78118c9",
+            "error": null,
+            "attempts": 1,
+            "watermark_target_scope": "agent:openminion",
+            "probe_wait": null
+          },
+          "cron_events": [
+            {
+              "event": "cron.run.started",
+              "run_id": "84ae053a45b6492597f6b72242d0c825",
+              "job_id": "f1c977cf898346d8bffbdaa6e78118c9"
+            },
+            {
+              "event": "cron.run.finished",
+              "run_id": "84ae053a45b6492597f6b72242d0c825",
+              "job_id": "f1c977cf898346d8bffbdaa6e78118c9",
+              "state": "finished",
+              "summary": "openminion: Consolidation reviewed; nothing to change."
+            }
+          ],
+          "recoveries": [
+            {
+              "sessions_is_runtime_session_store": true,
+              "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+              "extract_candidates_is_service_method": true,
+              "limit": 8,
+              "result": [
+                1,
+                0,
+                1
+              ]
+            }
+          ],
+          "provider_requests_during_recovery": [],
+          "provider_requests": [
+            "extraction",
+            "decide",
+            "freshness",
+            "freshness"
+          ],
+          "extractor_calls": [],
+          "bundle_writes": [
+            {
+              "capture_id": "capture:bc8a5dde02a5c8c5cb5bba05e8792c3fb7527beda19af46f0b7391ff99412080",
+              "root_turn_id": "3f5c91a38116484d86348967ea99ae39",
+              "session_id": "consolidate:f1c977cf898346d8bffbdaa6e78118c9",
+              "agent_id": "openminion",
+              "candidates": [],
+              "thread": "asyncio_2",
+              "result": {
+                "capture_id": "capture:bc8a5dde02a5c8c5cb5bba05e8792c3fb7527beda19af46f0b7391ff99412080",
+                "report_hash": "b44aabed1bfcf9bab7399a64295a86ef2baf82cdae9229dc29c23ac7b5c101ca",
+                "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80",
+                "output_ids": [],
+                "disposition": "succeeded_no_output",
+                "committed_at": "2026-10-27T04:32:29.552834+00:00"
+              }
+            }
+          ],
+          "policy_decisions": [
+            {
+              "tool_name": "memory.write",
+              "channel": "cron",
+              "target": "memory-capture-recovery",
+              "session_id": "capture",
+              "run_id": "402fa8f1da8a45f58ac15faa01e2d8ad",
+              "decision": "require_approval",
+              "reason_code": "identity_hard_constraint_restricted",
+              "allowed": false,
+              "details": {
+                "identity_constraint_violated": "NEVER write memory records",
+                "tool_name": "memory.write",
+                "action": "execute tool"
+              }
+            }
+          ],
+          "submitted_turns": [
+            {
+              "session_id": "consolidate:f1c977cf898346d8bffbdaa6e78118c9",
+              "agent_id": "openminion",
+              "input_text": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+              "thread": "openminion-cron-run-84ae053a"
+            }
+          ],
+          "timeline": [
+            "cron.run.started",
+            "recovery.start",
+            "policy.decision",
+            "recovery.end",
+            "submit_turn",
+            "bundle_write",
+            "cron.task_outcomes.reconciled",
+            "cron.run.finished"
+          ],
+          "results_for_intent": [],
+          "cron_session_outcomes": [
+            {
+              "canonical_event_id": "turn.outcome:bc8a5dde02a5c8c5cb5bba05e8792c3fb7527beda19af46f0b7391ff99412080",
+              "capture_id": "capture:bc8a5dde02a5c8c5cb5bba05e8792c3fb7527beda19af46f0b7391ff99412080",
+              "capture_state": "pending",
+              "root_turn_id": "3f5c91a38116484d86348967ea99ae39",
+              "runtime_session_id": "consolidate:f1c977cf898346d8bffbdaa6e78118c9",
+              "agent_id": "openminion"
+            }
+          ],
+          "memory_rows": {
+            "receipts": [],
+            "candidates": []
+          },
+          "brain_extraction_events": [],
+          "runtime_store_extraction_events": 0
+        },
+        {
+          "queued": {
+            "run_id": "55f7f5449541484c8959317e0007391e",
+            "job_id": "f1c977cf898346d8bffbdaa6e78118c9",
+            "state": "queued"
+          },
+          "row": {
+            "state": "finished",
+            "summary": "openminion: Consolidation reviewed; nothing to change.",
+            "isolated_session_id": "consolidate:f1c977cf898346d8bffbdaa6e78118c9",
+            "error": null,
+            "attempts": 1,
+            "watermark_target_scope": "agent:openminion",
+            "probe_wait": null
+          },
+          "cron_events": [
+            {
+              "event": "cron.run.started",
+              "run_id": "55f7f5449541484c8959317e0007391e",
+              "job_id": "f1c977cf898346d8bffbdaa6e78118c9"
+            },
+            {
+              "event": "cron.run.finished",
+              "run_id": "55f7f5449541484c8959317e0007391e",
+              "job_id": "f1c977cf898346d8bffbdaa6e78118c9",
+              "state": "finished",
+              "summary": "openminion: Consolidation reviewed; nothing to change."
+            }
+          ],
+          "recoveries": [
+            {
+              "sessions_is_runtime_session_store": true,
+              "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+              "extract_candidates_is_service_method": true,
+              "limit": 8,
+              "result": [
+                1,
+                0,
+                1
+              ]
+            }
+          ],
+          "provider_requests_during_recovery": [],
+          "provider_requests": [
+            "extraction",
+            "decide",
+            "freshness",
+            "freshness"
+          ],
+          "extractor_calls": [],
+          "bundle_writes": [
+            {
+              "capture_id": "capture:9865768d843b96c534244b8b9a6dfc54fdf038e0e2f79145ef73711f73c89e73",
+              "root_turn_id": "0337a1ec78664f5fafce04652087f6f9",
+              "session_id": "consolidate:f1c977cf898346d8bffbdaa6e78118c9",
+              "agent_id": "openminion",
+              "candidates": [],
+              "thread": "asyncio_2",
+              "result": {
+                "capture_id": "capture:9865768d843b96c534244b8b9a6dfc54fdf038e0e2f79145ef73711f73c89e73",
+                "report_hash": "2ffd036b217fd6ab1f219bd22f0d0e599e803567c80b68ccc1ea7526a8370d6c",
+                "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80",
+                "output_ids": [],
+                "disposition": "succeeded_no_output",
+                "committed_at": "2026-10-27T04:32:30.426913+00:00"
+              }
+            }
+          ],
+          "policy_decisions": [
+            {
+              "tool_name": "memory.write",
+              "channel": "cron",
+              "target": "memory-capture-recovery",
+              "session_id": "capture",
+              "run_id": "402fa8f1da8a45f58ac15faa01e2d8ad",
+              "decision": "require_approval",
+              "reason_code": "identity_hard_constraint_restricted",
+              "allowed": false,
+              "details": {
+                "identity_constraint_violated": "NEVER write memory records",
+                "tool_name": "memory.write",
+                "action": "execute tool"
+              }
+            }
+          ],
+          "submitted_turns": [
+            {
+              "session_id": "consolidate:f1c977cf898346d8bffbdaa6e78118c9",
+              "agent_id": "openminion",
+              "input_text": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+              "thread": "openminion-cron-run-55f7f544"
+            }
+          ],
+          "timeline": [
+            "cron.run.started",
+            "recovery.start",
+            "policy.decision",
+            "recovery.end",
+            "submit_turn",
+            "bundle_write",
+            "cron.task_outcomes.reconciled",
+            "cron.run.finished"
+          ],
+          "results_for_intent": [],
+          "cron_session_outcomes": [
+            {
+              "canonical_event_id": "turn.outcome:bc8a5dde02a5c8c5cb5bba05e8792c3fb7527beda19af46f0b7391ff99412080",
+              "capture_id": "capture:bc8a5dde02a5c8c5cb5bba05e8792c3fb7527beda19af46f0b7391ff99412080",
+              "capture_state": "pending",
+              "root_turn_id": "3f5c91a38116484d86348967ea99ae39",
+              "runtime_session_id": "consolidate:f1c977cf898346d8bffbdaa6e78118c9",
+              "agent_id": "openminion"
+            },
+            {
+              "canonical_event_id": "turn.outcome:9865768d843b96c534244b8b9a6dfc54fdf038e0e2f79145ef73711f73c89e73",
+              "capture_id": "capture:9865768d843b96c534244b8b9a6dfc54fdf038e0e2f79145ef73711f73c89e73",
+              "capture_state": "pending",
+              "root_turn_id": "0337a1ec78664f5fafce04652087f6f9",
+              "runtime_session_id": "consolidate:f1c977cf898346d8bffbdaa6e78118c9",
+              "agent_id": "openminion"
+            }
+          ],
+          "memory_rows": {
+            "receipts": [],
+            "candidates": []
+          },
+          "brain_extraction_events": [],
+          "runtime_store_extraction_events": 0
+        }
+      ],
+      "intents_after": [
+        {
+          "canonical_event_id": "turn.outcome:d755b9ed0fa4eb69315b9298f2a102b456be809c00f632a8418970ed2de375f6",
+          "capture_id": "capture:d755b9ed0fa4eb69315b9298f2a102b456be809c00f632a8418970ed2de375f6",
+          "capture_state": "pending",
+          "root_turn_id": "402fa8f1da8a45f58ac15faa01e2d8ad",
+          "runtime_session_id": "capture",
+          "agent_id": "openminion"
+        }
+      ],
+      "provider_requests_total": 12,
+      "provider_hosts": [
+        "127.0.0.1"
+      ],
+      "scheduler_events": [
+        {
+          "event": "cron.scheduler.started"
+        },
+        {
+          "event": "cron.task_outcomes.reconciled",
+          "job_id": "f1c977cf898346d8bffbdaa6e78118c9"
+        },
+        {
+          "event": "cron.task_outcomes.reconciled",
+          "job_id": "f1c977cf898346d8bffbdaa6e78118c9"
+        }
+      ],
+      "capture_id": "capture:d755b9ed0fa4eb69315b9298f2a102b456be809c00f632a8418970ed2de375f6",
+      "root_turn_id": "402fa8f1da8a45f58ac15faa01e2d8ad",
+      "cron_session": "consolidate:f1c977cf898346d8bffbdaa6e78118c9"
+    },
+    "U_unsupported_capture": {
+      "classes": {
+        "runtime_session_store": "SessionStore",
+        "brain_session_api": "SessctlAdapter",
+        "brain_session_api_store": "SQLiteSessionStore",
+        "memory_store": "BackendMemoryStoreAdapter",
+        "memory_store_inner": null,
+        "memory_backend": "SophiaGraphSqliteStore",
+        "memctl": "MemctlAdapter",
+        "agent_service": "BrainBridgeService",
+        "runtime_manager": "AgentRuntimeManager",
+        "security_policy": "SecurityPolicyEngine"
+      },
+      "identity_constraints_loaded": [],
+      "turn": {
+        "run_state": "completed",
+        "text": "openminion: Noted: tabs over spaces.",
+        "memory_capture_state": "pending",
+        "memory_capture_bundle_result": {
+          "capture_id": "capture:b245d3ea0986769a48e39c17624c7a3bdaa781f515bb20467bdff5b129e8e72a",
+          "disposition": "pending",
+          "error_code": "CAPTURE_RECOVERY_UNSUPPORTED"
+        }
+      },
+      "turn_bundle_writes": [
+        {
+          "capture_id": "capture:b245d3ea0986769a48e39c17624c7a3bdaa781f515bb20467bdff5b129e8e72a",
+          "root_turn_id": "f5c455e036ab45ea82d23ec3af7e8abf",
+          "session_id": "capture",
+          "agent_id": "openminion",
+          "candidates": [
+            {
+              "kind": "user_preference",
+              "normalized_key": "user_preference:indentation",
+              "title": "Prefers tabs for indentation",
+              "content": "The user prefers tabs over spaces for indentation.",
+              "tags": [
+                "probe-420"
+              ],
+              "confidence": 0.3
+            }
+          ],
+          "thread": "asyncio_2",
+          "raised": "CaptureRecoveryUnsupportedError: memory backend SophiaGraphSqliteStore does not support atomic capture bundles"
+        }
+      ],
+      "intents_before": [
+        {
+          "canonical_event_id": "turn.outcome:b245d3ea0986769a48e39c17624c7a3bdaa781f515bb20467bdff5b129e8e72a",
+          "capture_id": "capture:b245d3ea0986769a48e39c17624c7a3bdaa781f515bb20467bdff5b129e8e72a",
+          "capture_state": "pending",
+          "root_turn_id": "f5c455e036ab45ea82d23ec3af7e8abf",
+          "runtime_session_id": "capture",
+          "agent_id": "openminion"
+        }
+      ],
+      "canonical_identity": {
+        "capture_id": "capture:b245d3ea0986769a48e39c17624c7a3bdaa781f515bb20467bdff5b129e8e72a",
+        "event_id": "turn.outcome:b245d3ea0986769a48e39c17624c7a3bdaa781f515bb20467bdff5b129e8e72a"
+      },
+      "results_before": [],
+      "memory_rows_before": {
+        "store": "not a built-in SQLite memory store"
+      },
+      "brain_extraction_events_before": [],
+      "job": {
+        "created": {
+          "ok": true,
+          "task_id": "f2aa3a38570d497daf7adf36ffbef927",
+          "name": "memory consolidation",
+          "enabled": true,
+          "schedule": {
+            "every_ms": 43200000,
+            "jitter_ms": 0,
+            "kind": "every"
+          },
+          "batch_limit": 8,
+          "target_scope": "agent:openminion",
+          "consolidation_session_id": "consolidate:f2aa3a38570d497daf7adf36ffbef927"
+        },
+        "payload": {
+          "_openminion_memory_consolidation": {
+            "batch_limit": 8,
+            "max_iterations": 2,
+            "target_scope": "agent:openminion",
+            "timeout_seconds": 30
+          },
+          "kind": "agentTurn",
+          "message": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+          "session_id": "consolidate:f2aa3a38570d497daf7adf36ffbef927"
+        },
+        "session_target": "isolated",
+        "concurrency_key": "memory-consolidation:agent:openminion",
+        "max_attempts": 3
+      },
+      "scheduler": "CronScheduler",
+      "runs": [
+        {
+          "queued": {
+            "run_id": "cf593ee8a5b3486f8388cb0145aa80f0",
+            "job_id": "f2aa3a38570d497daf7adf36ffbef927",
+            "state": "queued"
+          },
+          "row": {
+            "state": "failed",
+            "summary": null,
+            "isolated_session_id": null,
+            "error": {
+              "code": "cron_failed",
+              "message": "BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given",
+              "retryable": false
+            },
+            "attempts": 1,
+            "watermark_target_scope": null,
+            "probe_wait": null
+          },
+          "cron_events": [
+            {
+              "event": "cron.run.started",
+              "run_id": "cf593ee8a5b3486f8388cb0145aa80f0",
+              "job_id": "f2aa3a38570d497daf7adf36ffbef927"
+            },
+            {
+              "event": "cron.run.finished",
+              "run_id": "cf593ee8a5b3486f8388cb0145aa80f0",
+              "job_id": "f2aa3a38570d497daf7adf36ffbef927",
+              "state": "failed",
+              "summary": "",
+              "error": {
+                "code": "cron_failed",
+                "message": "BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given",
+                "retryable": false
+              }
+            }
+          ],
+          "recoveries": [
+            {
+              "sessions_is_runtime_session_store": true,
+              "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+              "extract_candidates_is_service_method": true,
+              "limit": 8,
+              "raised": "TypeError: BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given"
+            }
+          ],
+          "provider_requests_during_recovery": [],
+          "provider_requests": [],
+          "extractor_calls": [
+            {
+              "positional_args": 4,
+              "keywords": [],
+              "session_api_type": "NoneType",
+              "session_api_is_brain_runner_session_api": false,
+              "session_api_is_runtime_session_store": false,
+              "session_id": null,
+              "root_turn_id": null,
+              "user_message": null,
+              "raised": "TypeError: BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given"
+            }
+          ],
+          "bundle_writes": [],
+          "policy_decisions": [
+            {
+              "tool_name": "memory.write",
+              "channel": "cron",
+              "target": "memory-capture-recovery",
+              "session_id": "capture",
+              "run_id": "f5c455e036ab45ea82d23ec3af7e8abf",
+              "decision": "allow",
+              "reason_code": "allowed",
+              "allowed": true,
+              "details": {}
+            }
+          ],
+          "submitted_turns": [],
+          "timeline": [
+            "cron.run.started",
+            "recovery.start",
+            "policy.decision",
+            "extractor.call",
+            "recovery.raised",
+            "cron.task_outcomes.reconciled",
+            "cron.run.finished"
+          ],
+          "results_for_intent": [],
+          "cron_session_outcomes": [],
+          "memory_rows": {
+            "store": "not a built-in SQLite memory store"
+          },
+          "brain_extraction_events": [],
+          "runtime_store_extraction_events": 0
+        },
+        {
+          "queued": {
+            "run_id": "8e02e4c112384d4d957e5b196f5f1930",
+            "job_id": "f2aa3a38570d497daf7adf36ffbef927",
+            "state": "queued"
+          },
+          "row": {
+            "state": "failed",
+            "summary": null,
+            "isolated_session_id": null,
+            "error": {
+              "code": "cron_failed",
+              "message": "BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given",
+              "retryable": false
+            },
+            "attempts": 1,
+            "watermark_target_scope": null,
+            "probe_wait": null
+          },
+          "cron_events": [
+            {
+              "event": "cron.run.started",
+              "run_id": "8e02e4c112384d4d957e5b196f5f1930",
+              "job_id": "f2aa3a38570d497daf7adf36ffbef927"
+            },
+            {
+              "event": "cron.run.finished",
+              "run_id": "8e02e4c112384d4d957e5b196f5f1930",
+              "job_id": "f2aa3a38570d497daf7adf36ffbef927",
+              "state": "failed",
+              "summary": "",
+              "error": {
+                "code": "cron_failed",
+                "message": "BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given",
+                "retryable": false
+              }
+            }
+          ],
+          "recoveries": [
+            {
+              "sessions_is_runtime_session_store": true,
+              "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+              "extract_candidates_is_service_method": true,
+              "limit": 8,
+              "raised": "TypeError: BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given"
+            }
+          ],
+          "provider_requests_during_recovery": [],
+          "provider_requests": [],
+          "extractor_calls": [
+            {
+              "positional_args": 4,
+              "keywords": [],
+              "session_api_type": "NoneType",
+              "session_api_is_brain_runner_session_api": false,
+              "session_api_is_runtime_session_store": false,
+              "session_id": null,
+              "root_turn_id": null,
+              "user_message": null,
+              "raised": "TypeError: BrainBridgeService.extract_memory_capture_candidates() takes 1 positional argument but 5 were given"
+            }
+          ],
+          "bundle_writes": [],
+          "policy_decisions": [
+            {
+              "tool_name": "memory.write",
+              "channel": "cron",
+              "target": "memory-capture-recovery",
+              "session_id": "capture",
+              "run_id": "f5c455e036ab45ea82d23ec3af7e8abf",
+              "decision": "allow",
+              "reason_code": "allowed",
+              "allowed": true,
+              "details": {}
+            }
+          ],
+          "submitted_turns": [],
+          "timeline": [
+            "cron.run.started",
+            "recovery.start",
+            "policy.decision",
+            "extractor.call",
+            "recovery.raised",
+            "cron.task_outcomes.reconciled",
+            "cron.run.finished"
+          ],
+          "results_for_intent": [],
+          "cron_session_outcomes": [],
+          "memory_rows": {
+            "store": "not a built-in SQLite memory store"
+          },
+          "brain_extraction_events": [],
+          "runtime_store_extraction_events": 0
+        }
+      ],
+      "intents_after": [
+        {
+          "canonical_event_id": "turn.outcome:b245d3ea0986769a48e39c17624c7a3bdaa781f515bb20467bdff5b129e8e72a",
+          "capture_id": "capture:b245d3ea0986769a48e39c17624c7a3bdaa781f515bb20467bdff5b129e8e72a",
+          "capture_state": "pending",
+          "root_turn_id": "f5c455e036ab45ea82d23ec3af7e8abf",
+          "runtime_session_id": "capture",
+          "agent_id": "openminion"
+        }
+      ],
+      "provider_requests_total": 4,
+      "provider_hosts": [
+        "127.0.0.1"
+      ],
+      "scheduler_events": [
+        {
+          "event": "cron.scheduler.started"
+        },
+        {
+          "event": "cron.task_outcomes.reconciled",
+          "job_id": "f2aa3a38570d497daf7adf36ffbef927"
+        },
+        {
+          "event": "cron.task_outcomes.reconciled",
+          "job_id": "f2aa3a38570d497daf7adf36ffbef927"
+        }
+      ],
+      "capture_id": "capture:b245d3ea0986769a48e39c17624c7a3bdaa781f515bb20467bdff5b129e8e72a",
+      "root_turn_id": "f5c455e036ab45ea82d23ec3af7e8abf",
+      "cron_session": "consolidate:f2aa3a38570d497daf7adf36ffbef927"
+    },
+    "N_no_pending": {
+      "classes": {
+        "runtime_session_store": "SessionStore",
+        "brain_session_api": "SessctlAdapter",
+        "brain_session_api_store": "SQLiteSessionStore",
+        "memory_store": "AuditedMemoryStore",
+        "memory_store_inner": "SQLiteMemoryStore",
+        "memory_backend": null,
+        "memctl": "MemctlAdapter",
+        "agent_service": "BrainBridgeService",
+        "runtime_manager": "AgentRuntimeManager",
+        "security_policy": "SecurityPolicyEngine"
+      },
+      "identity_constraints_loaded": [],
+      "turn": {
+        "run_state": "completed",
+        "text": "openminion: Noted: tabs over spaces.",
+        "memory_capture_state": "succeeded",
+        "memory_capture_bundle_result": {
+          "capture_id": "capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+          "committed_at": "2026-10-27T04:32:34.443434+00:00",
+          "disposition": "succeeded",
+          "output_ids": [
+            "cand_4ef874c0c5b5d55edfd6d70f"
+          ],
+          "report_hash": "6a172f6f262e18e0009307c24ce954ee5347be28c93646ffa3990c5ded5f9610",
+          "result_hash": "200ef875fb72bf72622219499820c8d7f84776bac9929ad8638a339c85a25ee0"
+        }
+      },
+      "turn_bundle_writes": [
+        {
+          "capture_id": "capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+          "root_turn_id": "32ac212543a6420e8f7970a6e1123cff",
+          "session_id": "capture",
+          "agent_id": "openminion",
+          "candidates": [
+            {
+              "kind": "user_preference",
+              "normalized_key": "user_preference:indentation",
+              "title": "Prefers tabs for indentation",
+              "content": "The user prefers tabs over spaces for indentation.",
+              "tags": [
+                "probe-420"
+              ],
+              "confidence": 0.3
+            }
+          ],
+          "thread": "asyncio_2",
+          "result": {
+            "capture_id": "capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+            "report_hash": "6a172f6f262e18e0009307c24ce954ee5347be28c93646ffa3990c5ded5f9610",
+            "result_hash": "200ef875fb72bf72622219499820c8d7f84776bac9929ad8638a339c85a25ee0",
+            "output_ids": [
+              "cand_4ef874c0c5b5d55edfd6d70f"
+            ],
+            "disposition": "succeeded",
+            "committed_at": "2026-10-27T04:32:34.443434+00:00"
+          }
+        }
+      ],
+      "intents_before": [
+        {
+          "canonical_event_id": "turn.outcome:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+          "capture_id": "capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+          "capture_state": "pending",
+          "root_turn_id": "32ac212543a6420e8f7970a6e1123cff",
+          "runtime_session_id": "capture",
+          "agent_id": "openminion"
+        }
+      ],
+      "canonical_identity": {
+        "capture_id": "capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+        "event_id": "turn.outcome:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e"
+      },
+      "results_before": [
+        {
+          "capture_id": "capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+          "committed_at": "2026-10-27T04:32:34.443434+00:00",
+          "disposition": "succeeded",
+          "output_ids": [
+            "cand_4ef874c0c5b5d55edfd6d70f"
+          ],
+          "report_hash": "6a172f6f262e18e0009307c24ce954ee5347be28c93646ffa3990c5ded5f9610",
+          "result_hash": "200ef875fb72bf72622219499820c8d7f84776bac9929ad8638a339c85a25ee0",
+          "root_turn_id": "32ac212543a6420e8f7970a6e1123cff",
+          "runtime_session_id": "capture",
+          "schema_version": "mcrr.capture-intent.v1",
+          "canonical_event_id": "memory.capture.result:capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e"
+        }
+      ],
+      "memory_rows_before": {
+        "receipts": [
+          [
+            "capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+            "succeeded",
+            "200ef875fb72bf72622219499820c8d7f84776bac9929ad8638a339c85a25ee0",
+            "6a172f6f262e18e0009307c24ce954ee5347be28c93646ffa3990c5ded5f9610",
+            "[\"cand_4ef874c0c5b5d55edfd6d70f\"]"
+          ]
+        ],
+        "candidates": [
+          [
+            "cand_4ef874c0c5b5d55edfd6d70f",
+            "capture",
+            "user_preference",
+            "user_preference:indentation",
+            "capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+            "32ac212543a6420e8f7970a6e1123cff",
+            "capture"
+          ]
+        ]
+      },
+      "brain_extraction_events_before": [],
+      "job": {
+        "created": {
+          "ok": true,
+          "task_id": "e1961ae060f9402a89319b75ddffc67d",
+          "name": "memory consolidation",
+          "enabled": true,
+          "schedule": {
+            "every_ms": 43200000,
+            "jitter_ms": 0,
+            "kind": "every"
+          },
+          "batch_limit": 8,
+          "target_scope": "agent:openminion",
+          "consolidation_session_id": "consolidate:e1961ae060f9402a89319b75ddffc67d"
+        },
+        "payload": {
+          "_openminion_memory_consolidation": {
+            "batch_limit": 8,
+            "max_iterations": 2,
+            "target_scope": "agent:openminion",
+            "timeout_seconds": 30
+          },
+          "kind": "agentTurn",
+          "message": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+          "session_id": "consolidate:e1961ae060f9402a89319b75ddffc67d"
+        },
+        "session_target": "isolated",
+        "concurrency_key": "memory-consolidation:agent:openminion",
+        "max_attempts": 3
+      },
+      "scheduler": "CronScheduler",
+      "runs": [
+        {
+          "queued": {
+            "run_id": "6aa1752590d4470d99dc5aa058b4922e",
+            "job_id": "e1961ae060f9402a89319b75ddffc67d",
+            "state": "queued"
+          },
+          "row": {
+            "state": "finished",
+            "summary": "openminion: Consolidation reviewed; nothing to change.",
+            "isolated_session_id": "consolidate:e1961ae060f9402a89319b75ddffc67d",
+            "error": null,
+            "attempts": 1,
+            "watermark_target_scope": "agent:openminion",
+            "probe_wait": null
+          },
+          "cron_events": [
+            {
+              "event": "cron.run.started",
+              "run_id": "6aa1752590d4470d99dc5aa058b4922e",
+              "job_id": "e1961ae060f9402a89319b75ddffc67d"
+            },
+            {
+              "event": "cron.run.finished",
+              "run_id": "6aa1752590d4470d99dc5aa058b4922e",
+              "job_id": "e1961ae060f9402a89319b75ddffc67d",
+              "state": "finished",
+              "summary": "openminion: Consolidation reviewed; nothing to change."
+            }
+          ],
+          "recoveries": [
+            {
+              "sessions_is_runtime_session_store": true,
+              "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+              "extract_candidates_is_service_method": true,
+              "limit": 8,
+              "result": [
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "provider_requests_during_recovery": [],
+          "provider_requests": [
+            "extraction",
+            "decide",
+            "freshness",
+            "freshness"
+          ],
+          "extractor_calls": [],
+          "bundle_writes": [
+            {
+              "capture_id": "capture:f77680f07b5d9fdd02163057b207b91339f30a17a82f0cd3842ac353c9fe4a17",
+              "root_turn_id": "4ece5c0f69904d1880b7adf001f01f81",
+              "session_id": "consolidate:e1961ae060f9402a89319b75ddffc67d",
+              "agent_id": "openminion",
+              "candidates": [],
+              "thread": "asyncio_1",
+              "result": {
+                "capture_id": "capture:f77680f07b5d9fdd02163057b207b91339f30a17a82f0cd3842ac353c9fe4a17",
+                "report_hash": "47815730b3ab7384f69ae0377f46bd3e26ff59b552e7632638aa89bb91bbe147",
+                "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80",
+                "output_ids": [],
+                "disposition": "succeeded_no_output",
+                "committed_at": "2026-10-27T04:32:35.237183+00:00"
+              }
+            }
+          ],
+          "policy_decisions": [],
+          "submitted_turns": [
+            {
+              "session_id": "consolidate:e1961ae060f9402a89319b75ddffc67d",
+              "agent_id": "openminion",
+              "input_text": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+              "thread": "openminion-cron-run-6aa17525"
+            }
+          ],
+          "timeline": [
+            "cron.run.started",
+            "recovery.start",
+            "recovery.end",
+            "submit_turn",
+            "bundle_write",
+            "cron.task_outcomes.reconciled",
+            "cron.run.finished"
+          ],
+          "results_for_intent": [
+            {
+              "capture_id": "capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+              "committed_at": "2026-10-27T04:32:34.443434+00:00",
+              "disposition": "succeeded",
+              "output_ids": [
+                "cand_4ef874c0c5b5d55edfd6d70f"
+              ],
+              "report_hash": "6a172f6f262e18e0009307c24ce954ee5347be28c93646ffa3990c5ded5f9610",
+              "result_hash": "200ef875fb72bf72622219499820c8d7f84776bac9929ad8638a339c85a25ee0",
+              "root_turn_id": "32ac212543a6420e8f7970a6e1123cff",
+              "runtime_session_id": "capture",
+              "schema_version": "mcrr.capture-intent.v1",
+              "canonical_event_id": "memory.capture.result:capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e"
+            }
+          ],
+          "cron_session_outcomes": [
+            {
+              "canonical_event_id": "turn.outcome:f77680f07b5d9fdd02163057b207b91339f30a17a82f0cd3842ac353c9fe4a17",
+              "capture_id": "capture:f77680f07b5d9fdd02163057b207b91339f30a17a82f0cd3842ac353c9fe4a17",
+              "capture_state": "pending",
+              "root_turn_id": "4ece5c0f69904d1880b7adf001f01f81",
+              "runtime_session_id": "consolidate:e1961ae060f9402a89319b75ddffc67d",
+              "agent_id": "openminion"
+            }
+          ],
+          "memory_rows": {
+            "receipts": [
+              [
+                "capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+                "succeeded",
+                "200ef875fb72bf72622219499820c8d7f84776bac9929ad8638a339c85a25ee0",
+                "6a172f6f262e18e0009307c24ce954ee5347be28c93646ffa3990c5ded5f9610",
+                "[\"cand_4ef874c0c5b5d55edfd6d70f\"]"
+              ]
+            ],
+            "candidates": [
+              [
+                "cand_4ef874c0c5b5d55edfd6d70f",
+                "capture",
+                "user_preference",
+                "user_preference:indentation",
+                "capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+                "32ac212543a6420e8f7970a6e1123cff",
+                "capture"
+              ]
+            ]
+          },
+          "brain_extraction_events": [],
+          "runtime_store_extraction_events": 0
+        },
+        {
+          "queued": {
+            "run_id": "d953e2213bb4420f9deb0c4160a0ad56",
+            "job_id": "e1961ae060f9402a89319b75ddffc67d",
+            "state": "queued"
+          },
+          "row": {
+            "state": "finished",
+            "summary": "openminion: Consolidation reviewed; nothing to change.",
+            "isolated_session_id": "consolidate:e1961ae060f9402a89319b75ddffc67d",
+            "error": null,
+            "attempts": 1,
+            "watermark_target_scope": "agent:openminion",
+            "probe_wait": null
+          },
+          "cron_events": [
+            {
+              "event": "cron.run.started",
+              "run_id": "d953e2213bb4420f9deb0c4160a0ad56",
+              "job_id": "e1961ae060f9402a89319b75ddffc67d"
+            },
+            {
+              "event": "cron.run.finished",
+              "run_id": "d953e2213bb4420f9deb0c4160a0ad56",
+              "job_id": "e1961ae060f9402a89319b75ddffc67d",
+              "state": "finished",
+              "summary": "openminion: Consolidation reviewed; nothing to change."
+            }
+          ],
+          "recoveries": [
+            {
+              "sessions_is_runtime_session_store": true,
+              "extract_candidates": "Observers.install.<locals>.extract.<locals>.wrapper",
+              "extract_candidates_is_service_method": true,
+              "limit": 8,
+              "result": [
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "provider_requests_during_recovery": [],
+          "provider_requests": [
+            "extraction",
+            "decide",
+            "freshness",
+            "freshness"
+          ],
+          "extractor_calls": [],
+          "bundle_writes": [
+            {
+              "capture_id": "capture:5f97729cee639353be016196270f05cc63284fb0a5e10b0b859c7532e877a8bd",
+              "root_turn_id": "ed560511ffad4cfa83a8b69cccaba500",
+              "session_id": "consolidate:e1961ae060f9402a89319b75ddffc67d",
+              "agent_id": "openminion",
+              "candidates": [],
+              "thread": "asyncio_2",
+              "result": {
+                "capture_id": "capture:5f97729cee639353be016196270f05cc63284fb0a5e10b0b859c7532e877a8bd",
+                "report_hash": "5d595c36696184f0d15834a8f3a493322fec1f51ba4824d1a7d915dbc0cd3652",
+                "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80",
+                "output_ids": [],
+                "disposition": "succeeded_no_output",
+                "committed_at": "2026-10-27T04:32:35.940922+00:00"
+              }
+            }
+          ],
+          "policy_decisions": [],
+          "submitted_turns": [
+            {
+              "session_id": "consolidate:e1961ae060f9402a89319b75ddffc67d",
+              "agent_id": "openminion",
+              "input_text": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+              "thread": "openminion-cron-run-d953e221"
+            }
+          ],
+          "timeline": [
+            "cron.run.started",
+            "recovery.start",
+            "recovery.end",
+            "submit_turn",
+            "bundle_write",
+            "cron.task_outcomes.reconciled",
+            "cron.run.finished"
+          ],
+          "results_for_intent": [
+            {
+              "capture_id": "capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+              "committed_at": "2026-10-27T04:32:34.443434+00:00",
+              "disposition": "succeeded",
+              "output_ids": [
+                "cand_4ef874c0c5b5d55edfd6d70f"
+              ],
+              "report_hash": "6a172f6f262e18e0009307c24ce954ee5347be28c93646ffa3990c5ded5f9610",
+              "result_hash": "200ef875fb72bf72622219499820c8d7f84776bac9929ad8638a339c85a25ee0",
+              "root_turn_id": "32ac212543a6420e8f7970a6e1123cff",
+              "runtime_session_id": "capture",
+              "schema_version": "mcrr.capture-intent.v1",
+              "canonical_event_id": "memory.capture.result:capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e"
+            }
+          ],
+          "cron_session_outcomes": [
+            {
+              "canonical_event_id": "turn.outcome:f77680f07b5d9fdd02163057b207b91339f30a17a82f0cd3842ac353c9fe4a17",
+              "capture_id": "capture:f77680f07b5d9fdd02163057b207b91339f30a17a82f0cd3842ac353c9fe4a17",
+              "capture_state": "pending",
+              "root_turn_id": "4ece5c0f69904d1880b7adf001f01f81",
+              "runtime_session_id": "consolidate:e1961ae060f9402a89319b75ddffc67d",
+              "agent_id": "openminion"
+            },
+            {
+              "canonical_event_id": "turn.outcome:5f97729cee639353be016196270f05cc63284fb0a5e10b0b859c7532e877a8bd",
+              "capture_id": "capture:5f97729cee639353be016196270f05cc63284fb0a5e10b0b859c7532e877a8bd",
+              "capture_state": "pending",
+              "root_turn_id": "ed560511ffad4cfa83a8b69cccaba500",
+              "runtime_session_id": "consolidate:e1961ae060f9402a89319b75ddffc67d",
+              "agent_id": "openminion"
+            }
+          ],
+          "memory_rows": {
+            "receipts": [
+              [
+                "capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+                "succeeded",
+                "200ef875fb72bf72622219499820c8d7f84776bac9929ad8638a339c85a25ee0",
+                "6a172f6f262e18e0009307c24ce954ee5347be28c93646ffa3990c5ded5f9610",
+                "[\"cand_4ef874c0c5b5d55edfd6d70f\"]"
+              ]
+            ],
+            "candidates": [
+              [
+                "cand_4ef874c0c5b5d55edfd6d70f",
+                "capture",
+                "user_preference",
+                "user_preference:indentation",
+                "capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+                "32ac212543a6420e8f7970a6e1123cff",
+                "capture"
+              ]
+            ]
+          },
+          "brain_extraction_events": [],
+          "runtime_store_extraction_events": 0
+        }
+      ],
+      "intents_after": [
+        {
+          "canonical_event_id": "turn.outcome:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+          "capture_id": "capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+          "capture_state": "pending",
+          "root_turn_id": "32ac212543a6420e8f7970a6e1123cff",
+          "runtime_session_id": "capture",
+          "agent_id": "openminion"
+        }
+      ],
+      "provider_requests_total": 12,
+      "provider_hosts": [
+        "127.0.0.1"
+      ],
+      "scheduler_events": [
+        {
+          "event": "cron.scheduler.started"
+        },
+        {
+          "event": "cron.task_outcomes.reconciled",
+          "job_id": "e1961ae060f9402a89319b75ddffc67d"
+        },
+        {
+          "event": "cron.task_outcomes.reconciled",
+          "job_id": "e1961ae060f9402a89319b75ddffc67d"
+        }
+      ],
+      "capture_id": "capture:060070d0bdb08d32385256b7bed6abe4dfc100bc66d9482365f57e2f970a310e",
+      "root_turn_id": "32ac212543a6420e8f7970a6e1123cff",
+      "cron_session": "consolidate:e1961ae060f9402a89319b75ddffc67d"
+    },
+    "P_postgres_memory_store": "not run: OPENMINION_TEST_POSTGRES_URL is not set"
+  }
+}

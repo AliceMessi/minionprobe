@@ -1,0 +1,59 @@
+Using Python 3.12.15 environment at: <VENV0112>
+Using Python 3.12.15 environment at: <VENV>
+Using Python 3.12.15 environment at: <VENV>
+provenance: 1 match
+=== probe_413
+exit=0
+SUMMARY passed=36 failed=0 total=36
+=== probe_413_0112
+exit=1
+FAIL 1. memctl inspect no --scope --json: exit 0, scope null, all-scope stats (= memctl stats), default `inspect` identifiers, history and trace kept | observed={'exit_code': 1, 'scope': '(missing)', 'stats.scope': '(mis
+FAIL 1. memctl inspect no --scope human: exit 0, 'scope: all', the all-scope stats block of memctl stats, history and trace kept | observed={'exit_code': 1, 'first line': '', 'scope lines': [], 'contains the memctl stats
+FAIL 1. memctl inspect --scope "" --json: exit 0, scope null, all-scope stats (= memctl stats), default `inspect` identifiers, history and trace kept | observed={'exit_code': 1, 'scope': '(missing)', 'stats.scope': '(mis
+FAIL 1. memctl inspect --scope "" human: exit 0, 'scope: all', the all-scope stats block of memctl stats, history and trace kept | observed={'exit_code': 1, 'first line': '', 'scope lines': [], 'contains the memctl stats
+FAIL 1. memctl inspect --scope "   " --json: exit 0, scope null, all-scope stats (= memctl stats), default `inspect` identifiers, history and trace kept | observed={'exit_code': 1, 'scope': '(missing)', 'stats.scope': '(
+FAIL 1. memctl inspect --scope "   " human: exit 0, 'scope: all', the all-scope stats block of memctl stats, history and trace kept | observed={'exit_code': 1, 'first line': '', 'scope lines': [], 'contains the memctl st
+FAIL 1. --json: no --scope, --scope "" and --scope "   " give the same output (snapshot timestamp aside) | observed={'identical': False, 'count': 3}
+FAIL 1. human: no --scope, --scope "" and --scope "   " give the same output | observed={'identical': False, 'count': 3}
+FAIL 2. memctl inspect --scope '  agent:a  ' --json: scope 'agent:a', stats of agent:a (= memctl stats --scope), snapshot session:inspect, keyed history depth 2 | observed={'exit_code': 0, 'scope': '  agent:a  ', 'stats.
+FAIL 2. memctl inspect --scope '  agent:a  ' (human): 'scope: agent:a' and 'Scope: agent:a' (same normalized scope as JSON), 2 active, keyed history depth 2 | observed={'exit_code': 0, 'scope lines': ['  scope:   agent:a
+FAIL 2. --json: --scope "  agent:a  " gives the same output as --scope agent:a | observed={'identical': False}
+FAIL 2. human: --scope "  agent:a  " gives the same output as --scope agent:a | observed={'identical': False}
+FAIL 3. memctl inspect --scope 'not-a-scope' --json: exit 1, stdout empty, stderr exactly "Error: invalid scope: 'not-a-scope'" (as memctl list), no traceback | observed={'exit_code': 1, 'stdout': '', 'stderr': "(last 3 
+FAIL 3. memctl inspect --scope 'not-a-scope' human: exit 1, stdout empty, stderr exactly "Error: invalid scope: 'not-a-scope'" (as memctl list), no traceback | observed={'exit_code': 1, 'stdout': '', 'stderr': "(last 3 l
+FAIL 3. memctl inspect --scope 'bogus:x' --json: exit 1, stdout empty, stderr exactly "Error: invalid scope: 'bogus:x'" (as memctl list), no traceback | observed={'exit_code': 1, 'stdout': '', 'stderr': "(last 3 lines) �
+FAIL 3. memctl inspect --scope 'bogus:x' human: exit 1, stdout empty, stderr exactly "Error: invalid scope: 'bogus:x'" (as memctl list), no traceback | observed={'exit_code': 1, 'stdout': '', 'stderr': "(last 3 lines) �
+FAIL 3. memctl inspect --scope '  not-a-scope  ' --json: exit 1, stdout empty, stderr exactly "Error: invalid scope: 'not-a-scope'" (as memctl list), no traceback | observed={'exit_code': 1, 'stdout': '', 'stderr': "(las
+FAIL 3. memctl inspect --scope '  not-a-scope  ' human: exit 1, stdout empty, stderr exactly "Error: invalid scope: 'not-a-scope'" (as memctl list), no traceback | observed={'exit_code': 1, 'stdout': '', 'stderr': "(last
+FAIL 3. invalid scope on a --db that does not exist: exit 1 and no database or audit database created (the memory service is never opened) | observed={'--json': {'exit_code': 1, 'stderr_tail': ["InvalidArgumentError: inv
+FAIL 4. in process, GC disabled, successful inspect, no --scope, --json: the command-owned service, audit sink and store closed once at command exit; no open connection; files renamed and deleted; a second close is a no-
+FAIL 4. in process, GC disabled, successful inspect, --scope "   ", human: the command-owned service, audit sink and store closed once at command exit; no open connection; files renamed and deleted; a second close is a n
+FAIL 4. in process, GC disabled, failing inspect, invalid --scope not-a-scope: exit 1 before _get_service is called (no service, store or audit sink created); no open connection; files renamed and deleted | observed={'ex
+FAIL 4. in process, GC disabled: a borrowed service is not closed by successful, failing or invalid-scope commands (invalid scope never asks for it), stays usable, and its owner closes it | observed={'successful inspect,
+SUMMARY passed=13 failed=23 total=36
+=== probe_401
+exit=0
+SUMMARY passed=34 failed=0 total=34 backends=['sqlite', 'postgres']
+=== probe_401_0112
+exit=1
+FAIL postgres: memctl gc exits 0 and reports deleted_records=2, deleted_candidates=2 (retention: 2 decayed) | observed={'exit_code': 1, 'result': None, 'GC line': None, 'stderr_tail': ["Error: gc is not supported for thi
+FAIL postgres: after memctl gc the soft-deleted records and the rejected/promoted candidates are gone; old decayed to 0.6, fresh and the superseded keyed history kept (server-side: 6 -> 4 rows, 4 -> 2 candidates) | obser
+FAIL postgres: evidence: retained old keeps its evidence (server-side and read back as written), its artifact edge stays; edges of purged low, deleted and c-rejected removed | observed={'old evidence server-side after': 
+FAIL postgres: run_gc on the audited AuditedMemoryStore: the expected result, rows, candidates and edges (those memctl gc must give); no audit events | observed={'run_gc result': "raised builtins.AttributeError: 'Postgre
+FAIL postgres: purge_soft_deleted on the audited store: (1, 2); only the soft-deleted record and the rejected/promoted candidates go | observed={'purge_soft_deleted result (records, candidates)': "raised builtins.Attribu
+FAIL postgres: purge failing inside its transaction (audited store): raises the trigger's error and rolls back | observed={'purge_soft_deleted': "raised builtins.AttributeError: 'PostgresMemoryStore' object has no attrib
+FAIL postgres: the audited store raises the same error as the bare store (exception behavior unchanged) | observed={'bare': 'raised sqlalchemy.exc.ProgrammingError: (psycopg.errors.RaiseException) probe: purge blocked', 
+FAIL postgres: memctl gc with the purge blocked: exit 1, no GC line, the trigger's error on stderr; purge rolled back (soft-deleted rows and all candidates still there), the retention pass before it committed | observed=
+SUMMARY passed=26 failed=8 total=34 backends=['sqlite', 'postgres']
+empty dir after: 0 entries
+Name: openminion
+Version: 0.1.13
+Location: <VENV>/lib/python3.12/site-packages
+Requires: aiosqlite, alembic, cryptography, httpx, jsonschema, platformdirs, prompt-toolkit, psutil, pydantic, pyyaml, rich, send2trash, sophiagraph, typer, tzdata
+Required-by:
+Linux runnervmtai0g 6.17.0-1022-azure #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+PRETTY_NAME="Ubuntu 24.04.5 LTS"
+VERSION_ID="24.04"
+python 3.12.15 sqlite 3.45.1
+PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+<VENV>/lib/python3.12/site-packages/openminion/__init__.py 0.1.13
