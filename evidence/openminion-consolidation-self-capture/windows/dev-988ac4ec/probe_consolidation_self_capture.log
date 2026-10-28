@@ -1,0 +1,38 @@
+{
+  "probe": "probe_consolidation_self_capture",
+  "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+  "openminion.__version__": "0.1.13",
+  "python": "3.12.11",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "sqlite3.sqlite_version": "3.50.4",
+  "cwd": "<WORK>\\empty",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "provider": "openai (OpenAI-compatible HTTP) -> scripted ThreadingHTTPServer on 127.0.0.1",
+  "dist_versions": {
+    "openminion": "0.1.13",
+    "sophiagraph": "0.0.12",
+    "pydantic": "2.14.1"
+  },
+  "openminion_direct_url": {
+    "url": "https://github.com/openminion/openminion",
+    "vcs_info": {
+      "vcs": "git",
+      "commit_id": "988ac4ec54ae803f4ac937a6fc2fc1c04bb5f590",
+      "requested_revision": "988ac4ec54ae803f4ac937a6fc2fc1c04bb5f590"
+    }
+  }
+}
+[04:02:08Z] openminion: Noted: tabs over spaces.
+[04:02:09Z] openminion: Consolidation reviewed; nothing to change.
+PASS Setup: built-in memory store (AuditedMemoryStore over SQLiteMemoryStore) with a callable apply_capture_bundle | observed={'class': 'AuditedMemoryStore', 'inner': 'SQLiteMemoryStore', 'apply_capture_bundle_callable': True}
+PASS Direct calls: capture_is_excluded returns True for memory_consolidation_job 'true' (False without it), and so does the resume hints' _metadata_bool; the gateway's _extract_ephemeral_prompt_metadata keeps cron_job_id, cron_run_id and scheduled_for and drops memory_consolidation_job | observed={"capture_is_excluded({memory_consolidation_job: 'true'})": True, 'capture_is_excluded({})': False, "_metadata_bool({memory_consolidation_job: 'true'}, memory_consolidation_job) (resume hints)": True, '_extract_ephemeral_prompt_metadata({memory_consolidation_job, cron_job_id, cron_run_id, scheduled_for})': {'cron_run_id': 'r', 'cron_job_id': 'j', 'scheduled_for': '2026-10-28T00:00:00+00:00'}}
+PASS K. the consolidation run finishes; recovery scans 0 (nothing pending on this store) | observed={'run_state': 'finished', 'run_error': None, 'recovery': [[0, 0, 0]]}
+PASS K. the marker is set and survives ingress: memory_consolidation_job is 'true' in the manager request meta and in the ingress request's inbound metadata | observed={'meta_at_submit': [{'session_id': 'consolidate:bba65fcde33b4119a29278e2f72368e1', 'memory_consolidation_job': 'true', 'cron_run_id_present': True}], 'ingress_inbound_metadata': [{'session_id': 'consolidate:bba65fcde33b4119a29278e2f72368e1', 'channel': 'console', 'memory_consolidation_job': 'true', 'cron_run_id_present': True}]}
+PASS K. the marker is lost before the brain: capture_is_excluded receives message metadata with cron_run_id but without memory_consolidation_job, and returns False | observed=[{'memory_consolidation_job': None, 'cron_run_id_present': True, 'session_id': 'consolidate:bba65fcde33b4119a29278e2f72368e1', 'returned': False}]
+PASS K. the same metadata reaches the brain's resume hints without memory_consolidation_job (cron_job_id present), so the brain's memory consolidation context is never attached (_attach_memory_consolidation_resume_context is not called) | observed={'brain_resume_task_hints_calls': [{'memory_consolidation_job': None, 'cron_job_id_present': True, 'session_id': 'consolidate:bba65fcde33b4119a29278e2f72368e1::conv:consolidate:bba65fcde33b4119a29278e2f72368e1:d3a075fc7371459d8698c3dafd81193c'}], 'brain_consolidation_context_attached': 0}
+PASS K. so the consolidation turn captures itself: it makes one extraction request, its intent is 'pending' (not 'excluded') and its bundle (no candidates) commits succeeded_no_output with a memory.capture.result | observed={'turn_extraction_requests': 1, 'new_intents': [{'capture_state': 'pending', 'result_disposition': 'succeeded_no_output'}], 'bundle_writes': [{'candidates': 0, 'raised': None, 'disposition': 'succeeded_no_output'}], 'provider_requests_by_kind': {'decide': 1, 'extraction': 1, 'freshness': 2}}
+PASS C. a caller-supplied memory_consolidation_job reaches the manager request meta and the ingress inbound metadata, but not the brain: capture_is_excluded gets no such key and returns False | observed={'meta_at_submit': [{'session_id': 'caller', 'memory_consolidation_job': 'true', 'cron_run_id_present': False}], 'ingress_inbound_metadata': [{'session_id': 'caller', 'channel': 'console', 'memory_consolidation_job': 'true', 'cron_run_id_present': False}], 'brain_capture_is_excluded_calls': [{'memory_consolidation_job': None, 'cron_run_id_present': False, 'session_id': 'caller', 'returned': False}]}
+PASS C. the caller's turn is captured normally: one extraction request, intent 'pending' with a succeeded result (one candidate) | observed={'turn_extraction_requests': 1, 'new_intents': [{'capture_state': 'pending', 'result_disposition': 'succeeded'}], 'bundle_writes': [{'candidates': 1, 'raised': None, 'disposition': 'succeeded'}]}
+PASS Offline provider: the openai base URL is the scripted server on 127.0.0.1 | observed={'hosts': ['127.0.0.1'], 'requests': 8}
+SUMMARY passed=10 failed=0 total=10
