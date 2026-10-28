@@ -1,0 +1,689 @@
+{
+  "info": {
+    "probe": "probe_448_turn_capture",
+    "openminion.__file__": "<WORKTREE>\\src\\openminion\\__init__.py",
+    "openminion.__version__": "0.1.14",
+    "python": "3.12.11",
+    "platform": "Windows-11-10.0.22631-SP0",
+    "sqlite3.sqlite_version": "3.50.4",
+    "cwd": "<WORK>\\empty-wt-probe_448_turn_capture",
+    "imported_from_site_packages": false,
+    "isolated_mode": true,
+    "provider": "openai (OpenAI-compatible HTTP) -> scripted ThreadingHTTPServer on 127.0.0.1",
+    "dist_versions": {
+      "openminion": "0.1.14",
+      "sophiagraph": "0.0.12",
+      "pydantic": "2.14.1"
+    },
+    "openminion_direct_url": {
+      "url": "file:///<WORKTREE>",
+      "dir_info": {
+        "editable": true
+      }
+    }
+  },
+  "summary": {
+    "passed": 12,
+    "failed": 0,
+    "total": 12
+  },
+  "all_pass": true,
+  "checks": [
+    {
+      "check": "W/R/C. the identity profile is loaded in each runtime (the agent's SecurityPolicyEngine holds the constraint)",
+      "pass": true,
+      "observed": {
+        "W": [
+          "NEVER write memory records"
+        ],
+        "R": [
+          "NEVER reveal secrets"
+        ],
+        "C": [
+          "NEVER reveal secrets"
+        ]
+      }
+    },
+    {
+      "check": "W. the SDK turn completes with the same reply as the control turn C",
+      "pass": true,
+      "observed": {
+        "W": [
+          "completed",
+          "openminion: Noted: tabs over spaces."
+        ],
+        "C": [
+          "completed",
+          "openminion: Noted: tabs over spaces."
+        ]
+      }
+    },
+    {
+      "check": "W. the turn asks memory.write once, before its capture, with the turn's context (channel console, target memory-capture, runtime session `capture`, root turn) and recovery's actor: require_approval, identity_hard_constraint_restricted",
+      "pass": true,
+      "observed": [
+        {
+          "channel": "console",
+          "target": "memory-capture",
+          "session_id": "capture",
+          "run_id": "b13e0b994d1848aab366c845a5103fd8",
+          "actor_scopes": [
+            "agent.execute",
+            "agent.openminion.execute",
+            "channel.message.send",
+            "gateway.turn.execute",
+            "tool.execute"
+          ],
+          "decision": "require_approval",
+          "reason_code": "identity_hard_constraint_restricted"
+        }
+      ]
+    },
+    {
+      "check": "W. no extraction request, no memctl bundle write, no capture candidate, no receipt and no memory.capture.result for the turn's capture",
+      "pass": true,
+      "observed": {
+        "provider": [
+          "decide",
+          "freshness",
+          "freshness"
+        ],
+        "bundle_writes": [],
+        "store": {
+          "capture_candidates": [],
+          "receipts": [],
+          "record_types": [
+            [
+              "decision",
+              1
+            ]
+          ],
+          "candidate_types": []
+        },
+        "results": []
+      }
+    },
+    {
+      "check": "W. the intent stays pending; memory_capture_state pending and memory_capture_bundle_result {capture_id, disposition pending, error_code CAPTURE_RECOVERY_UNAUTHORIZED}",
+      "pass": true,
+      "observed": {
+        "intent": {
+          "canonical_event_id": "turn.outcome:431b6370d9f0f189bfcd3c03b64561082269c19b95794bff13f8b399ac744d92",
+          "capture_id": "capture:431b6370d9f0f189bfcd3c03b64561082269c19b95794bff13f8b399ac744d92",
+          "capture_state": "pending",
+          "root_turn_id": "b13e0b994d1848aab366c845a5103fd8",
+          "runtime_session_id": "capture",
+          "agent_id": "openminion"
+        },
+        "state": "pending",
+        "bundle": {
+          "capture_id": "capture:431b6370d9f0f189bfcd3c03b64561082269c19b95794bff13f8b399ac744d92",
+          "disposition": "pending",
+          "error_code": "CAPTURE_RECOVERY_UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "check": "W. no approval callback call for the capture (the SDK callback would approve)",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "W. the recovery gate for the same capture returns False with the same decision, actor scopes, session and root turn; it differs only by channel cron and target memory-capture-recovery",
+      "pass": true,
+      "observed": {
+        "returned": false,
+        "decisions": [
+          {
+            "channel": "cron",
+            "target": "memory-capture-recovery",
+            "session_id": "capture",
+            "run_id": "b13e0b994d1848aab366c845a5103fd8",
+            "actor_scopes": [
+              "agent.execute",
+              "agent.openminion.execute",
+              "channel.message.send",
+              "gateway.turn.execute",
+              "tool.execute"
+            ],
+            "decision": "require_approval",
+            "reason_code": "identity_hard_constraint_restricted"
+          }
+        ]
+      }
+    },
+    {
+      "check": "W. a memory consolidation run (daemon TaskManager + cron scheduler) is denied before extraction: recovery (1, 0, 1), no extractor call, no recovery extraction request or bundle write, still no result",
+      "pass": true,
+      "observed": {
+        "state": "finished",
+        "error": null,
+        "recovery": [
+          [
+            1,
+            0,
+            1
+          ]
+        ],
+        "extractor_calls": [],
+        "recovery_provider_extractions": 0,
+        "recovery_bundle_writes": [],
+        "recovery_decisions": [
+          {
+            "channel": "cron",
+            "target": "memory-capture-recovery",
+            "session_id": "capture",
+            "run_id": "b13e0b994d1848aab366c845a5103fd8",
+            "decision": "require_approval",
+            "reason_code": "identity_hard_constraint_restricted"
+          }
+        ],
+        "provider_requests": 3,
+        "results_for_capture": 0
+      }
+    },
+    {
+      "check": "R. the same home reopened with the neutral profile: the next run recovers the turn's intent once (recovery (1, 1, 0), one extractor call for its root turn, one bundle write), the run after it scans nothing, and the capture has exactly one memory.capture.result (succeeded, one output)",
+      "pass": true,
+      "observed": {
+        "run1": {
+          "state": "finished",
+          "error": null,
+          "recovery": [
+            [
+              1,
+              1,
+              0
+            ]
+          ],
+          "extractor_calls": [
+            "b13e0b994d1848aab366c845a5103fd8"
+          ],
+          "recovery_provider_extractions": 1,
+          "recovery_bundle_writes": [
+            "capture:431b6370d9f0f189bfcd3c03b64561082269c19b95794bff13f8b399ac744d92"
+          ],
+          "recovery_decisions": [
+            {
+              "channel": "cron",
+              "target": "memory-capture-recovery",
+              "session_id": "capture",
+              "run_id": "b13e0b994d1848aab366c845a5103fd8",
+              "decision": "allow",
+              "reason_code": "allowed"
+            }
+          ],
+          "provider_requests": 4,
+          "results_for_capture": 1
+        },
+        "run2": {
+          "state": "finished",
+          "error": null,
+          "recovery": [
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "extractor_calls": [],
+          "recovery_provider_extractions": 0,
+          "recovery_bundle_writes": [],
+          "recovery_decisions": [],
+          "provider_requests": 4,
+          "results_for_capture": 1
+        },
+        "results": [
+          {
+            "capture_id": "capture:431b6370d9f0f189bfcd3c03b64561082269c19b95794bff13f8b399ac744d92",
+            "committed_at": "2026-10-28T13:50:32.224647+00:00",
+            "disposition": "succeeded",
+            "output_ids": [
+              "cand_36809668ba3fbf7846bfbf25"
+            ],
+            "report_hash": "d23cf80b185e56e5103d95a36ac96043d99f9df70f7c5e9d4c747e7996df9bfa",
+            "result_hash": "cc9668346e3428917edb25f3cce9f21063822c13fd239444e667e6585a64abfa",
+            "root_turn_id": "b13e0b994d1848aab366c845a5103fd8",
+            "runtime_session_id": "capture",
+            "schema_version": "mcrr.capture-intent.v1"
+          }
+        ]
+      }
+    },
+    {
+      "check": "C. control: the same turn with the neutral constraint captures as before: one extraction request, one bundle write with the candidate, memory_capture_state succeeded, one candidate, one receipt and one result",
+      "pass": true,
+      "observed": {
+        "provider": [
+          "extraction",
+          "decide",
+          "freshness",
+          "freshness"
+        ],
+        "bundle_writes": [
+          {
+            "capture_id": "capture:7d138381af6126373fd2c306391b3962c6dbcac760022d43dddb082d8167f2c3",
+            "candidates": [
+              {
+                "kind": "user_preference",
+                "normalized_key": "user_preference:indentation",
+                "title": "Prefers tabs for indentation",
+                "content": "The user prefers tabs over spaces for indentation.",
+                "tags": [
+                  "probe-420"
+                ],
+                "confidence": 0.3
+              }
+            ],
+            "raised": null
+          }
+        ],
+        "state": "succeeded",
+        "store": {
+          "capture_candidates": [
+            [
+              "cand_31410624b7bd6c18adae1884",
+              "user_preference",
+              "user_preference:indentation",
+              "proposed"
+            ]
+          ],
+          "receipts": [
+            [
+              "capture:7d138381af6126373fd2c306391b3962c6dbcac760022d43dddb082d8167f2c3",
+              "succeeded"
+            ]
+          ],
+          "record_types": [
+            [
+              "decision",
+              1
+            ]
+          ],
+          "candidate_types": [
+            [
+              "user_preference",
+              1
+            ]
+          ]
+        },
+        "results": 1
+      }
+    },
+    {
+      "check": "C. control: the turn asks memory.write once with the turn's context and is allowed",
+      "pass": true,
+      "observed": [
+        {
+          "channel": "console",
+          "target": "memory-capture",
+          "session_id": "capture",
+          "run_id": "4529bcfafffe420f9d6d221334f4050e",
+          "actor_scopes": [
+            "agent.execute",
+            "agent.openminion.execute",
+            "channel.message.send",
+            "gateway.turn.execute",
+            "tool.execute"
+          ],
+          "decision": "allow",
+          "reason_code": "allowed"
+        }
+      ]
+    },
+    {
+      "check": "Offline provider: every case's openai base URL is the scripted server on 127.0.0.1",
+      "pass": true,
+      "observed": [
+        "127.0.0.1"
+      ]
+    }
+  ],
+  "observed": {
+    "W_write_constraint": {
+      "constraint": "NEVER write memory records",
+      "identity_constraints": [
+        "NEVER write memory records"
+      ],
+      "turn": {
+        "run_state": "completed",
+        "text": "openminion: Noted: tabs over spaces.",
+        "memory_capture_state": "pending",
+        "memory_capture_bundle_result": {
+          "capture_id": "capture:431b6370d9f0f189bfcd3c03b64561082269c19b95794bff13f8b399ac744d92",
+          "disposition": "pending",
+          "error_code": "CAPTURE_RECOVERY_UNAUTHORIZED"
+        },
+        "provider_requests": [
+          "decide",
+          "freshness",
+          "freshness"
+        ],
+        "bundle_writes": [],
+        "memory_write_decisions": [
+          {
+            "channel": "console",
+            "target": "memory-capture",
+            "session_id": "capture",
+            "run_id": "b13e0b994d1848aab366c845a5103fd8",
+            "actor_scopes": [
+              "agent.execute",
+              "agent.openminion.execute",
+              "channel.message.send",
+              "gateway.turn.execute",
+              "tool.execute"
+            ],
+            "decision": "require_approval",
+            "reason_code": "identity_hard_constraint_restricted"
+          }
+        ],
+        "approval_callback_calls": []
+      },
+      "intent": {
+        "canonical_event_id": "turn.outcome:431b6370d9f0f189bfcd3c03b64561082269c19b95794bff13f8b399ac744d92",
+        "capture_id": "capture:431b6370d9f0f189bfcd3c03b64561082269c19b95794bff13f8b399ac744d92",
+        "capture_state": "pending",
+        "root_turn_id": "b13e0b994d1848aab366c845a5103fd8",
+        "runtime_session_id": "capture",
+        "agent_id": "openminion"
+      },
+      "results": [],
+      "store_after_turn": {
+        "capture_candidates": [],
+        "receipts": [],
+        "record_types": [
+          [
+            "decision",
+            1
+          ]
+        ],
+        "candidate_types": []
+      },
+      "recovery_gate": {
+        "returned": false,
+        "decisions": [
+          {
+            "channel": "cron",
+            "target": "memory-capture-recovery",
+            "session_id": "capture",
+            "run_id": "b13e0b994d1848aab366c845a5103fd8",
+            "actor_scopes": [
+              "agent.execute",
+              "agent.openminion.execute",
+              "channel.message.send",
+              "gateway.turn.execute",
+              "tool.execute"
+            ],
+            "decision": "require_approval",
+            "reason_code": "identity_hard_constraint_restricted"
+          }
+        ]
+      },
+      "job_id": "ac0d31b509524ad390b9d83cc34c9aec",
+      "runs": [
+        {
+          "state": "finished",
+          "error": null,
+          "recovery": [
+            [
+              1,
+              0,
+              1
+            ]
+          ],
+          "extractor_calls": [],
+          "recovery_provider_extractions": 0,
+          "recovery_bundle_writes": [],
+          "recovery_decisions": [
+            {
+              "channel": "cron",
+              "target": "memory-capture-recovery",
+              "session_id": "capture",
+              "run_id": "b13e0b994d1848aab366c845a5103fd8",
+              "decision": "require_approval",
+              "reason_code": "identity_hard_constraint_restricted"
+            }
+          ],
+          "provider_requests": 3,
+          "results_for_capture": 0
+        }
+      ],
+      "store_after_runs": {
+        "capture_candidates": [],
+        "receipts": [],
+        "record_types": [
+          [
+            "decision",
+            2
+          ]
+        ],
+        "candidate_types": []
+      },
+      "provider_hosts": [
+        "127.0.0.1"
+      ]
+    },
+    "R_reopened_neutral": {
+      "constraint": "NEVER reveal secrets",
+      "identity_constraints": [
+        "NEVER reveal secrets"
+      ],
+      "runs": [
+        {
+          "state": "finished",
+          "error": null,
+          "recovery": [
+            [
+              1,
+              1,
+              0
+            ]
+          ],
+          "extractor_calls": [
+            "b13e0b994d1848aab366c845a5103fd8"
+          ],
+          "recovery_provider_extractions": 1,
+          "recovery_bundle_writes": [
+            "capture:431b6370d9f0f189bfcd3c03b64561082269c19b95794bff13f8b399ac744d92"
+          ],
+          "recovery_decisions": [
+            {
+              "channel": "cron",
+              "target": "memory-capture-recovery",
+              "session_id": "capture",
+              "run_id": "b13e0b994d1848aab366c845a5103fd8",
+              "decision": "allow",
+              "reason_code": "allowed"
+            }
+          ],
+          "provider_requests": 4,
+          "results_for_capture": 1
+        },
+        {
+          "state": "finished",
+          "error": null,
+          "recovery": [
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "extractor_calls": [],
+          "recovery_provider_extractions": 0,
+          "recovery_bundle_writes": [],
+          "recovery_decisions": [],
+          "provider_requests": 4,
+          "results_for_capture": 1
+        }
+      ],
+      "results": [
+        {
+          "capture_id": "capture:431b6370d9f0f189bfcd3c03b64561082269c19b95794bff13f8b399ac744d92",
+          "committed_at": "2026-10-28T13:50:32.224647+00:00",
+          "disposition": "succeeded",
+          "output_ids": [
+            "cand_36809668ba3fbf7846bfbf25"
+          ],
+          "report_hash": "d23cf80b185e56e5103d95a36ac96043d99f9df70f7c5e9d4c747e7996df9bfa",
+          "result_hash": "cc9668346e3428917edb25f3cce9f21063822c13fd239444e667e6585a64abfa",
+          "root_turn_id": "b13e0b994d1848aab366c845a5103fd8",
+          "runtime_session_id": "capture",
+          "schema_version": "mcrr.capture-intent.v1"
+        }
+      ],
+      "store_after_runs": {
+        "capture_candidates": [
+          [
+            "cand_36809668ba3fbf7846bfbf25",
+            "user_preference",
+            "user_preference:indentation",
+            "proposed"
+          ]
+        ],
+        "receipts": [
+          [
+            "capture:431b6370d9f0f189bfcd3c03b64561082269c19b95794bff13f8b399ac744d92",
+            "succeeded"
+          ]
+        ],
+        "record_types": [
+          [
+            "decision",
+            4
+          ],
+          [
+            "session_summary",
+            2
+          ]
+        ],
+        "candidate_types": [
+          [
+            "user_preference",
+            1
+          ]
+        ]
+      },
+      "provider_hosts": [
+        "127.0.0.1"
+      ]
+    },
+    "C_neutral_constraint": {
+      "constraint": "NEVER reveal secrets",
+      "identity_constraints": [
+        "NEVER reveal secrets"
+      ],
+      "turn": {
+        "run_state": "completed",
+        "text": "openminion: Noted: tabs over spaces.",
+        "memory_capture_state": "succeeded",
+        "memory_capture_bundle_result": {
+          "capture_id": "capture:7d138381af6126373fd2c306391b3962c6dbcac760022d43dddb082d8167f2c3",
+          "committed_at": "2026-10-28T13:50:35.499205+00:00",
+          "disposition": "succeeded",
+          "output_ids": [
+            "cand_31410624b7bd6c18adae1884"
+          ],
+          "report_hash": "0a985cef5e6923ae8ff184f1832f966725fa43e57926ce810c99ce7e7da3231d",
+          "result_hash": "c9f806e886499b24c79aa4d69b921950f1a874b1600b7351d14df586820bb5d6"
+        },
+        "provider_requests": [
+          "extraction",
+          "decide",
+          "freshness",
+          "freshness"
+        ],
+        "bundle_writes": [
+          {
+            "capture_id": "capture:7d138381af6126373fd2c306391b3962c6dbcac760022d43dddb082d8167f2c3",
+            "candidates": [
+              {
+                "kind": "user_preference",
+                "normalized_key": "user_preference:indentation",
+                "title": "Prefers tabs for indentation",
+                "content": "The user prefers tabs over spaces for indentation.",
+                "tags": [
+                  "probe-420"
+                ],
+                "confidence": 0.3
+              }
+            ],
+            "raised": null
+          }
+        ],
+        "memory_write_decisions": [
+          {
+            "channel": "console",
+            "target": "memory-capture",
+            "session_id": "capture",
+            "run_id": "4529bcfafffe420f9d6d221334f4050e",
+            "actor_scopes": [
+              "agent.execute",
+              "agent.openminion.execute",
+              "channel.message.send",
+              "gateway.turn.execute",
+              "tool.execute"
+            ],
+            "decision": "allow",
+            "reason_code": "allowed"
+          }
+        ],
+        "approval_callback_calls": []
+      },
+      "intent": {
+        "canonical_event_id": "turn.outcome:7d138381af6126373fd2c306391b3962c6dbcac760022d43dddb082d8167f2c3",
+        "capture_id": "capture:7d138381af6126373fd2c306391b3962c6dbcac760022d43dddb082d8167f2c3",
+        "capture_state": "pending",
+        "root_turn_id": "4529bcfafffe420f9d6d221334f4050e",
+        "runtime_session_id": "capture",
+        "agent_id": "openminion"
+      },
+      "results": [
+        {
+          "capture_id": "capture:7d138381af6126373fd2c306391b3962c6dbcac760022d43dddb082d8167f2c3",
+          "committed_at": "2026-10-28T13:50:35.499205+00:00",
+          "disposition": "succeeded",
+          "output_ids": [
+            "cand_31410624b7bd6c18adae1884"
+          ],
+          "report_hash": "0a985cef5e6923ae8ff184f1832f966725fa43e57926ce810c99ce7e7da3231d",
+          "result_hash": "c9f806e886499b24c79aa4d69b921950f1a874b1600b7351d14df586820bb5d6",
+          "root_turn_id": "4529bcfafffe420f9d6d221334f4050e",
+          "runtime_session_id": "capture",
+          "schema_version": "mcrr.capture-intent.v1"
+        }
+      ],
+      "store_after_turn": {
+        "capture_candidates": [
+          [
+            "cand_31410624b7bd6c18adae1884",
+            "user_preference",
+            "user_preference:indentation",
+            "proposed"
+          ]
+        ],
+        "receipts": [
+          [
+            "capture:7d138381af6126373fd2c306391b3962c6dbcac760022d43dddb082d8167f2c3",
+            "succeeded"
+          ]
+        ],
+        "record_types": [
+          [
+            "decision",
+            1
+          ]
+        ],
+        "candidate_types": [
+          [
+            "user_preference",
+            1
+          ]
+        ]
+      },
+      "provider_hosts": [
+        "127.0.0.1"
+      ]
+    }
+  }
+}
