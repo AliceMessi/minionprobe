@@ -1,0 +1,779 @@
+{
+  "cases": {
+    "ddl_scan": {
+      "ddl_tuples": [
+        {
+          "autoincrement_statements_in_DDL": [
+            "CREATE TABLE IF NOT EXISTS dropped_reasons ("
+          ],
+          "file": "openminion/modules/context/compress/storage/migrations/versions/0001_baseline.py",
+          "has_POSTGRES_DDL": true,
+          "module_id": "compress",
+          "postgres_validated": true
+        },
+        {
+          "autoincrement_statements_in_DDL": [
+            "CREATE TABLE IF NOT EXISTS telegram_pair_attempts ("
+          ],
+          "file": "openminion/modules/controlplane/channels/telegram/storage/migrations/versions/0001_baseline.py",
+          "has_POSTGRES_DDL": false,
+          "module_id": "controlplane_telegram",
+          "postgres_validated": false
+        },
+        {
+          "autoincrement_statements_in_DDL": [
+            "CREATE TABLE IF NOT EXISTS cp_inbound_messages (",
+            "CREATE TABLE IF NOT EXISTS cp_outbound_messages (",
+            "CREATE TABLE IF NOT EXISTS cp_pair_attempts ("
+          ],
+          "file": "openminion/modules/controlplane/storage/migrations/versions/0001_baseline.py",
+          "has_POSTGRES_DDL": false,
+          "module_id": "controlplane",
+          "postgres_validated": true
+        },
+        {
+          "autoincrement_statements_in_DDL": [
+            "CREATE TABLE IF NOT EXISTS events ("
+          ],
+          "file": "openminion/modules/telemetry/storage/migrations/versions/0001_baseline.py",
+          "has_POSTGRES_DDL": false,
+          "module_id": "telemetry",
+          "postgres_validated": true
+        }
+      ],
+      "lines": [
+        {
+          "file": "openminion/modules/context/compress/storage/migrations/versions/0001_baseline.py",
+          "line": 35,
+          "module_id": "compress",
+          "text": "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        },
+        {
+          "file": "openminion/modules/controlplane/channels/telegram/storage/migrations/versions/0001_baseline.py",
+          "line": 34,
+          "module_id": "controlplane_telegram",
+          "text": "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        },
+        {
+          "file": "openminion/modules/controlplane/storage/migrations/versions/0001_baseline.py",
+          "line": 51,
+          "module_id": "controlplane",
+          "text": "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        },
+        {
+          "file": "openminion/modules/controlplane/storage/migrations/versions/0001_baseline.py",
+          "line": 90,
+          "module_id": "controlplane",
+          "text": "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        },
+        {
+          "file": "openminion/modules/telemetry/storage/migrations/versions/0001_baseline.py",
+          "line": 15,
+          "module_id": "telemetry",
+          "text": "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        }
+      ],
+      "postgres_validated": [
+        "a2a",
+        "artifact",
+        "compress",
+        "controlplane",
+        "identity",
+        "memory",
+        "policy",
+        "registry",
+        "retrieve",
+        "secret",
+        "session",
+        "skill",
+        "task",
+        "telemetry"
+      ]
+    },
+    "patched_copy": {
+      "controlplane": {
+        "postgres": {
+          "after": {
+            "alembic_version": [
+              "0002_index_audit"
+            ],
+            "om_meta_module_id": "controlplane",
+            "table_count": 19,
+            "tables": [
+              "alembic_version",
+              "cp_audit_events",
+              "cp_channel_subjects",
+              "cp_chat_bindings",
+              "cp_inbound_messages",
+              "cp_inbox",
+              "cp_migrations",
+              "cp_outbound_messages",
+              "cp_outbox",
+              "cp_pair_attempts",
+              "cp_pair_tokens",
+              "cp_pairings",
+              "cp_pending_clarify",
+              "cp_principals",
+              "cp_rate_limits",
+              "cp_session_agents",
+              "cp_sessions",
+              "cp_users",
+              "om_meta"
+            ]
+          },
+          "checks": {
+            "cp_inbound_messages ids": [
+              1,
+              2
+            ],
+            "id column default": "nextval('cp_inbound_messages_id_seq'::regclass)"
+          },
+          "error": null,
+          "success": true
+        },
+        "sqlite": {
+          "alembic_version_before_after": [
+            [
+              "0002_index_audit"
+            ],
+            [
+              "0002_index_audit"
+            ]
+          ],
+          "patched_success": true,
+          "rerun_success": true,
+          "shipped_success": true,
+          "sqlite_master_identical": true,
+          "sqlite_master_unchanged_after_rerun": true
+        }
+      },
+      "patch": "def upgrade() -> None:  # probe patch (scratch copy only)\n    from alembic import op\n\n    statements = DDL\n    if op.get_bind().dialect.name == \"postgresql\":\n        statements = tuple(\n            str(s)\n            .replace(\"INTEGER PRIMARY KEY AUTOINCREMENT\", \"SERIAL PRIMARY KEY\")\n            .replace(\"timestamp REAL NOT NULL\", \"timestamp DOUBLE PRECISION NOT NULL\")\n            for s in DDL\n        )\n    apply_ddl_statements(statements)",
+      "real_vs_double": {
+        "double": 1761650000.123456,
+        "real": 1761650048.0
+      },
+      "telemetry": {
+        "postgres": {
+          "after": {
+            "alembic_version": [
+              "0003_debug_query_indexes"
+            ],
+            "om_meta_module_id": "telemetry",
+            "table_count": 3,
+            "tables": [
+              "alembic_version",
+              "events",
+              "om_meta"
+            ]
+          },
+          "checks": {
+            "events.timestamp read back": 1761650000.123456,
+            "id column default": "nextval('events_id_seq'::regclass)"
+          },
+          "error": null,
+          "success": true
+        },
+        "sqlite": {
+          "alembic_version_before_after": [
+            [
+              "0003_debug_query_indexes"
+            ],
+            [
+              "0003_debug_query_indexes"
+            ]
+          ],
+          "patched_success": true,
+          "rerun_success": true,
+          "shipped_success": true,
+          "sqlite_master_identical": true,
+          "sqlite_master_unchanged_after_rerun": true
+        }
+      }
+    },
+    "pg_cli": {
+      "controlplane": {
+        "after": {
+          "alembic_version": null,
+          "om_meta_module_id": null,
+          "table_count": 0,
+          "tables": []
+        },
+        "argv": [
+          "openminion",
+          "storage",
+          "migrate",
+          "--backend",
+          "postgres",
+          "--postgres-url",
+          "postgresql+psycopg://postgres:***@localhost:5432/pai_dev_controlplane",
+          "--module",
+          "controlplane",
+          "--json"
+        ],
+        "entries": [
+          {
+            "error": "Alembic upgrade failed for module 'controlplane': (psycopg.errors.SyntaxError) syntax error at or near \"AUTOINCREMENT\"\nLINE 2:         id INTEGER PRIMARY KEY AUTOINCREMENT,\n                                       ^\n[SQL: CREATE TABLE IF NOT EXISTS cp_inbound_messages (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        message_id TEXT NOT NULL,\n        chat_key TEXT NOT NULL,\n        user_key TEXT NOT NULL,\n        session_id TEXT,\n        agent_id TEXT,\n        timestamp TEXT NOT NULL,\n        text TEXT,\n        payload_json TEXT NOT NULL\n    )]\n(Background on this error at: https://sqlalche.me/e/21/f405)",
+            "module_id": "controlplane",
+            "status": "error",
+            "success": false
+          }
+        ],
+        "exit": 1,
+        "in_process": "error: Alembic upgrade failed for module 'controlplane': (psycopg.errors.SyntaxError) syntax error at or near \"AUTOINCREMENT\"\nLINE 2:         id INTEGER PRIMARY KEY AUTOINCREMENT,\n                                       ^\n[SQL: CREATE TABLE IF NOT EXISTS cp_inbound_messages (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        message_id TEXT NOT NULL,\n        chat_key TEXT NOT NULL,\n        user_key TEXT NOT NULL,\n        session_id TEXT,\n        agent_id TEXT,\n        timestamp TEXT NOT NULL,\n        text TEXT,\n        payload_json TEXT NOT NULL\n    )]\n(Background on this error at: https://sqlalche.me/e/21/f405)",
+        "stderr_tail": "",
+        "text": {
+          "exit": 1,
+          "stderr_tail": "",
+          "stdout": "  FAIL  controlplane: Alembic upgrade failed for module 'controlplane': (psycopg.errors.SyntaxError) syntax error at or near \"AUTOINCREMENT\"\nLINE 2:         id INTEGER PRIMARY KEY AUTOINCREMENT,\n                                       ^\n[SQL: CREATE TABLE IF NOT EXISTS cp_inbound_messages (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        message_id TEXT NOT NULL,\n        chat_key TEXT NOT NULL,\n        user_key TEXT NOT NULL,\n        session_id TEXT,\n        agent_id TEXT,\n        timestamp TEXT NOT NULL,\n        text TEXT,\n        payload_json TEXT NOT NULL\n    )]\n(Background on this error at: https://sqlalche.me/e/21/f405)\n"
+        }
+      },
+      "telemetry": {
+        "after": {
+          "alembic_version": null,
+          "om_meta_module_id": null,
+          "table_count": 0,
+          "tables": []
+        },
+        "argv": [
+          "openminion",
+          "storage",
+          "migrate",
+          "--backend",
+          "postgres",
+          "--postgres-url",
+          "postgresql+psycopg://postgres:***@localhost:5432/pai_dev_telemetry",
+          "--module",
+          "telemetry",
+          "--json"
+        ],
+        "entries": [
+          {
+            "error": "Alembic upgrade failed for module 'telemetry': (psycopg.errors.SyntaxError) syntax error at or near \"AUTOINCREMENT\"\nLINE 2:         id INTEGER PRIMARY KEY AUTOINCREMENT,\n                                       ^\n[SQL: CREATE TABLE IF NOT EXISTS events (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        session_id TEXT NOT NULL,\n        turn_id TEXT NOT NULL,\n        event_type TEXT NOT NULL,\n        timestamp REAL NOT NULL,\n        data TEXT NOT NULL\n    )]\n(Background on this error at: https://sqlalche.me/e/21/f405)",
+            "module_id": "telemetry",
+            "status": "error",
+            "success": false
+          }
+        ],
+        "exit": 1,
+        "in_process": "error: Alembic upgrade failed for module 'telemetry': (psycopg.errors.SyntaxError) syntax error at or near \"AUTOINCREMENT\"\nLINE 2:         id INTEGER PRIMARY KEY AUTOINCREMENT,\n                                       ^\n[SQL: CREATE TABLE IF NOT EXISTS events (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        session_id TEXT NOT NULL,\n        turn_id TEXT NOT NULL,\n        event_type TEXT NOT NULL,\n        timestamp REAL NOT NULL,\n        data TEXT NOT NULL\n    )]\n(Background on this error at: https://sqlalche.me/e/21/f405)",
+        "stderr_tail": "",
+        "text": {
+          "exit": 1,
+          "stderr_tail": "",
+          "stdout": "  FAIL  telemetry: Alembic upgrade failed for module 'telemetry': (psycopg.errors.SyntaxError) syntax error at or near \"AUTOINCREMENT\"\nLINE 2:         id INTEGER PRIMARY KEY AUTOINCREMENT,\n                                       ^\n[SQL: CREATE TABLE IF NOT EXISTS events (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        session_id TEXT NOT NULL,\n        turn_id TEXT NOT NULL,\n        event_type TEXT NOT NULL,\n        timestamp REAL NOT NULL,\n        data TEXT NOT NULL\n    )]\n(Background on this error at: https://sqlalche.me/e/21/f405)\n"
+        }
+      }
+    },
+    "pg_control": {
+      "after": {
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "om_meta_module_id": "secret",
+        "table_count": 3,
+        "tables": [
+          "alembic_version",
+          "om_meta",
+          "secrets"
+        ]
+      },
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--backend",
+        "postgres",
+        "--postgres-url",
+        "postgresql+psycopg://postgres:***@localhost:5432/pai_dev_secret",
+        "--module",
+        "secret",
+        "--json"
+      ],
+      "entries": [
+        {
+          "module_id": "secret",
+          "status": "ok",
+          "success": true
+        }
+      ],
+      "exit": 0,
+      "stderr_tail": ""
+    },
+    "pg_each_module_alone": {
+      "rows": {
+        "a2a": {
+          "error": null,
+          "exit": 0,
+          "status": "ok"
+        },
+        "artifact": {
+          "error": null,
+          "exit": 0,
+          "status": "ok"
+        },
+        "compress": {
+          "error": "Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.",
+          "exit": 1,
+          "status": "error"
+        },
+        "controlplane": {
+          "error": "Alembic upgrade failed for module 'controlplane': (psycopg.errors.SyntaxError) syntax error at or near \"AUTOINCREMENT\"\nLINE 2:         id INTEGER PRIMARY KEY AUTOINCREMENT,\n                                       ^\n[SQL: CREATE TABLE IF NOT EXISTS cp_inbound_messages (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        message_id TEXT NOT NULL,\n        chat_key TEXT NOT NULL,\n        user_key TEXT NOT NULL,\n        session_id TEXT,\n        agent_id TEXT,\n        timestamp TEXT NOT NULL,\n        text TEXT,\n        payload_json TEXT NOT NULL\n    )]\n(Background on this error at: https://sqlalche.me/e/21/f405)",
+          "exit": 1,
+          "status": "error"
+        },
+        "identity": {
+          "error": null,
+          "exit": 0,
+          "status": "ok"
+        },
+        "memory": {
+          "error": null,
+          "exit": 0,
+          "status": "ok"
+        },
+        "policy": {
+          "error": null,
+          "exit": 0,
+          "status": "ok"
+        },
+        "registry": {
+          "error": null,
+          "exit": 0,
+          "status": "ok"
+        },
+        "retrieve": {
+          "error": null,
+          "exit": 0,
+          "status": "ok"
+        },
+        "secret": {
+          "error": null,
+          "exit": 0,
+          "status": "ok"
+        },
+        "session": {
+          "error": null,
+          "exit": 0,
+          "status": "ok"
+        },
+        "skill": {
+          "error": null,
+          "exit": 0,
+          "status": "ok"
+        },
+        "task": {
+          "error": null,
+          "exit": 0,
+          "status": "ok"
+        },
+        "telemetry": {
+          "error": "Alembic upgrade failed for module 'telemetry': (psycopg.errors.SyntaxError) syntax error at or near \"AUTOINCREMENT\"\nLINE 2:         id INTEGER PRIMARY KEY AUTOINCREMENT,\n                                       ^\n[SQL: CREATE TABLE IF NOT EXISTS events (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        session_id TEXT NOT NULL,\n        turn_id TEXT NOT NULL,\n        event_type TEXT NOT NULL,\n        timestamp REAL NOT NULL,\n        data TEXT NOT NULL\n    )]\n(Background on this error at: https://sqlalche.me/e/21/f405)",
+          "exit": 1,
+          "status": "error"
+        }
+      },
+      "skipped": [
+        "storage",
+        "controlplane_telegram",
+        "authoring",
+        "brain",
+        "commerce"
+      ],
+      "to_run": [
+        "session",
+        "artifact",
+        "registry",
+        "identity",
+        "policy",
+        "secret",
+        "telemetry",
+        "controlplane",
+        "retrieve",
+        "memory",
+        "skill",
+        "a2a",
+        "compress",
+        "task"
+      ]
+    },
+    "pg_full_run": {
+      "after": {
+        "alembic_version": [
+          "0005_cron_scheduler_control"
+        ],
+        "om_meta_module_id": "session",
+        "table_count": 21,
+        "tables": [
+          "alembic_version",
+          "compression_checkpoints",
+          "cron_jobs",
+          "cron_runs",
+          "cron_scheduler_control",
+          "cron_scope_state",
+          "events",
+          "message_refs",
+          "om_meta",
+          "prompt_contexts",
+          "run_records",
+          "seed_bundles",
+          "session_events",
+          "session_snapshots",
+          "session_summaries",
+          "session_turn_leases",
+          "sessions",
+          "summaries",
+          "summary_deltas",
+          "turns",
+          "working_state"
+        ]
+      },
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--backend",
+        "postgres",
+        "--postgres-url",
+        "postgresql+psycopg://postgres:***@localhost:5432/pai_dev_full",
+        "--json"
+      ],
+      "entries": [
+        {
+          "module_id": "storage",
+          "reason": "not validated for Postgres",
+          "status": "skipped"
+        },
+        {
+          "module_id": "controlplane_telegram",
+          "reason": "not validated for Postgres",
+          "status": "skipped"
+        },
+        {
+          "module_id": "authoring",
+          "reason": "not validated for Postgres",
+          "status": "skipped"
+        },
+        {
+          "module_id": "brain",
+          "reason": "not validated for Postgres",
+          "status": "skipped"
+        },
+        {
+          "module_id": "commerce",
+          "reason": "not validated for Postgres",
+          "status": "skipped"
+        },
+        {
+          "module_id": "session",
+          "status": "ok",
+          "success": true
+        },
+        {
+          "error": "Alembic upgrade failed for module 'artifact': Can't locate revision identified by '0005_cron_scheduler_control'",
+          "module_id": "artifact",
+          "status": "error",
+          "success": false
+        },
+        {
+          "error": "Alembic upgrade failed for module 'registry': Can't locate revision identified by '0005_cron_scheduler_control'",
+          "module_id": "registry",
+          "status": "error",
+          "success": false
+        },
+        {
+          "error": "Alembic upgrade failed for module 'identity': Can't locate revision identified by '0005_cron_scheduler_control'",
+          "module_id": "identity",
+          "status": "error",
+          "success": false
+        },
+        {
+          "error": "Alembic upgrade failed for module 'policy': Can't locate revision identified by '0005_cron_scheduler_control'",
+          "module_id": "policy",
+          "status": "error",
+          "success": false
+        },
+        {
+          "error": "Alembic upgrade failed for module 'secret': Can't locate revision identified by '0005_cron_scheduler_control'",
+          "module_id": "secret",
+          "status": "error",
+          "success": false
+        },
+        {
+          "error": "Alembic upgrade failed for module 'telemetry': Can't locate revision identified by '0005_cron_scheduler_control'",
+          "module_id": "telemetry",
+          "status": "error",
+          "success": false
+        },
+        {
+          "error": "Alembic upgrade failed for module 'controlplane': Can't locate revision identified by '0005_cron_scheduler_control'",
+          "module_id": "controlplane",
+          "status": "error",
+          "success": false
+        },
+        {
+          "error": "Alembic upgrade failed for module 'retrieve': Can't locate revision identified by '0005_cron_scheduler_control'",
+          "module_id": "retrieve",
+          "status": "error",
+          "success": false
+        },
+        {
+          "error": "Alembic upgrade failed for module 'memory': Can't locate revision identified by '0005_cron_scheduler_control'",
+          "module_id": "memory",
+          "status": "error",
+          "success": false
+        },
+        {
+          "error": "Alembic upgrade failed for module 'skill': Can't locate revision identified by '0005_cron_scheduler_control'",
+          "module_id": "skill",
+          "status": "error",
+          "success": false
+        },
+        {
+          "error": "Alembic upgrade failed for module 'a2a': Can't locate revision identified by '0005_cron_scheduler_control'",
+          "module_id": "a2a",
+          "status": "error",
+          "success": false
+        },
+        {
+          "error": "Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.",
+          "module_id": "compress",
+          "status": "error",
+          "success": false
+        },
+        {
+          "error": "Alembic upgrade failed for module 'task': Can't locate revision identified by '0005_cron_scheduler_control'",
+          "module_id": "task",
+          "status": "error",
+          "success": false
+        }
+      ],
+      "exit": 1,
+      "stderr_tail": ""
+    },
+    "pg_statements": {
+      "controlplane": {
+        "serial_failures": [],
+        "shipped_failures": [
+          {
+            "error": "psycopg.errors.SyntaxError: syntax error at or near \"AUTOINCREMENT\"",
+            "statement": "CREATE TABLE IF NOT EXISTS cp_inbound_messages ("
+          },
+          {
+            "error": "psycopg.errors.SyntaxError: syntax error at or near \"AUTOINCREMENT\"",
+            "statement": "CREATE TABLE IF NOT EXISTS cp_outbound_messages ("
+          },
+          {
+            "error": "psycopg.errors.UndefinedTable: relation \"cp_inbound_messages\" does not exist",
+            "statement": "CREATE INDEX IF NOT EXISTS idx_cp_inbound_chat_ts ON cp_inbound_messages(chat_key, timestamp, id)"
+          },
+          {
+            "error": "psycopg.errors.UndefinedTable: relation \"cp_inbound_messages\" does not exist",
+            "statement": "CREATE INDEX IF NOT EXISTS idx_cp_inbound_msg_id ON cp_inbound_messages(message_id)"
+          },
+          {
+            "error": "psycopg.errors.UndefinedTable: relation \"cp_inbound_messages\" does not exist",
+            "statement": "CREATE INDEX IF NOT EXISTS idx_cp_inbound_session_ts ON cp_inbound_messages(session_id, timestamp, id)"
+          },
+          {
+            "error": "psycopg.errors.UndefinedTable: relation \"cp_outbound_messages\" does not exist",
+            "statement": "CREATE INDEX IF NOT EXISTS idx_cp_outbound_chat_ts ON cp_outbound_messages(chat_key, timestamp, id)"
+          },
+          {
+            "error": "psycopg.errors.UndefinedTable: relation \"cp_outbound_messages\" does not exist",
+            "statement": "CREATE INDEX IF NOT EXISTS idx_cp_outbound_session_ts ON cp_outbound_messages(session_id, timestamp, id)"
+          },
+          {
+            "error": "psycopg.errors.SyntaxError: syntax error at or near \"AUTOINCREMENT\"",
+            "statement": "CREATE TABLE IF NOT EXISTS cp_pair_attempts ("
+          },
+          {
+            "error": "psycopg.errors.UndefinedTable: relation \"cp_pair_attempts\" does not exist",
+            "statement": "CREATE INDEX IF NOT EXISTS idx_cp_pair_attempts_channel_account_time"
+          },
+          {
+            "error": "psycopg.errors.UndefinedTable: relation \"cp_pair_attempts\" does not exist",
+            "statement": "CREATE INDEX IF NOT EXISTS idx_cp_pair_attempts_channel_chat_time"
+          }
+        ],
+        "statements": 44
+      },
+      "telemetry": {
+        "serial_failures": [],
+        "shipped_failures": [
+          {
+            "error": "psycopg.errors.SyntaxError: syntax error at or near \"AUTOINCREMENT\"",
+            "statement": "CREATE TABLE IF NOT EXISTS events ("
+          },
+          {
+            "error": "psycopg.errors.UndefinedTable: relation \"events\" does not exist",
+            "statement": "CREATE INDEX IF NOT EXISTS idx_session ON events(session_id)"
+          },
+          {
+            "error": "psycopg.errors.UndefinedTable: relation \"events\" does not exist",
+            "statement": "CREATE INDEX IF NOT EXISTS idx_turn ON events(session_id, turn_id)"
+          }
+        ],
+        "statements": 4
+      }
+    },
+    "sqlite": {
+      "controlplane": {
+        "after": {
+          "alembic_version": [
+            "0002_index_audit"
+          ],
+          "table_count": 20,
+          "tables": [
+            "alembic_version",
+            "cp_audit_events",
+            "cp_channel_subjects",
+            "cp_chat_bindings",
+            "cp_inbound_messages",
+            "cp_inbox",
+            "cp_migrations",
+            "cp_outbound_messages",
+            "cp_outbox",
+            "cp_pair_attempts",
+            "cp_pair_tokens",
+            "cp_pairings",
+            "cp_pending_clarify",
+            "cp_principals",
+            "cp_rate_limits",
+            "cp_session_agents",
+            "cp_sessions",
+            "cp_users",
+            "om_meta",
+            "sqlite_sequence"
+          ]
+        },
+        "argv": [
+          "openminion",
+          "storage",
+          "migrate",
+          "--sqlite",
+          "<WORK>/sqlite-cli-controlplane/controlplane.db",
+          "--module",
+          "controlplane",
+          "--json"
+        ],
+        "entries": [
+          {
+            "module_id": "controlplane",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "exit": 0,
+        "stderr_tail": ""
+      },
+      "telemetry": {
+        "after": {
+          "alembic_version": [
+            "0003_debug_query_indexes"
+          ],
+          "table_count": 4,
+          "tables": [
+            "alembic_version",
+            "events",
+            "om_meta",
+            "sqlite_sequence"
+          ]
+        },
+        "argv": [
+          "openminion",
+          "storage",
+          "migrate",
+          "--sqlite",
+          "<WORK>/sqlite-cli-telemetry/telemetry.db",
+          "--module",
+          "telemetry",
+          "--json"
+        ],
+        "entries": [
+          {
+            "module_id": "telemetry",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "exit": 0,
+        "stderr_tail": ""
+      }
+    },
+    "startup_check": {
+      "build": "built, runtime schema v15",
+      "suggested_commands": {
+        "controlplane": {
+          "argv": [
+            "openminion",
+            "storage",
+            "migrate",
+            "--backend",
+            "postgres",
+            "--postgres-url",
+            "postgresql+psycopg://postgres:***@localhost:5432/pai_dev_startup",
+            "--module",
+            "controlplane",
+            "--json"
+          ],
+          "entries": [
+            {
+              "error": "Alembic upgrade failed for module 'controlplane': (psycopg.errors.SyntaxError) syntax error at or near \"AUTOINCREMENT\"\nLINE 2:         id INTEGER PRIMARY KEY AUTOINCREMENT,\n                                       ^\n[SQL: CREATE TABLE IF NOT EXISTS cp_inbound_messages (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        message_id TEXT NOT NULL,\n        chat_key TEXT NOT NULL,\n        user_key TEXT NOT NULL,\n        session_id TEXT,\n        agent_id TEXT,\n        timestamp TEXT NOT NULL,\n        text TEXT,\n        payload_json TEXT NOT NULL\n    )]\n(Background on this error at: https://sqlalche.me/e/21/f405)",
+              "module_id": "controlplane",
+              "status": "error",
+              "success": false
+            }
+          ],
+          "exit": 1,
+          "stderr_tail": ""
+        },
+        "telemetry": {
+          "argv": [
+            "openminion",
+            "storage",
+            "migrate",
+            "--backend",
+            "postgres",
+            "--postgres-url",
+            "postgresql+psycopg://postgres:***@localhost:5432/pai_dev_startup",
+            "--module",
+            "telemetry",
+            "--json"
+          ],
+          "entries": [
+            {
+              "error": "Alembic upgrade failed for module 'telemetry': (psycopg.errors.SyntaxError) syntax error at or near \"AUTOINCREMENT\"\nLINE 2:         id INTEGER PRIMARY KEY AUTOINCREMENT,\n                                       ^\n[SQL: CREATE TABLE IF NOT EXISTS events (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        session_id TEXT NOT NULL,\n        turn_id TEXT NOT NULL,\n        event_type TEXT NOT NULL,\n        timestamp REAL NOT NULL,\n        data TEXT NOT NULL\n    )]\n(Background on this error at: https://sqlalche.me/e/21/f405)",
+              "module_id": "telemetry",
+              "status": "error",
+              "success": false
+            }
+          ],
+          "exit": 1,
+          "stderr_tail": ""
+        }
+      },
+      "warnings": [
+        "Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a",
+        "Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact",
+        "Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress",
+        "Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane",
+        "Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity",
+        "Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory",
+        "Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy",
+        "Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry",
+        "Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve",
+        "Postgres module 'secret' has pending migrations. Run: openminion storage migrate --module secret",
+        "Postgres module 'session' has pending migrations. Run: openminion storage migrate --module session",
+        "Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill",
+        "Postgres module 'task' has pending migrations. Run: openminion storage migrate --module task",
+        "Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry"
+      ]
+    }
+  },
+  "label": "dev",
+  "openminion": {
+    "file": "/home/runner/work/linux-runner/linux-runner/src/openminion/__init__.py",
+    "version": "0.1.14"
+  },
+  "postgres": "PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit"
+}

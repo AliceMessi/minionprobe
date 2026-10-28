@@ -1,0 +1,48 @@
+checkout: ad954d5b probe: selection racing a leave of the agent it selects (temporary, not for merge)
+commits on top of 39da8ffb:
+ad954d5b probe: selection racing a leave of the agent it selects (temporary, not for merge)
+files changed against 39da8ffb:
+   probe_tmp/probe_selection_leave_race.py | 319 ++++++++++++++++++++++++++++++++
+   1 file changed, 319 insertions(+)
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+packages: psycopg 3.3.6;psycopg-binary 3.3.6;SQLAlchemy 2.1.6;
+OPENMINION_TEST_POSTGRES_URL set: yes
+src identical to 39da8ffb: yes
+
+== [dev] related tests (the same command as in prototype.sh)
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/linux-runner/docs/trackers/artifacts/storage-benchmarks/baseline.json'
+
+/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/pathlib.py:1044: FileNotFoundError
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/websockets/legacy/__init__.py:6
+  /home/runner/work/linux-runner/linux-runner/.venv/lib/python3.11/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/storage/benchmarks/test_benchmarks.py::test_baseline_file_shape - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/linux-runner/docs/trackers/artifacts/storage-benchmarks/baseline.json'
+FAILED tests/storage/benchmarks/test_benchmarks.py::test_storage_benchmarks_against_baseline - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/linux-runner/docs/trackers/artifacts/storage-benchmarks/baseline.json'
+2 failed, 749 passed, 3 skipped, 1 deselected, 1 warning in 24.06s
+pytest exit=1
+
+== [dev] the PostgreSQL file: -m postgres tests/integration/test_runtime_storage_postgres.py
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+........................................                                 [100%]
+40 passed in 24.99s
+pytest exit=0

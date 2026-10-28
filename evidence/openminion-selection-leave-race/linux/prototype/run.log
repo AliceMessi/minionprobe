@@ -1,0 +1,417 @@
+checkout: aaf32f9a fix(runtime): check and write a room selection under the session-row lock (prototype)
+commits on top of 39da8ffb:
+aaf32f9a fix(runtime): check and write a room selection under the session-row lock (prototype)
+9acd6f92 test(runtime): cover a room selection racing a leave of the agent it selects (prototype)
+ad954d5b probe: selection racing a leave of the agent it selects (temporary, not for merge)
+files changed against 39da8ffb:
+   probe_tmp/probe_selection_leave_race.py            | 319 +++++++++++++++++++++
+   .../storage/runtime/session_store/participants.py  |  55 ++--
+   tests/_room_participant_scenarios.py               | 217 +++++++++++++-
+   tests/integration/test_runtime_storage_postgres.py |  45 +++
+   tests/test_session_store.py                        |  30 ++
+   5 files changed, 644 insertions(+), 22 deletions(-)
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+packages: psycopg 3.3.6;psycopg-binary 3.3.6;SQLAlchemy 2.1.6;
+OPENMINION_TEST_POSTGRES_URL set: yes
+
+== [prototype] probe sha256: 4897efb8c218249882f5cab045608c4c5c851939b3ec96e13f22ddc4a5672b12  probe_tmp/probe_selection_leave_race.py
+
+== [prototype] openminion imported from: /home/runner/work/linux-runner/linux-runner/src/openminion/__init__.py
+
+== [prototype] probe run 1
+openminion 0.1.14 from /home/runner/work/linux-runner/linux-runner/src
+python 3.11.17 linux | SQLite 3.45.1
+== SQLite 3.45.1
+1. selection held before its write, leave on the other storage
+   A: set_active_agent(beta) passed its participant check, held before its write
+   B: remove_participant(beta) returned during the hold: False
+   A: set_active_agent(beta) returned 'beta'
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (1.0 s)
+2. leave held before its fallback, selection on the other storage
+   B: remove_participant(beta) marked beta as left, held before its fallback
+   A: set_active_agent(beta) returned during the hold: False
+   A: set_active_agent(beta) sent its write during the hold: False
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) ValueError: Agent 'beta' is not an active participant
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (1.0 s)
+3. control: selection, no leave
+   A: set_active_agent(beta) returned 'beta'
+   after: agents listed ['alpha', 'beta'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   OK
+   (0.0 s)
+4. control: leave of the active agent, no selection
+   M: set_active_agent(beta) before the leave
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+5. control: selection after the leave
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) ValueError: Agent 'beta' is not an active participant
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+== PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2)
+1. selection held before its write, leave on the other storage
+   A: set_active_agent(beta) passed its participant check, held before its write
+   B: remove_participant(beta) returned during the hold: False
+   A: set_active_agent(beta) returned 'beta'
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (1.0 s)
+2. leave held before its fallback, selection on the other storage
+   B: remove_participant(beta) marked beta as left, held before its fallback
+   A: set_active_agent(beta) returned during the hold: False
+   A: set_active_agent(beta) sent its write during the hold: False
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) ValueError: Agent 'beta' is not an active participant
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (1.0 s)
+3. control: selection, no leave
+   A: set_active_agent(beta) returned 'beta'
+   after: agents listed ['alpha', 'beta'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   OK
+   (0.0 s)
+4. control: leave of the active agent, no selection
+   M: set_active_agent(beta) before the leave
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+5. control: selection after the leave
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) ValueError: Agent 'beta' is not an active participant
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+SUMMARY failed cases: none
+probe exit=0
+(stderr: 42 lines; 42 of them are the PostgreSQL storage's 'has pending migrations' log warning; the others follow)
+
+== [prototype] probe run 2
+openminion 0.1.14 from /home/runner/work/linux-runner/linux-runner/src
+python 3.11.17 linux | SQLite 3.45.1
+== SQLite 3.45.1
+1. selection held before its write, leave on the other storage
+   A: set_active_agent(beta) passed its participant check, held before its write
+   B: remove_participant(beta) returned during the hold: False
+   A: set_active_agent(beta) returned 'beta'
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (1.0 s)
+2. leave held before its fallback, selection on the other storage
+   B: remove_participant(beta) marked beta as left, held before its fallback
+   A: set_active_agent(beta) returned during the hold: False
+   A: set_active_agent(beta) sent its write during the hold: False
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) ValueError: Agent 'beta' is not an active participant
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (1.0 s)
+3. control: selection, no leave
+   A: set_active_agent(beta) returned 'beta'
+   after: agents listed ['alpha', 'beta'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   OK
+   (0.0 s)
+4. control: leave of the active agent, no selection
+   M: set_active_agent(beta) before the leave
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+5. control: selection after the leave
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) ValueError: Agent 'beta' is not an active participant
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+== PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2)
+1. selection held before its write, leave on the other storage
+   A: set_active_agent(beta) passed its participant check, held before its write
+   B: remove_participant(beta) returned during the hold: False
+   A: set_active_agent(beta) returned 'beta'
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (1.0 s)
+2. leave held before its fallback, selection on the other storage
+   B: remove_participant(beta) marked beta as left, held before its fallback
+   A: set_active_agent(beta) returned during the hold: False
+   A: set_active_agent(beta) sent its write during the hold: False
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) ValueError: Agent 'beta' is not an active participant
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (1.0 s)
+3. control: selection, no leave
+   A: set_active_agent(beta) returned 'beta'
+   after: agents listed ['alpha', 'beta'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   OK
+   (0.0 s)
+4. control: leave of the active agent, no selection
+   M: set_active_agent(beta) before the leave
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+5. control: selection after the leave
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) ValueError: Agent 'beta' is not an active participant
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+SUMMARY failed cases: none
+probe exit=0
+(stderr: 42 lines; 42 of them are the PostgreSQL storage's 'has pending migrations' log warning; the others follow)
+
+== [prototype] probe run 3
+openminion 0.1.14 from /home/runner/work/linux-runner/linux-runner/src
+python 3.11.17 linux | SQLite 3.45.1
+== SQLite 3.45.1
+1. selection held before its write, leave on the other storage
+   A: set_active_agent(beta) passed its participant check, held before its write
+   B: remove_participant(beta) returned during the hold: False
+   A: set_active_agent(beta) returned 'beta'
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (1.0 s)
+2. leave held before its fallback, selection on the other storage
+   B: remove_participant(beta) marked beta as left, held before its fallback
+   A: set_active_agent(beta) returned during the hold: False
+   A: set_active_agent(beta) sent its write during the hold: False
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) ValueError: Agent 'beta' is not an active participant
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (1.0 s)
+3. control: selection, no leave
+   A: set_active_agent(beta) returned 'beta'
+   after: agents listed ['alpha', 'beta'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   OK
+   (0.0 s)
+4. control: leave of the active agent, no selection
+   M: set_active_agent(beta) before the leave
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+5. control: selection after the leave
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) ValueError: Agent 'beta' is not an active participant
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+== PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2)
+1. selection held before its write, leave on the other storage
+   A: set_active_agent(beta) passed its participant check, held before its write
+   B: remove_participant(beta) returned during the hold: False
+   A: set_active_agent(beta) returned 'beta'
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (1.0 s)
+2. leave held before its fallback, selection on the other storage
+   B: remove_participant(beta) marked beta as left, held before its fallback
+   A: set_active_agent(beta) returned during the hold: False
+   A: set_active_agent(beta) sent its write during the hold: False
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) ValueError: Agent 'beta' is not an active participant
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (1.0 s)
+3. control: selection, no leave
+   A: set_active_agent(beta) returned 'beta'
+   after: agents listed ['alpha', 'beta'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   OK
+   (0.0 s)
+4. control: leave of the active agent, no selection
+   M: set_active_agent(beta) before the leave
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+5. control: selection after the leave
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) ValueError: Agent 'beta' is not an active participant
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+SUMMARY failed cases: none
+probe exit=0
+(stderr: 42 lines; 42 of them are the PostgreSQL storage's 'has pending migrations' log warning; the others follow)
+
+== [prototype] new tests, SQLite
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+============================= test session starts ==============================
+platform linux -- Python 3.11.17, pytest-8.4.2, pluggy-1.7.0
+rootdir: /home/runner/work/linux-runner/linux-runner
+configfile: pyproject.toml
+plugins: platformdirs-4.13.7, timeout-2.4.0, Faker-27.4.0, anyio-4.15.1, cov-7.1.0, asyncio-0.26.0
+timeout: 60.0s
+timeout method: signal
+timeout func_only: False
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 76 items / 72 deselected / 4 selected
+
+tests/test_session_store.py ....                                         [100%]
+
+======================= 4 passed, 72 deselected in 2.43s =======================
+pytest exit=0
+
+== [prototype] new tests, PostgreSQL
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+============================= test session starts ==============================
+platform linux -- Python 3.11.17, pytest-8.4.2, pluggy-1.7.0
+rootdir: /home/runner/work/linux-runner/linux-runner
+configfile: pyproject.toml
+plugins: platformdirs-4.13.7, timeout-2.4.0, Faker-27.4.0, anyio-4.15.1, cov-7.1.0, asyncio-0.26.0
+timeout: 60.0s
+timeout method: signal
+timeout func_only: False
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 44 items / 40 deselected / 4 selected
+
+tests/integration/test_runtime_storage_postgres.py ....                  [100%]
+
+======================= 4 passed, 40 deselected in 4.47s =======================
+pytest exit=0
+
+== [prototype] new tests 20 times on each backend (last pytest line per run, counted)
+SQLite:      20 4 passed, 72 deselected
+PostgreSQL:      20 4 passed, 40 deselected
+
+== [prototype] related tests: the session store, room CLI, turn router, set_active_agent callers, tests/session, tests/storage (one test deselected: it times out with the postgres extra installed, on dev too)
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/linux-runner/docs/trackers/artifacts/storage-benchmarks/baseline.json'
+
+/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/pathlib.py:1044: FileNotFoundError
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/websockets/legacy/__init__.py:6
+  /home/runner/work/linux-runner/linux-runner/.venv/lib/python3.11/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/storage/benchmarks/test_benchmarks.py::test_baseline_file_shape - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/linux-runner/docs/trackers/artifacts/storage-benchmarks/baseline.json'
+FAILED tests/storage/benchmarks/test_benchmarks.py::test_storage_benchmarks_against_baseline - FileNotFoundError: [Errno 2] No such file or directory: '/home/runner/work/linux-runner/docs/trackers/artifacts/storage-benchmarks/baseline.json'
+2 failed, 753 passed, 3 skipped, 1 deselected, 1 warning in 25.22s
+pytest exit=1
+
+== [prototype] the PostgreSQL file: -m postgres tests/integration/test_runtime_storage_postgres.py
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+............................................                             [100%]
+44 passed in 28.78s
+pytest exit=0
+
+== [prototype] ruff check .
+All checks passed!
+
+== [prototype] ruff format --check on the changed files
+4 files already formatted
+
+== [prototype] make lint
+cd "/home/runner/work/linux-runner/linux-runner" && /home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4309; baseline total: 4309
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 290
+[tcr] api: 77 / 77 | monthly quota -50 | next target <= 27 | headroom 0
+[tcr] cli: 309 / 309 | monthly quota -50 | next target <= 259 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 222 / 222 | monthly quota -50 | next target <= 172 | headroom 0
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+make lint exit=0
+
+== dev sources from here on: git checkout 39da8ffb -- src (1 paths differ from the prototype)
+
+== [dev sources] new tests, SQLite
+                selection = pool.submit(
+                    selector.set_active_agent, session_id=room_id, agent_id="beta"
+                )
+                assert held.wait(timeout=SELECTION_HOLD_TIMEOUT)
+                leave = pool.submit(
+                    leaver.remove_participant,
+                    session_id=room_id,
+                    participant_type="agent",
+                    participant_id="beta",
+                )
+                done, _ = wait([leave], timeout=SELECTION_HOLD_SECONDS)
+            selection.result(timeout=30)
+            assert leave.result(timeout=30) is True
+    
+        # The agents listed, and the stored active agent.
+        outcome = (listed_agents(sessions, room_id), stored_selection(sessions, room_id))
+>       assert outcome == (["alpha"], "alpha"), outcome
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: (['alpha'], 'beta')
+
+tests/_room_participant_scenarios.py:516: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_session_store.py::SessionStoreTests::test_selection_during_a_leave_is_refused - AssertionError: ('beta', ['alpha'], 'beta')
+FAILED tests/test_session_store.py::SessionStoreTests::test_selection_held_before_its_write_applies_before_a_leave - AssertionError: (['alpha'], 'beta')
+2 failed, 2 passed, 72 deselected in 1.43s
+pytest exit=1
+
+== [dev sources] new tests, PostgreSQL
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'secret' has pending migrations. Run: openminion storage migrate --module secret
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'session' has pending migrations. Run: openminion storage migrate --module session
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'task' has pending migrations. Run: openminion storage migrate --module task
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'secret' has pending migrations. Run: openminion storage migrate --module secret
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact
+WARNING  openminion.modules.storage.runtime.validation:validation.py:94 Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy
+=========================== short test summary info ============================
+FAILED tests/integration/test_runtime_storage_postgres.py::test_postgres_selection_and_leave_on_two_connections[selection-before-leave] - AssertionError: (['alpha'], 'beta')
+FAILED tests/integration/test_runtime_storage_postgres.py::test_postgres_selection_and_leave_on_two_connections[leave-before-selection] - AssertionError: ('beta', ['alpha'], 'beta')
+2 failed, 2 passed, 40 deselected in 3.26s
+pytest exit=1
+
+== back to the prototype: 0 paths differ

@@ -1,0 +1,245 @@
+checkout: ad954d5b probe: selection racing a leave of the agent it selects (temporary, not for merge)
+commits on top of 39da8ffb:
+ad954d5b probe: selection racing a leave of the agent it selects (temporary, not for merge)
+files changed against 39da8ffb:
+   probe_tmp/probe_selection_leave_race.py | 319 ++++++++++++++++++++++++++++++++
+   1 file changed, 319 insertions(+)
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+packages: psycopg 3.3.6;psycopg-binary 3.3.6;SQLAlchemy 2.1.6;
+OPENMINION_TEST_POSTGRES_URL set: yes
+src identical to 39da8ffb: yes
+
+== [dev] probe sha256: 4897efb8c218249882f5cab045608c4c5c851939b3ec96e13f22ddc4a5672b12  probe_tmp/probe_selection_leave_race.py
+
+== [dev] openminion imported from: /home/runner/work/linux-runner/linux-runner/src/openminion/__init__.py
+
+== [dev] probe run 1
+openminion 0.1.14 from /home/runner/work/linux-runner/linux-runner/src
+python 3.11.17 linux | SQLite 3.45.1
+== SQLite 3.45.1
+1. selection held before its write, leave on the other storage
+   A: set_active_agent(beta) passed its participant check, held before its write
+   B: remove_participant(beta) returned during the hold: True
+   A: set_active_agent(beta) returned 'beta'
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   FAIL: stored active agent 'beta' is not a listed agent
+   (0.0 s)
+2. leave held before its fallback, selection on the other storage
+   B: remove_participant(beta) marked beta as left, held before its fallback
+   A: set_active_agent(beta) returned during the hold: False
+   A: set_active_agent(beta) sent its write during the hold: True
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) returned 'beta'
+   after: agents listed ['alpha'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   FAIL: stored active agent 'beta' is not a listed agent
+   (1.0 s)
+3. control: selection, no leave
+   A: set_active_agent(beta) returned 'beta'
+   after: agents listed ['alpha', 'beta'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   OK
+   (0.0 s)
+4. control: leave of the active agent, no selection
+   M: set_active_agent(beta) before the leave
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+5. control: selection after the leave
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) ValueError: Agent 'beta' is not an active participant
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+== PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2)
+1. selection held before its write, leave on the other storage
+   A: set_active_agent(beta) passed its participant check, held before its write
+   B: remove_participant(beta) returned during the hold: True
+   A: set_active_agent(beta) returned 'beta'
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   FAIL: stored active agent 'beta' is not a listed agent
+   (0.0 s)
+2. leave held before its fallback, selection on the other storage
+   B: remove_participant(beta) marked beta as left, held before its fallback
+   A: set_active_agent(beta) returned during the hold: False
+   A: set_active_agent(beta) sent its write during the hold: True
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) returned 'beta'
+   after: agents listed ['alpha'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   FAIL: stored active agent 'beta' is not a listed agent
+   (1.0 s)
+3. control: selection, no leave
+   A: set_active_agent(beta) returned 'beta'
+   after: agents listed ['alpha', 'beta'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   OK
+   (0.0 s)
+4. control: leave of the active agent, no selection
+   M: set_active_agent(beta) before the leave
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+5. control: selection after the leave
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) ValueError: Agent 'beta' is not an active participant
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+SUMMARY failed cases: ['SQLite case 1', 'SQLite case 2', 'PostgreSQL case 1', 'PostgreSQL case 2']
+probe exit=1
+(stderr: 42 lines; 42 of them are the PostgreSQL storage's 'has pending migrations' log warning; the others follow)
+
+== [dev] probe run 2
+openminion 0.1.14 from /home/runner/work/linux-runner/linux-runner/src
+python 3.11.17 linux | SQLite 3.45.1
+== SQLite 3.45.1
+1. selection held before its write, leave on the other storage
+   A: set_active_agent(beta) passed its participant check, held before its write
+   B: remove_participant(beta) returned during the hold: True
+   A: set_active_agent(beta) returned 'beta'
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   FAIL: stored active agent 'beta' is not a listed agent
+   (0.0 s)
+2. leave held before its fallback, selection on the other storage
+   B: remove_participant(beta) marked beta as left, held before its fallback
+   A: set_active_agent(beta) returned during the hold: False
+   A: set_active_agent(beta) sent its write during the hold: True
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) returned 'beta'
+   after: agents listed ['alpha'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   FAIL: stored active agent 'beta' is not a listed agent
+   (1.0 s)
+3. control: selection, no leave
+   A: set_active_agent(beta) returned 'beta'
+   after: agents listed ['alpha', 'beta'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   OK
+   (0.0 s)
+4. control: leave of the active agent, no selection
+   M: set_active_agent(beta) before the leave
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+5. control: selection after the leave
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) ValueError: Agent 'beta' is not an active participant
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+== PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2)
+1. selection held before its write, leave on the other storage
+   A: set_active_agent(beta) passed its participant check, held before its write
+   B: remove_participant(beta) returned during the hold: True
+   A: set_active_agent(beta) returned 'beta'
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   FAIL: stored active agent 'beta' is not a listed agent
+   (0.0 s)
+2. leave held before its fallback, selection on the other storage
+   B: remove_participant(beta) marked beta as left, held before its fallback
+   A: set_active_agent(beta) returned during the hold: False
+   A: set_active_agent(beta) sent its write during the hold: True
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) returned 'beta'
+   after: agents listed ['alpha'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   FAIL: stored active agent 'beta' is not a listed agent
+   (1.0 s)
+3. control: selection, no leave
+   A: set_active_agent(beta) returned 'beta'
+   after: agents listed ['alpha', 'beta'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   OK
+   (0.0 s)
+4. control: leave of the active agent, no selection
+   M: set_active_agent(beta) before the leave
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+5. control: selection after the leave
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) ValueError: Agent 'beta' is not an active participant
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+SUMMARY failed cases: ['SQLite case 1', 'SQLite case 2', 'PostgreSQL case 1', 'PostgreSQL case 2']
+probe exit=1
+(stderr: 42 lines; 42 of them are the PostgreSQL storage's 'has pending migrations' log warning; the others follow)
+
+== [dev] probe run 3
+openminion 0.1.14 from /home/runner/work/linux-runner/linux-runner/src
+python 3.11.17 linux | SQLite 3.45.1
+== SQLite 3.45.1
+1. selection held before its write, leave on the other storage
+   A: set_active_agent(beta) passed its participant check, held before its write
+   B: remove_participant(beta) returned during the hold: True
+   A: set_active_agent(beta) returned 'beta'
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   FAIL: stored active agent 'beta' is not a listed agent
+   (0.0 s)
+2. leave held before its fallback, selection on the other storage
+   B: remove_participant(beta) marked beta as left, held before its fallback
+   A: set_active_agent(beta) returned during the hold: False
+   A: set_active_agent(beta) sent its write during the hold: True
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) returned 'beta'
+   after: agents listed ['alpha'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   FAIL: stored active agent 'beta' is not a listed agent
+   (1.0 s)
+3. control: selection, no leave
+   A: set_active_agent(beta) returned 'beta'
+   after: agents listed ['alpha', 'beta'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   OK
+   (0.0 s)
+4. control: leave of the active agent, no selection
+   M: set_active_agent(beta) before the leave
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+5. control: selection after the leave
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) ValueError: Agent 'beta' is not an active participant
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+== PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2)
+1. selection held before its write, leave on the other storage
+   A: set_active_agent(beta) passed its participant check, held before its write
+   B: remove_participant(beta) returned during the hold: True
+   A: set_active_agent(beta) returned 'beta'
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   FAIL: stored active agent 'beta' is not a listed agent
+   (0.0 s)
+2. leave held before its fallback, selection on the other storage
+   B: remove_participant(beta) marked beta as left, held before its fallback
+   A: set_active_agent(beta) returned during the hold: False
+   A: set_active_agent(beta) sent its write during the hold: True
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) returned 'beta'
+   after: agents listed ['alpha'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   FAIL: stored active agent 'beta' is not a listed agent
+   (1.0 s)
+3. control: selection, no leave
+   A: set_active_agent(beta) returned 'beta'
+   after: agents listed ['alpha', 'beta'] | stored active_agent_id 'beta' | get_active_agent 'beta'
+   OK
+   (0.0 s)
+4. control: leave of the active agent, no selection
+   M: set_active_agent(beta) before the leave
+   B: remove_participant(beta) returned True
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+5. control: selection after the leave
+   B: remove_participant(beta) returned True
+   A: set_active_agent(beta) ValueError: Agent 'beta' is not an active participant
+   after: agents listed ['alpha'] | stored active_agent_id 'alpha' | get_active_agent 'alpha'
+   OK
+   (0.0 s)
+SUMMARY failed cases: ['SQLite case 1', 'SQLite case 2', 'PostgreSQL case 1', 'PostgreSQL case 2']
+probe exit=1
+(stderr: 42 lines; 42 of them are the PostgreSQL storage's 'has pending migrations' log warning; the others follow)
