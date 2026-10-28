@@ -87,3 +87,7 @@ Paths are sanitized: `<VENV>` is the venv under test, `<VENV0112>` the 0.1.12 ve
 - PostgreSQL runtime storage.
 - Module databases that an echo turn does not create.
 - The Windows `LocalSessionStore` `::conv:` id observation from #419, which is a separate report.
+
+## Round 2
+
+The maintainer's review of #453 found that the round 1 rollback steps left a hot rollback journal next to a restored file, and that the generic copy of the other files could put companions back. The corrected backup and rollback steps, and their validation, are in [`round2/`](round2/README.md).
