@@ -75,3 +75,39 @@ Tests (gates run 40541883618):
 An earlier gates run on `50e0d77a` ([run 40537465219](https://github.com/AliceMessi/linux-runner/actions/runs/40537465219)) found one more failure, `tests/api/runtime/test_memory.py::test_runtime_exposes_same_memory_adapter`. Its config stub had no `storage` section. Commit `3ad2981c` gives that stub the default `StorageConfig()`, and the runs above are on it.
 
 Windows: `pytest -q tests/api/test_runtime_storage_connection.py tests/api/runtime/test_memory.py tests/test_room_cli.py tests/integration/test_runtime_storage_postgres.py` -> 17 passed, 40 skipped, on both trees.
+
+## Final head
+
+The PR is opened from `fix/437-postgres-runtime-storage` @ `de74deaf`: 3 commits on `dev` @ `988ac4ec` (the #436 merge), after the maintainer approved the scoped direction ([comment](https://github.com/openminion/openminion/issues/437#issuecomment-6459371829)). It has the same source change as `3ad2981c`. The test-stub change for `test_runtime_exposes_same_memory_adapter` is now in the fix commit, and the docs section lists only the paths the PostgreSQL tests check. Everything above was rerun on it, in `final-de74deaf/`:
+
+| sha256 | file |
+|---|---|
+| `154ab6e2ac58d34d1601f893017b80d3489aeb983dee5f78d222ebdd9ebb4339` | `final-de74deaf/linux/gates-run-40629191323.txt` |
+| `4a1e921ec9f1f8a7339fd808af52f0143ca8e7ea1d3b5e6dfad47e8eb647337f` | `final-de74deaf/linux/probes/probe_apiruntime_pg_dev.json` |
+| `2d334abcb82afa786c567aa48cb5998eaa21e2548d6104bfa372c39982f37009` | `final-de74deaf/linux/probes/probe_apiruntime_pg_dev.log` |
+| `8d178962a07773bc8868c21e34e00b0f08930b05f3755343195b0e89fe4c32f5` | `final-de74deaf/linux/probes/probe_apiruntime_pg_head.json` |
+| `babd4a8b13cc194ae454d3f9dc88e34f814ce6ccc2189776ebcbffed701db3e2` | `final-de74deaf/linux/probes/probe_apiruntime_pg_head.log` |
+| `434e9eb6c31012e260ed2b27dcb02563e2e17d906e4ce6fd7817067f385804b4` | `final-de74deaf/linux/probes/probe_runtime_postgres_data_dev.json` |
+| `fb63d33ca5091a48a466ba6d0cc36b512840de3c940e3dccc353523a0801c781` | `final-de74deaf/linux/probes/probe_runtime_postgres_data_dev.log` |
+| `7a4c4259012fa64c9f199655976bbc221e562ace5d13a0886b87dec1e124278a` | `final-de74deaf/linux/probes/probe_runtime_postgres_data_head.json` |
+| `6678834af1f025a2dd57d00891cca2fbd02d86a13b2593f8c0718817b2df5a9c` | `final-de74deaf/linux/probes/probe_runtime_postgres_data_head.log` |
+| `150f5daeb2b7b94646af21072fb19c5a8ad66a0dd1877f8fcad3ab1056834248` | `final-de74deaf/linux/probes/probes.sha256` |
+| `576d959243c8c70c2c9d7307a79db3f2aaae02aafddc5d235f9493423a14a304` | `final-de74deaf/linux/probes/run-id.txt` |
+| `cb88c9332c4a9c4631b823442da5c280fa262ef42be9c64c128ef2def8732225` | `final-de74deaf/linux/probes/spec_dev.txt` |
+| `cbd19c9cef1e7bc71d469de67499a4192cc535b270cb04443bb49c83b408b2f2` | `final-de74deaf/linux/probes/spec_head.txt` |
+| `e4e2e0165761d4375a6c00471f3b4d7f71fe985df9cfcfe1b20e28d5e81ba6c2` | `final-de74deaf/linux/runner-gates.sh` |
+| `10cef90584e7635ee34a1761c23286372f46c93168f2c10445c1bfd950023625` | `final-de74deaf/linux/runner-test-ci.sh` |
+| `6b20ea3bcfef767ab11d4aa417814364664961405380c18b579acac24d15761a` | `final-de74deaf/linux/test-ci-run-40629193948.txt` |
+| `b14b657152459beec222802f8eff1771067a1d63c673c5e2904e36602a08bad9` | `final-de74deaf/runner_setup.sh` |
+| `7fab10694da2b87343276ad3314e88ee28f04ddeec4a3245c45c1f995090490c` | `final-de74deaf/windows/pytest-dev-988ac4ec-sources.txt` |
+| `a913a7f22c53199e12f29b33811762eee8a4b5ca81bdd11a7730d72394747e09` | `final-de74deaf/windows/pytest-head-de74deaf.txt` |
+
+- `final-de74deaf/runner_setup.sh` is `probes/runner_setup.sh` with the two specs changed to `dev` @ `988ac4ec` and `de74deaf`. The probes are the files in `probes/` (same sha256, see `linux/probes/probes.sha256`).
+- Probes ([run 40629230063](https://github.com/AliceMessi/linux-runner/actions/runs/40629230063)): the same results as the tables above, with `988ac4ec` in place of `691a1d54` and `de74deaf` in place of `3ad2981c`.
+- Gates ([run 40629191323](https://github.com/AliceMessi/linux-runner/actions/runs/40629191323), script `final-de74deaf/linux/runner-gates.sh`):
+  - focused tests: 17 passed on the head and on `988ac4ec` sources;
+  - `-m postgres`: 47 passed on the head; on `988ac4ec` sources 3 failed (the three new tests), 44 passed;
+  - the `test-ci`-marker slice: 1 failed (the PostgreSQL-extra timeout above), 1084 passed, 3 skipped, 1 xfailed, on both trees;
+  - `ruff check .`, `make format-check` (5131 files), `make workflow-check`, `make lint` (mypy ratchet 4309 / 4309) and `make test-critical` (486 passed, 4 skipped) pass.
+- `make test-ci` ([run 40629193948](https://github.com/AliceMessi/linux-runner/actions/runs/40629193948)): 1 failed (the same timeout), 20417 passed, 29 skipped, 1 xfailed.
+- Windows: 17 passed, 40 skipped on the head and on `988ac4ec` sources, in a fresh `uv` venv.
