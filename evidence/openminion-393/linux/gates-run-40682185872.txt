@@ -1,0 +1,154 @@
+AliceMessi/linux-runner run 40682185872: https://github.com/AliceMessi/linux-runner/actions/runs/40682185872
+checkout: e7f42b5f docs(changelog): note the room active agent written under the session lock
+head: e7f42b5f docs(changelog): note the room active agent written under the session lock
+dev:  042e0a2c Merge pull request #463 from openminion/fix/memory-consolidation-trusted-context
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+packages: psycopg 3.3.6;sophiagraph 0.0.12;SQLAlchemy 2.1.6;typer 0.27.3;
+OPENMINION_TEST_POSTGRES_URL set: yes
+
+== [head] upstream postgres-memory-retrieval job, its command list from .github/workflows/ci.yml
+$ python -m pytest -q -m postgres tests/memory/test_memory_postgres_conformance.py
+19 passed in 2.51s
+$ python -m pytest -q -m postgres tests/memory/test_memory_search_quality.py::test_postgres_lexical_score_contributes_to_semantic_order
+1 passed in 0.36s
+$ python -m pytest -q -m postgres tests/memory/test_gc_evidence_postgres.py
+7 passed in 1.13s
+$ python -m pytest -q -m postgres tests/skill/test_skill_postgres_conformance.py
+6 passed, 6 deselected in 0.90s
+$ python -m pytest -q -m postgres tests/integration/test_runtime_storage_postgres.py
+46 passed in 31.09s
+$ python -m pytest -q -m postgres tests/integration/test_runtime_memory_postgres.py
+7 passed in 3.64s
+$ python -m pytest -q -m postgres tests/memory/test_gc_postgres.py
+13 passed in 2.26s
+
+== [head] openminion imported from: <RUNNER_CHECKOUT>/src/openminion/__init__.py
+
+== [head] pytest <focused>: tests/test_session_store.py -k "active_agent or selection or leave or legacy or blank or join" -v
+====================== 17 passed, 61 deselected in 4.17s =======================
+
+== [head] pytest -m postgres <postgres> -v (the #393 tests)
+collected 46 items / 40 deselected / 6 selected
+======================= 6 passed, 40 deselected in 5.71s =======================
+
+== [head] pytest -m postgres <postgres> (the whole file)
+46 passed in 30.29s
+
+== [head] pytest -m "<test-ci markers>" <related>
+E   Failed: Timeout (>60.0s) from pytest-timeout.
+tests/cli/test_status_telemetry_command.py::test_status_telemetry_failed_and_opaque_lookup
+  <RUNNER_CHECKOUT>/src/openminion/base/config/paths.py:54: RuntimeWarning: telemetry_db_path must be under data_root (/tmp/pytest-of-runner/pytest-10/test_status_telemetry_failed_a0/.openminion), got /tmp/pytest-of-runner/pytest-10/test_status_telemetry_failed_a0/data/tele ...
+FAILED tests/storage/test_startup_validation.py::TestValidatePostgresConnectionFailure::test_unreachable_db_raises_with_redacted_url - Failed: Timeout (>60.0s) from pytest-timeout.
+1 failed, 5282 passed, 4 skipped, 142 deselected, 1 xfailed, 52 warnings in 479.45s (0:07:59)
+
+== dev sources from here on: git checkout 042e0a2c6d9efed679ec825ba621e1ee055be6af -- src (1 paths differ)
+
+== [dev] openminion imported from: <RUNNER_CHECKOUT>/src/openminion/__init__.py
+
+== [dev] pytest <focused>: tests/test_session_store.py -k "active_agent or selection or leave or legacy or blank or join" -v
+E   AssertionError: ({'alpha': 'alpha', 'beta': 'beta'}, 'alpha')
+E   AssertionError: ([], 'alpha')
+E   AssertionError: ('beta', 'alpha')
+FAILED tests/test_session_store.py::SessionStoreTests::test_join_keeps_an_active_agent_stored_during_it - AssertionError: ({'alpha': 'alpha', 'beta': 'beta'}, 'alpha')
+FAILED tests/test_session_store.py::SessionStoreTests::test_leave_during_a_join_waits_and_then_applies - AssertionError: ([], 'alpha')
+FAILED tests/test_session_store.py::SessionStoreTests::test_selection_during_a_join_waits_and_then_applies - AssertionError: ('beta', 'alpha')
+================= 3 failed, 14 passed, 61 deselected in 1.36s ==================
+
+== [dev] pytest -m postgres <postgres> -v (the #393 tests)
+collected 46 items / 40 deselected / 6 selected
+E   AssertionError: ({'alpha': 'alpha', 'beta': 'beta'}, 'alpha')
+E   AssertionError: ('beta', 'alpha')
+E   AssertionError: ([], 'alpha')
+FAILED tests/integration/test_runtime_storage_postgres.py::test_postgres_room_active_agent_on_two_connections[two-first-joins] - AssertionError: ({'alpha': 'alpha', 'beta': 'beta'}, 'alpha')
+FAILED tests/integration/test_runtime_storage_postgres.py::test_postgres_room_active_agent_on_two_connections[selection] - AssertionError: ('beta', 'alpha')
+FAILED tests/integration/test_runtime_storage_postgres.py::test_postgres_room_active_agent_on_two_connections[leave] - AssertionError: ([], 'alpha')
+================== 3 failed, 3 passed, 40 deselected in 2.96s ==================
+
+== [dev] pytest -m postgres <postgres> (the whole file)
+E   AssertionError: ({'alpha': 'alpha', 'beta': 'beta'}, 'alpha')
+E   AssertionError: ('beta', 'alpha')
+E   AssertionError: ([], 'alpha')
+FAILED tests/integration/test_runtime_storage_postgres.py::test_postgres_room_active_agent_on_two_connections[two-first-joins] - AssertionError: ({'alpha': 'alpha', 'beta': 'beta'}, 'alpha')
+FAILED tests/integration/test_runtime_storage_postgres.py::test_postgres_room_active_agent_on_two_connections[selection] - AssertionError: ('beta', 'alpha')
+FAILED tests/integration/test_runtime_storage_postgres.py::test_postgres_room_active_agent_on_two_connections[leave] - AssertionError: ([], 'alpha')
+3 failed, 43 passed in 27.30s
+
+== [dev] pytest -m "<test-ci markers>" <related>
+E   AssertionError: ({'alpha': 'alpha', 'beta': 'beta'}, 'alpha')
+E   AssertionError: ([], 'alpha')
+E   AssertionError: ('beta', 'alpha')
+E   Failed: Timeout (>60.0s) from pytest-timeout.
+tests/cli/test_status_telemetry_command.py::test_status_telemetry_failed_and_opaque_lookup
+  <RUNNER_CHECKOUT>/src/openminion/base/config/paths.py:54: RuntimeWarning: telemetry_db_path must be under data_root (/tmp/pytest-of-runner/pytest-14/test_status_telemetry_failed_a0/.openminion), got /tmp/pytest-of-runner/pytest-14/test_status_telemetry_failed_a0/data/tele ...
+FAILED tests/test_session_store.py::SessionStoreTests::test_join_keeps_an_active_agent_stored_during_it - AssertionError: ({'alpha': 'alpha', 'beta': 'beta'}, 'alpha')
+FAILED tests/test_session_store.py::SessionStoreTests::test_leave_during_a_join_waits_and_then_applies - AssertionError: ([], 'alpha')
+FAILED tests/test_session_store.py::SessionStoreTests::test_selection_during_a_join_waits_and_then_applies - AssertionError: ('beta', 'alpha')
+FAILED tests/storage/test_startup_validation.py::TestValidatePostgresConnectionFailure::test_unreachable_db_raises_with_redacted_url - Failed: Timeout (>60.0s) from pytest-timeout.
+4 failed, 5279 passed, 4 skipped, 142 deselected, 1 xfailed, 52 warnings in 465.11s (0:07:45)
+
+== back to the branch head: 0 paths differ
+
+== [head] the #393 tests 20 times each (SQLite and PostgreSQL)
+     20 7 passed, 71 deselected
+     20 6 passed, 40 deselected
+
+== ruff check .
+All checks passed!
+
+== make format-check
+<RUNNER_CHECKOUT>/.venv/bin/python3.11 -m ruff format --check "<RUNNER_CHECKOUT>"
+5132 files already formatted
+
+== make workflow-check
+[INFO] This may take a few minutes...
+Lint GitHub Actions workflow files.......................................Passed
+<RUNNER_CHECKOUT>/.venv/bin/python3.11 scripts/validate/action_pins.py
+workflow action pins: clean
+
+== make lint
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=0
+[type-ignore-hygiene] clean — 0 bare ignores; 93 qualified ignores across 14 codes
+{
+  "checked": 2647,
+  "ok": true,
+  "violations": []
+}
+broad_exception
+
+[INFO] Summary
+  files: 410
+  handlers: 1101
+  silent pass: 106
+  baseline entries: 410
+
+[OK] Result
+  - broad-exception baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 410, "files_with_handlers": 410, "handler_count": 1101, "silent_pass_count": 106}, "ok": true, "validator": "broad_exception"}
+make[1]: Leaving directory '<RUNNER_CHECKOUT>'
+<RUNNER_CHECKOUT>/.venv/bin/python3.11 scripts/validate/controlplane_delivery.py
+[coo-09] clean — no synchronous runner deliver regressions
+<RUNNER_CHECKOUT>/.venv/bin/python3.11 scripts/validate/webhook_secret.py
+[coo-10] clean — webhook secret-required contract preserved
+Skipping workspace browser tool-family contract validator (not present in standalone checkout).
+make typecheck
+make[1]: Entering directory '<RUNNER_CHECKOUT>'
+cd "<RUNNER_CHECKOUT>" && <RUNNER_CHECKOUT>/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4309; baseline total: 4309
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 290
+[tcr] api: 77 / 77 | monthly quota -50 | next target <= 27 | headroom 0
+[tcr] cli: 309 / 309 | monthly quota -50 | next target <= 259 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 222 / 222 | monthly quota -50 | next target <= 172 | headroom 0
+make[1]: Leaving directory '<RUNNER_CHECKOUT>'
+make lint exit: 0
+
+== make test-critical
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+486 passed, 4 skipped, 1 warning in 15.61s

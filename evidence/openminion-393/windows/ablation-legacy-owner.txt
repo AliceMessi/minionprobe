@@ -1,0 +1,59 @@
+# Ablation of the legacy-owner guard, native Windows (same venv and worktree as pytest-head.txt)
+# slice: tests/test_session_store.py tests/test_room_cli.py tests/test_turn_router.py tests/session tests/services/runtime/test_session_profile_binding.py tests/api/routes/test_session_continuations.py
+# ablation: ensure_legacy_participant_record passes activate_agent=True to upsert_participant_record (applied to the worktree, then git checkout HEAD -- <file>)
+
+## head e7f42b5f
+FAILED tests/session/fork_restore/test_sfrx.py::test_restore_file_checkpoint_rejects_paths_outside_root
+FAILED tests/session/project/test_tpeo_project.py::test_store_create_then_get_round_trips
+FAILED tests/session/project/test_tpeo_project.py::test_store_list_returns_all_projects_in_creation_order
+FAILED tests/session/project/test_tpeo_project.py::test_store_delete_removes_project_and_bindings
+FAILED tests/session/project/test_tpeo_project.py::test_store_delete_unknown_returns_false
+FAILED tests/session/project/test_tpeo_project.py::test_bind_session_then_project_for_session_resolves
+FAILED tests/session/project/test_tpeo_project.py::test_resolve_inheritance_returns_typed_payload
+FAILED tests/session/project/test_tpeo_project.py::test_resolve_inheritance_returns_none_for_unbound_session
+FAILED tests/session/project/test_tpeo_project.py::test_bind_session_is_upsert_on_session_id
+FAILED tests/session/project/test_tpeo_project.py::test_cli_create_then_list_round_trips
+FAILED tests/session/project/test_tpeo_project.py::test_cli_show_returns_project_and_bindings
+FAILED tests/session/project/test_tpeo_project.py::test_cli_bind_session_errors_for_unknown_project
+FAILED tests/session/project/test_tpeo_project.py::test_cli_usage_for_empty_args
+FAILED tests/session/project/test_tpeo_project.py::test_cli_unknown_subcommand_returns_error
+FAILED tests/session/project/test_tpeo_project.py::test_resolve_cron_project_binding_returns_typed_binding
+FAILED tests/session/project/test_tpeo_project.py::test_resolve_cron_project_binding_returns_none_when_no_project_id
+FAILED tests/session/project/test_tpeo_project.py::test_resolve_cron_project_binding_returns_none_for_unknown_project
+FAILED tests/session/project/test_tpeo_project.py::test_inheritance_scope_key_is_project_scoped
+FAILED tests/session/project/test_tpeo_project.py::test_e2e_smoke_create_bind_inherit_cron_inspect
+FAILED tests/session/test_session_retention.py::test_retention_blocks_active_hold_lease_and_share
+FAILED tests/session/test_session_retention.py::test_retention_purges_blockchain_records_before_database_rows
+FAILED tests/session/test_session_retention.py::test_retention_domain_failure_preserves_database_and_retry_converges
+FAILED tests/session/test_v15_e2e_integration.py::T17IntegrationTests::test_e2e_ctxctl_brain_sessctl
+23 failed, 326 passed, 2 skipped, 1 warning in 25.17s
+
+## head e7f42b5f with the ablation
+FAILED tests/test_session_store.py::SessionStoreTests::test_legacy_owner_records_activate_no_agent
+FAILED tests/session/fork_restore/test_sfrx.py::test_restore_file_checkpoint_rejects_paths_outside_root
+FAILED tests/session/project/test_tpeo_project.py::test_store_create_then_get_round_trips
+FAILED tests/session/project/test_tpeo_project.py::test_store_list_returns_all_projects_in_creation_order
+FAILED tests/session/project/test_tpeo_project.py::test_store_delete_removes_project_and_bindings
+FAILED tests/session/project/test_tpeo_project.py::test_store_delete_unknown_returns_false
+FAILED tests/session/project/test_tpeo_project.py::test_bind_session_then_project_for_session_resolves
+FAILED tests/session/project/test_tpeo_project.py::test_resolve_inheritance_returns_typed_payload
+FAILED tests/session/project/test_tpeo_project.py::test_resolve_inheritance_returns_none_for_unbound_session
+FAILED tests/session/project/test_tpeo_project.py::test_bind_session_is_upsert_on_session_id
+FAILED tests/session/project/test_tpeo_project.py::test_cli_create_then_list_round_trips
+FAILED tests/session/project/test_tpeo_project.py::test_cli_show_returns_project_and_bindings
+FAILED tests/session/project/test_tpeo_project.py::test_cli_bind_session_errors_for_unknown_project
+FAILED tests/session/project/test_tpeo_project.py::test_cli_usage_for_empty_args
+FAILED tests/session/project/test_tpeo_project.py::test_cli_unknown_subcommand_returns_error
+FAILED tests/session/project/test_tpeo_project.py::test_resolve_cron_project_binding_returns_typed_binding
+FAILED tests/session/project/test_tpeo_project.py::test_resolve_cron_project_binding_returns_none_when_no_project_id
+FAILED tests/session/project/test_tpeo_project.py::test_resolve_cron_project_binding_returns_none_for_unknown_project
+FAILED tests/session/project/test_tpeo_project.py::test_inheritance_scope_key_is_project_scoped
+FAILED tests/session/project/test_tpeo_project.py::test_e2e_smoke_create_bind_inherit_cron_inspect
+FAILED tests/session/test_session_retention.py::test_retention_blocks_active_hold_lease_and_share
+FAILED tests/session/test_session_retention.py::test_retention_purges_blockchain_records_before_database_rows
+FAILED tests/session/test_session_retention.py::test_retention_domain_failure_preserves_database_and_retry_converges
+FAILED tests/session/test_v15_e2e_integration.py::T17IntegrationTests::test_e2e_ctxctl_brain_sessctl
+24 failed, 325 passed, 2 skipped, 1 warning in 27.96s
+
+## failures only with the ablation
+> FAILED tests/test_session_store.py::SessionStoreTests::test_legacy_owner_records_activate_no_agent

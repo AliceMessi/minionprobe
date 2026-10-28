@@ -1,0 +1,310 @@
+AliceMessi/linux-runner run 40682226940: https://github.com/AliceMessi/linux-runner/actions/runs/40682226940
+checkout: e7f42b5f docs(changelog): note the room active agent written under the session lock
+head: e7f42b5f docs(changelog): note the room active agent written under the session lock
+dev:  042e0a2c Merge pull request #463 from openminion/fix/memory-consolidation-trusted-context
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+packages: psycopg 3.3.6;sophiagraph 0.0.12;SQLAlchemy 2.1.6;typer 0.27.3;
+OPENMINION_TEST_POSTGRES_URL set: yes
+228f93d5234e08ee6ee71144e1430dd421bbf694460ccf79ca97add4e6c3d96c  /tmp/ev/probe_race_active_agent.py
+
+== [head] openminion imported from: <RUNNER_CHECKOUT>/src/openminion/__init__.py
+
+== [head] run 1
+python 3.11.17 linux
+== SQLite 3.45.1
+1. two first joins
+  A (alpha) read active_agent_id='alpha'; B (beta) read 'alpha'
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+  B's add_participant(beta): ok
+  after B returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+2. explicit selection during a first join
+  A (alpha) read active_agent_id='alpha'
+  B: add_participant(beta), then set_active_agent(beta) -> active_agent_id='beta'
+  after B's explicit selection: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+3. leave during a first join
+  A (alpha) read active_agent_id='alpha'
+  B: remove_participant(alpha) -> True
+  after B's leave: agents listed: [] | stored active_agent_id: None | get_active_agent: None
+  A's add_participant(alpha): RuntimeError: Failed to upsert participant agent:alpha
+  after A returns: agents listed: [] | stored active_agent_id: None | get_active_agent: None
+  set_active_agent(alpha) now: ValueError: Agent 'alpha' is not an active participant
+4. two first joins, no pause
+  200 rooms: both joins read no active agent and wrote one in 0; in 0 of those the stored active agent is not the first agent listed; errors: 0
+== PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2)
+1. two first joins
+  A (alpha) read active_agent_id='alpha'; B (beta) read 'alpha'
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+  B's add_participant(beta): ok
+  after B returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+2. explicit selection during a first join
+  A (alpha) read active_agent_id='alpha'
+  B: add_participant(beta), then set_active_agent(beta) -> active_agent_id='beta'
+  after B's explicit selection: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+3. leave during a first join
+  A (alpha) read active_agent_id='alpha'
+  B: remove_participant(alpha) -> True
+  after B's leave: agents listed: [] | stored active_agent_id: None | get_active_agent: None
+  A's add_participant(alpha): RuntimeError: Failed to upsert participant agent:alpha
+  after A returns: agents listed: [] | stored active_agent_id: None | get_active_agent: None
+  set_active_agent(alpha) now: ValueError: Agent 'alpha' is not an active participant
+4. two first joins, no pause
+  200 rooms: both joins read no active agent and wrote one in 0; in 0 of those the stored active agent is not the first agent listed; errors: 0
+probe exit=0
+(stderr: 42 lines; 42 of them are the 'Postgres module ... has pending migrations' log warning; the others follow)
+
+== [head] run 2
+python 3.11.17 linux
+== SQLite 3.45.1
+1. two first joins
+  A (alpha) read active_agent_id='alpha'; B (beta) read 'alpha'
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+  B's add_participant(beta): ok
+  after B returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+2. explicit selection during a first join
+  A (alpha) read active_agent_id='alpha'
+  B: add_participant(beta), then set_active_agent(beta) -> active_agent_id='beta'
+  after B's explicit selection: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+3. leave during a first join
+  A (alpha) read active_agent_id='alpha'
+  B: remove_participant(alpha) -> True
+  after B's leave: agents listed: [] | stored active_agent_id: None | get_active_agent: None
+  A's add_participant(alpha): RuntimeError: Failed to upsert participant agent:alpha
+  after A returns: agents listed: [] | stored active_agent_id: None | get_active_agent: None
+  set_active_agent(alpha) now: ValueError: Agent 'alpha' is not an active participant
+4. two first joins, no pause
+  200 rooms: both joins read no active agent and wrote one in 0; in 0 of those the stored active agent is not the first agent listed; errors: 0
+== PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2)
+1. two first joins
+  A (alpha) read active_agent_id='alpha'; B (beta) read 'alpha'
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+  B's add_participant(beta): ok
+  after B returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+2. explicit selection during a first join
+  A (alpha) read active_agent_id='alpha'
+  B: add_participant(beta), then set_active_agent(beta) -> active_agent_id='beta'
+  after B's explicit selection: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+3. leave during a first join
+  A (alpha) read active_agent_id='alpha'
+  B: remove_participant(alpha) -> True
+  after B's leave: agents listed: [] | stored active_agent_id: None | get_active_agent: None
+  A's add_participant(alpha): RuntimeError: Failed to upsert participant agent:alpha
+  after A returns: agents listed: [] | stored active_agent_id: None | get_active_agent: None
+  set_active_agent(alpha) now: ValueError: Agent 'alpha' is not an active participant
+4. two first joins, no pause
+  200 rooms: both joins read no active agent and wrote one in 0; in 0 of those the stored active agent is not the first agent listed; errors: 0
+probe exit=0
+(stderr: 42 lines; 42 of them are the 'Postgres module ... has pending migrations' log warning; the others follow)
+
+== [head] run 3
+python 3.11.17 linux
+== SQLite 3.45.1
+1. two first joins
+  A (alpha) read active_agent_id='alpha'; B (beta) read 'alpha'
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+  B's add_participant(beta): ok
+  after B returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+2. explicit selection during a first join
+  A (alpha) read active_agent_id='alpha'
+  B: add_participant(beta), then set_active_agent(beta) -> active_agent_id='beta'
+  after B's explicit selection: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+3. leave during a first join
+  A (alpha) read active_agent_id='alpha'
+  B: remove_participant(alpha) -> True
+  after B's leave: agents listed: [] | stored active_agent_id: None | get_active_agent: None
+  A's add_participant(alpha): RuntimeError: Failed to upsert participant agent:alpha
+  after A returns: agents listed: [] | stored active_agent_id: None | get_active_agent: None
+  set_active_agent(alpha) now: ValueError: Agent 'alpha' is not an active participant
+4. two first joins, no pause
+  200 rooms: both joins read no active agent and wrote one in 0; in 0 of those the stored active agent is not the first agent listed; errors: 0
+== PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2)
+1. two first joins
+  A (alpha) read active_agent_id='alpha'; B (beta) read 'alpha'
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+  B's add_participant(beta): ok
+  after B returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+2. explicit selection during a first join
+  A (alpha) read active_agent_id='alpha'
+  B: add_participant(beta), then set_active_agent(beta) -> active_agent_id='beta'
+  after B's explicit selection: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+3. leave during a first join
+  A (alpha) read active_agent_id='alpha'
+  B: remove_participant(alpha) -> True
+  after B's leave: agents listed: [] | stored active_agent_id: None | get_active_agent: None
+  A's add_participant(alpha): RuntimeError: Failed to upsert participant agent:alpha
+  after A returns: agents listed: [] | stored active_agent_id: None | get_active_agent: None
+  set_active_agent(alpha) now: ValueError: Agent 'alpha' is not an active participant
+4. two first joins, no pause
+  200 rooms: both joins read no active agent and wrote one in 0; in 0 of those the stored active agent is not the first agent listed; errors: 0
+probe exit=0
+(stderr: 42 lines; 42 of them are the 'Postgres module ... has pending migrations' log warning; the others follow)
+
+== dev sources from here on: git checkout 042e0a2c6d9efed679ec825ba621e1ee055be6af -- src (1 paths differ)
+
+== [dev] openminion imported from: <RUNNER_CHECKOUT>/src/openminion/__init__.py
+
+== [dev] run 1
+python 3.11.17 linux
+== SQLite 3.45.1
+1. two first joins
+  A (alpha) read active_agent_id=None; B (beta) read None
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+  B's add_participant(beta): ok
+  after B returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+2. explicit selection during a first join
+  A (alpha) read active_agent_id=None
+  B: add_participant(beta), then set_active_agent(beta) -> active_agent_id='beta'
+  after B's explicit selection: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+3. leave during a first join
+  A (alpha) read active_agent_id=None
+  B: remove_participant(alpha) -> True
+  after B's leave: agents listed: [] | stored active_agent_id: None | get_active_agent: None
+  A's add_participant(alpha): RuntimeError: Failed to upsert participant agent:alpha
+  after A returns: agents listed: [] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+  set_active_agent(alpha) now: ValueError: Agent 'alpha' is not an active participant
+4. two first joins, no pause
+  200 rooms: both joins read no active agent and wrote one in 1; in 0 of those the stored active agent is not the first agent listed; errors: 0
+== PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2)
+1. two first joins
+  A (alpha) read active_agent_id=None; B (beta) read None
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+  B's add_participant(beta): ok
+  after B returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+2. explicit selection during a first join
+  A (alpha) read active_agent_id=None
+  B: add_participant(beta), then set_active_agent(beta) -> active_agent_id='beta'
+  after B's explicit selection: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+3. leave during a first join
+  A (alpha) read active_agent_id=None
+  B: remove_participant(alpha) -> True
+  after B's leave: agents listed: [] | stored active_agent_id: None | get_active_agent: None
+  A's add_participant(alpha): RuntimeError: Failed to upsert participant agent:alpha
+  after A returns: agents listed: [] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+  set_active_agent(alpha) now: ValueError: Agent 'alpha' is not an active participant
+4. two first joins, no pause
+  200 rooms: both joins read no active agent and wrote one in 194; in 180 of those the stored active agent is not the first agent listed; errors: 0
+probe exit=0
+(stderr: 42 lines; 42 of them are the 'Postgres module ... has pending migrations' log warning; the others follow)
+
+== [dev] run 2
+python 3.11.17 linux
+== SQLite 3.45.1
+1. two first joins
+  A (alpha) read active_agent_id=None; B (beta) read None
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+  B's add_participant(beta): ok
+  after B returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+2. explicit selection during a first join
+  A (alpha) read active_agent_id=None
+  B: add_participant(beta), then set_active_agent(beta) -> active_agent_id='beta'
+  after B's explicit selection: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+3. leave during a first join
+  A (alpha) read active_agent_id=None
+  B: remove_participant(alpha) -> True
+  after B's leave: agents listed: [] | stored active_agent_id: None | get_active_agent: None
+  A's add_participant(alpha): RuntimeError: Failed to upsert participant agent:alpha
+  after A returns: agents listed: [] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+  set_active_agent(alpha) now: ValueError: Agent 'alpha' is not an active participant
+4. two first joins, no pause
+  200 rooms: both joins read no active agent and wrote one in 5; in 0 of those the stored active agent is not the first agent listed; errors: 0
+== PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2)
+1. two first joins
+  A (alpha) read active_agent_id=None; B (beta) read None
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+  B's add_participant(beta): ok
+  after B returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+2. explicit selection during a first join
+  A (alpha) read active_agent_id=None
+  B: add_participant(beta), then set_active_agent(beta) -> active_agent_id='beta'
+  after B's explicit selection: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+3. leave during a first join
+  A (alpha) read active_agent_id=None
+  B: remove_participant(alpha) -> True
+  after B's leave: agents listed: [] | stored active_agent_id: None | get_active_agent: None
+  A's add_participant(alpha): RuntimeError: Failed to upsert participant agent:alpha
+  after A returns: agents listed: [] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+  set_active_agent(alpha) now: ValueError: Agent 'alpha' is not an active participant
+4. two first joins, no pause
+  200 rooms: both joins read no active agent and wrote one in 198; in 187 of those the stored active agent is not the first agent listed; errors: 0
+probe exit=0
+(stderr: 42 lines; 42 of them are the 'Postgres module ... has pending migrations' log warning; the others follow)
+
+== [dev] run 3
+python 3.11.17 linux
+== SQLite 3.45.1
+1. two first joins
+  A (alpha) read active_agent_id=None; B (beta) read None
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+  B's add_participant(beta): ok
+  after B returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+2. explicit selection during a first join
+  A (alpha) read active_agent_id=None
+  B: add_participant(beta), then set_active_agent(beta) -> active_agent_id='beta'
+  after B's explicit selection: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+3. leave during a first join
+  A (alpha) read active_agent_id=None
+  B: remove_participant(alpha) -> True
+  after B's leave: agents listed: [] | stored active_agent_id: None | get_active_agent: None
+  A's add_participant(alpha): RuntimeError: Failed to upsert participant agent:alpha
+  after A returns: agents listed: [] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+  set_active_agent(alpha) now: ValueError: Agent 'alpha' is not an active participant
+4. two first joins, no pause
+  200 rooms: both joins read no active agent and wrote one in 2; in 0 of those the stored active agent is not the first agent listed; errors: 0
+== PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2)
+1. two first joins
+  A (alpha) read active_agent_id=None; B (beta) read None
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+  B's add_participant(beta): ok
+  after B returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+2. explicit selection during a first join
+  A (alpha) read active_agent_id=None
+  B: add_participant(beta), then set_active_agent(beta) -> active_agent_id='beta'
+  after B's explicit selection: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'beta' | get_active_agent: 'beta'
+  A's add_participant(alpha): ok
+  after A returns: agents listed: ['alpha', 'beta'] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+3. leave during a first join
+  A (alpha) read active_agent_id=None
+  B: remove_participant(alpha) -> True
+  after B's leave: agents listed: [] | stored active_agent_id: None | get_active_agent: None
+  A's add_participant(alpha): RuntimeError: Failed to upsert participant agent:alpha
+  after A returns: agents listed: [] | stored active_agent_id: 'alpha' | get_active_agent: 'alpha'
+  set_active_agent(alpha) now: ValueError: Agent 'alpha' is not an active participant
+4. two first joins, no pause
+  200 rooms: both joins read no active agent and wrote one in 198; in 188 of those the stored active agent is not the first agent listed; errors: 0
+probe exit=0
+(stderr: 42 lines; 42 of them are the 'Postgres module ... has pending migrations' log warning; the others follow)
+
+== back to the branch head: 0 paths differ
