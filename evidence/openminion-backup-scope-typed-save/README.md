@@ -91,3 +91,7 @@ Paths are sanitized: `<VENV>` is the venv under test, `<VENV0112>` the 0.1.12 ve
 ## Round 2
 
 The maintainer's review of #453 found that the round 1 rollback steps left a hot rollback journal next to a restored file, and that the generic copy of the other files could put companions back. The corrected backup and rollback steps, and their validation, are in [`round2/`](round2/README.md).
+
+## Round 3
+
+The second review accepted the corrected steps. Check B of round 2's `probe_rollback_companions.py` was not portable: it asserted that the backup methods leave no `-wal`/`-shm` next to the database, while the macOS `sqlite3` shell leaves zero-byte ones. The probe now asserts the backup content, integrity, return code and the other-files exclusion instead, and records what each method leaves. See [`round3/`](round3/README.md).

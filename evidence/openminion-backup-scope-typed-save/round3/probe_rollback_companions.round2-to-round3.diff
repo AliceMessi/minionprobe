@@ -1,0 +1,107 @@
+--- round2/probes/probe_rollback_companions.py
++++ round3/probes/probe_rollback_companions.py
+@@ -21,7 +21,10 @@
+   J  hot DELETE journal (the maintainer's reproduction in the #453 review)
+   W  stale -wal/-shm from a WAL writer that committed and exited without closing
+   O  the other-files copy holds a -wal: the old steps put it back after deleting
+-  B  companions present while the backup is taken: SQLite consumes them
++  B  companions present while the backup is taken: the backup holds the
++     committed content, and the other-files copy leaves out every companion
++     that is still there (round 3: whether a backup method leaves companions
++     behind is recorded per platform, not asserted)
+   V  a backup that does not match its recorded checksum stops the rollback
+      before anything is moved
+ 
+@@ -167,8 +170,10 @@
+         con.close()
+         (self.data / "notes.json").write_text('{"other": "file"}', encoding="utf-8")
+ 
+-    def take_backup(self, shell: bool = False) -> dict[str, Any]:
+-        """Backup steps 1-4: the database, the other files without companions, a checksum."""
++    def take_backup(self, shell: bool = False, before_copy=None) -> dict[str, Any]:
++        """Backup steps 1-4: the database, the other files without companions, a checksum.
++
++        `before_copy`, if given, runs between the database backup and the other-files copy."""
+         if shell:
+             proc = run([SQLITE3, str(self.db), f".backup '{self.backup}'"])
+             how = {"method": "sqlite3 <file> \".backup '<backup>'\"", "rc": proc.returncode}
+@@ -178,6 +183,8 @@
+         else:
+             proc = run([sys.executable, "-c", PY_BACKUP, str(self.db), str(self.backup)])
+             how = {"method": "python -c <documented backup one-liner> <file> <backup>", "rc": proc.returncode}
++        if before_copy is not None:
++            how["before_copy"] = before_copy(self)
+         copied = []
+         for p in sorted(self.data.iterdir()):
+             if p.is_file() and p != self.db and not p.name.endswith(COMPANIONS):
+@@ -383,21 +390,64 @@
+                                                                                     "committed-in-wal")
+         before = companions(case.db)
+         took = case.take_backup(shell=variant == "refused-shell")
++        # Companions can be in place when the other files are copied: the backup method may
++        # leave them (a zero-byte -wal and -shm after the macOS sqlite3 shell's .backup), or a
++        # still-running reader may hold them. The copy has to leave out whatever is there.
++        companions_at_copy = companions(case.db)
+         backup_time[f"{variant}/{kind}"] = {
+             "writer_rc": rc, "companions_before_backup": before, "backup": took,
+-            "backup_reads": read_marker(case.backup), "companions_after_backup": companions(case.db),
++            "backup_reads": read_marker(case.backup), "companions_after_backup": companions_at_copy,
++            "other_backup_dir": sorted(p.name for p in case.other_backup.iterdir()),
+             "database_reads_after_backup": read_marker(case.db)}
+ observed["B_backup_time"] = backup_time
++# Recorded, not asserted: which companions each backup method left next to the database.
++observed["B_companions_left_by_backup_method"] = {k: v["companions_after_backup"] for k, v in backup_time.items()}
++
++
++# What the macOS sqlite3 shell leaves after .backup (zero-byte -wal and -shm), made the same on
++# every platform, so the other-files exclusion is exercised everywhere, not only where it happens.
++def leave_zero_byte_wal_shm(case: Case) -> dict[str, Any]:
++    made = []
++    for s in ("-wal", "-shm"):
++        p = Path(str(case.db) + s)
++        if not p.exists():
++            p.write_bytes(b"")
++            made.append(s)
++    return {"simulated_zero_byte": made, "companions_at_copy": companions(case.db)}
++
++
++left_zero: dict[str, Any] = {}
++for variant in ("accepted", "refused"):
++    case = Case("B-zero-left", variant, "wal")
++    con = sqlite3.connect(str(case.db))
++    con.execute("update marker set value = 'committed'")
++    con.commit()
++    con.close()
++    took = case.take_backup(before_copy=leave_zero_byte_wal_shm)
++    left_zero[variant] = {"backup": took, "backup_reads": read_marker(case.backup),
++                          "other_backup_dir": sorted(p.name for p in case.other_backup.iterdir())}
++observed["B_zero_byte_companions_at_copy"] = left_zero
++c.check("B: with a zero-byte -wal and -shm next to the database when the other files are copied (what the macOS "
++        "sqlite3 shell leaves after .backup), the backup holds 'committed' (integrity ok, exit 0) and the "
++        "other-files copy leaves out both companions",
++        all(v["backup"].get("rc") == 0 and v["backup"]["before_copy"]["companions_at_copy"] == {"-wal": 0, "-shm": 0}
++            and v["backup_reads"].get("value") == "committed" and v["backup_reads"].get("integrity") == "ok"
++            and v["backup"]["other_files_copied"] == ["notes.json"] and v["other_backup_dir"] == ["notes.json"]
++            for v in left_zero.values()),
++        {k: {"at_copy": v["backup"]["before_copy"]["companions_at_copy"], "backup": v["backup_reads"].get("value"),
++             "other_files_copied": v["other_backup_dir"]} for k, v in left_zero.items()})
+ c.check("B: when a hot -journal or a -wal is next to the database while the backup is taken, `openminion storage "
+-        "backup`, the Python one-liner and `sqlite3 <file> \".backup\"` (where the shell is installed) open it "
+-        "through SQLite: the backup holds the committed content "
+-        "('committed' / 'committed-in-wal', integrity ok) and no companion is left next to the database to copy",
+-        all(v["companions_before_backup"] and v["backup"].get("rc") == 0 and v["companions_after_backup"] == {}
++        "backup`, the Python one-liner and `sqlite3 <file> \".backup\"` (where the shell is installed) exit 0 and "
++        "the backup holds the committed content ('committed' / 'committed-in-wal', integrity ok); the other-files "
++        "copy (backup step 3) leaves out every -journal/-wal/-shm still next to the database, whatever its size",
++        all(v["companions_before_backup"] and v["backup"].get("rc") == 0
+             and v["backup_reads"].get("integrity") == "ok"
+             and v["backup_reads"].get("value") == ("committed" if k.endswith("hot-journal") else "committed-in-wal")
++            and v["backup"]["other_files_copied"] == ["notes.json"] and v["other_backup_dir"] == ["notes.json"]
+             for k, v in backup_time.items()),
+         {k: {"before": v["companions_before_backup"], "backup": v["backup_reads"].get("value"),
+-             "after": v["companions_after_backup"]} for k, v in backup_time.items()})
++             "left_by_backup": v["companions_after_backup"], "other_files_copied": v["other_backup_dir"]}
++         for k, v in backup_time.items()})
+ 
+ 
+ # ======================================================== V: a backup that does not match its checksum
