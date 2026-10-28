@@ -1,0 +1,125 @@
+head: 7be94543 docs(memory): document the capture capability check in recovery
+dev:  96e8e662 Merge pull request #462 from openminion/main
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+packages: psycopg 3.3.6;sophiagraph 0.0.12;SQLAlchemy 2.1.6;typer 0.27.3;
+OPENMINION_TEST_POSTGRES_URL set: yes
+
+== [head] upstream postgres-memory-retrieval job, its command list from .github/workflows/ci.yml
+$ python -m pytest -q -m postgres tests/memory/test_memory_postgres_conformance.py
+19 passed in 2.17s
+$ python -m pytest -q -m postgres tests/memory/test_memory_search_quality.py::test_postgres_lexical_score_contributes_to_semantic_order
+1 passed in 0.23s
+$ python -m pytest -q -m postgres tests/memory/test_gc_evidence_postgres.py
+7 passed in 1.90s
+$ python -m pytest -q -m postgres tests/skill/test_skill_postgres_conformance.py
+6 passed, 6 deselected in 0.59s
+$ python -m pytest -q -m postgres tests/integration/test_runtime_storage_postgres.py
+37 passed in 16.09s
+$ python -m pytest -q -m postgres tests/integration/test_runtime_memory_postgres.py
+8 passed in 3.16s
+$ python -m pytest -q -m postgres tests/memory/test_gc_postgres.py
+13 passed in 1.59s
+
+== [head] pytest <focused>
+31 passed in 6.83s
+
+== [head] pytest -m postgres <postgres>
+8 passed in 3.02s
+
+== [head] pytest -m "<test-ci markers>" <related>
+6673 passed, 4 skipped, 132 deselected, 38 warnings in 115.95s (0:01:55)
+
+== dev sources from here on: git checkout 96e8e6625ee7ea3f9ae501d3ff5559ea99e48242 -- src (7 paths differ)
+
+== [dev] pytest <focused>
+FAILED tests/memory/runtime/test_capture_recovery.py::test_recovery_does_not_extract_while_the_store_cannot_commit_a_bundle[external-backend] - AssertionError: assert {'root-1': ['...t', 'bundle']} == {'root-1': ['...'capability']}
+FAILED tests/memory/runtime/test_capture_recovery.py::test_recovery_does_not_extract_while_the_store_cannot_commit_a_bundle[audited-store] - AttributeError: 'InMemoryMemoryStore' object has no attribute 'apply_capture_bundle'
+FAILED tests/memory/runtime/test_capture_recovery.py::test_recovery_checks_identity_and_authorization_before_the_store_capability - AssertionError: assert {'root-allowe...t-denied': []} == {'root-allowe...t-denied': []}
+FAILED tests/memory/runtime/test_capture_recovery.py::test_capture_capability_falls_back_to_a_callable_capture_method - AttributeError: 'SQLiteMemoryStore' object has no attribute 'supports_capture_bundles'
+FAILED tests/memory/test_external_backend_capture.py::test_capture_capability_is_forwarded_through_the_store_owners[without-capture] - AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'supports_capture_bundles'
+FAILED tests/memory/test_external_backend_capture.py::test_capture_capability_is_forwarded_through_the_store_owners[implemented] - AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'supports_capture_bundles'
+FAILED tests/memory/test_external_backend_capture.py::test_capture_capability_is_forwarded_through_the_store_owners[failing] - AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'supports_capture_bundles'
+FAILED tests/memory/test_external_backend_capture.py::test_sdk_turns_with_the_reference_backend_complete_with_capture_unsupported - assert 2 == 0
+FAILED tests/runtime/test_cron_capture_recovery.py::test_consolidation_run_keeps_an_unsupported_capture_pending - AssertionError: assert [{'root_turn_...prefer tabs'}] == []
+FAILED tests/runtime/test_cron_capture_recovery.py::test_consolidation_runs_recover_an_unsupported_intent_once_the_store_is_capable - AssertionError: assert [{'root_turn_...prefer tabs'}] == []
+10 failed, 21 passed in 5.93s
+
+== [dev] pytest -m postgres <postgres>
+FAILED tests/integration/test_runtime_memory_postgres.py::test_capture_recovery_on_the_postgres_memory_store_extracts_and_commits_once - AttributeError: 'MemctlAdapter' object has no attribute 'supports_capture_bundles'
+1 failed, 7 passed in 3.15s
+
+== [dev] pytest -m "<test-ci markers>" <related>
+FAILED tests/memory/runtime/test_capture_recovery.py::test_recovery_does_not_extract_while_the_store_cannot_commit_a_bundle[external-backend] - AssertionError: assert {'root-1': ['...t', 'bundle']} == {'root-1': ['...'capability']}
+FAILED tests/memory/runtime/test_capture_recovery.py::test_recovery_does_not_extract_while_the_store_cannot_commit_a_bundle[audited-store] - AttributeError: 'InMemoryMemoryStore' object has no attribute 'apply_capture_bundle'
+FAILED tests/memory/runtime/test_capture_recovery.py::test_recovery_checks_identity_and_authorization_before_the_store_capability - AssertionError: assert {'root-allowe...t-denied': []} == {'root-allowe...t-denied': []}
+FAILED tests/memory/runtime/test_capture_recovery.py::test_capture_capability_falls_back_to_a_callable_capture_method - AttributeError: 'SQLiteMemoryStore' object has no attribute 'supports_capture_bundles'
+FAILED tests/memory/test_external_backend_capture.py::test_capture_capability_is_forwarded_through_the_store_owners[without-capture] - AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'supports_capture_bundles'
+FAILED tests/memory/test_external_backend_capture.py::test_capture_capability_is_forwarded_through_the_store_owners[implemented] - AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'supports_capture_bundles'
+FAILED tests/memory/test_external_backend_capture.py::test_capture_capability_is_forwarded_through_the_store_owners[failing] - AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'supports_capture_bundles'
+FAILED tests/memory/test_external_backend_capture.py::test_sdk_turns_with_the_reference_backend_complete_with_capture_unsupported - assert 2 == 0
+FAILED tests/runtime/test_cron_capture_recovery.py::test_consolidation_run_keeps_an_unsupported_capture_pending - AssertionError: assert [{'root_turn_...prefer tabs'}] == []
+FAILED tests/runtime/test_cron_capture_recovery.py::test_consolidation_runs_recover_an_unsupported_intent_once_the_store_is_capable - AssertionError: assert [{'root_turn_...prefer tabs'}] == []
+10 failed, 6663 passed, 4 skipped, 132 deselected, 38 warnings in 102.71s (0:01:42)
+
+== back to the branch head: 0 paths differ
+
+== ruff check .
+All checks passed!
+
+== make format-check
+<RUNNER_CHECKOUT>/.venv/bin/python3.11 -m ruff format --check "<RUNNER_CHECKOUT>"
+5130 files already formatted
+
+== make workflow-check
+[INFO] This may take a few minutes...
+Lint GitHub Actions workflow files.......................................Passed
+<RUNNER_CHECKOUT>/.venv/bin/python3.11 scripts/validate/action_pins.py
+workflow action pins: clean
+
+== make lint
+
+[OK] Result
+  - method-LOC baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 111, "ceiling": 100, "checked": 20843, "over_ceiling": 111}, "ok": true, "validator": "method_loc"}
+{
+  "checked": 2647,
+  "ok": true,
+  "violations": []
+}
+broad_exception
+
+[INFO] Summary
+  files: 410
+  handlers: 1101
+  silent pass: 106
+  baseline entries: 410
+
+[OK] Result
+  - broad-exception baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 410, "files_with_handlers": 410, "handler_count": 1101, "silent_pass_count": 106}, "ok": true, "validator": "broad_exception"}
+make[1]: Leaving directory '<RUNNER_CHECKOUT>'
+<RUNNER_CHECKOUT>/.venv/bin/python3.11 scripts/validate/controlplane_delivery.py
+[coo-09] clean — no synchronous runner deliver regressions
+<RUNNER_CHECKOUT>/.venv/bin/python3.11 scripts/validate/webhook_secret.py
+[coo-10] clean — webhook secret-required contract preserved
+Skipping workspace browser tool-family contract validator (not present in standalone checkout).
+make typecheck
+make[1]: Entering directory '<RUNNER_CHECKOUT>'
+cd "<RUNNER_CHECKOUT>" && <RUNNER_CHECKOUT>/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4309; baseline total: 4309
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 290
+[tcr] api: 77 / 77 | monthly quota -50 | next target <= 27 | headroom 0
+[tcr] cli: 309 / 309 | monthly quota -50 | next target <= 259 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 222 / 222 | monthly quota -50 | next target <= 172 | headroom 0
+make[1]: Leaving directory '<RUNNER_CHECKOUT>'
+make lint exit: 0
+
+== make test-critical
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+486 passed, 4 skipped, 1 warning in 10.46s

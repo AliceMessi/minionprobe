@@ -1,0 +1,28 @@
+dev-tree: git archive 042e0a2c (whole tree), then the four test files from 34ccf868; PYTHONPATH=src
+$ python -c 'import openminion; print(openminion.__file__)'
+<DEV_TREE>-042\src\openminion\__init__.py
+$ PYTHONPATH=src python -m pytest -q -p no:cacheprovider -rfE --tb=line tests/memory/runtime/test_capture_recovery.py tests/memory/test_external_backend_capture.py tests/runtime/test_cron_capture_recovery.py tests/integration/test_runtime_memory_postgres.py
+.........FF.F.F..FFF..F.....FF.ssssssss                                  [100%]
+================================== FAILURES ===================================
+<DEV_TREE>-042\tests\memory\runtime\test_capture_recovery.py:490: AssertionError: assert {'root-1': ['...t', 'bundle']} == {'root-1': ['...'capability']}
+<DEV_TREE>-042\src\openminion\modules\memory\storage\audit.py:191: AttributeError: 'InMemoryMemoryStore' object has no attribute 'apply_capture_bundle'
+<DEV_TREE>-042\tests\memory\runtime\test_capture_recovery.py:559: AssertionError: assert {'root-allowe...t-denied': []} == {'root-allowe...t-denied': []}
+<DEV_TREE>-042\src\openminion\modules\memory\storage\audit.py:152: AttributeError: 'SQLiteMemoryStore' object has no attribute 'supports_capture_bundles'. Did you mean: 'apply_capture_bundle'?
+<DEV_TREE>-042\tests\memory\test_external_backend_capture.py:164: AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'supports_capture_bundles'. Did you mean: 'apply_capture_bundle'?
+<DEV_TREE>-042\tests\memory\test_external_backend_capture.py:164: AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'supports_capture_bundles'. Did you mean: 'apply_capture_bundle'?
+<DEV_TREE>-042\tests\memory\test_external_backend_capture.py:164: AttributeError: 'BackendMemoryStoreAdapter' object has no attribute 'supports_capture_bundles'. Did you mean: 'apply_capture_bundle'?
+<DEV_TREE>-042\tests\memory\test_external_backend_capture.py:280: assert 2 == 0
+<DEV_TREE>-042\tests\runtime\test_cron_capture_recovery.py:272: AssertionError: assert [{'root_turn_...prefer tabs'}] == []
+<DEV_TREE>-042\tests\runtime\test_cron_capture_recovery.py:307: AssertionError: assert [{'root_turn_...prefer tabs'}] == []
+=========================== short test summary info ===========================
+FAILED tests/memory/runtime/test_capture_recovery.py::test_recovery_does_not_extract_while_the_store_cannot_commit_a_bundle[external-backend]
+FAILED tests/memory/runtime/test_capture_recovery.py::test_recovery_does_not_extract_while_the_store_cannot_commit_a_bundle[audited-store]
+FAILED tests/memory/runtime/test_capture_recovery.py::test_recovery_checks_identity_and_authorization_before_the_store_capability
+FAILED tests/memory/runtime/test_capture_recovery.py::test_capture_capability_falls_back_to_a_callable_capture_method
+FAILED tests/memory/test_external_backend_capture.py::test_capture_capability_is_forwarded_through_the_store_owners[without-capture]
+FAILED tests/memory/test_external_backend_capture.py::test_capture_capability_is_forwarded_through_the_store_owners[implemented]
+FAILED tests/memory/test_external_backend_capture.py::test_capture_capability_is_forwarded_through_the_store_owners[failing]
+FAILED tests/memory/test_external_backend_capture.py::test_sdk_turns_with_the_reference_backend_complete_with_capture_unsupported
+FAILED tests/runtime/test_cron_capture_recovery.py::test_consolidation_run_keeps_an_unsupported_capture_pending
+FAILED tests/runtime/test_cron_capture_recovery.py::test_consolidation_runs_recover_an_unsupported_intent_once_the_store_is_capable
+10 failed, 21 passed, 8 skipped in 27.05s
