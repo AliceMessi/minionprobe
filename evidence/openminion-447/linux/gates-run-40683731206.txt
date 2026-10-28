@@ -1,0 +1,204 @@
+head: 20034752 docs(api): state what a failed APIRuntime start closes
+dev:  042e0a2c Merge pull request #463 from openminion/fix/memory-consolidation-trusted-context
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+packages: psutil 7.2.2;psycopg 3.3.6;sophiagraph 0.0.12;SQLAlchemy 2.1.6;
+OPENMINION_TEST_POSTGRES_URL set: yes
+
+== [head] upstream postgres-memory-retrieval job, its command list from .github/workflows/ci.yml
+$ python -m pytest -q -m postgres tests/memory/test_memory_postgres_conformance.py
+19 passed in 2.06s
+$ python -m pytest -q -m postgres tests/memory/test_memory_search_quality.py::test_postgres_lexical_score_contributes_to_semantic_order
+1 passed in 0.23s
+$ python -m pytest -q -m postgres tests/memory/test_gc_evidence_postgres.py
+7 passed in 0.92s
+$ python -m pytest -q -m postgres tests/skill/test_skill_postgres_conformance.py
+6 passed, 6 deselected in 0.66s
+$ python -m pytest -q -m postgres tests/integration/test_runtime_storage_postgres.py
+45 passed in 20.55s
+$ python -m pytest -q -m postgres tests/integration/test_runtime_memory_postgres.py
+7 passed in 2.73s
+$ python -m pytest -q -m postgres tests/memory/test_gc_postgres.py
+13 passed in 1.65s
+
+== [head] pytest <focused>
+22 passed in 2.99s
+
+== [head] pytest -m postgres <postgres>
+45 passed in 18.73s
+
+== [head] pytest -m postgres -k failed_start <postgres>
+5 passed, 40 deselected in 2.40s
+
+== [head] pytest -m "<test-ci markers>" <related>
+FAILED tests/storage/test_startup_validation.py::TestValidatePostgresConnectionFailure::test_unreachable_db_raises_with_redacted_url - Failed: Timeout (>60.0s) from pytest-timeout.
+1 failed, 2598 passed, 4 skipped, 139 deselected, 1 xfailed, 37 warnings in 264.16s (0:04:24)
+
+== dev sources from here on: git checkout 042e0a2c6d9efed679ec825ba621e1ee055be6af -- src (6 paths differ)
+
+== [dev] pytest <focused>
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...ssembly', ...}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...ssembly', ...}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...ssembly', ...}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...ssembly', ...}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...d_store', ...}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'record_stor...etry_service'}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...etry_service'}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...eve_ctl', ...}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'record_stor...etry_service'}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...service', ...}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'record_stor...etry_service'}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...storage', ...}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'record_stor...etry_service'}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...service', ...}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...ssembly', ...}
+/home/runner/work/linux-runner/linux-runner/tests/storage/test_failed_construction_cleanup.py:169: AssertionError: assert [] == ['record']
+/home/runner/work/linux-runner/linux-runner/tests/storage/test_failed_construction_cleanup.py:169: AssertionError: assert [] == ['vector', 'record']
+/home/runner/work/linux-runner/linux-runner/tests/storage/test_failed_construction_cleanup.py:194: AssertionError: assert [] == ['record']
+/home/runner/work/linux-runner/linux-runner/tests/storage/test_failed_construction_cleanup.py:224: AssertionError: assert [] == ['record']
+/home/runner/work/linux-runner/linux-runner/tests/storage/test_failed_construction_cleanup.py:270: assert [] == [<openminion....7f531f3cdf50>]
+/home/runner/work/linux-runner/linux-runner/tests/storage/test_failed_construction_cleanup.py:270: assert [] == [<openminion....7f531f698550>]
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[after-construction-bind-runtime-handle] - AssertionError: assert set() == {'action_poli...ssembly', ...}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[after-construction-runtime-manager] - AssertionError: assert set() == {'action_poli...ssembly', ...}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[construction-post-init] - AssertionError: assert set() == {'action_poli...ssembly', ...}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[construction-sqlite-connection-read] - AssertionError: assert set() == {'action_poli...ssembly', ...}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[infrastructure-after-support] - AssertionError: assert set() == {'action_poli...d_store', ...}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[infrastructure-extension-runtime] - AssertionError: assert set() == {'record_stor...etry_service'}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[infrastructure-ops-service-after-action-policy] - AssertionError: assert set() == {'action_poli...etry_service'}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[infrastructure-tool-authoring-after-memory-assembly] - AssertionError: assert set() == {'action_poli...eve_ctl', ...}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[runtime-storage-migration] - AssertionError: assert set() == {'record_stor...etry_service'}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[stack-gateway-after-agent] - AssertionError: assert set() == {'action_poli...service', ...}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[storage-engine-emitter-start] - AssertionError: assert set() == {'record_stor...etry_service'}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_from_its_configuration_closes_what_was_built[memory-provider] - AssertionError: assert set() == {'action_poli...storage', ...}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_from_its_configuration_closes_what_was_built[sessions-table-exists] - AssertionError: assert set() == {'record_stor...etry_service'}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_keeps_its_error_when_a_close_raises[stack-gateway-after-agent] - AssertionError: assert set() == {'action_poli...service', ...}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_keeps_its_error_when_a_close_raises[after-construction-bind-runtime-handle] - AssertionError: assert set() == {'action_poli...ssembly', ...}
+FAILED tests/storage/test_failed_construction_cleanup.py::test_engine_closes_the_backends_it_created_when_a_later_step_fails[before-the-vector-store] - AssertionError: assert [] == ['record']
+FAILED tests/storage/test_failed_construction_cleanup.py::test_engine_closes_the_backends_it_created_when_a_later_step_fails[after-the-vector-store] - AssertionError: assert [] == ['vector', 'record']
+FAILED tests/storage/test_failed_construction_cleanup.py::test_engine_closes_a_backend_that_is_both_record_and_vector_store_once - AssertionError: assert [] == ['record']
+FAILED tests/storage/test_failed_construction_cleanup.py::test_engine_construction_keeps_its_error_when_a_backend_close_fails - AssertionError: assert [] == ['record']
+FAILED tests/storage/test_failed_construction_cleanup.py::test_runtime_storage_closes_its_engine_when_migration_fails[closes] - assert [] == [<openminion....7f531f3cdf50>]
+FAILED tests/storage/test_failed_construction_cleanup.py::test_runtime_storage_closes_its_engine_when_migration_fails[close-fails] - assert [] == [<openminion....7f531f698550>]
+21 failed, 1 passed in 3.03s
+
+== [dev] pytest -m postgres <postgres>
+FAILED tests/integration/test_runtime_storage_postgres.py::test_postgres_failed_start_closes_the_owned_engine_and_emitter[sessions-table-exists] - assert 0 == 1
+FAILED tests/integration/test_runtime_storage_postgres.py::test_postgres_failed_start_closes_the_owned_engine_and_emitter[stack-gateway-after-agent] - assert 0 == 1
+FAILED tests/integration/test_runtime_storage_postgres.py::test_postgres_failed_start_closes_the_owned_engine_and_emitter[construction-post-init] - assert 0 == 1
+FAILED tests/integration/test_runtime_storage_postgres.py::test_postgres_failed_start_closes_the_owned_engine_and_emitter[after-construction-runtime-manager] - assert 0 == 1
+4 failed, 41 passed in 20.77s
+
+== [dev] pytest -m postgres -k failed_start <postgres>
+FAILED tests/integration/test_runtime_storage_postgres.py::test_postgres_failed_start_closes_the_owned_engine_and_emitter[sessions-table-exists] - assert 0 == 1
+FAILED tests/integration/test_runtime_storage_postgres.py::test_postgres_failed_start_closes_the_owned_engine_and_emitter[stack-gateway-after-agent] - assert 0 == 1
+FAILED tests/integration/test_runtime_storage_postgres.py::test_postgres_failed_start_closes_the_owned_engine_and_emitter[construction-post-init] - assert 0 == 1
+FAILED tests/integration/test_runtime_storage_postgres.py::test_postgres_failed_start_closes_the_owned_engine_and_emitter[after-construction-runtime-manager] - assert 0 == 1
+4 failed, 1 passed, 40 deselected in 2.48s
+
+== [dev] pytest -m "<test-ci markers>" <related>
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...ssembly', ...}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...ssembly', ...}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...ssembly', ...}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...ssembly', ...}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...d_store', ...}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'record_stor...etry_service'}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...etry_service'}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...eve_ctl', ...}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'record_stor...etry_service'}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...service', ...}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'record_stor...etry_service'}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...storage', ...}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'record_stor...etry_service'}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...service', ...}
+/home/runner/work/linux-runner/linux-runner/tests/api/runtime/test_failed_start_cleanup.py:100: AssertionError: assert set() == {'action_poli...ssembly', ...}
+/home/runner/work/linux-runner/linux-runner/tests/storage/test_failed_construction_cleanup.py:169: AssertionError: assert [] == ['record']
+/home/runner/work/linux-runner/linux-runner/tests/storage/test_failed_construction_cleanup.py:169: AssertionError: assert [] == ['vector', 'record']
+/home/runner/work/linux-runner/linux-runner/tests/storage/test_failed_construction_cleanup.py:194: AssertionError: assert [] == ['record']
+/home/runner/work/linux-runner/linux-runner/tests/storage/test_failed_construction_cleanup.py:224: AssertionError: assert [] == ['record']
+/home/runner/work/linux-runner/linux-runner/tests/storage/test_failed_construction_cleanup.py:270: assert [] == [<openminion....7f53bc85e290>]
+/home/runner/work/linux-runner/linux-runner/tests/storage/test_failed_construction_cleanup.py:270: assert [] == [<openminion....7f53bc85d990>]
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[after-construction-bind-runtime-handle] - AssertionError: assert set() == {'action_poli...ssembly', ...}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[after-construction-runtime-manager] - AssertionError: assert set() == {'action_poli...ssembly', ...}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[construction-post-init] - AssertionError: assert set() == {'action_poli...ssembly', ...}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[construction-sqlite-connection-read] - AssertionError: assert set() == {'action_poli...ssembly', ...}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[infrastructure-after-support] - AssertionError: assert set() == {'action_poli...d_store', ...}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[infrastructure-extension-runtime] - AssertionError: assert set() == {'record_stor...etry_service'}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[infrastructure-ops-service-after-action-policy] - AssertionError: assert set() == {'action_poli...etry_service'}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[infrastructure-tool-authoring-after-memory-assembly] - AssertionError: assert set() == {'action_poli...eve_ctl', ...}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[runtime-storage-migration] - AssertionError: assert set() == {'record_stor...etry_service'}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[stack-gateway-after-agent] - AssertionError: assert set() == {'action_poli...service', ...}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_closes_what_each_owner_built[storage-engine-emitter-start] - AssertionError: assert set() == {'record_stor...etry_service'}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_from_its_configuration_closes_what_was_built[memory-provider] - AssertionError: assert set() == {'action_poli...storage', ...}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_from_its_configuration_closes_what_was_built[sessions-table-exists] - AssertionError: assert set() == {'record_stor...etry_service'}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_keeps_its_error_when_a_close_raises[stack-gateway-after-agent] - AssertionError: assert set() == {'action_poli...service', ...}
+FAILED tests/api/runtime/test_failed_start_cleanup.py::test_failed_start_keeps_its_error_when_a_close_raises[after-construction-bind-runtime-handle] - AssertionError: assert set() == {'action_poli...ssembly', ...}
+FAILED tests/storage/test_failed_construction_cleanup.py::test_engine_closes_the_backends_it_created_when_a_later_step_fails[before-the-vector-store] - AssertionError: assert [] == ['record']
+FAILED tests/storage/test_failed_construction_cleanup.py::test_engine_closes_the_backends_it_created_when_a_later_step_fails[after-the-vector-store] - AssertionError: assert [] == ['vector', 'record']
+FAILED tests/storage/test_failed_construction_cleanup.py::test_engine_closes_a_backend_that_is_both_record_and_vector_store_once - AssertionError: assert [] == ['record']
+FAILED tests/storage/test_failed_construction_cleanup.py::test_engine_construction_keeps_its_error_when_a_backend_close_fails - AssertionError: assert [] == ['record']
+FAILED tests/storage/test_failed_construction_cleanup.py::test_runtime_storage_closes_its_engine_when_migration_fails[closes] - assert [] == [<openminion....7f53bc85e290>]
+FAILED tests/storage/test_failed_construction_cleanup.py::test_runtime_storage_closes_its_engine_when_migration_fails[close-fails] - assert [] == [<openminion....7f53bc85d990>]
+FAILED tests/storage/test_startup_validation.py::TestValidatePostgresConnectionFailure::test_unreachable_db_raises_with_redacted_url - Failed: Timeout (>60.0s) from pytest-timeout.
+22 failed, 2577 passed, 4 skipped, 139 deselected, 1 xfailed, 37 warnings in 260.95s (0:04:20)
+
+== back to the branch head: 0 paths differ
+
+== ruff check .
+All checks passed!
+
+== make format-check
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m ruff format --check "/home/runner/work/linux-runner/linux-runner"
+5135 files already formatted
+
+== make workflow-check
+[INFO] This may take a few minutes...
+Lint GitHub Actions workflow files.......................................Passed
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/action_pins.py
+workflow action pins: clean
+
+== make lint
+
+[OK] Result
+  - method-LOC baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 111, "ceiling": 100, "checked": 20845, "over_ceiling": 111}, "ok": true, "validator": "method_loc"}
+{
+  "checked": 2647,
+  "ok": true,
+  "violations": []
+}
+broad_exception
+
+[INFO] Summary
+  files: 410
+  handlers: 1101
+  silent pass: 106
+  baseline entries: 410
+
+[OK] Result
+  - broad-exception baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 410, "files_with_handlers": 410, "handler_count": 1101, "silent_pass_count": 106}, "ok": true, "validator": "broad_exception"}
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/controlplane_delivery.py
+[coo-09] clean — no synchronous runner deliver regressions
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/webhook_secret.py
+[coo-10] clean — webhook secret-required contract preserved
+Skipping workspace browser tool-family contract validator (not present in standalone checkout).
+make typecheck
+make[1]: Entering directory '/home/runner/work/linux-runner/linux-runner'
+cd "/home/runner/work/linux-runner/linux-runner" && /home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4309; baseline total: 4309
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 290
+[tcr] api: 77 / 77 | monthly quota -50 | next target <= 27 | headroom 0
+[tcr] cli: 309 / 309 | monthly quota -50 | next target <= 259 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 222 / 222 | monthly quota -50 | next target <= 172 | headroom 0
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+make lint exit: 0
+
+== make test-critical
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+486 passed, 4 skipped, 1 warning in 12.17s
