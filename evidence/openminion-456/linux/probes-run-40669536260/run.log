@@ -1,0 +1,65 @@
+33dde7cb4968756d67da49c158897d429c16c505d2586d07b81d4c6345a37e5c  _common.py
+6a00f9f700579801e8fb26b128fdb8babe134ca410fabc50648336f3874052dd  probe_420_lib.py
+9d9d0df8387004f093e22aaa54e1c54e1e3a0c6cf5a24bba1195383b9c8a6d59  probe_consolidation_fix.py
+3188af226a913a154233a51eedb6e9869ece4faaae785a8eb6ac03d44dd4825f  probe_consolidation_self_capture.py
+PRETTY_NAME="Ubuntu 24.04.5 LTS"
+venv dev: CPython 3.12.3 SQLite 3.45.1
+venv head: CPython 3.12.3 SQLite 3.45.1
+
+=== dev probe_consolidation_self_capture
+exit=0
+PASS Setup: built-in memory store (AuditedMemoryStore over SQLiteMemoryStore) with a callable apply_capture_bundle | observed={'class': 'AuditedMemoryStore', 'inner': 'SQLiteMemoryStore', 'apply_capture_bundle_callable': True}
+PASS Direct calls: capture_is_excluded returns True for memory_consolidation_job 'true' (False without it), and so does the resume hints' _metadata_bool; the gateway's _extract_ephemeral_prompt_metadata keeps cron_job_id, cron_run_id and scheduled_for and drop
+PASS K. the consolidation run finishes; recovery scans 0 (nothing pending on this store) | observed={'run_state': 'finished', 'run_error': None, 'recovery': [[0, 0, 0]]}
+PASS K. the marker is set and survives ingress: memory_consolidation_job is 'true' in the manager request meta and in the ingress request's inbound metadata | observed={'meta_at_submit': [{'session_id': 'consolidate:6ce2f5fb7d89487d881be29a7438b48f', 'memory_c
+PASS K. the marker is lost before the brain: capture_is_excluded receives message metadata with cron_run_id but without memory_consolidation_job, and returns False | observed=[{'memory_consolidation_job': None, 'cron_run_id_present': True, 'session_id': 'conso
+PASS K. the same metadata reaches the brain's resume hints without memory_consolidation_job (cron_job_id present), so the brain's memory consolidation context is never attached (_attach_memory_consolidation_resume_context is not called) | observed={'brain_resu
+PASS K. so the consolidation turn captures itself: it makes one extraction request, its intent is 'pending' (not 'excluded') and its bundle (no candidates) commits succeeded_no_output with a memory.capture.result | observed={'turn_extraction_requests': 1, 'new
+PASS C. a caller-supplied memory_consolidation_job reaches the manager request meta and the ingress inbound metadata, but not the brain: capture_is_excluded gets no such key and returns False | observed={'meta_at_submit': [{'session_id': 'caller', 'memory_cons
+PASS C. the caller's turn is captured normally: one extraction request, intent 'pending' with a succeeded result (one candidate) | observed={'turn_extraction_requests': 1, 'new_intents': [{'capture_state': 'pending', 'result_disposition': 'succeeded'}], 'bundl
+PASS Offline provider: the openai base URL is the scripted server on 127.0.0.1 | observed={'hosts': ['127.0.0.1'], 'requests': 8}
+SUMMARY passed=10 failed=0 total=10
+
+=== dev probe_consolidation_fix
+exit=1
+PASS Setup: built-in memory store (AuditedMemoryStore over SQLiteMemoryStore) | observed={'class': 'AuditedMemoryStore', 'inner': 'SQLiteMemoryStore'}
+PASS K. the consolidation run finishes; recovery scans 0 (nothing pending on this store) | observed={'run_state': 'finished', 'run_error': None, 'recovery': [[0, 0, 0]]}
+FAIL K. the cron executor puts the job's consolidation fields on the manager request as the typed trusted_consolidation_context, and none in its public meta | observed=[{'session_id': 'consolidate:53eeda48dc83469ebd4fd0499603ee30', 'meta_consolidation_keys': {
+FAIL K. ingress carries the typed context to the ingress request; the request's inbound metadata (parsed from public meta) has no consolidation keys | observed=[{'session_id': 'consolidate:53eeda48dc83469ebd4fd0499603ee30', 'inbound_metadata_consolidation_keys
+FAIL K. the brain message metadata has the job's five memory_consolidation_* keys, so capture_is_excluded returns True | observed=[{'consolidation_keys': {}, 'cron_job_id': '53eeda48dc83469ebd4fd0499603ee30', 'session_id': 'consolidate:53eeda48dc83469ebd4fd049
+FAIL K. the brain attaches the consolidation context once, with the job's target scope, batch limit, iteration limit and timeout, and the one candidate that C's capture proposed | observed=[]
+FAIL K. the consolidation turn does not capture itself: no extraction request, intent 'excluded' without a result, no bundle write | observed={'turn_extraction_requests': 1, 'new_intents': [{'capture_state': 'pending', 'result_disposition': 'succeeded_no_outpu
+FAIL C. a caller-supplied memory_consolidation_job in meta is dropped at ingress (manager meta has it, the ingress request does not, no typed context), capture_is_excluded returns False, and the turn is captured normally | observed={'manager_request': [{'sessi
+FAIL F. every memory_consolidation_* key in meta and inbound_metadata, with K's real cron ids, is dropped at ingress; the cron ids reach the brain but assert nothing: not excluded, no consolidation context, captured normally | observed={'ingress_request': [{'s
+FAIL O. an ordinary cron job with memory_consolidation_* keys in its payload inbound_metadata runs, has no typed context, reaches the brain with its own cron_job_id and no consolidation keys, and is captured normally | observed={'run_state': 'finished', 'manag
+PASS Offline provider: the openai base URL is the scripted server on 127.0.0.1 | observed={'hosts': ['127.0.0.1'], 'requests': 16}
+SUMMARY passed=3 failed=8 total=11
+
+=== head probe_consolidation_self_capture
+exit=1
+PASS Setup: built-in memory store (AuditedMemoryStore over SQLiteMemoryStore) with a callable apply_capture_bundle | observed={'class': 'AuditedMemoryStore', 'inner': 'SQLiteMemoryStore', 'apply_capture_bundle_callable': True}
+FAIL Direct calls: capture_is_excluded returns True for memory_consolidation_job 'true' (False without it), and so does the resume hints' _metadata_bool; the gateway's _extract_ephemeral_prompt_metadata keeps cron_job_id, cron_run_id and scheduled_for and drop
+PASS K. the consolidation run finishes; recovery scans 0 (nothing pending on this store) | observed={'run_state': 'finished', 'run_error': None, 'recovery': [[0, 0, 0]]}
+FAIL K. the marker is set and survives ingress: memory_consolidation_job is 'true' in the manager request meta and in the ingress request's inbound metadata | observed={'meta_at_submit': [{'session_id': 'consolidate:fbf613115b9641cfa39d34b48dc239f0', 'memory_c
+FAIL K. the marker is lost before the brain: capture_is_excluded receives message metadata with cron_run_id but without memory_consolidation_job, and returns False | observed=[{'memory_consolidation_job': 'true', 'cron_run_id_present': True, 'session_id': 'con
+FAIL K. the same metadata reaches the brain's resume hints without memory_consolidation_job (cron_job_id present), so the brain's memory consolidation context is never attached (_attach_memory_consolidation_resume_context is not called) | observed={'brain_resu
+FAIL K. so the consolidation turn captures itself: it makes one extraction request, its intent is 'pending' (not 'excluded') and its bundle (no candidates) commits succeeded_no_output with a memory.capture.result | observed={'turn_extraction_requests': 0, 'new
+FAIL C. a caller-supplied memory_consolidation_job reaches the manager request meta and the ingress inbound metadata, but not the brain: capture_is_excluded gets no such key and returns False | observed={'meta_at_submit': [{'session_id': 'caller', 'memory_cons
+PASS C. the caller's turn is captured normally: one extraction request, intent 'pending' with a succeeded result (one candidate) | observed={'turn_extraction_requests': 1, 'new_intents': [{'capture_state': 'pending', 'result_disposition': 'succeeded'}], 'bundl
+PASS Offline provider: the openai base URL is the scripted server on 127.0.0.1 | observed={'hosts': ['127.0.0.1'], 'requests': 7}
+SUMMARY passed=4 failed=6 total=10
+
+=== head probe_consolidation_fix
+exit=0
+PASS Setup: built-in memory store (AuditedMemoryStore over SQLiteMemoryStore) | observed={'class': 'AuditedMemoryStore', 'inner': 'SQLiteMemoryStore'}
+PASS K. the consolidation run finishes; recovery scans 0 (nothing pending on this store) | observed={'run_state': 'finished', 'run_error': None, 'recovery': [[0, 0, 0]]}
+PASS K. the cron executor puts the job's consolidation fields on the manager request as the typed trusted_consolidation_context, and none in its public meta | observed=[{'session_id': 'consolidate:78e1ed1a7811431db59b0352777167a2', 'meta_consolidation_keys': {
+PASS K. ingress carries the typed context to the ingress request; the request's inbound metadata (parsed from public meta) has no consolidation keys | observed=[{'session_id': 'consolidate:78e1ed1a7811431db59b0352777167a2', 'inbound_metadata_consolidation_keys
+PASS K. the brain message metadata has the job's five memory_consolidation_* keys, so capture_is_excluded returns True | observed=[{'consolidation_keys': {'memory_consolidation_timeout_seconds': '30', 'memory_consolidation_batch_limit': '8', 'memory_consolidat
+PASS K. the brain attaches the consolidation context once, with the job's target scope, batch limit, iteration limit and timeout, and the one candidate that C's capture proposed | observed=[{'enabled': True, 'target_scope': 'agent:openminion', 'batch_limit': 8
+PASS K. the consolidation turn does not capture itself: no extraction request, intent 'excluded' without a result, no bundle write | observed={'turn_extraction_requests': 0, 'new_intents': [{'capture_state': 'excluded', 'result_disposition': None}], 'bundle_wr
+PASS C. a caller-supplied memory_consolidation_job in meta is dropped at ingress (manager meta has it, the ingress request does not, no typed context), capture_is_excluded returns False, and the turn is captured normally | observed={'manager_request': [{'sessi
+PASS F. every memory_consolidation_* key in meta and inbound_metadata, with K's real cron ids, is dropped at ingress; the cron ids reach the brain but assert nothing: not excluded, no consolidation context, captured normally | observed={'ingress_request': [{'s
+PASS O. an ordinary cron job with memory_consolidation_* keys in its payload inbound_metadata runs, has no typed context, reaches the brain with its own cron_job_id and no consolidation keys, and is captured normally | observed={'run_state': 'finished', 'manag
+PASS Offline provider: the openai base URL is the scripted server on 127.0.0.1 | observed={'hosts': ['127.0.0.1'], 'requests': 15}
+SUMMARY passed=11 failed=0 total=11

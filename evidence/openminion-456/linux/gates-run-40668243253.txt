@@ -1,0 +1,106 @@
+head: 2145c61f docs(runtime): note the scheduled consolidation turn fix in the changelog
+dev:  39c36a1b Merge pull request #460 from openminion/release/openminion-0.1.14-final
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+packages: sophiagraph 0.0.12;SQLAlchemy 2.1.6;typer 0.27.3;
+OPENMINION_TEST_POSTGRES_URL set: no
+
+== [head] pytest <focused>
+81 passed in 11.45s
+
+== [head] pytest -m "not benchmark and not e2e and not postgres and not memory_eval_benchmark and not mcp_live and not package_integration and not telegram_live and not slack_live and not slow" <related>
+3010 passed, 9 deselected, 1 xfailed, 11 warnings in 252.31s (0:04:12)
+
+== dev sources and test-commit tests from here on: git checkout 39c36a1b5183ca811a9031cbcb397b3f9470a06e -- src; git checkout 988503a5d84aefa31a3aec9bc2c236023161cc3c -- tests (12 paths differ)
+
+== [dev] pytest <focused>
+FAILED tests/runtime/test_cron_consolidation_turn.py::test_scheduled_consolidation_turn_gets_its_context_and_does_not_capture_itself - AssertionError: assert 'Review the provided memory candidates, decide which to promote, discard, or defer ...
+FAILED tests/runtime/test_cron_consolidation_turn.py::test_scheduled_consolidation_turns_add_no_pending_intent_without_atomic_capture - assert [(1, 0, 1), (2, 0, 2)] == [(1, 0, 1), (1, 0, 1)]
+FAILED tests/runtime/test_cron_consolidation_turn.py::test_scheduled_consolidation_keeps_the_scope_and_limit_checks - AssertionError: assert 'pending' == 'excluded'
+FAILED tests/services/test_runtime_ingress_contract.py::test_public_consolidation_metadata_does_not_reach_the_gateway[False-public0] - AssertionError: assert ['memory_cons...eout_seconds'] == []
+FAILED tests/services/test_runtime_ingress_contract.py::test_public_consolidation_metadata_does_not_reach_the_gateway[True-public1] - AssertionError: assert ['memory_cons...eout_seconds'] == []
+FAILED tests/services/test_runtime_ingress_contract.py::test_public_consolidation_metadata_does_not_reach_the_gateway[True-public2] - AssertionError: assert ['memory_cons...eout_seconds'] == []
+6 failed, 74 passed in 11.42s
+
+== [dev] pytest -m "not benchmark and not e2e and not postgres and not memory_eval_benchmark and not mcp_live and not package_integration and not telegram_live and not slack_live and not slow" <related>
+FAILED tests/runtime/test_cron_consolidation_turn.py::test_scheduled_consolidation_turn_gets_its_context_and_does_not_capture_itself - AssertionError: assert 'Review the provided memory candidates, decide which to promote, discard, or defer ...
+FAILED tests/runtime/test_cron_consolidation_turn.py::test_scheduled_consolidation_turns_add_no_pending_intent_without_atomic_capture - assert [(1, 0, 1), (2, 0, 2)] == [(1, 0, 1), (1, 0, 1)]
+FAILED tests/runtime/test_cron_consolidation_turn.py::test_scheduled_consolidation_keeps_the_scope_and_limit_checks - AssertionError: assert 'pending' == 'excluded'
+FAILED tests/services/test_runtime_ingress_contract.py::test_public_consolidation_metadata_does_not_reach_the_gateway[False-public0] - AssertionError: assert ['memory_cons...eout_seconds'] == []
+FAILED tests/services/test_runtime_ingress_contract.py::test_public_consolidation_metadata_does_not_reach_the_gateway[True-public1] - AssertionError: assert ['memory_cons...eout_seconds'] == []
+FAILED tests/services/test_runtime_ingress_contract.py::test_public_consolidation_metadata_does_not_reach_the_gateway[True-public2] - AssertionError: assert ['memory_cons...eout_seconds'] == []
+6 failed, 3003 passed, 9 deselected, 1 xfailed, 11 warnings in 248.45s (0:04:08)
+
+== back to the branch head: 0 paths differ
+
+== [head] tests/runtime/test_cron_consolidation_turn.py, 10 more runs
+5 passed in 5.70s
+5 passed in 5.86s
+5 passed in 5.84s
+5 passed in 5.76s
+5 passed in 5.92s
+5 passed in 5.97s
+5 passed in 5.89s
+5 passed in 5.71s
+5 passed in 5.65s
+5 passed in 5.62s
+
+== ruff check .
+All checks passed!
+
+== make format-check
+<CHECKOUT>/.venv/bin/python3.11 -m ruff format --check "<CHECKOUT>"
+5131 files already formatted
+
+== make workflow-check
+[INFO] This may take a few minutes...
+Lint GitHub Actions workflow files.......................................Passed
+<CHECKOUT>/.venv/bin/python3.11 scripts/validate/action_pins.py
+workflow action pins: clean
+
+== make lint
+
+[OK] Result
+  - method-LOC baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 111, "ceiling": 100, "checked": 20839, "over_ceiling": 111}, "ok": true, "validator": "method_loc"}
+{
+  "checked": 2647,
+  "ok": true,
+  "violations": []
+}
+broad_exception
+
+[INFO] Summary
+  files: 410
+  handlers: 1101
+  silent pass: 106
+  baseline entries: 410
+
+[OK] Result
+  - broad-exception baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 410, "files_with_handlers": 410, "handler_count": 1101, "silent_pass_count": 106}, "ok": true, "validator": "broad_exception"}
+make[1]: Leaving directory '<CHECKOUT>'
+<CHECKOUT>/.venv/bin/python3.11 scripts/validate/controlplane_delivery.py
+[coo-09] clean — no synchronous runner deliver regressions
+<CHECKOUT>/.venv/bin/python3.11 scripts/validate/webhook_secret.py
+[coo-10] clean — webhook secret-required contract preserved
+Skipping workspace browser tool-family contract validator (not present in standalone checkout).
+make typecheck
+make[1]: Entering directory '<CHECKOUT>'
+cd "<CHECKOUT>" && <CHECKOUT>/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4309; baseline total: 4309
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 290
+[tcr] api: 77 / 77 | monthly quota -50 | next target <= 27 | headroom 0
+[tcr] cli: 309 / 309 | monthly quota -50 | next target <= 259 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 222 / 222 | monthly quota -50 | next target <= 172 | headroom 0
+make[1]: Leaving directory '<CHECKOUT>'
+make lint exit: 0
+
+== make test-critical
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+486 passed, 4 skipped, 1 warning in 14.44s

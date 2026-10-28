@@ -1,0 +1,573 @@
+{
+  "info": {
+    "probe": "probe_consolidation_fix",
+    "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+    "openminion.__version__": "0.1.14",
+    "python": "3.12.11",
+    "platform": "Windows-11-10.0.22631-SP0",
+    "sqlite3.sqlite_version": "3.50.4",
+    "cwd": "<EMPTY>",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "provider": "openai (OpenAI-compatible HTTP) -> scripted ThreadingHTTPServer on 127.0.0.1",
+    "dist_versions": {
+      "openminion": "0.1.14",
+      "sophiagraph": "0.0.12",
+      "pydantic": "2.14.1"
+    },
+    "openminion_direct_url": {
+      "url": "https://github.com/openminion/openminion",
+      "vcs_info": {
+        "vcs": "git",
+        "commit_id": "39c36a1b5183ca811a9031cbcb397b3f9470a06e",
+        "requested_revision": "39c36a1b5183ca811a9031cbcb397b3f9470a06e"
+      }
+    }
+  },
+  "summary": {
+    "passed": 3,
+    "failed": 8,
+    "total": 11
+  },
+  "all_pass": false,
+  "checks": [
+    {
+      "check": "Setup: built-in memory store (AuditedMemoryStore over SQLiteMemoryStore)",
+      "pass": true,
+      "observed": {
+        "class": "AuditedMemoryStore",
+        "inner": "SQLiteMemoryStore"
+      }
+    },
+    {
+      "check": "K. the consolidation run finishes; recovery scans 0 (nothing pending on this store)",
+      "pass": true,
+      "observed": {
+        "run_state": "finished",
+        "run_error": null,
+        "recovery": [
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "check": "K. the cron executor puts the job's consolidation fields on the manager request as the typed trusted_consolidation_context, and none in its public meta",
+      "pass": false,
+      "observed": [
+        {
+          "session_id": "consolidate:f7ad5c46f19c4597ae03bbb2b2851af1",
+          "meta_consolidation_keys": {
+            "memory_consolidation_job": "true",
+            "memory_consolidation_target_scope": "agent:openminion",
+            "memory_consolidation_batch_limit": "8",
+            "memory_consolidation_max_iterations": "2",
+            "memory_consolidation_timeout_seconds": "30"
+          },
+          "meta_inbound_metadata_consolidation_keys": {},
+          "cron_run_id_present": true,
+          "trusted_consolidation_context": "no such field"
+        }
+      ]
+    },
+    {
+      "check": "K. ingress carries the typed context to the ingress request; the request's inbound metadata (parsed from public meta) has no consolidation keys",
+      "pass": false,
+      "observed": [
+        {
+          "session_id": "consolidate:f7ad5c46f19c4597ae03bbb2b2851af1",
+          "inbound_metadata_consolidation_keys": {
+            "memory_consolidation_job": "true",
+            "memory_consolidation_target_scope": "agent:openminion",
+            "memory_consolidation_batch_limit": "8",
+            "memory_consolidation_max_iterations": "2",
+            "memory_consolidation_timeout_seconds": "30"
+          },
+          "cron_job_id": "f7ad5c46f19c4597ae03bbb2b2851af1",
+          "trusted_consolidation_context": "no such field"
+        }
+      ]
+    },
+    {
+      "check": "K. the brain message metadata has the job's five memory_consolidation_* keys, so capture_is_excluded returns True",
+      "pass": false,
+      "observed": [
+        {
+          "consolidation_keys": {},
+          "cron_job_id": "f7ad5c46f19c4597ae03bbb2b2851af1",
+          "session_id": "consolidate:f7ad5c46f19c4597ae03bbb2b2851af1",
+          "returned": false
+        }
+      ]
+    },
+    {
+      "check": "K. the brain attaches the consolidation context once, with the job's target scope, batch limit, iteration limit and timeout, and the one candidate that C's capture proposed",
+      "pass": false,
+      "observed": []
+    },
+    {
+      "check": "K. the consolidation turn does not capture itself: no extraction request, intent 'excluded' without a result, no bundle write",
+      "pass": false,
+      "observed": {
+        "turn_extraction_requests": 1,
+        "new_intents": [
+          {
+            "capture_state": "pending",
+            "result_disposition": "succeeded_no_output"
+          }
+        ],
+        "bundle_writes": [
+          {
+            "candidates": 0,
+            "raised": null,
+            "disposition": "succeeded_no_output"
+          }
+        ],
+        "provider_requests_by_kind": {
+          "decide": 1,
+          "extraction": 1,
+          "freshness": 2
+        }
+      }
+    },
+    {
+      "check": "C. a caller-supplied memory_consolidation_job in meta is dropped at ingress (manager meta has it, the ingress request does not, no typed context), capture_is_excluded returns False, and the turn is captured normally",
+      "pass": false,
+      "observed": {
+        "manager_request": [
+          {
+            "session_id": "caller",
+            "meta_consolidation_keys": {
+              "memory_consolidation_job": "true"
+            },
+            "meta_inbound_metadata_consolidation_keys": {},
+            "cron_run_id_present": false,
+            "trusted_consolidation_context": "no such field"
+          }
+        ],
+        "ingress_request": [
+          {
+            "session_id": "caller",
+            "inbound_metadata_consolidation_keys": {
+              "memory_consolidation_job": "true"
+            },
+            "cron_job_id": null,
+            "trusted_consolidation_context": "no such field"
+          }
+        ],
+        "brain_capture_is_excluded_calls": [
+          {
+            "consolidation_keys": {},
+            "cron_job_id": null,
+            "session_id": "caller",
+            "returned": false
+          }
+        ],
+        "turn_extraction_requests": 1,
+        "new_intents": [
+          {
+            "capture_state": "pending",
+            "result_disposition": "succeeded"
+          }
+        ],
+        "bundle_writes": [
+          {
+            "candidates": 1,
+            "raised": null,
+            "disposition": "succeeded"
+          }
+        ]
+      }
+    },
+    {
+      "check": "F. every memory_consolidation_* key in meta and inbound_metadata, with K's real cron ids, is dropped at ingress; the cron ids reach the brain but assert nothing: not excluded, no consolidation context, captured normally",
+      "pass": false,
+      "observed": {
+        "ingress_request": [
+          {
+            "session_id": "forged",
+            "inbound_metadata_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "15",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id": "f7ad5c46f19c4597ae03bbb2b2851af1",
+            "trusted_consolidation_context": "no such field"
+          }
+        ],
+        "brain_capture_is_excluded_calls": [
+          {
+            "consolidation_keys": {},
+            "cron_job_id": "f7ad5c46f19c4597ae03bbb2b2851af1",
+            "session_id": "forged",
+            "returned": false
+          }
+        ],
+        "brain_consolidation_context_attached": [],
+        "turn_extraction_requests": 1,
+        "new_intents": [
+          {
+            "capture_state": "pending",
+            "result_disposition": "succeeded"
+          }
+        ],
+        "bundle_writes": [
+          {
+            "candidates": 1,
+            "raised": null,
+            "disposition": "succeeded"
+          }
+        ]
+      }
+    },
+    {
+      "check": "O. an ordinary cron job with memory_consolidation_* keys in its payload inbound_metadata runs, has no typed context, reaches the brain with its own cron_job_id and no consolidation keys, and is captured normally",
+      "pass": false,
+      "observed": {
+        "run_state": "finished",
+        "manager_request": [
+          {
+            "session_id": "ordinary-cron",
+            "meta_consolidation_keys": {},
+            "meta_inbound_metadata_consolidation_keys": {
+              "memory_consolidation_batch_limit": "15",
+              "memory_consolidation_job": "true",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_run_id_present": true,
+            "trusted_consolidation_context": "no such field"
+          }
+        ],
+        "ingress_request": [
+          {
+            "session_id": "ordinary-cron",
+            "inbound_metadata_consolidation_keys": {
+              "memory_consolidation_batch_limit": "15",
+              "memory_consolidation_job": "true",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id": "b75e905fb89a4c75b272ba1de300b697",
+            "trusted_consolidation_context": "no such field"
+          }
+        ],
+        "brain_capture_is_excluded_calls": [
+          {
+            "consolidation_keys": {},
+            "cron_job_id": "b75e905fb89a4c75b272ba1de300b697",
+            "session_id": "ordinary-cron",
+            "returned": false
+          }
+        ],
+        "turn_extraction_requests": 1,
+        "new_intents": [
+          {
+            "capture_state": "pending",
+            "result_disposition": "succeeded"
+          }
+        ],
+        "bundle_writes": [
+          {
+            "candidates": 1,
+            "raised": null,
+            "disposition": "succeeded"
+          }
+        ]
+      }
+    },
+    {
+      "check": "Offline provider: the openai base URL is the scripted server on 127.0.0.1",
+      "pass": true,
+      "observed": {
+        "hosts": [
+          "127.0.0.1"
+        ],
+        "requests": 16
+      }
+    }
+  ],
+  "observed": {
+    "run": {
+      "memory_store": {
+        "class": "AuditedMemoryStore",
+        "inner": "SQLiteMemoryStore"
+      },
+      "C": {
+        "label": "C caller turn with meta memory_consolidation_job=true",
+        "response_type": "TurnResponse",
+        "manager_request": [
+          {
+            "session_id": "caller",
+            "meta_consolidation_keys": {
+              "memory_consolidation_job": "true"
+            },
+            "meta_inbound_metadata_consolidation_keys": {},
+            "cron_run_id_present": false,
+            "trusted_consolidation_context": "no such field"
+          }
+        ],
+        "ingress_request": [
+          {
+            "session_id": "caller",
+            "inbound_metadata_consolidation_keys": {
+              "memory_consolidation_job": "true"
+            },
+            "cron_job_id": null,
+            "trusted_consolidation_context": "no such field"
+          }
+        ],
+        "brain_capture_is_excluded_calls": [
+          {
+            "consolidation_keys": {},
+            "cron_job_id": null,
+            "session_id": "caller",
+            "returned": false
+          }
+        ],
+        "brain_consolidation_context_attached": [],
+        "new_intents": [
+          {
+            "capture_state": "pending",
+            "result_disposition": "succeeded"
+          }
+        ],
+        "bundle_writes": [
+          {
+            "candidates": 1,
+            "raised": null,
+            "disposition": "succeeded"
+          }
+        ],
+        "provider_requests_by_kind": {
+          "decide": 1,
+          "extraction": 1,
+          "freshness": 2
+        },
+        "recovery": [],
+        "turn_extraction_requests": 1
+      },
+      "job": {
+        "created": {
+          "ok": true,
+          "task_id": "f7ad5c46f19c4597ae03bbb2b2851af1",
+          "batch_limit": 8,
+          "target_scope": "agent:openminion"
+        }
+      },
+      "K": {
+        "label": "K consolidation cron run",
+        "run_state": "finished",
+        "run_error": null,
+        "manager_request": [
+          {
+            "session_id": "consolidate:f7ad5c46f19c4597ae03bbb2b2851af1",
+            "meta_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "meta_inbound_metadata_consolidation_keys": {},
+            "cron_run_id_present": true,
+            "trusted_consolidation_context": "no such field"
+          }
+        ],
+        "ingress_request": [
+          {
+            "session_id": "consolidate:f7ad5c46f19c4597ae03bbb2b2851af1",
+            "inbound_metadata_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id": "f7ad5c46f19c4597ae03bbb2b2851af1",
+            "trusted_consolidation_context": "no such field"
+          }
+        ],
+        "brain_capture_is_excluded_calls": [
+          {
+            "consolidation_keys": {},
+            "cron_job_id": "f7ad5c46f19c4597ae03bbb2b2851af1",
+            "session_id": "consolidate:f7ad5c46f19c4597ae03bbb2b2851af1",
+            "returned": false
+          }
+        ],
+        "brain_consolidation_context_attached": [],
+        "new_intents": [
+          {
+            "capture_state": "pending",
+            "result_disposition": "succeeded_no_output"
+          }
+        ],
+        "bundle_writes": [
+          {
+            "candidates": 0,
+            "raised": null,
+            "disposition": "succeeded_no_output"
+          }
+        ],
+        "provider_requests_by_kind": {
+          "decide": 1,
+          "extraction": 1,
+          "freshness": 2
+        },
+        "recovery": [
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "turn_extraction_requests": 1
+      },
+      "F": {
+        "label": "F forged consolidation keys with K's cron ids",
+        "response_type": "TurnResponse",
+        "forged_cron_job_id_is_k_job": true,
+        "manager_request": [
+          {
+            "session_id": "forged",
+            "meta_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "15",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "meta_inbound_metadata_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "15",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_run_id_present": true,
+            "trusted_consolidation_context": "no such field"
+          }
+        ],
+        "ingress_request": [
+          {
+            "session_id": "forged",
+            "inbound_metadata_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "15",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id": "f7ad5c46f19c4597ae03bbb2b2851af1",
+            "trusted_consolidation_context": "no such field"
+          }
+        ],
+        "brain_capture_is_excluded_calls": [
+          {
+            "consolidation_keys": {},
+            "cron_job_id": "f7ad5c46f19c4597ae03bbb2b2851af1",
+            "session_id": "forged",
+            "returned": false
+          }
+        ],
+        "brain_consolidation_context_attached": [],
+        "new_intents": [
+          {
+            "capture_state": "pending",
+            "result_disposition": "succeeded"
+          }
+        ],
+        "bundle_writes": [
+          {
+            "candidates": 1,
+            "raised": null,
+            "disposition": "succeeded"
+          }
+        ],
+        "provider_requests_by_kind": {
+          "decide": 1,
+          "extraction": 1,
+          "freshness": 2
+        },
+        "recovery": [],
+        "turn_extraction_requests": 1
+      },
+      "O": {
+        "label": "O ordinary cron job with consolidation keys in its payload inbound_metadata",
+        "run_state": "finished",
+        "run_error": null,
+        "cron_job_id": "b75e905fb89a4c75b272ba1de300b697",
+        "manager_request": [
+          {
+            "session_id": "ordinary-cron",
+            "meta_consolidation_keys": {},
+            "meta_inbound_metadata_consolidation_keys": {
+              "memory_consolidation_batch_limit": "15",
+              "memory_consolidation_job": "true",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_run_id_present": true,
+            "trusted_consolidation_context": "no such field"
+          }
+        ],
+        "ingress_request": [
+          {
+            "session_id": "ordinary-cron",
+            "inbound_metadata_consolidation_keys": {
+              "memory_consolidation_batch_limit": "15",
+              "memory_consolidation_job": "true",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id": "b75e905fb89a4c75b272ba1de300b697",
+            "trusted_consolidation_context": "no such field"
+          }
+        ],
+        "brain_capture_is_excluded_calls": [
+          {
+            "consolidation_keys": {},
+            "cron_job_id": "b75e905fb89a4c75b272ba1de300b697",
+            "session_id": "ordinary-cron",
+            "returned": false
+          }
+        ],
+        "brain_consolidation_context_attached": [],
+        "new_intents": [
+          {
+            "capture_state": "pending",
+            "result_disposition": "succeeded"
+          }
+        ],
+        "bundle_writes": [
+          {
+            "candidates": 1,
+            "raised": null,
+            "disposition": "succeeded"
+          }
+        ],
+        "provider_requests_by_kind": {
+          "decide": 1,
+          "extraction": 1,
+          "freshness": 2
+        },
+        "recovery": [],
+        "turn_extraction_requests": 1
+      },
+      "provider_hosts": [
+        "127.0.0.1"
+      ],
+      "provider_requests_total": 16
+    }
+  }
+}
