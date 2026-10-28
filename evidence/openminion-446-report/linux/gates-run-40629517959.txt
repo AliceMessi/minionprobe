@@ -1,0 +1,134 @@
+head: bddf6e88 docs(changelog): note the storage migrate report error
+dev:  988ac4ec Merge pull request #436 from Afar88/fix/tool-model-args
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+packages: psycopg 3.3.6;sophiagraph 0.0.12;SQLAlchemy 2.1.6;typer 0.27.3;
+OPENMINION_TEST_POSTGRES_URL set: yes
+9a581f263539d973d560474478ec447f89729933c0984a5bbf6ec82e20714ab5  /tmp/ev/probe_446_report.py
+
+== [head] pytest <focused>
+27 passed in 0.58s
+
+== [head] pytest -m "not benchmark and not e2e and not postgres and not memory_eval_benchmark and not mcp_live and not package_integration and not telegram_live and not slack_live and not slow" tests/cli tests/storage
+tests/cli/test_status_telemetry_command.py::test_status_telemetry_failed_and_opaque_lookup
+  /home/runner/work/linux-runner/linux-runner/src/openminion/base/config/paths.py:54: RuntimeWarning: telemetry_db_path must be under data_root (/tmp/pytest-of-runner/pytest-1/test_status_telemetry_failed_a0/.openminion), got /tmp/pytest-of ...
+FAILED tests/storage/test_startup_validation.py::TestValidatePostgresConnectionFailure::test_unreachable_db_raises_with_redacted_url - Failed: Timeout (>60.0s) from pytest-timeout.
+1 failed, 2125 passed, 3 skipped, 57 deselected, 8 warnings in 119.31s (0:01:59)
+
+== [head] pytest -m postgres <postgres>
+8 passed in 0.89s
+
+== [head] the issue's probe: PYTHONPATH=src:. python probe_446_report.py
+CASE sqlite_unknown_revision setup: --module secret exit=0
+CASE sqlite_unknown_revision after setting 9999_not_a_revision: json exit=1 entries=[{"module_id": "secret", "status": "error", "success": false, "error": "Alembic upgrade failed for module 'secret': Can't locate revision identified by '9999_not_a_revision'"}] | text exit=1 output="FAIL  secret: Alembic upgrade failed for module 'secret': Can't locate revision identified by '9999_not_a_revision'"
+CASE pg_session_then_artifact setup: --module session exit=0
+CASE pg_session_then_artifact --module artifact: json exit=1 entries=[{"module_id": "artifact", "status": "error", "success": false, "error": "Alembic upgrade failed for module 'artifact': Can't locate revision identified by '0005_cron_scheduler_control'"}] | text exit=1 output="FAIL  artifact: Alembic upgrade failed for module 'artifact': Can't locate revision identified by '0005_cron_scheduler_control'"
+CASE pg_unknown_revision setup: --module secret exit=0
+CASE pg_unknown_revision after setting 9999_not_a_revision: json exit=1 entries=[{"module_id": "secret", "status": "error", "success": false, "error": "Alembic upgrade failed for module 'secret': Can't locate revision identified by '9999_not_a_revision'"}] | text exit=1 output="FAIL  secret: Alembic upgrade failed for module 'secret': Can't locate revision identified by '9999_not_a_revision'"
+
+== dev sources from here on: git checkout 988ac4ec54ae803f4ac937a6fc2fc1c04bb5f590 -- src (1 paths differ)
+
+== [dev] pytest <focused>
+/home/runner/work/linux-runner/linux-runner/tests/cli/test_storage_migrate_report_fields.py:105: assert [{'applied': ...cess': False}] == [{'error': "A...cess': False}]
+/home/runner/work/linux-runner/linux-runner/tests/cli/test_storage_migrate_report_fields.py:140: KeyError: 'error'
+FAILED tests/cli/test_storage_migrate_report_fields.py::test_failed_report_json_entry_carries_the_report_error - assert [{'applied': ...cess': False}] == [{'error': "A...cess': False}]
+  At index 0 diff: {'module_id': 'secret', 'status': 'error', 'applied': [], 'success': False} != {'module_id': 'secret', 'status': 'error', 'success': False, 'error': "Alembic upgrade failed for module 'secret': Can't locate revision ident ...
+  -         'error': "Alembic upgrade failed for module 'secret': Can't locate revision "
+            'status': 'error',
+FAILED tests/cli/test_storage_migrate_report_fields.py::test_successful_report_json_entry_has_no_error_and_no_empty_applied_list - AssertionError: assert [{'applied': ...ccess': True}] == [{'module_id'...ccess': True}]
+FAILED tests/cli/test_storage_migrate_report_fields.py::test_failed_verified_report_json_entry_carries_the_report_error - KeyError: 'error'
+FAILED tests/cli/test_storage_migrate_report_fields.py::test_failed_report_text_output_prints_the_report_error - assert '  FAIL  secret\n' == "  FAIL  secr...a_revision'\n"
+  -   FAIL  secret: Alembic upgrade failed for module 'secret': Can't locate revision identified by '9999_not_a_revision'
+FAILED tests/cli/test_storage_migrate_report_fields.py::test_sqlite_module_migration_reports_success_and_failure - AssertionError: assert [{'applied': ...ccess': True}] == [{'module_id'...ccess': True}]
+5 failed, 22 passed in 0.37s
+
+== [dev] pytest -m "not benchmark and not e2e and not postgres and not memory_eval_benchmark and not mcp_live and not package_integration and not telegram_live and not slack_live and not slow" tests/cli tests/storage
+/home/runner/work/linux-runner/linux-runner/tests/cli/test_storage_migrate_report_fields.py:105: assert [{'applied': ...cess': False}] == [{'error': "A...cess': False}]
+/home/runner/work/linux-runner/linux-runner/tests/cli/test_storage_migrate_report_fields.py:140: KeyError: 'error'
+tests/cli/test_status_telemetry_command.py::test_status_telemetry_failed_and_opaque_lookup
+  /home/runner/work/linux-runner/linux-runner/src/openminion/base/config/paths.py:54: RuntimeWarning: telemetry_db_path must be under data_root (/tmp/pytest-of-runner/pytest-4/test_status_telemetry_failed_a0/.openminion), got /tmp/pytest-of ...
+FAILED tests/cli/test_storage_migrate_report_fields.py::test_failed_report_json_entry_carries_the_report_error - assert [{'applied': ...cess': False}] == [{'error': "A...cess': False}]
+  At index 0 diff: {'module_id': 'secret', 'status': 'error', 'applied': [], 'success': False} != {'module_id': 'secret', 'status': 'error', 'success': False, 'error': "Alembic upgrade failed for module 'secret': Can't locate revision ident ...
+  -         'error': "Alembic upgrade failed for module 'secret': Can't locate revision "
+            'status': 'error',
+FAILED tests/cli/test_storage_migrate_report_fields.py::test_successful_report_json_entry_has_no_error_and_no_empty_applied_list - AssertionError: assert [{'applied': ...ccess': True}] == [{'module_id'...ccess': True}]
+FAILED tests/cli/test_storage_migrate_report_fields.py::test_failed_verified_report_json_entry_carries_the_report_error - KeyError: 'error'
+FAILED tests/cli/test_storage_migrate_report_fields.py::test_failed_report_text_output_prints_the_report_error - assert '  FAIL  secret\n' == "  FAIL  secr...a_revision'\n"
+  -   FAIL  secret: Alembic upgrade failed for module 'secret': Can't locate revision identified by '9999_not_a_revision'
+FAILED tests/cli/test_storage_migrate_report_fields.py::test_sqlite_module_migration_reports_success_and_failure - AssertionError: assert [{'applied': ...ccess': True}] == [{'module_id'...ccess': True}]
+FAILED tests/storage/test_startup_validation.py::TestValidatePostgresConnectionFailure::test_unreachable_db_raises_with_redacted_url - Failed: Timeout (>60.0s) from pytest-timeout.
+6 failed, 2120 passed, 3 skipped, 57 deselected, 8 warnings in 112.03s (0:01:52)
+
+== [dev] pytest -m postgres <postgres>
+FAILED tests/integration/test_storage_migrate_report_postgres.py::test_postgres_module_migration_reports_success_and_failure - AssertionError: assert [{'applied': ...ccess': True}] == [{'module_id'...ccess': True}]
+1 failed, 7 passed in 0.74s
+
+== [dev] the issue's probe: PYTHONPATH=src:. python probe_446_report.py
+CASE sqlite_unknown_revision setup: --module secret exit=0
+CASE sqlite_unknown_revision after setting 9999_not_a_revision: json exit=1 entries=[{"module_id": "secret", "status": "error", "applied": [], "success": false}] | text exit=1 output='FAIL  secret'
+CASE pg_session_then_artifact setup: --module session exit=0
+CASE pg_session_then_artifact --module artifact: json exit=1 entries=[{"module_id": "artifact", "status": "error", "applied": [], "success": false}] | text exit=1 output='FAIL  artifact'
+CASE pg_unknown_revision setup: --module secret exit=0
+CASE pg_unknown_revision after setting 9999_not_a_revision: json exit=1 entries=[{"module_id": "secret", "status": "error", "applied": [], "success": false}] | text exit=1 output='FAIL  secret'
+
+== back to the branch head: 0 paths differ
+
+== ruff check .
+All checks passed!
+
+== make format-check
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m ruff format --check "/home/runner/work/linux-runner/linux-runner"
+5131 files already formatted
+
+== make workflow-check
+[INFO] This may take a few minutes...
+Lint GitHub Actions workflow files.......................................Passed
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/action_pins.py
+workflow action pins: clean
+
+== make lint
+
+[OK] Result
+  - method-LOC baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 111, "ceiling": 100, "checked": 20838, "over_ceiling": 111}, "ok": true, "validator": "method_loc"}
+{
+  "checked": 2647,
+  "ok": true,
+  "violations": []
+}
+broad_exception
+
+[INFO] Summary
+  files: 410
+  handlers: 1101
+  silent pass: 106
+  baseline entries: 410
+
+[OK] Result
+  - broad-exception baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 410, "files_with_handlers": 410, "handler_count": 1101, "silent_pass_count": 106}, "ok": true, "validator": "broad_exception"}
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/controlplane_delivery.py
+[coo-09] clean — no synchronous runner deliver regressions
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 scripts/validate/webhook_secret.py
+[coo-10] clean — webhook secret-required contract preserved
+Skipping workspace browser tool-family contract validator (not present in standalone checkout).
+make typecheck
+make[1]: Entering directory '/home/runner/work/linux-runner/linux-runner'
+cd "/home/runner/work/linux-runner/linux-runner" && /home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4309; baseline total: 4309
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 290
+[tcr] api: 77 / 77 | monthly quota -50 | next target <= 27 | headroom 0
+[tcr] cli: 309 / 309 | monthly quota -50 | next target <= 259 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 222 / 222 | monthly quota -50 | next target <= 172 | headroom 0
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+make lint exit: 0
+
+== make test-critical
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+486 passed, 4 skipped, 1 warning in 16.93s
