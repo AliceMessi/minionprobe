@@ -1,0 +1,68 @@
+VERSIONS packages | {"openminion": "0.1.7", "sqlalchemy": "2.1.6", "psycopg": "3.3.6", "alembic": "1.18.4"}
+VERSIONS postgres | 16.15 (Debian 16.15-1.pgdg13+2)
+MANIFEST runtime | v1..v11 built one by one: 14 tables at v11
+MANIFEST session | 0001_baseline..0004_task_plan_step_start built one by one: 18 tables at 0004_task_plan_step_start
+MANIFEST artifact | 0001_baseline built one by one: 4 tables at 0001_baseline
+MANIFEST registry | 0001_baseline built one by one: 3 tables at 0001_baseline
+MANIFEST identity | 0001_baseline built one by one: 2 tables at 0001_baseline
+MANIFEST policy | 0001_baseline..0002_blockchain_confirmations built one by one: 4 tables at 0002_blockchain_confirmations
+MANIFEST secret | 0001_baseline built one by one: 1 tables at 0001_baseline
+MANIFEST telemetry | 0001_baseline: ok: success=False revision None -> None; error=Alembic upgrade failed for module 'telemetry': (psycopg.errors.SyntaxError) syntax error at or near "AUTOINCREMENT"; module left out of the manifest
+MANIFEST controlplane | 0001_baseline: ok: success=False revision None -> None; error=Alembic upgrade failed for module 'controlplane': (psycopg.errors.SyntaxError) syntax error at or near "AUTOINCREMENT"; module left out of the manifest
+MANIFEST retrieve | 0001_baseline..0002_index built one by one: 5 tables at 0002_index
+MANIFEST memory | 0001_baseline..0004_namespace built one by one: 5 tables at 0004_namespace
+MANIFEST skill | 0001_baseline..0007_workflow_observations built one by one: 9 tables at 0007_workflow_observations
+MANIFEST a2a | 0001_baseline..0005_job_idempotency_scope built one by one: 5 tables at 0005_job_idempotency_scope
+MANIFEST task | 0001_baseline built one by one: 5 tables at 0001_baseline
+MANIFEST memory_store | ok: built | ledger alembic=['0004_namespace'] om_meta={'module_id': 'memory', 'schema_head': '0004_namespace'} | tables beyond memory@0004_namespace: ['memory_capture_bundle_receipts', 'memory_relations'] | same name, other signature than memory@0004_namespace: []
+MANIFEST a2a_audit_store | ok: built | ledger alembic=['0005_job_idempotency_scope'] om_meta={'module_id': 'a2a', 'schema_head': '0005_job_idempotency_scope'} | tables beyond a2a@0005_job_idempotency_scope: [] | same name, other signature than a2a@0005_job_idempotency_scope: []
+MANIFEST a2a_state_store | ok: built | ledger alembic=None om_meta={'module_id': 'a2a', 'schema_head': '0005_job_idempotency_scope'} | tables beyond a2a@0005_job_idempotency_scope: [] | same name, other signature than a2a@0005_job_idempotency_scope: []
+MANIFEST session_store | ok: built | ledger alembic=None om_meta={'module_id': 'session', 'schema_head': '0004_task_plan_step_start'} | tables beyond session@0004_task_plan_step_start: ['session_retention_holds', 'session_shares'] | same name, other signature than session@0004_task_plan_step_start: []
+SHARED agents | a2a 0001_baseline..store bootstrap: (agent_id text NN, capabilities_json text NN, endpoint text NN, status text NN, tags_json text NN, updated_at text NN) pk(agent_id)
+SHARED agents | registry 0001_baseline: (agent_id text NN, descriptor_json text NN, source text NN, updated_at text NN) pk(agent_id)
+IDENTICAL agents | no two owners share a signature
+SHARED events | runtime v1..v10: (created_at text NN, event_type text NN, id bigint NN, payload_json text NN, session_id text NN) pk(id)
+SHARED events | runtime v11: (canonical_event_id text, created_at text NN, event_type text NN, id bigint NN, payload_json text NN, session_id text NN) pk(id)
+SHARED events | session 0001_baseline..store bootstrap: (agent_id text, artifact_refs_json text NN, error_json text, event_id text NN, memory_refs_json text NN, parent_id text, payload_json text NN, session_id text NN, status text, task_id text, trace_id text, ts text NN, type text NN) pk(event_id)
+IDENTICAL events | no two owners share a signature
+SHARED idempotency_keys | a2a 0001_baseline..store bootstrap: (created_at text NN, error_json text, key text NN, result_inline_json text, result_ref text, scope text NN, status text NN, task_id text, updated_at text NN) pk(key, scope)
+SHARED idempotency_keys | runtime v1..v11: (created_at text NN, idempotency_key text NN, method text NN, request_hash text NN, response_json text NN, status text NN, updated_at text NN) pk(idempotency_key, method)
+IDENTICAL idempotency_keys | no two owners share a signature
+SHARED memory_records | memory 0001_baseline: (access_count integer NN, confidence double precision NN, content_json jsonb NN, created_at text NN, entities_json jsonb NN, evidence_json jsonb NN, expires_at text, id text NN, is_deleted boolean NN, key text, last_hit_at text, meta_json jsonb NN, scope text NN, search_text text NN, search_vector tsvector, source text NN, superseded_by_id text, supersedes_id text, supersession_reason text, tags_json jsonb NN, tier text NN, title text, type text NN, updated_at text NN) pk(id)
+SHARED memory_records | memory 0002_audit: (access_count integer NN, confidence double precision NN, content_json jsonb NN, created_at text NN, deleted_at text, deleted_reason text, entities_json jsonb NN, evidence_json jsonb NN, expires_at text, id text NN, is_deleted boolean NN, key text, last_hit_at text, meta_json jsonb NN, scope text NN, search_text text NN, search_vector tsvector, source text NN, superseded_by_id text, supersedes_id text, supersession_reason text, tags_json jsonb NN, tier text NN, title text, type text NN, updated_at text NN) pk(id)
+SHARED memory_records | memory 0003_validity: (access_count integer NN, confidence double precision NN, content_json jsonb NN, created_at text NN, deleted_at text, deleted_reason text, entities_json jsonb NN, event_time text, evidence_json jsonb NN, expires_at text, id text NN, is_deleted boolean NN, key text, last_hit_at text, meta_json jsonb NN, scope text NN, search_text text NN, search_vector tsvector, source text NN, superseded_by_id text, supersedes_id text, supersession_reason text, tags_json jsonb NN, tier text NN, title text, type text NN, updated_at text NN, valid_to text) pk(id)
+SHARED memory_records | memory 0004_namespace: (access_count integer NN, confidence double precision NN, content_json jsonb NN, created_at text NN, deleted_at text, deleted_reason text, entities_json jsonb NN, event_time text, evidence_json jsonb NN, expires_at text, id text NN, is_deleted boolean NN, key text, last_hit_at text, meta_json jsonb NN, namespace_json text, scope text NN, search_text text NN, search_vector tsvector, source text NN, superseded_by_id text, supersedes_id text, supersession_reason text, tags_json jsonb NN, tier text NN, title text, type text NN, updated_at text NN, valid_to text) pk(id)
+SHARED memory_records | runtime v4..v11: (agent_id text NN, chunk_ref text NN, content text NN, content_type text NN, created_at text NN, event_id integer, id text NN, idempotency_key text NN, importance integer NN, message_id text, project_id text NN, scope text NN, session_id text NN, updated_at text NN) pk(id)
+IDENTICAL memory_records | no two owners share a signature
+SHARED migrations | memory 0001_baseline..0004_namespace: (applied_at text NN, name text NN, version integer NN) pk(version)
+SHARED migrations | runtime v1..v11: (applied_at text NN, name text NN, version integer NN) pk(version)
+IDENTICAL migrations | memory 0001_baseline..0004_namespace == runtime v1..v11
+SHARED session_retention_holds | runtime v11: (actor_id text NN, created_at text NN, hold_id text NN, reason text NN, released_at text, schema_version text NN, session_id text NN) pk(hold_id)
+SHARED session_retention_holds | session store bootstrap: (actor_id text NN, created_at text NN, hold_id text NN, reason text NN, released_at text, schema_version text NN, session_id text NN) pk(hold_id)
+IDENTICAL session_retention_holds | runtime v11 == session store bootstrap
+SHARED session_turn_leases | runtime v10..v11: (acquired_at text NN, expires_at text NN, fence_token integer NN, owner text NN, released_at text, renewed_at text NN, request_id text NN, session_id text NN) pk(session_id)
+SHARED session_turn_leases | session 0001_baseline..store bootstrap: (acquired_at text NN, expires_at text NN, fence_token integer NN, owner text NN, released_at text, renewed_at text NN, request_id text NN, session_id text NN) pk(session_id)
+IDENTICAL session_turn_leases | runtime v10..v11 == session 0001_baseline..store bootstrap
+SHARED sessions | runtime v1..v6: (channel text NN, created_at text NN, id text NN, metadata_json text NN, session_key text NN, target text NN, updated_at text NN) pk(id)
+SHARED sessions | runtime v7..v8: (channel text NN, closed_at text, created_at text NN, expires_at text, id text NN, last_activity_at text NN, metadata_json text NN, session_key text NN, status text NN, target text NN, updated_at text NN) pk(id)
+SHARED sessions | runtime v9..v11: (active_agent_id text, channel text NN, closed_at text, created_at text NN, expires_at text, id text NN, last_activity_at text NN, metadata_json text NN, session_key text NN, status text NN, target text NN, updated_at text NN) pk(id)
+SHARED sessions | session 0001_baseline..store bootstrap: (active_agent_id text, active_profile_version text, config_snapshot_ref text, created_at text NN, meta_json text NN, participants_json text NN, root_goal text, session_id text NN, status text NN, tags_json text NN, title text, updated_at text NN) pk(session_id)
+IDENTICAL sessions | no two owners share a signature
+STEP r_session_017 | migrate session with 0.1.7: ok: success=True revision None -> 0004_task_plan_step_start; error=None
+STEP r_session_017 | one session row: ok: 1 statement(s)
+Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry
+Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill
+Postgres module 'task' has pending migrations. Run: openminion storage migrate --module task
+Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact
+Postgres module 'secret' has pending migrations. Run: openminion storage migrate --module secret
+Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane
+Postgres module 'session' has pending migrations. Run: openminion storage migrate --module session
+Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity
+Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress
+Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a
+Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory
+Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy
+Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve
+Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry
+STEP r_runtime_017 | runtime storage with 0.1.7: ok: runtime version 11
+STEP r_runtime_017 | runtime rows: ok: 1 session row, 1 idempotency row
