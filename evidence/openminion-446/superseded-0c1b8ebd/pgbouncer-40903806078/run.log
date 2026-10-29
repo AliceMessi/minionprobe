@@ -1,0 +1,41 @@
+9355d36be361cfc25f472e1c690860e665b5bfe7 wip: #446 pgbouncer probe
+PgBouncer 1.22.0
+libevent 2.1.12-stable
+adns: c-ares 1.27.0
+tls: OpenSSL 3.0.13 30 Jan 2024
+systemd: yes
+
+=== PgBouncer, transaction pooling, defaults
+plain connection with options: error: OperationalError (psycopg.OperationalError) connection failed: connection to server at "127.0.0.1", port 6433 failed: FATAL:  unsupported startup parameter in options: search_path
+memory store through PgBouncer: OperationalError (psycopg.OperationalError) connection failed: connection to server at "127.0.0.1", port 6433 failed: FATAL:  unsupported startup parameter in options: search_path
+database unchanged after the memory store attempt: True
+storage migrate --module secret through PgBouncer: ok 
+schemas after: ['information_schema', 'public', 'public__secret']
+memory_records in: []
+two clients: error: (psycopg.OperationalError) connection failed: connection to server at "127.0.0.1", port 6433 failed: FATAL:  unsupported startup parameter in options: search_path
+pgbouncer log: 2026-10-29 15:40:44.929 UTC [3478] WARNING C-0x558c6654acf0: (nodb)/(nouser)@127.0.0.1:58934 unsupported startup parameter in options: search_path="public__memory"
+2026-10-29 15:40:44.929 UTC [3478] LOG C-0x558c6654acf0: (nodb)/(nouser)@127.0.0.1:58934 closing because: unsupported startup parameter in options: search_path (age=0s)
+2026-10-29 15:40:44.929 UTC [3478] WARNING C-0x558c6654acf0: (nodb)/(nouser)@127.0.0.1:58934 pooler error: unsupported startup parameter in options: search_path
+2026-10-29 15:40:45.116 UTC [3478] WARNING C-0x558c6654acf0: (nodb)/(nouser)@127.0.0.1:55468 unsupported startup parameter in options: search_path="public__memory"
+2026-10-29 15:40:45.116 UTC [3478] LOG C-0x558c6654acf0: (nodb)/(nouser)@127.0.0.1:55468 closing because: unsupported startup parameter in options: search_path (age=0s)
+2026-10-29 15:40:45.116 UTC [3478] WARNING C-0x558c6654acf0: (nodb)/(nouser)@127.0.0.1:55468 pooler error: unsupported startup parameter in options: search_path
+
+=== PgBouncer, transaction pooling, ignore_startup_parameters = options
+plain connection with options: search_path = "$user", public
+memory store through PgBouncer: SchemaOwnershipError A connection for PostgreSQL schema "public__memory" started with search_path '"$user", public': the server or a proxy (a transaction pooler such as PgBouncer) did not apply the URL's options parameter. Connect module stores directly or through a pooler that passes options. Nothing was written. OpenMinion does not move, repair or restamp existing tables.
+database unchanged after the memory store attempt: True
+storage migrate --module secret through PgBouncer: ok 
+schemas after: ['information_schema', 'public', 'public__secret']
+memory_records in: []
+two clients, search_path: "$user", public | "$user", public
+pgbouncer log: 
+
+=== PgBouncer, transaction pooling, track_extra_parameters = search_path
+plain connection with options: search_path = "$user", public
+memory store through PgBouncer: SchemaOwnershipError A connection for PostgreSQL schema "public__memory" started with search_path '"$user", public': the server or a proxy (a transaction pooler such as PgBouncer) did not apply the URL's options parameter. Connect module stores directly or through a pooler that passes options. Nothing was written. OpenMinion does not move, repair or restamp existing tables.
+database unchanged after the memory store attempt: True
+storage migrate --module secret through PgBouncer: ok 
+schemas after: ['information_schema', 'public', 'public__secret']
+memory_records in: []
+two clients, search_path: "$user", public | "$user", public
+pgbouncer log: 

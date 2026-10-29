@@ -1,0 +1,68 @@
+df7912d9e9623afc39ecbf07f4c740ad84862e14 probe: #446 review, session store leftovers on dev
+4833218729abb9bbab4774a4f6141cfaacfa33a3 fix(storage): support PostgreSQL controlplane and telemetry migrations (#521)
+Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill
+Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact
+Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity
+Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a
+Postgres module 'secret' has pending migrations. Run: openminion storage migrate --module secret
+Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy
+Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane
+Postgres module 'task' has pending migrations. Run: openminion storage migrate --module task
+Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve
+Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress
+Postgres module 'session' has pending migrations. Run: openminion storage migrate --module session
+Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry
+Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry
+Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory
+runtime version 15
+session store error: ProgrammingError (psycopg.errors.UndefinedColumn) column "session_id" referenced in foreign key constraint does not exist
+{
+ "added_relations": [
+  "idx_sessions_status_updated (i)"
+ ],
+ "removed_relations": [],
+ "added_columns": [],
+ "schemas": [
+  "public"
+ ]
+}
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/psycopg/connection.py:109: in connect
+    rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/psycopg/waiting.py:141: in wait_conn
+    if not (rlist := sel.select(timeout=t)):
+                     ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <selectors.EpollSelector object at 0x7fbdbc182890>, timeout = 0.1
+
+    def select(self, timeout=None):
+        if timeout is None:
+            timeout = -1
+        elif timeout <= 0:
+            timeout = 0
+        else:
+            # epoll_wait() has a resolution of 1 millisecond, round away
+            # from zero to wait *at least* timeout seconds.
+            timeout = math.ceil(timeout * 1e3) * 1e-3
+    
+        # epoll_wait() expects `maxevents` to be greater than zero;
+        # we want to make sure that `select()` can be called when no
+        # FD is registered.
+        max_ev = max(len(self._fd_to_key), 1)
+    
+        ready = []
+        try:
+>           fd_event_list = self._selector.poll(timeout, max_ev)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: Timeout (>60.0s) from pytest-timeout.
+
+/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/selectors.py:468: Failed
+=========================== short test summary info ============================
+FAILED tests/services/agent/test_truth_maintenance.py::test_session_lifecycle_runs_capacity_and_purge_on_postgres - AssertionError: assert MemoryRecord(id='purge-me', scope='agent:truth-agent', type='fact', content='obsolete fact', created_at='2026-10-29T15...amespace=None, deleted_at=None, deleted_reason=None, tier='working', access_count=0, integrity_hash=None, goal_id=None) is None
+ +  where MemoryRecord(id='purge-me', scope='agent:truth-agent', type='fact', content='obsolete fact', created_at='2026-10-29T15...amespace=None, deleted_at=None, deleted_reason=None, tier='working', access_count=0, integrity_hash=None, goal_id=None) = get('purge-me')
+ +    where get = <openminion.modules.memory.storage.postgres.store.PostgresMemoryStore object at 0x7fbdbd560b90>.get
+FAILED tests/storage/test_startup_validation.py::TestValidatePostgresConnectionFailure::test_unreachable_db_raises_with_redacted_url - Failed: Timeout (>60.0s) from pytest-timeout.
+2 failed in 61.19s (0:01:01)
