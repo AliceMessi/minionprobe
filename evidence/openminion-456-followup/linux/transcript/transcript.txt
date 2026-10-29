@@ -1,0 +1,3043 @@
+
+# setup: openminion==0.1.14 from PyPI in a separate venv
+[setup] 0.1.14 venv: openminion 0.1.14 CPython 3.11.17
+[setup] checkout: openminion 0.1.15 CPython 3.11.17 SQLite 3.45.1
+[setup] checkout head: 973fb002 docs(runtime): document replacing consolidation jobs from earlier packages
+
+# A: a pre-upgrade job, stopped (pause) before it runs on this package; replacement created while the daemon runs
+[setup] homeA/agents.json: echo agent 'openminion' (default agent), daemon_auto_start false
+
+$ openminion(0.1.14) --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tools run task.consolidate_memory --json '{"interval_hours": 12, "batch_limit": 8}'
+{
+  "artifact_refs": [
+    {
+      "ref": "artifact://tool/tools/task.consolidate_memory",
+      "tool": "task.consolidate_memory",
+      "type": "tool_result"
+    }
+  ],
+  "ok": true,
+  "runtime_fallback_reason": "openminion daemon is not running",
+  "runtime_source": "inproc",
+  "tool": {
+    "content": "{\"batch_limit\": 8, \"consolidation_session_id\": \"consolidate:0aaf8a905a3b455ebdb16b050a0082a0\", \"enabled\": true, \"name\": \"memory consolidation\", \"next_due_at\": \"2026-10-29T23:45:18.032439+00:00\", \"schedule\": {\"every_ms\": 43200000, \"jitter_ms\": 0, \"kind\": \"every\"}, \"scheduler_note\": \"Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start\", \"target_scope\": \"agent:openminion\", \"task_id\": \"0aaf8a905a3b455ebdb16b050a0082a0\"}",
+    "data": {
+      "batch_limit": 8,
+      "consolidation_session_id": "consolidate:0aaf8a905a3b455ebdb16b050a0082a0",
+      "enabled": true,
+      "model_tool_name": "task.consolidate_memory",
+      "name": "memory consolidation",
+      "next_due_at": "2026-10-29T23:45:18.032439+00:00",
+      "runtime_binding_id": "runtime.task.consolidate_memory",
+      "runtime_fallback_chain": [
+        "task.consolidate_memory"
+      ],
+      "runtime_fallback_used": false,
+      "runtime_resolution_source": "runtime_direct",
+      "runtime_tool_name": "task.consolidate_memory",
+      "schedule": {
+        "every_ms": 43200000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "scheduler_note": "Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start",
+      "target_scope": "agent:openminion",
+      "task_id": "0aaf8a905a3b455ebdb16b050a0082a0",
+      "tool_blast_radius": "local_mutation",
+      "tool_min_scope": "WRITE_SAFE"
+    },
+    "error": "",
+    "name": "task.consolidate_memory",
+    "ok": true,
+    "verified": true
+  }
+}
+[exit 0]
+[setup] pre-upgrade task in A: 0aaf8a905a3b455ebdb16b050a0082a0
+[evidence] .openminion/task/task.db scheduled_tasks 0aaf8a905a3b455ebdb16b050a0082a0: state=active, metadata.kind=None
+
+# A. inspect
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks list --json
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "0aaf8a905a3b455ebdb16b050a0082a0",
+      "title": "memory consolidation",
+      "status": "ACTIVE",
+      "lifecycle_state": "active",
+      "due_at": "2026-10-29T23:45:18.032439+00:00",
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "0aaf8a905a3b455ebdb16b050a0082a0",
+      "created_at": "2026-10-29T11:45:18.032691+00:00",
+      "updated_at": "2026-10-29T11:45:18.032691+00:00",
+      "operator_state": "running",
+      "resume_action": "continue",
+      "valid_actions": [
+        "pause",
+        "cancel",
+        "run-now",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 43200000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:43200000ms",
+      "schedule_revision": "2026-10-29T11:45:18.032439+00:00",
+      "enabled": true,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    }
+  ],
+  "pending_actions": [],
+  "count": 1,
+  "source": "task_manager",
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:45:21.857856+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+[summary] consolidation tasks:
+[summary]   0aaf8a905a3b455ebdb16b050a0082a0  agent_id=openminion  lifecycle_state=active  enabled=True  last_run=None  valid_actions=['pause', 'cancel', 'run-now', 'delete-history']
+[summary] enabled consolidation tasks: ['0aaf8a905a3b455ebdb16b050a0082a0']
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks show 0aaf8a905a3b455ebdb16b050a0082a0 --json
+{
+  "ok": true,
+  "task": {
+    "id": "0aaf8a905a3b455ebdb16b050a0082a0",
+    "title": "memory consolidation",
+    "status": "ACTIVE",
+    "lifecycle_state": "active",
+    "due_at": "2026-10-29T23:45:18.032439+00:00",
+    "steps": [],
+    "pending_actions": [],
+    "agent_id": "openminion",
+    "cron_job_id": "0aaf8a905a3b455ebdb16b050a0082a0",
+    "created_at": "2026-10-29T11:45:18.032691+00:00",
+    "updated_at": "2026-10-29T11:45:18.032691+00:00",
+    "operator_state": "running",
+    "resume_action": "continue",
+    "valid_actions": [
+      "pause",
+      "cancel",
+      "run-now",
+      "delete-history"
+    ],
+    "schedule": {
+      "every_ms": 43200000,
+      "jitter_ms": 0,
+      "kind": "every"
+    },
+    "schedule_summary": "every:43200000ms",
+    "schedule_revision": "2026-10-29T11:45:18.032439+00:00",
+    "enabled": true,
+    "task_kind": "scheduled_recurring",
+    "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+    "session_target": "isolated",
+    "recent_runs_limit": 5,
+    "recent_runs": [],
+    "last_run": null,
+    "daemon_required": true
+  },
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:45:21.857856+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tools run task.list --json '{"limit": 50}'
+{
+  "artifact_refs": [
+    {
+      "ref": "artifact://tool/tools/task.list",
+      "tool": "task.list",
+      "type": "tool_result"
+    }
+  ],
+  "ok": true,
+  "runtime_fallback_reason": "openminion daemon is not running",
+  "runtime_source": "inproc",
+  "tool": {
+    "content": "{\"count\": 1, \"limit\": 50, \"tasks\": [{\"agent_id\": \"openminion\", \"concurrency_key\": \"memory-consolidation:agent:openminion\", \"consolidation\": {\"batch_limit\": 8, \"max_iterations\": 2, \"target_scope\": \"agent:openminion\", \"timeout_seconds\": 30}, \"created_at\": \"2026-10-29T11:45:18.032439+00:00\", \"enabled\": true, \"id\": \"0aaf8a905a3b455ebdb16b050a0082a0\", \"last_run_at\": null, \"last_run_note\": \"No runs recorded yet. Scheduled runs execute only while the openminion daemon is running.\", \"last_run_state\": \"pending\", \"lifecycle_state\": \"active\", \"name\": \"memory consolidation\", \"next_due_at\": \"2026-10-29T23:45:18.032439+00:00\", \"pending_first_run\": true, \"retry_policy\": {\"max_attempts\": 3, \"retry_backoff_s\": 30}, \"schedule\": {\"every_ms\": 43200000, \"jitter_ms\": 0, \"kind\": \"every\", \"summary\": \"every:43200000ms\"}, \"status\": \"ACTIVE\", \"task_id\": \"0aaf8a905a3b455ebdb16b050a0082a0\", \"task_kind\": \"scheduled_recurring\", \"valid_actions\": [\"pause\", \"cancel\", \"run-now\", \"delete-history\"], \"watch\": null}]}",
+    "data": {
+      "count": 1,
+      "limit": 50,
+      "model_tool_name": "task.list",
+      "runtime_binding_id": "runtime.task.list",
+      "runtime_fallback_chain": [
+        "task.list"
+      ],
+      "runtime_fallback_used": false,
+      "runtime_resolution_source": "runtime_direct",
+      "runtime_tool_name": "task.list",
+      "tasks": [
+        {
+          "agent_id": "openminion",
+          "concurrency_key": "memory-consolidation:agent:openminion",
+          "consolidation": {
+            "batch_limit": 8,
+            "max_iterations": 2,
+            "target_scope": "agent:openminion",
+            "timeout_seconds": 30
+          },
+          "created_at": "2026-10-29T11:45:18.032439+00:00",
+          "enabled": true,
+          "id": "0aaf8a905a3b455ebdb16b050a0082a0",
+          "last_run_at": null,
+          "last_run_note": "No runs recorded yet. Scheduled runs execute only while the openminion daemon is running.",
+          "last_run_state": "pending",
+          "lifecycle_state": "active",
+          "name": "memory consolidation",
+          "next_due_at": "2026-10-29T23:45:18.032439+00:00",
+          "pending_first_run": true,
+          "retry_policy": {
+            "max_attempts": 3,
+            "retry_backoff_s": 30
+          },
+          "schedule": {
+            "every_ms": 43200000,
+            "jitter_ms": 0,
+            "kind": "every",
+            "summary": "every:43200000ms"
+          },
+          "status": "ACTIVE",
+          "task_id": "0aaf8a905a3b455ebdb16b050a0082a0",
+          "task_kind": "scheduled_recurring",
+          "valid_actions": [
+            "pause",
+            "cancel",
+            "run-now",
+            "delete-history"
+          ],
+          "watch": null
+        }
+      ],
+      "tool_blast_radius": "read_only",
+      "tool_min_scope": "READ_ONLY"
+    },
+    "error": "",
+    "name": "task.list",
+    "ok": true,
+    "verified": true
+  }
+}
+[exit 0]
+
+# A. stop the old job (pause), then create the replacement with the daemon running
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks pause 0aaf8a905a3b455ebdb16b050a0082a0 --json
+{
+  "ok": true,
+  "action": "pause",
+  "error": "",
+  "task_id": "0aaf8a905a3b455ebdb16b050a0082a0",
+  "paused": true,
+  "enabled": false,
+  "schedule": {
+    "every_ms": 43200000,
+    "jitter_ms": 0,
+    "kind": "every"
+  },
+  "next_due_at": null,
+  "last_run_state": null,
+  "model_tool_name": "task.pause",
+  "runtime_binding_id": "runtime.task.pause",
+  "runtime_tool_name": "task.pause",
+  "runtime_fallback_chain": [
+    "task.pause"
+  ],
+  "runtime_fallback_used": false,
+  "runtime_resolution_source": "runtime_direct",
+  "tool_blast_radius": "local_mutation",
+  "tool_min_scope": "WRITE_SAFE",
+  "task": {
+    "id": "0aaf8a905a3b455ebdb16b050a0082a0",
+    "title": "memory consolidation",
+    "status": "WAITING",
+    "lifecycle_state": "paused",
+    "due_at": null,
+    "steps": [],
+    "pending_actions": [],
+    "agent_id": "openminion",
+    "cron_job_id": "0aaf8a905a3b455ebdb16b050a0082a0",
+    "created_at": "2026-10-29T11:45:18.032691+00:00",
+    "updated_at": "2026-10-29T11:45:32.906618+00:00",
+    "operator_state": "waiting",
+    "resume_action": "continue",
+    "valid_actions": [
+      "resume",
+      "cancel",
+      "delete-history"
+    ],
+    "schedule": {
+      "every_ms": 43200000,
+      "jitter_ms": 0,
+      "kind": "every"
+    },
+    "schedule_summary": "every:43200000ms",
+    "schedule_revision": "2026-10-29T11:45:32.907321+00:00",
+    "enabled": false,
+    "task_kind": "scheduled_recurring",
+    "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+    "session_target": "isolated",
+    "recent_runs_limit": 5,
+    "recent_runs": [],
+    "last_run": null,
+    "daemon_required": true
+  },
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:45:21.857856+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check daemon start
+Started daemon pid=50687 (127.0.0.1:18789)
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tools run task.consolidate_memory --json '{"interval_hours": 12, "batch_limit": 8}'
+{
+  "artifact_refs": [
+    {
+      "ref": "artifact://tool/tools/7f40c85940884dc592e2f119f84e7927/task.consolidate_memory/7f40c85940884dc592e2f119f84e7927",
+      "tool": "task.consolidate_memory",
+      "type": "tool_result"
+    }
+  ],
+  "meta": {
+    "method": "POST",
+    "path": "/v1/tools/task.consolidate_memory/run",
+    "request_id": "7f40c85940884dc592e2f119f84e7927",
+    "run_id": "7f40c85940884dc592e2f119f84e7927",
+    "session_id": "tools"
+  },
+  "ok": true,
+  "runtime_source": "daemon",
+  "tool": {
+    "call_id": "7f40c85940884dc592e2f119f84e7927",
+    "content": "{\"batch_limit\": 8, \"consolidation_session_id\": \"consolidate:493f97880249404aaa36d3daba262774\", \"enabled\": true, \"name\": \"memory consolidation\", \"next_due_at\": \"2026-10-29T23:45:42.304125+00:00\", \"schedule\": {\"every_ms\": 43200000, \"jitter_ms\": 0, \"kind\": \"every\"}, \"scheduler_note\": \"Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start\", \"target_scope\": \"agent:openminion\", \"task_id\": \"493f97880249404aaa36d3daba262774\"}",
+    "data": {
+      "batch_limit": 8,
+      "consolidation_session_id": "consolidate:493f97880249404aaa36d3daba262774",
+      "enabled": true,
+      "model_tool_name": "task.consolidate_memory",
+      "name": "memory consolidation",
+      "next_due_at": "2026-10-29T23:45:42.304125+00:00",
+      "runtime_binding_id": "runtime.task.consolidate_memory",
+      "runtime_fallback_chain": [
+        "task.consolidate_memory"
+      ],
+      "runtime_fallback_used": false,
+      "runtime_resolution_source": "runtime_direct",
+      "runtime_tool_name": "task.consolidate_memory",
+      "schedule": {
+        "every_ms": 43200000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "scheduler_note": "Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start",
+      "target_scope": "agent:openminion",
+      "task_id": "493f97880249404aaa36d3daba262774",
+      "tool_blast_radius": "local_mutation",
+      "tool_min_scope": "WRITE_SAFE"
+    },
+    "error": "",
+    "name": "task.consolidate_memory",
+    "ok": true,
+    "source": "daemon_api",
+    "verified": true
+  },
+  "trace_id": "7f40c85940884dc592e2f119f84e7927"
+}
+[exit 0]
+[replacement in A: 493f97880249404aaa36d3daba262774]
+[evidence] .openminion/task/task.db scheduled_tasks 493f97880249404aaa36d3daba262774: state=active, metadata.kind='memory_consolidation'
+
+# A. check: only the replacement is enabled
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks list --json
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "493f97880249404aaa36d3daba262774",
+      "title": "memory consolidation",
+      "status": "ACTIVE",
+      "lifecycle_state": "active",
+      "due_at": "2026-10-29T23:45:42.304125+00:00",
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "493f97880249404aaa36d3daba262774",
+      "created_at": "2026-10-29T11:45:42.304340+00:00",
+      "updated_at": "2026-10-29T11:45:42.304340+00:00",
+      "operator_state": "running",
+      "resume_action": "continue",
+      "valid_actions": [
+        "pause",
+        "cancel",
+        "run-now",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 43200000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:43200000ms",
+      "schedule_revision": "2026-10-29T11:45:42.304125+00:00",
+      "enabled": true,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    },
+    {
+      "id": "0aaf8a905a3b455ebdb16b050a0082a0",
+      "title": "memory consolidation",
+      "status": "WAITING",
+      "lifecycle_state": "paused",
+      "due_at": null,
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "0aaf8a905a3b455ebdb16b050a0082a0",
+      "created_at": "2026-10-29T11:45:18.032691+00:00",
+      "updated_at": "2026-10-29T11:45:32.906618+00:00",
+      "operator_state": "waiting",
+      "resume_action": "continue",
+      "valid_actions": [
+        "resume",
+        "cancel",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 43200000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:43200000ms",
+      "schedule_revision": "2026-10-29T11:45:32.907321+00:00",
+      "enabled": false,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    }
+  ],
+  "pending_actions": [],
+  "count": 2,
+  "source": "task_manager",
+  "scheduler": {
+    "state": "ready",
+    "hosted_by": "daemon",
+    "reason": null,
+    "last_heartbeat_at": "2026-10-29T11:45:45.819180+00:00",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:45:21.857856+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+[summary] consolidation tasks:
+[summary]   493f97880249404aaa36d3daba262774  agent_id=openminion  lifecycle_state=active  enabled=True  last_run=None  valid_actions=['pause', 'cancel', 'run-now', 'delete-history']
+[summary]   0aaf8a905a3b455ebdb16b050a0082a0  agent_id=openminion  lifecycle_state=paused  enabled=False  last_run=None  valid_actions=['resume', 'cancel', 'delete-history']
+[summary] enabled consolidation tasks: ['493f97880249404aaa36d3daba262774']
+
+# A. the replacement's scheduled run under the daemon is a consolidation run
+[setup] .openminion/state/brain/sessions.db: cron_jobs.next_due_at of 493f97880249404aaa36d3daba262774: 2026-10-29T23:45:42.304125+00:00 -> 2026-10-29T11:45:46.965421+00:00
+[wait] new run bf145ddf94ba42ebba0122d1d791161a: finished
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks show 493f97880249404aaa36d3daba262774 --json
+{
+  "ok": true,
+  "task": {
+    "id": "493f97880249404aaa36d3daba262774",
+    "title": "memory consolidation",
+    "status": "ACTIVE",
+    "lifecycle_state": "active",
+    "due_at": "2026-10-29T23:45:46.965421+00:00",
+    "steps": [],
+    "pending_actions": [],
+    "agent_id": "openminion",
+    "cron_job_id": "493f97880249404aaa36d3daba262774",
+    "created_at": "2026-10-29T11:45:42.304340+00:00",
+    "updated_at": "2026-10-29T11:45:47.571047+00:00",
+    "operator_state": "running",
+    "resume_action": "continue",
+    "valid_actions": [
+      "pause",
+      "cancel",
+      "run-now",
+      "delete-history"
+    ],
+    "schedule": {
+      "every_ms": 43200000,
+      "jitter_ms": 0,
+      "kind": "every"
+    },
+    "schedule_summary": "every:43200000ms",
+    "schedule_revision": "2026-10-29T11:45:47.569900+00:00",
+    "enabled": true,
+    "task_kind": "scheduled_recurring",
+    "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+    "session_target": "isolated",
+    "recent_runs_limit": 5,
+    "recent_runs": [
+      {
+        "run_id": "bf145ddf94ba42ebba0122d1d791161a",
+        "state": "finished",
+        "due_at": "2026-10-29T11:45:46.965421+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:45:47.323291+00:00",
+        "finished_at": "2026-10-29T11:45:47.569900+00:00",
+        "summary": "openminion: Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer. (thinking=minimal)",
+        "attempts": 1,
+        "error": null,
+        "isolated_session_id": "consolidate:493f97880249404aaa36d3daba262774",
+        "delivery": {
+          "mode": "none",
+          "state": "not_requested",
+          "targets": []
+        },
+        "delivery_targets": []
+      }
+    ],
+    "last_run": {
+      "run_id": "bf145ddf94ba42ebba0122d1d791161a",
+      "state": "finished",
+      "due_at": "2026-10-29T11:45:46.965421+00:00",
+      "available_at": null,
+      "started_at": "2026-10-29T11:45:47.323291+00:00",
+      "finished_at": "2026-10-29T11:45:47.569900+00:00",
+      "summary": "openminion: Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer. (thinking=minimal)",
+      "attempts": 1,
+      "error": null,
+      "isolated_session_id": "consolidate:493f97880249404aaa36d3daba262774",
+      "delivery": {
+        "mode": "none",
+        "state": "not_requested",
+        "targets": []
+      },
+      "delivery_targets": [],
+      "last_error": null
+    },
+    "daemon_required": true
+  },
+  "scheduler": {
+    "state": "ready",
+    "hosted_by": "daemon",
+    "reason": null,
+    "last_heartbeat_at": "2026-10-29T11:45:53.849324+00:00",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:45:21.857856+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check daemon stop
+Stopped daemon pid=50687
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks list --json
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "493f97880249404aaa36d3daba262774",
+      "title": "memory consolidation",
+      "status": "ACTIVE",
+      "lifecycle_state": "active",
+      "due_at": "2026-10-29T23:45:46.965421+00:00",
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "493f97880249404aaa36d3daba262774",
+      "created_at": "2026-10-29T11:45:42.304340+00:00",
+      "updated_at": "2026-10-29T11:45:47.571047+00:00",
+      "operator_state": "running",
+      "resume_action": "continue",
+      "valid_actions": [
+        "pause",
+        "cancel",
+        "run-now",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 43200000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:43200000ms",
+      "schedule_revision": "2026-10-29T11:45:47.569900+00:00",
+      "enabled": true,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [
+        {
+          "run_id": "bf145ddf94ba42ebba0122d1d791161a",
+          "state": "finished",
+          "due_at": "2026-10-29T11:45:46.965421+00:00",
+          "available_at": null,
+          "started_at": "2026-10-29T11:45:47.323291+00:00",
+          "finished_at": "2026-10-29T11:45:47.569900+00:00",
+          "summary": "openminion: Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer. (thinking=minimal)",
+          "attempts": 1,
+          "error": null,
+          "isolated_session_id": "consolidate:493f97880249404aaa36d3daba262774",
+          "delivery": {
+            "mode": "none",
+            "state": "not_requested",
+            "targets": []
+          },
+          "delivery_targets": []
+        }
+      ],
+      "last_run": {
+        "run_id": "bf145ddf94ba42ebba0122d1d791161a",
+        "state": "finished",
+        "due_at": "2026-10-29T11:45:46.965421+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:45:47.323291+00:00",
+        "finished_at": "2026-10-29T11:45:47.569900+00:00",
+        "summary": "openminion: Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer. (thinking=minimal)",
+        "attempts": 1,
+        "error": null,
+        "isolated_session_id": "consolidate:493f97880249404aaa36d3daba262774",
+        "delivery": {
+          "mode": "none",
+          "state": "not_requested",
+          "targets": []
+        },
+        "delivery_targets": [],
+        "last_error": null
+      },
+      "daemon_required": true
+    },
+    {
+      "id": "0aaf8a905a3b455ebdb16b050a0082a0",
+      "title": "memory consolidation",
+      "status": "WAITING",
+      "lifecycle_state": "paused",
+      "due_at": null,
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "0aaf8a905a3b455ebdb16b050a0082a0",
+      "created_at": "2026-10-29T11:45:18.032691+00:00",
+      "updated_at": "2026-10-29T11:45:32.906618+00:00",
+      "operator_state": "waiting",
+      "resume_action": "continue",
+      "valid_actions": [
+        "resume",
+        "cancel",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 43200000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:43200000ms",
+      "schedule_revision": "2026-10-29T11:45:32.907321+00:00",
+      "enabled": false,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    }
+  ],
+  "pending_actions": [],
+  "count": 2,
+  "source": "task_manager",
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:45:21.857856+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+[summary] consolidation tasks:
+[summary]   493f97880249404aaa36d3daba262774  agent_id=openminion  lifecycle_state=active  enabled=True  last_run=finished  valid_actions=['pause', 'cancel', 'run-now', 'delete-history']
+[summary]   0aaf8a905a3b455ebdb16b050a0082a0  agent_id=openminion  lifecycle_state=paused  enabled=False  last_run=None  valid_actions=['resume', 'cancel', 'delete-history']
+[summary] enabled consolidation tasks: ['493f97880249404aaa36d3daba262774']
+
+# B: a pre-upgrade job that the daemon runs on this package
+[setup] homeB/agents.json: echo agent 'openminion' (default agent), daemon_auto_start false
+
+$ openminion(0.1.14) --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tools run task.consolidate_memory --json '{"interval_hours": 6, "batch_limit": 5}'
+{
+  "artifact_refs": [
+    {
+      "ref": "artifact://tool/tools/task.consolidate_memory",
+      "tool": "task.consolidate_memory",
+      "type": "tool_result"
+    }
+  ],
+  "ok": true,
+  "runtime_fallback_reason": "openminion daemon is not running",
+  "runtime_source": "inproc",
+  "tool": {
+    "content": "{\"batch_limit\": 5, \"consolidation_session_id\": \"consolidate:1f3e51d303b9429cbe8b9f3ac1fdfb0d\", \"enabled\": true, \"name\": \"memory consolidation\", \"next_due_at\": \"2026-10-29T17:46:05.227270+00:00\", \"schedule\": {\"every_ms\": 21600000, \"jitter_ms\": 0, \"kind\": \"every\"}, \"scheduler_note\": \"Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start\", \"target_scope\": \"agent:openminion\", \"task_id\": \"1f3e51d303b9429cbe8b9f3ac1fdfb0d\"}",
+    "data": {
+      "batch_limit": 5,
+      "consolidation_session_id": "consolidate:1f3e51d303b9429cbe8b9f3ac1fdfb0d",
+      "enabled": true,
+      "model_tool_name": "task.consolidate_memory",
+      "name": "memory consolidation",
+      "next_due_at": "2026-10-29T17:46:05.227270+00:00",
+      "runtime_binding_id": "runtime.task.consolidate_memory",
+      "runtime_fallback_chain": [
+        "task.consolidate_memory"
+      ],
+      "runtime_fallback_used": false,
+      "runtime_resolution_source": "runtime_direct",
+      "runtime_tool_name": "task.consolidate_memory",
+      "schedule": {
+        "every_ms": 21600000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "scheduler_note": "Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start",
+      "target_scope": "agent:openminion",
+      "task_id": "1f3e51d303b9429cbe8b9f3ac1fdfb0d",
+      "tool_blast_radius": "local_mutation",
+      "tool_min_scope": "WRITE_SAFE"
+    },
+    "error": "",
+    "name": "task.consolidate_memory",
+    "ok": true,
+    "verified": true
+  }
+}
+[exit 0]
+[setup] pre-upgrade task in B: 1f3e51d303b9429cbe8b9f3ac1fdfb0d
+[setup] .openminion/state/brain/sessions.db: cron_jobs.next_due_at of 1f3e51d303b9429cbe8b9f3ac1fdfb0d: 2026-10-29T17:46:05.227270+00:00 -> 2026-10-29T11:46:06.112390+00:00
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check daemon start
+Started daemon pid=50935 (127.0.0.1:18789)
+[exit 0]
+[wait] new run 5f5d4d17f97b4ceab665da65520c1bb9: failed
+
+# B. inspect the paused job
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks list --json
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "1f3e51d303b9429cbe8b9f3ac1fdfb0d",
+      "title": "memory consolidation",
+      "status": "WAITING",
+      "lifecycle_state": "paused",
+      "due_at": null,
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "1f3e51d303b9429cbe8b9f3ac1fdfb0d",
+      "created_at": "2026-10-29T11:46:05.227493+00:00",
+      "updated_at": "2026-10-29T11:46:11.983484+00:00",
+      "operator_state": "waiting",
+      "resume_action": "continue",
+      "valid_actions": [
+        "resume",
+        "cancel",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 21600000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:21600000ms",
+      "schedule_revision": "2026-10-29T11:46:11.982882+00:00",
+      "enabled": false,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [
+        {
+          "run_id": "5f5d4d17f97b4ceab665da65520c1bb9",
+          "state": "failed",
+          "due_at": "2026-10-29T11:46:06.112390+00:00",
+          "available_at": null,
+          "started_at": "2026-10-29T11:46:11.978587+00:00",
+          "finished_at": "2026-10-29T11:46:11.982882+00:00",
+          "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+          "attempts": 1,
+          "error": {
+            "code": "cron_failed",
+            "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+          },
+          "isolated_session_id": "cron:1f3e51d303b9429cbe8b9f3ac1fdfb0d:5f5d4d17f97b4ceab665da65520c1bb9",
+          "delivery": null,
+          "delivery_targets": []
+        }
+      ],
+      "last_run": {
+        "run_id": "5f5d4d17f97b4ceab665da65520c1bb9",
+        "state": "failed",
+        "due_at": "2026-10-29T11:46:06.112390+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:46:11.978587+00:00",
+        "finished_at": "2026-10-29T11:46:11.982882+00:00",
+        "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+        "attempts": 1,
+        "error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        },
+        "isolated_session_id": "cron:1f3e51d303b9429cbe8b9f3ac1fdfb0d:5f5d4d17f97b4ceab665da65520c1bb9",
+        "delivery": null,
+        "delivery_targets": [],
+        "last_error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        }
+      },
+      "daemon_required": true
+    }
+  ],
+  "pending_actions": [],
+  "count": 1,
+  "source": "task_manager",
+  "scheduler": {
+    "state": "ready",
+    "hosted_by": "daemon",
+    "reason": null,
+    "last_heartbeat_at": "2026-10-29T11:46:23.011171+00:00",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:46:11.977235+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+[summary] consolidation tasks:
+[summary]   1f3e51d303b9429cbe8b9f3ac1fdfb0d  agent_id=openminion  lifecycle_state=paused  enabled=False  last_run=failed  valid_actions=['resume', 'cancel', 'delete-history']
+[summary] enabled consolidation tasks: []
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks show 1f3e51d303b9429cbe8b9f3ac1fdfb0d --json
+{
+  "ok": true,
+  "task": {
+    "id": "1f3e51d303b9429cbe8b9f3ac1fdfb0d",
+    "title": "memory consolidation",
+    "status": "WAITING",
+    "lifecycle_state": "paused",
+    "due_at": null,
+    "steps": [],
+    "pending_actions": [],
+    "agent_id": "openminion",
+    "cron_job_id": "1f3e51d303b9429cbe8b9f3ac1fdfb0d",
+    "created_at": "2026-10-29T11:46:05.227493+00:00",
+    "updated_at": "2026-10-29T11:46:11.983484+00:00",
+    "operator_state": "waiting",
+    "resume_action": "continue",
+    "valid_actions": [
+      "resume",
+      "cancel",
+      "delete-history"
+    ],
+    "schedule": {
+      "every_ms": 21600000,
+      "jitter_ms": 0,
+      "kind": "every"
+    },
+    "schedule_summary": "every:21600000ms",
+    "schedule_revision": "2026-10-29T11:46:11.982882+00:00",
+    "enabled": false,
+    "task_kind": "scheduled_recurring",
+    "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+    "session_target": "isolated",
+    "recent_runs_limit": 5,
+    "recent_runs": [
+      {
+        "run_id": "5f5d4d17f97b4ceab665da65520c1bb9",
+        "state": "failed",
+        "due_at": "2026-10-29T11:46:06.112390+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:46:11.978587+00:00",
+        "finished_at": "2026-10-29T11:46:11.982882+00:00",
+        "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+        "attempts": 1,
+        "error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        },
+        "isolated_session_id": "cron:1f3e51d303b9429cbe8b9f3ac1fdfb0d:5f5d4d17f97b4ceab665da65520c1bb9",
+        "delivery": null,
+        "delivery_targets": []
+      }
+    ],
+    "last_run": {
+      "run_id": "5f5d4d17f97b4ceab665da65520c1bb9",
+      "state": "failed",
+      "due_at": "2026-10-29T11:46:06.112390+00:00",
+      "available_at": null,
+      "started_at": "2026-10-29T11:46:11.978587+00:00",
+      "finished_at": "2026-10-29T11:46:11.982882+00:00",
+      "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+      "attempts": 1,
+      "error": {
+        "code": "cron_failed",
+        "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+      },
+      "isolated_session_id": "cron:1f3e51d303b9429cbe8b9f3ac1fdfb0d:5f5d4d17f97b4ceab665da65520c1bb9",
+      "delivery": null,
+      "delivery_targets": [],
+      "last_error": {
+        "code": "cron_failed",
+        "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+      }
+    },
+    "daemon_required": true
+  },
+  "scheduler": {
+    "state": "ready",
+    "hosted_by": "daemon",
+    "reason": null,
+    "last_heartbeat_at": "2026-10-29T11:46:27.027336+00:00",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:46:11.977235+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tools run task.list --json '{"limit": 50}'
+{
+  "artifact_refs": [
+    {
+      "ref": "artifact://tool/tools/537ea50f20494743aab0ff7e08907d87/task.list/537ea50f20494743aab0ff7e08907d87",
+      "tool": "task.list",
+      "type": "tool_result"
+    }
+  ],
+  "meta": {
+    "method": "POST",
+    "path": "/v1/tools/task.list/run",
+    "request_id": "537ea50f20494743aab0ff7e08907d87",
+    "run_id": "537ea50f20494743aab0ff7e08907d87",
+    "session_id": "tools"
+  },
+  "ok": true,
+  "runtime_source": "daemon",
+  "tool": {
+    "call_id": "537ea50f20494743aab0ff7e08907d87",
+    "content": "{\"count\": 1, \"limit\": 50, \"tasks\": [{\"agent_id\": \"openminion\", \"concurrency_key\": \"memory-consolidation:agent:openminion\", \"consolidation\": {\"batch_limit\": 5, \"max_iterations\": 2, \"target_scope\": \"agent:openminion\", \"timeout_seconds\": 30}, \"created_at\": \"2026-10-29T11:46:05.227270+00:00\", \"enabled\": false, \"id\": \"1f3e51d303b9429cbe8b9f3ac1fdfb0d\", \"last_run_at\": \"2026-10-29T11:46:11.982882+00:00\", \"last_run_note\": null, \"last_run_state\": \"failed\", \"lifecycle_state\": \"paused\", \"name\": \"memory consolidation\", \"next_due_at\": null, \"pending_first_run\": false, \"retry_policy\": {\"max_attempts\": 3, \"retry_backoff_s\": 30}, \"schedule\": {\"every_ms\": 21600000, \"jitter_ms\": 0, \"kind\": \"every\", \"summary\": \"every:21600000ms\"}, \"status\": \"WAITING\", \"task_id\": \"1f3e51d303b9429cbe8b9f3ac1fdfb0d\", \"task_kind\": \"scheduled_recurring\", \"valid_actions\": [\"resume\", \"cancel\", \"delete-history\"], \"watch\": null}]}",
+    "data": {
+      "count": 1,
+      "limit": 50,
+      "model_tool_name": "task.list",
+      "runtime_binding_id": "runtime.task.list",
+      "runtime_fallback_chain": [
+        "task.list"
+      ],
+      "runtime_fallback_used": false,
+      "runtime_resolution_source": "runtime_direct",
+      "runtime_tool_name": "task.list",
+      "tasks": [
+        {
+          "agent_id": "openminion",
+          "concurrency_key": "memory-consolidation:agent:openminion",
+          "consolidation": {
+            "batch_limit": 5,
+            "max_iterations": 2,
+            "target_scope": "agent:openminion",
+            "timeout_seconds": 30
+          },
+          "created_at": "2026-10-29T11:46:05.227270+00:00",
+          "enabled": false,
+          "id": "1f3e51d303b9429cbe8b9f3ac1fdfb0d",
+          "last_run_at": "2026-10-29T11:46:11.982882+00:00",
+          "last_run_note": null,
+          "last_run_state": "failed",
+          "lifecycle_state": "paused",
+          "name": "memory consolidation",
+          "next_due_at": null,
+          "pending_first_run": false,
+          "retry_policy": {
+            "max_attempts": 3,
+            "retry_backoff_s": 30
+          },
+          "schedule": {
+            "every_ms": 21600000,
+            "jitter_ms": 0,
+            "kind": "every",
+            "summary": "every:21600000ms"
+          },
+          "status": "WAITING",
+          "task_id": "1f3e51d303b9429cbe8b9f3ac1fdfb0d",
+          "task_kind": "scheduled_recurring",
+          "valid_actions": [
+            "resume",
+            "cancel",
+            "delete-history"
+          ],
+          "watch": null
+        }
+      ],
+      "tool_blast_radius": "read_only",
+      "tool_min_scope": "READ_ONLY"
+    },
+    "error": "",
+    "name": "task.list",
+    "ok": true,
+    "source": "daemon_api",
+    "verified": true
+  },
+  "trace_id": "537ea50f20494743aab0ff7e08907d87"
+}
+[exit 0]
+
+# B. resuming it does not help: its next run fails and pauses it again
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks resume 1f3e51d303b9429cbe8b9f3ac1fdfb0d --json
+{
+  "ok": true,
+  "action": "resume",
+  "error": "",
+  "task_id": "1f3e51d303b9429cbe8b9f3ac1fdfb0d",
+  "resumed": true,
+  "enabled": true,
+  "schedule": {
+    "every_ms": 21600000,
+    "jitter_ms": 0,
+    "kind": "every"
+  },
+  "next_due_at": "2026-10-29T17:46:34.420974+00:00",
+  "model_tool_name": "task.resume",
+  "runtime_binding_id": "runtime.task.resume",
+  "runtime_tool_name": "task.resume",
+  "runtime_fallback_chain": [
+    "task.resume"
+  ],
+  "runtime_fallback_used": false,
+  "runtime_resolution_source": "runtime_direct",
+  "tool_blast_radius": "local_mutation",
+  "tool_min_scope": "WRITE_SAFE",
+  "task": {
+    "id": "1f3e51d303b9429cbe8b9f3ac1fdfb0d",
+    "title": "memory consolidation",
+    "status": "ACTIVE",
+    "lifecycle_state": "active",
+    "due_at": "2026-10-29T17:46:34.420974+00:00",
+    "steps": [],
+    "pending_actions": [],
+    "agent_id": "openminion",
+    "cron_job_id": "1f3e51d303b9429cbe8b9f3ac1fdfb0d",
+    "created_at": "2026-10-29T11:46:05.227493+00:00",
+    "updated_at": "2026-10-29T11:46:34.421139+00:00",
+    "operator_state": "running",
+    "resume_action": "continue",
+    "valid_actions": [
+      "pause",
+      "cancel",
+      "run-now",
+      "delete-history"
+    ],
+    "schedule": {
+      "every_ms": 21600000,
+      "jitter_ms": 0,
+      "kind": "every"
+    },
+    "schedule_summary": "every:21600000ms",
+    "schedule_revision": "2026-10-29T11:46:34.420974+00:00",
+    "enabled": true,
+    "task_kind": "scheduled_recurring",
+    "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+    "session_target": "isolated",
+    "recent_runs_limit": 5,
+    "recent_runs": [
+      {
+        "run_id": "5f5d4d17f97b4ceab665da65520c1bb9",
+        "state": "failed",
+        "due_at": "2026-10-29T11:46:06.112390+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:46:11.978587+00:00",
+        "finished_at": "2026-10-29T11:46:11.982882+00:00",
+        "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+        "attempts": 1,
+        "error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        },
+        "isolated_session_id": "cron:1f3e51d303b9429cbe8b9f3ac1fdfb0d:5f5d4d17f97b4ceab665da65520c1bb9",
+        "delivery": null,
+        "delivery_targets": []
+      }
+    ],
+    "last_run": {
+      "run_id": "5f5d4d17f97b4ceab665da65520c1bb9",
+      "state": "failed",
+      "due_at": "2026-10-29T11:46:06.112390+00:00",
+      "available_at": null,
+      "started_at": "2026-10-29T11:46:11.978587+00:00",
+      "finished_at": "2026-10-29T11:46:11.982882+00:00",
+      "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+      "attempts": 1,
+      "error": {
+        "code": "cron_failed",
+        "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+      },
+      "isolated_session_id": "cron:1f3e51d303b9429cbe8b9f3ac1fdfb0d:5f5d4d17f97b4ceab665da65520c1bb9",
+      "delivery": null,
+      "delivery_targets": [],
+      "last_error": {
+        "code": "cron_failed",
+        "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+      }
+    },
+    "daemon_required": true
+  },
+  "scheduler": {
+    "state": "ready",
+    "hosted_by": "daemon",
+    "reason": null,
+    "last_heartbeat_at": "2026-10-29T11:46:34.047042+00:00",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:46:11.977235+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+[setup] .openminion/state/brain/sessions.db: cron_jobs.next_due_at of 1f3e51d303b9429cbe8b9f3ac1fdfb0d: 2026-10-29T17:46:34.420974+00:00 -> 2026-10-29T11:46:35.515813+00:00
+[wait] new run c664d4e1cf9b496db87bfa5707eea152: failed
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check daemon stop
+Stopped daemon pid=50935
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks show 1f3e51d303b9429cbe8b9f3ac1fdfb0d --json
+{
+  "ok": true,
+  "task": {
+    "id": "1f3e51d303b9429cbe8b9f3ac1fdfb0d",
+    "title": "memory consolidation",
+    "status": "WAITING",
+    "lifecycle_state": "paused",
+    "due_at": null,
+    "steps": [],
+    "pending_actions": [],
+    "agent_id": "openminion",
+    "cron_job_id": "1f3e51d303b9429cbe8b9f3ac1fdfb0d",
+    "created_at": "2026-10-29T11:46:05.227493+00:00",
+    "updated_at": "2026-10-29T11:46:35.554849+00:00",
+    "operator_state": "waiting",
+    "resume_action": "continue",
+    "valid_actions": [
+      "resume",
+      "cancel",
+      "delete-history"
+    ],
+    "schedule": {
+      "every_ms": 21600000,
+      "jitter_ms": 0,
+      "kind": "every"
+    },
+    "schedule_summary": "every:21600000ms",
+    "schedule_revision": "2026-10-29T11:46:35.554367+00:00",
+    "enabled": false,
+    "task_kind": "scheduled_recurring",
+    "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+    "session_target": "isolated",
+    "recent_runs_limit": 5,
+    "recent_runs": [
+      {
+        "run_id": "c664d4e1cf9b496db87bfa5707eea152",
+        "state": "failed",
+        "due_at": "2026-10-29T11:46:35.515813+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:46:35.551626+00:00",
+        "finished_at": "2026-10-29T11:46:35.554367+00:00",
+        "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+        "attempts": 1,
+        "error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        },
+        "isolated_session_id": "cron:1f3e51d303b9429cbe8b9f3ac1fdfb0d:c664d4e1cf9b496db87bfa5707eea152",
+        "delivery": null,
+        "delivery_targets": []
+      },
+      {
+        "run_id": "5f5d4d17f97b4ceab665da65520c1bb9",
+        "state": "failed",
+        "due_at": "2026-10-29T11:46:06.112390+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:46:11.978587+00:00",
+        "finished_at": "2026-10-29T11:46:11.982882+00:00",
+        "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+        "attempts": 1,
+        "error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        },
+        "isolated_session_id": "cron:1f3e51d303b9429cbe8b9f3ac1fdfb0d:5f5d4d17f97b4ceab665da65520c1bb9",
+        "delivery": null,
+        "delivery_targets": []
+      }
+    ],
+    "last_run": {
+      "run_id": "c664d4e1cf9b496db87bfa5707eea152",
+      "state": "failed",
+      "due_at": "2026-10-29T11:46:35.515813+00:00",
+      "available_at": null,
+      "started_at": "2026-10-29T11:46:35.551626+00:00",
+      "finished_at": "2026-10-29T11:46:35.554367+00:00",
+      "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+      "attempts": 1,
+      "error": {
+        "code": "cron_failed",
+        "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+      },
+      "isolated_session_id": "cron:1f3e51d303b9429cbe8b9f3ac1fdfb0d:c664d4e1cf9b496db87bfa5707eea152",
+      "delivery": null,
+      "delivery_targets": [],
+      "last_error": {
+        "code": "cron_failed",
+        "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+      }
+    },
+    "daemon_required": true
+  },
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:46:11.977235+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+
+# B. stop the old job (cancel, on the paused job), then create the replacement
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks cancel 1f3e51d303b9429cbe8b9f3ac1fdfb0d --json
+{
+  "ok": true,
+  "action": "cancel",
+  "error": "",
+  "task_id": "1f3e51d303b9429cbe8b9f3ac1fdfb0d",
+  "cancelled": true,
+  "task_cancelled": true,
+  "model_tool_name": "task.cancel",
+  "runtime_binding_id": "runtime.task.cancel",
+  "runtime_tool_name": "task.cancel",
+  "runtime_fallback_chain": [
+    "task.cancel"
+  ],
+  "runtime_fallback_used": false,
+  "runtime_resolution_source": "runtime_direct",
+  "tool_blast_radius": "local_mutation",
+  "tool_min_scope": "WRITE_SAFE",
+  "task": {
+    "id": "1f3e51d303b9429cbe8b9f3ac1fdfb0d",
+    "title": "memory consolidation",
+    "status": "CANCELED",
+    "lifecycle_state": "cancelled",
+    "due_at": null,
+    "steps": [],
+    "pending_actions": [],
+    "agent_id": "openminion",
+    "cron_job_id": "1f3e51d303b9429cbe8b9f3ac1fdfb0d",
+    "created_at": "2026-10-29T11:46:05.227493+00:00",
+    "updated_at": "2026-10-29T11:46:50.646089+00:00",
+    "operator_state": "cancelled",
+    "resume_action": "none",
+    "valid_actions": [
+      "delete-history"
+    ],
+    "schedule": {
+      "every_ms": 21600000,
+      "jitter_ms": 0,
+      "kind": "every"
+    },
+    "schedule_summary": "every:21600000ms",
+    "schedule_revision": "2026-10-29T11:46:50.646903+00:00",
+    "enabled": false,
+    "task_kind": "scheduled_recurring",
+    "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+    "session_target": "isolated",
+    "recent_runs_limit": 5,
+    "recent_runs": [
+      {
+        "run_id": "c664d4e1cf9b496db87bfa5707eea152",
+        "state": "failed",
+        "due_at": "2026-10-29T11:46:35.515813+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:46:35.551626+00:00",
+        "finished_at": "2026-10-29T11:46:35.554367+00:00",
+        "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+        "attempts": 1,
+        "error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        },
+        "isolated_session_id": "cron:1f3e51d303b9429cbe8b9f3ac1fdfb0d:c664d4e1cf9b496db87bfa5707eea152",
+        "delivery": null,
+        "delivery_targets": []
+      },
+      {
+        "run_id": "5f5d4d17f97b4ceab665da65520c1bb9",
+        "state": "failed",
+        "due_at": "2026-10-29T11:46:06.112390+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:46:11.978587+00:00",
+        "finished_at": "2026-10-29T11:46:11.982882+00:00",
+        "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+        "attempts": 1,
+        "error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        },
+        "isolated_session_id": "cron:1f3e51d303b9429cbe8b9f3ac1fdfb0d:5f5d4d17f97b4ceab665da65520c1bb9",
+        "delivery": null,
+        "delivery_targets": []
+      }
+    ],
+    "last_run": {
+      "run_id": "c664d4e1cf9b496db87bfa5707eea152",
+      "state": "failed",
+      "due_at": "2026-10-29T11:46:35.515813+00:00",
+      "available_at": null,
+      "started_at": "2026-10-29T11:46:35.551626+00:00",
+      "finished_at": "2026-10-29T11:46:35.554367+00:00",
+      "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+      "attempts": 1,
+      "error": {
+        "code": "cron_failed",
+        "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+      },
+      "isolated_session_id": "cron:1f3e51d303b9429cbe8b9f3ac1fdfb0d:c664d4e1cf9b496db87bfa5707eea152",
+      "delivery": null,
+      "delivery_targets": [],
+      "last_error": {
+        "code": "cron_failed",
+        "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+      }
+    },
+    "daemon_required": true
+  },
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:46:11.977235+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tools run task.consolidate_memory --json '{"interval_hours": 6, "batch_limit": 5}'
+{
+  "artifact_refs": [
+    {
+      "ref": "artifact://tool/tools/task.consolidate_memory",
+      "tool": "task.consolidate_memory",
+      "type": "tool_result"
+    }
+  ],
+  "ok": true,
+  "runtime_fallback_reason": "openminion daemon is not running",
+  "runtime_source": "inproc",
+  "tool": {
+    "content": "{\"batch_limit\": 5, \"consolidation_session_id\": \"consolidate:ce08718d80844136a8415ca1508f32d4\", \"enabled\": true, \"name\": \"memory consolidation\", \"next_due_at\": \"2026-10-29T17:46:54.448195+00:00\", \"schedule\": {\"every_ms\": 21600000, \"jitter_ms\": 0, \"kind\": \"every\"}, \"scheduler_note\": \"Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start\", \"target_scope\": \"agent:openminion\", \"task_id\": \"ce08718d80844136a8415ca1508f32d4\"}",
+    "data": {
+      "batch_limit": 5,
+      "consolidation_session_id": "consolidate:ce08718d80844136a8415ca1508f32d4",
+      "enabled": true,
+      "model_tool_name": "task.consolidate_memory",
+      "name": "memory consolidation",
+      "next_due_at": "2026-10-29T17:46:54.448195+00:00",
+      "runtime_binding_id": "runtime.task.consolidate_memory",
+      "runtime_fallback_chain": [
+        "task.consolidate_memory"
+      ],
+      "runtime_fallback_used": false,
+      "runtime_resolution_source": "runtime_direct",
+      "runtime_tool_name": "task.consolidate_memory",
+      "schedule": {
+        "every_ms": 21600000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "scheduler_note": "Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start",
+      "target_scope": "agent:openminion",
+      "task_id": "ce08718d80844136a8415ca1508f32d4",
+      "tool_blast_radius": "local_mutation",
+      "tool_min_scope": "WRITE_SAFE"
+    },
+    "error": "",
+    "name": "task.consolidate_memory",
+    "ok": true,
+    "verified": true
+  }
+}
+[exit 0]
+[replacement in B: ce08718d80844136a8415ca1508f32d4]
+[evidence] .openminion/task/task.db scheduled_tasks ce08718d80844136a8415ca1508f32d4: state=active, metadata.kind='memory_consolidation'
+
+# B. check: only the replacement is enabled
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks list --json
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "ce08718d80844136a8415ca1508f32d4",
+      "title": "memory consolidation",
+      "status": "ACTIVE",
+      "lifecycle_state": "active",
+      "due_at": "2026-10-29T17:46:54.448195+00:00",
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "ce08718d80844136a8415ca1508f32d4",
+      "created_at": "2026-10-29T11:46:54.449133+00:00",
+      "updated_at": "2026-10-29T11:46:54.449133+00:00",
+      "operator_state": "running",
+      "resume_action": "continue",
+      "valid_actions": [
+        "pause",
+        "cancel",
+        "run-now",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 21600000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:21600000ms",
+      "schedule_revision": "2026-10-29T11:46:54.448195+00:00",
+      "enabled": true,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    },
+    {
+      "id": "1f3e51d303b9429cbe8b9f3ac1fdfb0d",
+      "title": "memory consolidation",
+      "status": "CANCELED",
+      "lifecycle_state": "cancelled",
+      "due_at": null,
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "1f3e51d303b9429cbe8b9f3ac1fdfb0d",
+      "created_at": "2026-10-29T11:46:05.227493+00:00",
+      "updated_at": "2026-10-29T11:46:50.646089+00:00",
+      "operator_state": "cancelled",
+      "resume_action": "none",
+      "valid_actions": [
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 21600000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:21600000ms",
+      "schedule_revision": "2026-10-29T11:46:50.646903+00:00",
+      "enabled": false,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [
+        {
+          "run_id": "c664d4e1cf9b496db87bfa5707eea152",
+          "state": "failed",
+          "due_at": "2026-10-29T11:46:35.515813+00:00",
+          "available_at": null,
+          "started_at": "2026-10-29T11:46:35.551626+00:00",
+          "finished_at": "2026-10-29T11:46:35.554367+00:00",
+          "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+          "attempts": 1,
+          "error": {
+            "code": "cron_failed",
+            "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+          },
+          "isolated_session_id": "cron:1f3e51d303b9429cbe8b9f3ac1fdfb0d:c664d4e1cf9b496db87bfa5707eea152",
+          "delivery": null,
+          "delivery_targets": []
+        },
+        {
+          "run_id": "5f5d4d17f97b4ceab665da65520c1bb9",
+          "state": "failed",
+          "due_at": "2026-10-29T11:46:06.112390+00:00",
+          "available_at": null,
+          "started_at": "2026-10-29T11:46:11.978587+00:00",
+          "finished_at": "2026-10-29T11:46:11.982882+00:00",
+          "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+          "attempts": 1,
+          "error": {
+            "code": "cron_failed",
+            "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+          },
+          "isolated_session_id": "cron:1f3e51d303b9429cbe8b9f3ac1fdfb0d:5f5d4d17f97b4ceab665da65520c1bb9",
+          "delivery": null,
+          "delivery_targets": []
+        }
+      ],
+      "last_run": {
+        "run_id": "c664d4e1cf9b496db87bfa5707eea152",
+        "state": "failed",
+        "due_at": "2026-10-29T11:46:35.515813+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:46:35.551626+00:00",
+        "finished_at": "2026-10-29T11:46:35.554367+00:00",
+        "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+        "attempts": 1,
+        "error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        },
+        "isolated_session_id": "cron:1f3e51d303b9429cbe8b9f3ac1fdfb0d:c664d4e1cf9b496db87bfa5707eea152",
+        "delivery": null,
+        "delivery_targets": [],
+        "last_error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        }
+      },
+      "daemon_required": true
+    }
+  ],
+  "pending_actions": [],
+  "count": 2,
+  "source": "task_manager",
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:46:11.977235+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+[summary] consolidation tasks:
+[summary]   ce08718d80844136a8415ca1508f32d4  agent_id=openminion  lifecycle_state=active  enabled=True  last_run=None  valid_actions=['pause', 'cancel', 'run-now', 'delete-history']
+[summary]   1f3e51d303b9429cbe8b9f3ac1fdfb0d  agent_id=openminion  lifecycle_state=cancelled  enabled=False  last_run=failed  valid_actions=['delete-history']
+[summary] enabled consolidation tasks: ['ce08718d80844136a8415ca1508f32d4']
+
+# B. raw cron API: a new job with the reserved payload is rejected
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check api run --host 127.0.0.1 --port 18766 &
+
+$ curl -sS -X POST http://127.0.0.1:18766/v1/cron/jobs -H 'Content-Type: application/json' -d '{"name": "raw consolidation", "agent_id": "openminion", "schedule": {"kind": "every", "every_ms": 43200000}, "payload": {"kind": "agentTurn", "message": "review memory candidates", "_openminion_memory_consolidation": {"target_scope": "agent:openminion"}}}'
+{"ok":false,"error":{"code":"invalid_request","message":"memory consolidation jobs must be created through task.consolidate_memory","details":{},"retryable":false,"retry_after_ms":null},"meta":{"request_id":"ff502581df89479e8bfcffd6ba3294fb","method":"POST","path":"/v1/cron/jobs"}}
+[http 400]
+
+$ curl -sS http://127.0.0.1:18766/v1/cron/jobs   (job ids and names only)
+{'ok': True, 'jobs': [('ce08718d80844136a8415ca1508f32d4', 'memory consolidation', True), ('system-cron-cleanup', 'system-cron-cleanup', True), ('1f3e51d303b9429cbe8b9f3ac1fdfb0d', 'memory consolidation', False)]}
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks list --json
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "ce08718d80844136a8415ca1508f32d4",
+      "title": "memory consolidation",
+      "status": "ACTIVE",
+      "lifecycle_state": "active",
+      "due_at": "2026-10-29T17:46:54.448195+00:00",
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "ce08718d80844136a8415ca1508f32d4",
+      "created_at": "2026-10-29T11:46:54.449133+00:00",
+      "updated_at": "2026-10-29T11:46:54.449133+00:00",
+      "operator_state": "running",
+      "resume_action": "continue",
+      "valid_actions": [
+        "pause",
+        "cancel",
+        "run-now",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 21600000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:21600000ms",
+      "schedule_revision": "2026-10-29T11:46:54.448195+00:00",
+      "enabled": true,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    },
+    {
+      "id": "1f3e51d303b9429cbe8b9f3ac1fdfb0d",
+      "title": "memory consolidation",
+      "status": "CANCELED",
+      "lifecycle_state": "cancelled",
+      "due_at": null,
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "1f3e51d303b9429cbe8b9f3ac1fdfb0d",
+      "created_at": "2026-10-29T11:46:05.227493+00:00",
+      "updated_at": "2026-10-29T11:46:50.646089+00:00",
+      "operator_state": "cancelled",
+      "resume_action": "none",
+      "valid_actions": [
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 21600000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:21600000ms",
+      "schedule_revision": "2026-10-29T11:46:50.646903+00:00",
+      "enabled": false,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [
+        {
+          "run_id": "c664d4e1cf9b496db87bfa5707eea152",
+          "state": "failed",
+          "due_at": "2026-10-29T11:46:35.515813+00:00",
+          "available_at": null,
+          "started_at": "2026-10-29T11:46:35.551626+00:00",
+          "finished_at": "2026-10-29T11:46:35.554367+00:00",
+          "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+          "attempts": 1,
+          "error": {
+            "code": "cron_failed",
+            "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+          },
+          "isolated_session_id": "cron:1f3e51d303b9429cbe8b9f3ac1fdfb0d:c664d4e1cf9b496db87bfa5707eea152",
+          "delivery": null,
+          "delivery_targets": []
+        },
+        {
+          "run_id": "5f5d4d17f97b4ceab665da65520c1bb9",
+          "state": "failed",
+          "due_at": "2026-10-29T11:46:06.112390+00:00",
+          "available_at": null,
+          "started_at": "2026-10-29T11:46:11.978587+00:00",
+          "finished_at": "2026-10-29T11:46:11.982882+00:00",
+          "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+          "attempts": 1,
+          "error": {
+            "code": "cron_failed",
+            "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+          },
+          "isolated_session_id": "cron:1f3e51d303b9429cbe8b9f3ac1fdfb0d:5f5d4d17f97b4ceab665da65520c1bb9",
+          "delivery": null,
+          "delivery_targets": []
+        }
+      ],
+      "last_run": {
+        "run_id": "c664d4e1cf9b496db87bfa5707eea152",
+        "state": "failed",
+        "due_at": "2026-10-29T11:46:35.515813+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:46:35.551626+00:00",
+        "finished_at": "2026-10-29T11:46:35.554367+00:00",
+        "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+        "attempts": 1,
+        "error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        },
+        "isolated_session_id": "cron:1f3e51d303b9429cbe8b9f3ac1fdfb0d:c664d4e1cf9b496db87bfa5707eea152",
+        "delivery": null,
+        "delivery_targets": [],
+        "last_error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        }
+      },
+      "daemon_required": true
+    }
+  ],
+  "pending_actions": [],
+  "count": 2,
+  "source": "task_manager",
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:46:11.977235+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+[summary] consolidation tasks:
+[summary]   ce08718d80844136a8415ca1508f32d4  agent_id=openminion  lifecycle_state=active  enabled=True  last_run=None  valid_actions=['pause', 'cancel', 'run-now', 'delete-history']
+[summary]   1f3e51d303b9429cbe8b9f3ac1fdfb0d  agent_id=openminion  lifecycle_state=cancelled  enabled=False  last_run=failed  valid_actions=['delete-history']
+[summary] enabled consolidation tasks: ['ce08718d80844136a8415ca1508f32d4']
+
+# C: the default agent is 'main'; a pre-upgrade job of 'main', replaced for 'main'
+[setup] homeC/agents.json: echo agent 'main' (default agent), daemon_auto_start false
+
+$ OPENMINION_AGENT_ID=main openminion(0.1.14) --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tools run task.consolidate_memory --json '{"interval_hours": 24, "batch_limit": 10}'
+{
+  "artifact_refs": [
+    {
+      "ref": "artifact://tool/tools/task.consolidate_memory",
+      "tool": "task.consolidate_memory",
+      "type": "tool_result"
+    }
+  ],
+  "ok": true,
+  "runtime_fallback_reason": "openminion daemon is not running",
+  "runtime_source": "inproc",
+  "tool": {
+    "content": "{\"batch_limit\": 10, \"consolidation_session_id\": \"consolidate:7ac559bca4fa43be9d5ee36311309c64\", \"enabled\": true, \"name\": \"memory consolidation\", \"next_due_at\": \"2026-10-30T11:48:36.098599+00:00\", \"schedule\": {\"every_ms\": 86400000, \"jitter_ms\": 0, \"kind\": \"every\"}, \"scheduler_note\": \"Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start\", \"target_scope\": \"agent:main\", \"task_id\": \"7ac559bca4fa43be9d5ee36311309c64\"}",
+    "data": {
+      "batch_limit": 10,
+      "consolidation_session_id": "consolidate:7ac559bca4fa43be9d5ee36311309c64",
+      "enabled": true,
+      "model_tool_name": "task.consolidate_memory",
+      "name": "memory consolidation",
+      "next_due_at": "2026-10-30T11:48:36.098599+00:00",
+      "runtime_binding_id": "runtime.task.consolidate_memory",
+      "runtime_fallback_chain": [
+        "task.consolidate_memory"
+      ],
+      "runtime_fallback_used": false,
+      "runtime_resolution_source": "runtime_direct",
+      "runtime_tool_name": "task.consolidate_memory",
+      "schedule": {
+        "every_ms": 86400000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "scheduler_note": "Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start",
+      "target_scope": "agent:main",
+      "task_id": "7ac559bca4fa43be9d5ee36311309c64",
+      "tool_blast_radius": "local_mutation",
+      "tool_min_scope": "WRITE_SAFE"
+    },
+    "error": "",
+    "name": "task.consolidate_memory",
+    "ok": true,
+    "verified": true
+  }
+}
+[exit 0]
+[setup] pre-upgrade task in C: 7ac559bca4fa43be9d5ee36311309c64
+[evidence] .openminion/task/task.db scheduled_tasks 7ac559bca4fa43be9d5ee36311309c64: state=active, metadata.kind=None
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks list --json
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "7ac559bca4fa43be9d5ee36311309c64",
+      "title": "memory consolidation",
+      "status": "ACTIVE",
+      "lifecycle_state": "active",
+      "due_at": "2026-10-30T11:48:36.098599+00:00",
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "main",
+      "cron_job_id": "7ac559bca4fa43be9d5ee36311309c64",
+      "created_at": "2026-10-29T11:48:36.098856+00:00",
+      "updated_at": "2026-10-29T11:48:36.098856+00:00",
+      "operator_state": "running",
+      "resume_action": "continue",
+      "valid_actions": [
+        "pause",
+        "cancel",
+        "run-now",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 86400000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:86400000ms",
+      "schedule_revision": "2026-10-29T11:48:36.098599+00:00",
+      "enabled": true,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    }
+  ],
+  "pending_actions": [],
+  "count": 1,
+  "source": "task_manager",
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:48:39.869412+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+[summary] consolidation tasks:
+[summary]   7ac559bca4fa43be9d5ee36311309c64  agent_id=main  lifecycle_state=active  enabled=True  last_run=None  valid_actions=['pause', 'cancel', 'run-now', 'delete-history']
+[summary] enabled consolidation tasks: ['7ac559bca4fa43be9d5ee36311309c64']
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks show 7ac559bca4fa43be9d5ee36311309c64 --json
+{
+  "ok": true,
+  "task": {
+    "id": "7ac559bca4fa43be9d5ee36311309c64",
+    "title": "memory consolidation",
+    "status": "ACTIVE",
+    "lifecycle_state": "active",
+    "due_at": "2026-10-30T11:48:36.098599+00:00",
+    "steps": [],
+    "pending_actions": [],
+    "agent_id": "main",
+    "cron_job_id": "7ac559bca4fa43be9d5ee36311309c64",
+    "created_at": "2026-10-29T11:48:36.098856+00:00",
+    "updated_at": "2026-10-29T11:48:36.098856+00:00",
+    "operator_state": "running",
+    "resume_action": "continue",
+    "valid_actions": [
+      "pause",
+      "cancel",
+      "run-now",
+      "delete-history"
+    ],
+    "schedule": {
+      "every_ms": 86400000,
+      "jitter_ms": 0,
+      "kind": "every"
+    },
+    "schedule_summary": "every:86400000ms",
+    "schedule_revision": "2026-10-29T11:48:36.098599+00:00",
+    "enabled": true,
+    "task_kind": "scheduled_recurring",
+    "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+    "session_target": "isolated",
+    "recent_runs_limit": 5,
+    "recent_runs": [],
+    "last_run": null,
+    "daemon_required": true
+  },
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:48:39.869412+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+
+$ OPENMINION_AGENT_ID=main openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tools run task.list --runtime-source inproc --json '{"limit": 50}'
+{
+  "artifact_refs": [
+    {
+      "ref": "artifact://tool/tools/task.list",
+      "tool": "task.list",
+      "type": "tool_result"
+    }
+  ],
+  "ok": true,
+  "runtime_source": "inproc",
+  "tool": {
+    "content": "{\"count\": 1, \"limit\": 50, \"tasks\": [{\"agent_id\": \"main\", \"concurrency_key\": \"memory-consolidation:agent:main\", \"consolidation\": {\"batch_limit\": 10, \"max_iterations\": 2, \"target_scope\": \"agent:main\", \"timeout_seconds\": 30}, \"created_at\": \"2026-10-29T11:48:36.098599+00:00\", \"enabled\": true, \"id\": \"7ac559bca4fa43be9d5ee36311309c64\", \"last_run_at\": null, \"last_run_note\": \"No runs recorded yet. Scheduled runs execute only while the openminion daemon is running.\", \"last_run_state\": \"pending\", \"lifecycle_state\": \"active\", \"name\": \"memory consolidation\", \"next_due_at\": \"2026-10-30T11:48:36.098599+00:00\", \"pending_first_run\": true, \"retry_policy\": {\"max_attempts\": 3, \"retry_backoff_s\": 30}, \"schedule\": {\"every_ms\": 86400000, \"jitter_ms\": 0, \"kind\": \"every\", \"summary\": \"every:86400000ms\"}, \"status\": \"ACTIVE\", \"task_id\": \"7ac559bca4fa43be9d5ee36311309c64\", \"task_kind\": \"scheduled_recurring\", \"valid_actions\": [\"pause\", \"cancel\", \"run-now\", \"delete-history\"], \"watch\": null}]}",
+    "data": {
+      "count": 1,
+      "limit": 50,
+      "model_tool_name": "task.list",
+      "runtime_binding_id": "runtime.task.list",
+      "runtime_fallback_chain": [
+        "task.list"
+      ],
+      "runtime_fallback_used": false,
+      "runtime_resolution_source": "runtime_direct",
+      "runtime_tool_name": "task.list",
+      "tasks": [
+        {
+          "agent_id": "main",
+          "concurrency_key": "memory-consolidation:agent:main",
+          "consolidation": {
+            "batch_limit": 10,
+            "max_iterations": 2,
+            "target_scope": "agent:main",
+            "timeout_seconds": 30
+          },
+          "created_at": "2026-10-29T11:48:36.098599+00:00",
+          "enabled": true,
+          "id": "7ac559bca4fa43be9d5ee36311309c64",
+          "last_run_at": null,
+          "last_run_note": "No runs recorded yet. Scheduled runs execute only while the openminion daemon is running.",
+          "last_run_state": "pending",
+          "lifecycle_state": "active",
+          "name": "memory consolidation",
+          "next_due_at": "2026-10-30T11:48:36.098599+00:00",
+          "pending_first_run": true,
+          "retry_policy": {
+            "max_attempts": 3,
+            "retry_backoff_s": 30
+          },
+          "schedule": {
+            "every_ms": 86400000,
+            "jitter_ms": 0,
+            "kind": "every",
+            "summary": "every:86400000ms"
+          },
+          "status": "ACTIVE",
+          "task_id": "7ac559bca4fa43be9d5ee36311309c64",
+          "task_kind": "scheduled_recurring",
+          "valid_actions": [
+            "pause",
+            "cancel",
+            "run-now",
+            "delete-history"
+          ],
+          "watch": null
+        }
+      ],
+      "tool_blast_radius": "read_only",
+      "tool_min_scope": "READ_ONLY"
+    },
+    "error": "",
+    "name": "task.list",
+    "ok": true,
+    "verified": true
+  }
+}
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tools run task.list --json '{"limit": 50}'
+{
+  "artifact_refs": [
+    {
+      "ref": "artifact://tool/tools/task.list",
+      "tool": "task.list",
+      "type": "tool_result"
+    }
+  ],
+  "ok": true,
+  "runtime_fallback_reason": "openminion daemon is not running",
+  "runtime_source": "inproc",
+  "tool": {
+    "content": "{\"count\": 0, \"limit\": 50, \"tasks\": []}",
+    "data": {
+      "count": 0,
+      "limit": 50,
+      "model_tool_name": "task.list",
+      "runtime_binding_id": "runtime.task.list",
+      "runtime_fallback_chain": [
+        "task.list"
+      ],
+      "runtime_fallback_used": false,
+      "runtime_resolution_source": "runtime_direct",
+      "runtime_tool_name": "task.list",
+      "tasks": [],
+      "tool_blast_radius": "read_only",
+      "tool_min_scope": "READ_ONLY"
+    },
+    "error": "",
+    "name": "task.list",
+    "ok": true,
+    "verified": true
+  }
+}
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks cancel 7ac559bca4fa43be9d5ee36311309c64 --json
+{
+  "ok": true,
+  "action": "cancel",
+  "error": "",
+  "task_id": "7ac559bca4fa43be9d5ee36311309c64",
+  "cancelled": true,
+  "task_cancelled": true,
+  "model_tool_name": "task.cancel",
+  "runtime_binding_id": "runtime.task.cancel",
+  "runtime_tool_name": "task.cancel",
+  "runtime_fallback_chain": [
+    "task.cancel"
+  ],
+  "runtime_fallback_used": false,
+  "runtime_resolution_source": "runtime_direct",
+  "tool_blast_radius": "local_mutation",
+  "tool_min_scope": "WRITE_SAFE",
+  "task": {
+    "id": "7ac559bca4fa43be9d5ee36311309c64",
+    "title": "memory consolidation",
+    "status": "CANCELED",
+    "lifecycle_state": "cancelled",
+    "due_at": null,
+    "steps": [],
+    "pending_actions": [],
+    "agent_id": "main",
+    "cron_job_id": "7ac559bca4fa43be9d5ee36311309c64",
+    "created_at": "2026-10-29T11:48:36.098856+00:00",
+    "updated_at": "2026-10-29T11:48:54.202047+00:00",
+    "operator_state": "cancelled",
+    "resume_action": "none",
+    "valid_actions": [
+      "delete-history"
+    ],
+    "schedule": {
+      "every_ms": 86400000,
+      "jitter_ms": 0,
+      "kind": "every"
+    },
+    "schedule_summary": "every:86400000ms",
+    "schedule_revision": "2026-10-29T11:48:54.202772+00:00",
+    "enabled": false,
+    "task_kind": "scheduled_recurring",
+    "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+    "session_target": "isolated",
+    "recent_runs_limit": 5,
+    "recent_runs": [],
+    "last_run": null,
+    "daemon_required": true
+  },
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:48:39.869412+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+
+# C. without OPENMINION_AGENT_ID the tool creates the job for 'openminion' (observation)
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tools run task.consolidate_memory --json '{"interval_hours": 24, "batch_limit": 10}'
+{
+  "artifact_refs": [
+    {
+      "ref": "artifact://tool/tools/task.consolidate_memory",
+      "tool": "task.consolidate_memory",
+      "type": "tool_result"
+    }
+  ],
+  "ok": true,
+  "runtime_fallback_reason": "openminion daemon is not running",
+  "runtime_source": "inproc",
+  "tool": {
+    "content": "{\"batch_limit\": 10, \"consolidation_session_id\": \"consolidate:c5ba655a68bb4947b18459fa1f1ba4f4\", \"enabled\": true, \"name\": \"memory consolidation\", \"next_due_at\": \"2026-10-30T11:48:57.856813+00:00\", \"schedule\": {\"every_ms\": 86400000, \"jitter_ms\": 0, \"kind\": \"every\"}, \"scheduler_note\": \"Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start\", \"target_scope\": \"agent:openminion\", \"task_id\": \"c5ba655a68bb4947b18459fa1f1ba4f4\"}",
+    "data": {
+      "batch_limit": 10,
+      "consolidation_session_id": "consolidate:c5ba655a68bb4947b18459fa1f1ba4f4",
+      "enabled": true,
+      "model_tool_name": "task.consolidate_memory",
+      "name": "memory consolidation",
+      "next_due_at": "2026-10-30T11:48:57.856813+00:00",
+      "runtime_binding_id": "runtime.task.consolidate_memory",
+      "runtime_fallback_chain": [
+        "task.consolidate_memory"
+      ],
+      "runtime_fallback_used": false,
+      "runtime_resolution_source": "runtime_direct",
+      "runtime_tool_name": "task.consolidate_memory",
+      "schedule": {
+        "every_ms": 86400000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "scheduler_note": "Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start",
+      "target_scope": "agent:openminion",
+      "task_id": "c5ba655a68bb4947b18459fa1f1ba4f4",
+      "tool_blast_radius": "local_mutation",
+      "tool_min_scope": "WRITE_SAFE"
+    },
+    "error": "",
+    "name": "task.consolidate_memory",
+    "ok": true,
+    "verified": true
+  }
+}
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks list --agent-id openminion --json
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "c5ba655a68bb4947b18459fa1f1ba4f4",
+      "title": "memory consolidation",
+      "status": "ACTIVE",
+      "lifecycle_state": "active",
+      "due_at": "2026-10-30T11:48:57.856813+00:00",
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "c5ba655a68bb4947b18459fa1f1ba4f4",
+      "created_at": "2026-10-29T11:48:57.857745+00:00",
+      "updated_at": "2026-10-29T11:48:57.857745+00:00",
+      "operator_state": "running",
+      "resume_action": "continue",
+      "valid_actions": [
+        "pause",
+        "cancel",
+        "run-now",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 86400000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:86400000ms",
+      "schedule_revision": "2026-10-29T11:48:57.856813+00:00",
+      "enabled": true,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    }
+  ],
+  "pending_actions": [],
+  "count": 1,
+  "source": "task_manager",
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:48:39.869412+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+[summary] consolidation tasks:
+[summary]   c5ba655a68bb4947b18459fa1f1ba4f4  agent_id=openminion  lifecycle_state=active  enabled=True  last_run=None  valid_actions=['pause', 'cancel', 'run-now', 'delete-history']
+[summary] enabled consolidation tasks: ['c5ba655a68bb4947b18459fa1f1ba4f4']
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks cancel c5ba655a68bb4947b18459fa1f1ba4f4 --agent-id openminion --json
+{
+  "ok": true,
+  "action": "cancel",
+  "error": "",
+  "task_id": "c5ba655a68bb4947b18459fa1f1ba4f4",
+  "cancelled": true,
+  "task_cancelled": true,
+  "model_tool_name": "task.cancel",
+  "runtime_binding_id": "runtime.task.cancel",
+  "runtime_tool_name": "task.cancel",
+  "runtime_fallback_chain": [
+    "task.cancel"
+  ],
+  "runtime_fallback_used": false,
+  "runtime_resolution_source": "runtime_direct",
+  "tool_blast_radius": "local_mutation",
+  "tool_min_scope": "WRITE_SAFE",
+  "task": {
+    "id": "c5ba655a68bb4947b18459fa1f1ba4f4",
+    "title": "memory consolidation",
+    "status": "CANCELED",
+    "lifecycle_state": "cancelled",
+    "due_at": null,
+    "steps": [],
+    "pending_actions": [],
+    "agent_id": "openminion",
+    "cron_job_id": "c5ba655a68bb4947b18459fa1f1ba4f4",
+    "created_at": "2026-10-29T11:48:57.857745+00:00",
+    "updated_at": "2026-10-29T11:49:05.342726+00:00",
+    "operator_state": "cancelled",
+    "resume_action": "none",
+    "valid_actions": [
+      "delete-history"
+    ],
+    "schedule": {
+      "every_ms": 86400000,
+      "jitter_ms": 0,
+      "kind": "every"
+    },
+    "schedule_summary": "every:86400000ms",
+    "schedule_revision": "2026-10-29T11:49:05.343492+00:00",
+    "enabled": false,
+    "task_kind": "scheduled_recurring",
+    "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+    "session_target": "isolated",
+    "recent_runs_limit": 5,
+    "recent_runs": [],
+    "last_run": null,
+    "daemon_required": true
+  },
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:48:39.869412+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+
+# C. with the daemon running: OPENMINION_AGENT_ID without and with --runtime-source inproc
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check daemon start
+Started daemon pid=51550 (127.0.0.1:18789)
+[exit 0]
+
+$ OPENMINION_AGENT_ID=main openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tools run task.consolidate_memory --json '{"interval_hours": 24, "batch_limit": 10}'
+{
+  "artifact_refs": [
+    {
+      "ref": "artifact://tool/tools/3cdda01d0f004201956587446bed13d7/task.consolidate_memory/3cdda01d0f004201956587446bed13d7",
+      "tool": "task.consolidate_memory",
+      "type": "tool_result"
+    }
+  ],
+  "meta": {
+    "method": "POST",
+    "path": "/v1/tools/task.consolidate_memory/run",
+    "request_id": "3cdda01d0f004201956587446bed13d7",
+    "run_id": "3cdda01d0f004201956587446bed13d7",
+    "session_id": "tools"
+  },
+  "ok": true,
+  "runtime_source": "daemon",
+  "tool": {
+    "call_id": "3cdda01d0f004201956587446bed13d7",
+    "content": "{\"batch_limit\": 10, \"consolidation_session_id\": \"consolidate:9277d4d7572542adab25fcb5efaf3f0e\", \"enabled\": true, \"name\": \"memory consolidation\", \"next_due_at\": \"2026-10-30T11:49:14.720793+00:00\", \"schedule\": {\"every_ms\": 86400000, \"jitter_ms\": 0, \"kind\": \"every\"}, \"scheduler_note\": \"Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start\", \"target_scope\": \"agent:openminion\", \"task_id\": \"9277d4d7572542adab25fcb5efaf3f0e\"}",
+    "data": {
+      "batch_limit": 10,
+      "consolidation_session_id": "consolidate:9277d4d7572542adab25fcb5efaf3f0e",
+      "enabled": true,
+      "model_tool_name": "task.consolidate_memory",
+      "name": "memory consolidation",
+      "next_due_at": "2026-10-30T11:49:14.720793+00:00",
+      "runtime_binding_id": "runtime.task.consolidate_memory",
+      "runtime_fallback_chain": [
+        "task.consolidate_memory"
+      ],
+      "runtime_fallback_used": false,
+      "runtime_resolution_source": "runtime_direct",
+      "runtime_tool_name": "task.consolidate_memory",
+      "schedule": {
+        "every_ms": 86400000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "scheduler_note": "Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start",
+      "target_scope": "agent:openminion",
+      "task_id": "9277d4d7572542adab25fcb5efaf3f0e",
+      "tool_blast_radius": "local_mutation",
+      "tool_min_scope": "WRITE_SAFE"
+    },
+    "error": "",
+    "name": "task.consolidate_memory",
+    "ok": true,
+    "source": "daemon_api",
+    "verified": true
+  },
+  "trace_id": "3cdda01d0f004201956587446bed13d7"
+}
+[exit 0]
+
+$ OPENMINION_AGENT_ID=main openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tools run task.consolidate_memory --runtime-source inproc --json '{"interval_hours": 24, "batch_limit": 10}'
+{
+  "artifact_refs": [
+    {
+      "ref": "artifact://tool/tools/task.consolidate_memory",
+      "tool": "task.consolidate_memory",
+      "type": "tool_result"
+    }
+  ],
+  "ok": true,
+  "runtime_source": "inproc",
+  "tool": {
+    "content": "{\"batch_limit\": 10, \"consolidation_session_id\": \"consolidate:d1a067eb41484909a7d5e4d665edb805\", \"enabled\": true, \"name\": \"memory consolidation\", \"next_due_at\": \"2026-10-30T11:49:18.122314+00:00\", \"schedule\": {\"every_ms\": 86400000, \"jitter_ms\": 0, \"kind\": \"every\"}, \"scheduler_note\": \"Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start\", \"target_scope\": \"agent:main\", \"task_id\": \"d1a067eb41484909a7d5e4d665edb805\"}",
+    "data": {
+      "batch_limit": 10,
+      "consolidation_session_id": "consolidate:d1a067eb41484909a7d5e4d665edb805",
+      "enabled": true,
+      "model_tool_name": "task.consolidate_memory",
+      "name": "memory consolidation",
+      "next_due_at": "2026-10-30T11:49:18.122314+00:00",
+      "runtime_binding_id": "runtime.task.consolidate_memory",
+      "runtime_fallback_chain": [
+        "task.consolidate_memory"
+      ],
+      "runtime_fallback_used": false,
+      "runtime_resolution_source": "runtime_direct",
+      "runtime_tool_name": "task.consolidate_memory",
+      "schedule": {
+        "every_ms": 86400000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "scheduler_note": "Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start",
+      "target_scope": "agent:main",
+      "task_id": "d1a067eb41484909a7d5e4d665edb805",
+      "tool_blast_radius": "local_mutation",
+      "tool_min_scope": "WRITE_SAFE"
+    },
+    "error": "",
+    "name": "task.consolidate_memory",
+    "ok": true,
+    "verified": true
+  }
+}
+[exit 0]
+[created via the daemon: 9277d4d7572542adab25fcb5efaf3f0e; replacement in C (inproc): d1a067eb41484909a7d5e4d665edb805]
+[evidence] .openminion/task/task.db scheduled_tasks d1a067eb41484909a7d5e4d665edb805: state=active, metadata.kind='memory_consolidation'
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks list --json
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "d1a067eb41484909a7d5e4d665edb805",
+      "title": "memory consolidation",
+      "status": "ACTIVE",
+      "lifecycle_state": "active",
+      "due_at": "2026-10-30T11:49:18.122314+00:00",
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "main",
+      "cron_job_id": "d1a067eb41484909a7d5e4d665edb805",
+      "created_at": "2026-10-29T11:49:18.122573+00:00",
+      "updated_at": "2026-10-29T11:49:18.122573+00:00",
+      "operator_state": "running",
+      "resume_action": "continue",
+      "valid_actions": [
+        "pause",
+        "cancel",
+        "run-now",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 86400000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:86400000ms",
+      "schedule_revision": "2026-10-29T11:49:18.122314+00:00",
+      "enabled": true,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    },
+    {
+      "id": "7ac559bca4fa43be9d5ee36311309c64",
+      "title": "memory consolidation",
+      "status": "CANCELED",
+      "lifecycle_state": "cancelled",
+      "due_at": null,
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "main",
+      "cron_job_id": "7ac559bca4fa43be9d5ee36311309c64",
+      "created_at": "2026-10-29T11:48:36.098856+00:00",
+      "updated_at": "2026-10-29T11:48:54.202047+00:00",
+      "operator_state": "cancelled",
+      "resume_action": "none",
+      "valid_actions": [
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 86400000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:86400000ms",
+      "schedule_revision": "2026-10-29T11:48:54.202772+00:00",
+      "enabled": false,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    }
+  ],
+  "pending_actions": [],
+  "count": 2,
+  "source": "task_manager",
+  "scheduler": {
+    "state": "ready",
+    "hosted_by": "daemon",
+    "reason": null,
+    "last_heartbeat_at": "2026-10-29T11:49:21.704846+00:00",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:48:39.869412+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+[summary] consolidation tasks:
+[summary]   d1a067eb41484909a7d5e4d665edb805  agent_id=main  lifecycle_state=active  enabled=True  last_run=None  valid_actions=['pause', 'cancel', 'run-now', 'delete-history']
+[summary]   7ac559bca4fa43be9d5ee36311309c64  agent_id=main  lifecycle_state=cancelled  enabled=False  last_run=None  valid_actions=['delete-history']
+[summary] enabled consolidation tasks: ['d1a067eb41484909a7d5e4d665edb805']
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks list --agent-id openminion --json
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "9277d4d7572542adab25fcb5efaf3f0e",
+      "title": "memory consolidation",
+      "status": "ACTIVE",
+      "lifecycle_state": "active",
+      "due_at": "2026-10-30T11:49:14.720793+00:00",
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "9277d4d7572542adab25fcb5efaf3f0e",
+      "created_at": "2026-10-29T11:49:14.721007+00:00",
+      "updated_at": "2026-10-29T11:49:14.721007+00:00",
+      "operator_state": "running",
+      "resume_action": "continue",
+      "valid_actions": [
+        "pause",
+        "cancel",
+        "run-now",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 86400000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:86400000ms",
+      "schedule_revision": "2026-10-29T11:49:14.720793+00:00",
+      "enabled": true,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    },
+    {
+      "id": "c5ba655a68bb4947b18459fa1f1ba4f4",
+      "title": "memory consolidation",
+      "status": "CANCELED",
+      "lifecycle_state": "cancelled",
+      "due_at": null,
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "c5ba655a68bb4947b18459fa1f1ba4f4",
+      "created_at": "2026-10-29T11:48:57.857745+00:00",
+      "updated_at": "2026-10-29T11:49:05.342726+00:00",
+      "operator_state": "cancelled",
+      "resume_action": "none",
+      "valid_actions": [
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 86400000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:86400000ms",
+      "schedule_revision": "2026-10-29T11:49:05.343492+00:00",
+      "enabled": false,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    }
+  ],
+  "pending_actions": [],
+  "count": 2,
+  "source": "task_manager",
+  "scheduler": {
+    "state": "ready",
+    "hosted_by": "daemon",
+    "reason": null,
+    "last_heartbeat_at": "2026-10-29T11:49:25.716851+00:00",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:48:39.869412+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+[summary] consolidation tasks:
+[summary]   9277d4d7572542adab25fcb5efaf3f0e  agent_id=openminion  lifecycle_state=active  enabled=True  last_run=None  valid_actions=['pause', 'cancel', 'run-now', 'delete-history']
+[summary]   c5ba655a68bb4947b18459fa1f1ba4f4  agent_id=openminion  lifecycle_state=cancelled  enabled=False  last_run=None  valid_actions=['delete-history']
+[summary] enabled consolidation tasks: ['9277d4d7572542adab25fcb5efaf3f0e']
+
+# C. the replacement's scheduled run under the daemon is a consolidation run
+[setup] .openminion/state/brain/sessions.db: cron_jobs.next_due_at of d1a067eb41484909a7d5e4d665edb805: 2026-10-30T11:49:18.122314+00:00 -> 2026-10-29T11:49:27.036459+00:00
+[wait] new run 276895ffb30b4350a8a4eb1c146f415c: finished
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check daemon stop
+Stopped daemon pid=51550
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks list --json
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "d1a067eb41484909a7d5e4d665edb805",
+      "title": "memory consolidation",
+      "status": "ACTIVE",
+      "lifecycle_state": "active",
+      "due_at": "2026-10-30T11:49:27.036459+00:00",
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "main",
+      "cron_job_id": "d1a067eb41484909a7d5e4d665edb805",
+      "created_at": "2026-10-29T11:49:18.122573+00:00",
+      "updated_at": "2026-10-29T11:49:27.471687+00:00",
+      "operator_state": "running",
+      "resume_action": "continue",
+      "valid_actions": [
+        "pause",
+        "cancel",
+        "run-now",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 86400000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:86400000ms",
+      "schedule_revision": "2026-10-29T11:49:27.470791+00:00",
+      "enabled": true,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [
+        {
+          "run_id": "276895ffb30b4350a8a4eb1c146f415c",
+          "state": "finished",
+          "due_at": "2026-10-29T11:49:27.036459+00:00",
+          "available_at": null,
+          "started_at": "2026-10-29T11:49:27.221551+00:00",
+          "finished_at": "2026-10-29T11:49:27.470791+00:00",
+          "summary": "main: Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer. (thinking=minimal)",
+          "attempts": 1,
+          "error": null,
+          "isolated_session_id": "consolidate:d1a067eb41484909a7d5e4d665edb805",
+          "delivery": {
+            "mode": "none",
+            "state": "not_requested",
+            "targets": []
+          },
+          "delivery_targets": []
+        }
+      ],
+      "last_run": {
+        "run_id": "276895ffb30b4350a8a4eb1c146f415c",
+        "state": "finished",
+        "due_at": "2026-10-29T11:49:27.036459+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:49:27.221551+00:00",
+        "finished_at": "2026-10-29T11:49:27.470791+00:00",
+        "summary": "main: Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer. (thinking=minimal)",
+        "attempts": 1,
+        "error": null,
+        "isolated_session_id": "consolidate:d1a067eb41484909a7d5e4d665edb805",
+        "delivery": {
+          "mode": "none",
+          "state": "not_requested",
+          "targets": []
+        },
+        "delivery_targets": [],
+        "last_error": null
+      },
+      "daemon_required": true
+    },
+    {
+      "id": "7ac559bca4fa43be9d5ee36311309c64",
+      "title": "memory consolidation",
+      "status": "CANCELED",
+      "lifecycle_state": "cancelled",
+      "due_at": null,
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "main",
+      "cron_job_id": "7ac559bca4fa43be9d5ee36311309c64",
+      "created_at": "2026-10-29T11:48:36.098856+00:00",
+      "updated_at": "2026-10-29T11:48:54.202047+00:00",
+      "operator_state": "cancelled",
+      "resume_action": "none",
+      "valid_actions": [
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 86400000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:86400000ms",
+      "schedule_revision": "2026-10-29T11:48:54.202772+00:00",
+      "enabled": false,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    }
+  ],
+  "pending_actions": [],
+  "count": 2,
+  "source": "task_manager",
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:48:39.869412+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+[summary] consolidation tasks:
+[summary]   d1a067eb41484909a7d5e4d665edb805  agent_id=main  lifecycle_state=active  enabled=True  last_run=finished  valid_actions=['pause', 'cancel', 'run-now', 'delete-history']
+[summary]   7ac559bca4fa43be9d5ee36311309c64  agent_id=main  lifecycle_state=cancelled  enabled=False  last_run=None  valid_actions=['delete-history']
+[summary] enabled consolidation tasks: ['d1a067eb41484909a7d5e4d665edb805']
+
+# D (what the guidance warns about): the replacement created while the old job is still enabled
+[setup] homeD/agents.json: echo agent 'openminion' (default agent), daemon_auto_start false
+
+$ openminion(0.1.14) --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tools run task.consolidate_memory --json '{"interval_hours": 12, "batch_limit": 8}'
+{
+  "artifact_refs": [
+    {
+      "ref": "artifact://tool/tools/task.consolidate_memory",
+      "tool": "task.consolidate_memory",
+      "type": "tool_result"
+    }
+  ],
+  "ok": true,
+  "runtime_fallback_reason": "openminion daemon is not running",
+  "runtime_source": "inproc",
+  "tool": {
+    "content": "{\"batch_limit\": 8, \"consolidation_session_id\": \"consolidate:e9e91ee6296c4441ac8ea5b123f37c3d\", \"enabled\": true, \"name\": \"memory consolidation\", \"next_due_at\": \"2026-10-29T23:49:41.442540+00:00\", \"schedule\": {\"every_ms\": 43200000, \"jitter_ms\": 0, \"kind\": \"every\"}, \"scheduler_note\": \"Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start\", \"target_scope\": \"agent:openminion\", \"task_id\": \"e9e91ee6296c4441ac8ea5b123f37c3d\"}",
+    "data": {
+      "batch_limit": 8,
+      "consolidation_session_id": "consolidate:e9e91ee6296c4441ac8ea5b123f37c3d",
+      "enabled": true,
+      "model_tool_name": "task.consolidate_memory",
+      "name": "memory consolidation",
+      "next_due_at": "2026-10-29T23:49:41.442540+00:00",
+      "runtime_binding_id": "runtime.task.consolidate_memory",
+      "runtime_fallback_chain": [
+        "task.consolidate_memory"
+      ],
+      "runtime_fallback_used": false,
+      "runtime_resolution_source": "runtime_direct",
+      "runtime_tool_name": "task.consolidate_memory",
+      "schedule": {
+        "every_ms": 43200000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "scheduler_note": "Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start",
+      "target_scope": "agent:openminion",
+      "task_id": "e9e91ee6296c4441ac8ea5b123f37c3d",
+      "tool_blast_radius": "local_mutation",
+      "tool_min_scope": "WRITE_SAFE"
+    },
+    "error": "",
+    "name": "task.consolidate_memory",
+    "ok": true,
+    "verified": true
+  }
+}
+[exit 0]
+[setup] pre-upgrade task in D: e9e91ee6296c4441ac8ea5b123f37c3d
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tools run task.consolidate_memory --json '{"interval_hours": 12, "batch_limit": 8}'
+{
+  "artifact_refs": [
+    {
+      "ref": "artifact://tool/tools/task.consolidate_memory",
+      "tool": "task.consolidate_memory",
+      "type": "tool_result"
+    }
+  ],
+  "ok": true,
+  "runtime_fallback_reason": "openminion daemon is not running",
+  "runtime_source": "inproc",
+  "tool": {
+    "content": "{\"batch_limit\": 8, \"consolidation_session_id\": \"consolidate:1a49a91418714f9dbf4e89a010b1abda\", \"enabled\": true, \"name\": \"memory consolidation\", \"next_due_at\": \"2026-10-29T23:49:45.055774+00:00\", \"schedule\": {\"every_ms\": 43200000, \"jitter_ms\": 0, \"kind\": \"every\"}, \"scheduler_note\": \"Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start\", \"target_scope\": \"agent:openminion\", \"task_id\": \"1a49a91418714f9dbf4e89a010b1abda\"}",
+    "data": {
+      "batch_limit": 8,
+      "consolidation_session_id": "consolidate:1a49a91418714f9dbf4e89a010b1abda",
+      "enabled": true,
+      "model_tool_name": "task.consolidate_memory",
+      "name": "memory consolidation",
+      "next_due_at": "2026-10-29T23:49:45.055774+00:00",
+      "runtime_binding_id": "runtime.task.consolidate_memory",
+      "runtime_fallback_chain": [
+        "task.consolidate_memory"
+      ],
+      "runtime_fallback_used": false,
+      "runtime_resolution_source": "runtime_direct",
+      "runtime_tool_name": "task.consolidate_memory",
+      "schedule": {
+        "every_ms": 43200000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "scheduler_note": "Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start",
+      "target_scope": "agent:openminion",
+      "task_id": "1a49a91418714f9dbf4e89a010b1abda",
+      "tool_blast_radius": "local_mutation",
+      "tool_min_scope": "WRITE_SAFE"
+    },
+    "error": "",
+    "name": "task.consolidate_memory",
+    "ok": true,
+    "verified": true
+  }
+}
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks list --json
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "1a49a91418714f9dbf4e89a010b1abda",
+      "title": "memory consolidation",
+      "status": "ACTIVE",
+      "lifecycle_state": "active",
+      "due_at": "2026-10-29T23:49:45.055774+00:00",
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "1a49a91418714f9dbf4e89a010b1abda",
+      "created_at": "2026-10-29T11:49:45.056591+00:00",
+      "updated_at": "2026-10-29T11:49:45.056591+00:00",
+      "operator_state": "running",
+      "resume_action": "continue",
+      "valid_actions": [
+        "pause",
+        "cancel",
+        "run-now",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 43200000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:43200000ms",
+      "schedule_revision": "2026-10-29T11:49:45.055774+00:00",
+      "enabled": true,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    },
+    {
+      "id": "e9e91ee6296c4441ac8ea5b123f37c3d",
+      "title": "memory consolidation",
+      "status": "ACTIVE",
+      "lifecycle_state": "active",
+      "due_at": "2026-10-29T23:49:41.442540+00:00",
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "e9e91ee6296c4441ac8ea5b123f37c3d",
+      "created_at": "2026-10-29T11:49:41.442788+00:00",
+      "updated_at": "2026-10-29T11:49:41.442788+00:00",
+      "operator_state": "running",
+      "resume_action": "continue",
+      "valid_actions": [
+        "pause",
+        "cancel",
+        "run-now",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 43200000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:43200000ms",
+      "schedule_revision": "2026-10-29T11:49:41.442540+00:00",
+      "enabled": true,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    }
+  ],
+  "pending_actions": [],
+  "count": 2,
+  "source": "task_manager",
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:49:49.272458+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+[summary] consolidation tasks:
+[summary]   1a49a91418714f9dbf4e89a010b1abda  agent_id=openminion  lifecycle_state=active  enabled=True  last_run=None  valid_actions=['pause', 'cancel', 'run-now', 'delete-history']
+[summary]   e9e91ee6296c4441ac8ea5b123f37c3d  agent_id=openminion  lifecycle_state=active  enabled=True  last_run=None  valid_actions=['pause', 'cancel', 'run-now', 'delete-history']
+[summary] enabled consolidation tasks: ['1a49a91418714f9dbf4e89a010b1abda', 'e9e91ee6296c4441ac8ea5b123f37c3d']
+[setup] .openminion/state/brain/sessions.db: cron_jobs.next_due_at of e9e91ee6296c4441ac8ea5b123f37c3d: 2026-10-29T23:49:41.442540+00:00 -> 2026-10-29T11:49:50.484397+00:00
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check daemon start
+Started daemon pid=51855 (127.0.0.1:18789)
+[exit 0]
+[wait] new run 4a35dad89977407096dfb4c127c66783: failed
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check daemon stop
+Stopped daemon pid=51855
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks list --json
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "1a49a91418714f9dbf4e89a010b1abda",
+      "title": "memory consolidation",
+      "status": "ACTIVE",
+      "lifecycle_state": "active",
+      "due_at": "2026-10-29T23:49:45.055774+00:00",
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "1a49a91418714f9dbf4e89a010b1abda",
+      "created_at": "2026-10-29T11:49:45.056591+00:00",
+      "updated_at": "2026-10-29T11:49:45.056591+00:00",
+      "operator_state": "running",
+      "resume_action": "continue",
+      "valid_actions": [
+        "pause",
+        "cancel",
+        "run-now",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 43200000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:43200000ms",
+      "schedule_revision": "2026-10-29T11:49:45.055774+00:00",
+      "enabled": true,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    },
+    {
+      "id": "e9e91ee6296c4441ac8ea5b123f37c3d",
+      "title": "memory consolidation",
+      "status": "WAITING",
+      "lifecycle_state": "paused",
+      "due_at": null,
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "e9e91ee6296c4441ac8ea5b123f37c3d",
+      "created_at": "2026-10-29T11:49:41.442788+00:00",
+      "updated_at": "2026-10-29T11:49:56.755394+00:00",
+      "operator_state": "waiting",
+      "resume_action": "continue",
+      "valid_actions": [
+        "resume",
+        "cancel",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 43200000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:43200000ms",
+      "schedule_revision": "2026-10-29T11:49:56.754765+00:00",
+      "enabled": false,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [
+        {
+          "run_id": "4a35dad89977407096dfb4c127c66783",
+          "state": "failed",
+          "due_at": "2026-10-29T11:49:50.484397+00:00",
+          "available_at": null,
+          "started_at": "2026-10-29T11:49:56.750530+00:00",
+          "finished_at": "2026-10-29T11:49:56.754765+00:00",
+          "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+          "attempts": 1,
+          "error": {
+            "code": "cron_failed",
+            "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+          },
+          "isolated_session_id": "cron:e9e91ee6296c4441ac8ea5b123f37c3d:4a35dad89977407096dfb4c127c66783",
+          "delivery": null,
+          "delivery_targets": []
+        }
+      ],
+      "last_run": {
+        "run_id": "4a35dad89977407096dfb4c127c66783",
+        "state": "failed",
+        "due_at": "2026-10-29T11:49:50.484397+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:49:56.750530+00:00",
+        "finished_at": "2026-10-29T11:49:56.754765+00:00",
+        "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+        "attempts": 1,
+        "error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        },
+        "isolated_session_id": "cron:e9e91ee6296c4441ac8ea5b123f37c3d:4a35dad89977407096dfb4c127c66783",
+        "delivery": null,
+        "delivery_targets": [],
+        "last_error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        }
+      },
+      "daemon_required": true
+    }
+  ],
+  "pending_actions": [],
+  "count": 2,
+  "source": "task_manager",
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:49:49.272458+00:00",
+    "updated_by": null
+  }
+}
+[exit 0]
+[summary] consolidation tasks:
+[summary]   1a49a91418714f9dbf4e89a010b1abda  agent_id=openminion  lifecycle_state=active  enabled=True  last_run=None  valid_actions=['pause', 'cancel', 'run-now', 'delete-history']
+[summary]   e9e91ee6296c4441ac8ea5b123f37c3d  agent_id=openminion  lifecycle_state=paused  enabled=False  last_run=failed  valid_actions=['resume', 'cancel', 'delete-history']
+[summary] enabled consolidation tasks: ['1a49a91418714f9dbf4e89a010b1abda']
+
+# done

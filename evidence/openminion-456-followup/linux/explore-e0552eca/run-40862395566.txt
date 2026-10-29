@@ -1,0 +1,2244 @@
+--- tests/runtime/test_cron_capture_recovery.py
++++ tests/runtime/test_cron_capture_recovery.py
+@@ -644,9 +644,7 @@
+         intent = _turn(runtime, monkeypatch, fail_capture_write=True)
+         assert intent["capture_state"] == "pending"
+         owner = _task_owner(runtime)
+-        legacy_id = _create_pre_upgrade_consolidation_task(
+-            owner, tmp_path, monkeypatch
+-        )
++        legacy_id = _create_pre_upgrade_consolidation_task(owner, tmp_path, monkeypatch)
+         with _daemon(runtime, owner, monkeypatch) as lookups:
+             legacy = _daemon_run(runtime, monkeypatch, owner, legacy_id, intent)
+             legacy_task = owner.get_task(legacy_id)
+
+1 file would be reformatted
+All checks passed!
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+============================= test session starts ==============================
+platform linux -- Python 3.11.17, pytest-8.4.2, pluggy-1.7.0 -- <checkout>/.venv/bin/python
+rootdir: <checkout>
+configfile: pyproject.toml
+plugins: timeout-2.4.0, Faker-27.4.0, anyio-4.15.1, cov-7.1.0, asyncio-0.26.0, platformdirs-4.14.0
+timeout: 60.0s
+timeout method: signal
+timeout func_only: False
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 8 items
+
+tests/runtime/test_cron_capture_recovery.py::test_consolidation_run_recovers_a_pending_intent_and_runs_its_turn PASSED [ 12%]
+tests/runtime/test_cron_capture_recovery.py::test_consolidation_run_keeps_an_intent_pending_when_recovery_is_denied PASSED [ 25%]
+tests/runtime/test_cron_capture_recovery.py::test_consolidation_run_keeps_an_unsupported_capture_pending PASSED [ 37%]
+tests/runtime/test_cron_capture_recovery.py::test_consolidation_runs_recover_an_unsupported_intent_once_the_store_is_capable PASSED [ 50%]
+tests/runtime/test_cron_capture_recovery.py::test_consolidation_run_without_pending_intents_runs_its_turn PASSED [ 62%]
+tests/runtime/test_cron_capture_recovery.py::test_daemon_runs_a_task_consolidate_memory_job_with_its_persisted_task_kind FAILED [ 75%]
+tests/runtime/test_cron_capture_recovery.py::test_daemon_run_of_a_task_consolidate_memory_job_keeps_unsupported_work_pending PASSED [ 87%]
+tests/runtime/test_cron_capture_recovery.py::test_daemon_pauses_a_pre_upgrade_consolidation_job_and_keeps_its_pending_work PASSED [100%]
+
+=================================== FAILURES ===================================
+_ test_daemon_runs_a_task_consolidate_memory_job_with_its_persisted_task_kind __
+
+tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_daemon_runs_a_task_consol0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2025d04d90>
+
+    def test_daemon_runs_a_task_consolidate_memory_job_with_its_persisted_task_kind(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        runtime = _runtime(tmp_path, monkeypatch, external=False)
+        try:
+            intent = _turn(runtime, monkeypatch, fail_capture_write=True)
+            assert intent["capture_state"] == "pending"
+            owner = _task_owner(runtime)
+            task_id = _create_consolidation_task(owner, tmp_path)
+            with _daemon(runtime, owner, monkeypatch) as lookups:
+                first = _daemon_run(runtime, monkeypatch, owner, task_id, intent)
+                second = _daemon_run(runtime, monkeypatch, owner, task_id, intent)
+            forged = _forged_turn(runtime, task_id)
+            results = {
+                str(event.payload.get("capture_id")): dict(event.payload)
+                for event in _events(runtime, "memory.capture.result")
+            }
+        finally:
+            runtime.close()
+    
+        # The daemon's own TaskManager read the kind the handler stored.
+        assert _kinds_seen(lookups, task_id) == {"memory_consolidation"}
+        for run in (first, second):
+            _assert_daemon_ran_the_scheduled_turn(run)
+        assert first.cron_turn_capture_states == ("excluded",)
+        assert second.cron_turn_capture_states == ("excluded", "excluded")
+        # The earlier pending capture is recovered once.
+        assert [(r.scanned, r.recovered, r.pending) for r in first.recovery] == [(1, 1, 0)]
+        _assert_extractor_called_for_the_intent(first)
+        assert first.intent_result is not None
+        assert [(r.scanned, r.recovered, r.pending) for r in second.recovery] == [(0, 0, 0)]
+        assert second.extractor_calls == []
+        assert second.intent_result == first.intent_result
+        # An ordinary turn with the job's id and the consolidation keys is captured.
+>       assert forged["capture_state"] == "succeeded"
+E       AssertionError: assert 'pending' == 'succeeded'
+E         
+E         - succeeded
+E         + pending
+
+tests/runtime/test_cron_capture_recovery.py:600: AssertionError
+----------------------------- Captured stdout call -----------------------------
+[11:04:13Z] openminion: Review the provided memory candidates, decide which to promote, discard, or
+                        defer, then provide a brief summary and the memory_consolidation trailer.
+                        (thinking=minimal)
+[11:04:13Z] openminion: Review the provided memory candidates, decide which to promote, discard, or
+                        defer, then provide a brief summary and the memory_consolidation trailer.
+                        (thinking=minimal)
+[11:04:13Z] openminion: remember that I prefer spaces (thinking=minimal)
+------------------------------ Captured log call -------------------------------
+2026-10-29 11:04:12,286 INFO openminion.modules.tool.bootstrap: File: registered via REGISTRAR (openminion.tools.file)
+2026-10-29 11:04:12,286 INFO openminion.modules.tool.bootstrap: Code: registered via REGISTRAR (openminion.tools.code)
+2026-10-29 11:04:12,287 INFO openminion.modules.tool.bootstrap: Exec: registered via REGISTRAR (openminion.tools.exec)
+2026-10-29 11:04:12,287 INFO openminion.modules.tool.bootstrap: Browser: registered via REGISTRAR (openminion.tools.browser)
+2026-10-29 11:04:12,288 INFO openminion.modules.tool.bootstrap: Browser Playwright: registered via REGISTRAR (openminion.tools.browser.providers.playwright)
+2026-10-29 11:04:12,288 INFO openminion.modules.tool.bootstrap: PinchTab: registered via REGISTRAR (openminion.tools.browser.providers.pinchtab)
+2026-10-29 11:04:12,291 INFO openminion.modules.tool.bootstrap: Search: registered via REGISTRAR (openminion.tools.search)
+2026-10-29 11:04:12,291 INFO openminion.modules.tool.bootstrap: Tavily: registered via REGISTRAR (openminion.tools.search.providers.tavily)
+2026-10-29 11:04:12,291 INFO openminion.modules.tool.bootstrap: Weather: registered via REGISTRAR (openminion.tools.weather)
+2026-10-29 11:04:12,291 INFO openminion.modules.tool.bootstrap: Weather OpenMeteo: registered via REGISTRAR (openminion.tools.weather.providers.openmeteo)
+2026-10-29 11:04:12,291 INFO openminion.modules.tool.bootstrap: Weather WeatherAPI: registered via REGISTRAR (openminion.tools.weather.providers.weatherapi)
+2026-10-29 11:04:12,291 INFO openminion.modules.tool.bootstrap: Utility: registered via REGISTRAR (openminion.tools.utility)
+2026-10-29 11:04:12,291 INFO openminion.modules.tool.bootstrap: Time: registered via REGISTRAR (openminion.tools.time)
+2026-10-29 11:04:12,292 INFO openminion.modules.tool.bootstrap: Location: registered via REGISTRAR (openminion.tools.location)
+2026-10-29 11:04:12,292 INFO openminion.modules.tool.bootstrap: Host: registered via REGISTRAR (openminion.tools.host)
+2026-10-29 11:04:12,292 INFO openminion.modules.tool.bootstrap: System operations: registered via REGISTRAR (openminion.tools.ops)
+2026-10-29 11:04:12,292 INFO openminion.modules.tool.bootstrap: Cloud operations: registered via REGISTRAR (openminion.tools.cloud_ops)
+2026-10-29 11:04:12,292 INFO openminion.modules.tool.bootstrap: Observability operations: registered via REGISTRAR (openminion.tools.observability)
+2026-10-29 11:04:12,292 INFO openminion.modules.tool.bootstrap: Security scanning: registered via REGISTRAR (openminion.tools.security)
+2026-10-29 11:04:12,292 INFO openminion.modules.tool.bootstrap: Kubernetes operations: registered via REGISTRAR (openminion.tools.k8s)
+2026-10-29 11:04:12,292 INFO openminion.modules.tool.bootstrap: IaC planning: registered via REGISTRAR (openminion.tools.iac)
+2026-10-29 11:04:12,292 INFO openminion.modules.tool.bootstrap: GitOps operations: registered via REGISTRAR (openminion.tools.gitops)
+2026-10-29 11:04:12,292 INFO openminion.modules.tool.bootstrap: Configuration management checks: registered via REGISTRAR (openminion.tools.config_mgmt)
+2026-10-29 11:04:12,293 INFO openminion.modules.tool.bootstrap: IP: registered via REGISTRAR (openminion.tools.ip)
+2026-10-29 11:04:12,293 INFO openminion.modules.tool.bootstrap: GitHub: registered via REGISTRAR (openminion.tools.github)
+2026-10-29 11:04:12,293 INFO openminion.modules.tool.bootstrap: Fetch: registered via REGISTRAR (openminion.tools.fetch)
+2026-10-29 11:04:12,293 INFO openminion.modules.tool.bootstrap: Fetch Scrapling: registered via REGISTRAR (openminion.tools.fetch.providers.scrapling)
+2026-10-29 11:04:12,293 INFO openminion.modules.tool.bootstrap: Fetch Firecrawl: registered via REGISTRAR (openminion.tools.fetch.providers.firecrawl)
+2026-10-29 11:04:12,293 INFO openminion.modules.tool.bootstrap: Fetch TinyFish: registered via REGISTRAR (openminion.tools.fetch.providers.tinyfish)
+2026-10-29 11:04:12,293 INFO openminion.modules.tool.bootstrap: Reactions: registered via REGISTRAR (openminion.tools.reaction)
+2026-10-29 11:04:12,293 INFO openminion.modules.tool.bootstrap: GWS: registered via REGISTRAR (openminion.tools.gws)
+2026-10-29 11:04:12,293 INFO openminion.modules.tool.bootstrap: Brave Search: registered via REGISTRAR (openminion.tools.search.providers.brave)
+2026-10-29 11:04:12,293 INFO openminion.modules.tool.bootstrap: SerpApi Search: registered via REGISTRAR (openminion.tools.search.providers.serpapi)
+2026-10-29 11:04:12,293 INFO openminion.modules.tool.bootstrap: Serper Search: registered via REGISTRAR (openminion.tools.search.providers.serper)
+2026-10-29 11:04:12,293 INFO openminion.modules.tool.bootstrap: TinyFish Search: registered via REGISTRAR (openminion.tools.search.providers.tinyfish)
+2026-10-29 11:04:12,293 INFO openminion.modules.tool.bootstrap: Firecrawl Search: registered via REGISTRAR (openminion.tools.search.providers.firecrawl)
+2026-10-29 11:04:12,294 INFO openminion.modules.tool.bootstrap: DuckDuckGo Search: registered via REGISTRAR (openminion.tools.search.providers.duckduckgo)
+2026-10-29 11:04:12,294 INFO openminion.modules.tool.bootstrap: Tool Catalog: registered via REGISTRAR (openminion.tools.tool_catalog)
+2026-10-29 11:04:12,294 INFO openminion.modules.tool.bootstrap: Skill: registered via REGISTRAR (openminion.tools.skill)
+2026-10-29 11:04:12,294 INFO openminion.modules.tool.bootstrap: Memory: registered via REGISTRAR (openminion.tools.memory)
+2026-10-29 11:04:12,294 INFO openminion.modules.tool.bootstrap: Graph: registered via REGISTRAR (openminion.tools.graph)
+2026-10-29 11:04:12,294 INFO openminion.modules.tool.bootstrap: Tool Authoring: registered via REGISTRAR (openminion.tools.tool_authoring)
+2026-10-29 11:04:12,294 INFO openminion.modules.tool.bootstrap: Task: registered via REGISTRAR (openminion.tools.task)
+2026-10-29 11:04:12,294 INFO openminion.modules.tool.bootstrap: Plan: registered via REGISTRAR (openminion.tools.todo)
+2026-10-29 11:04:12,294 INFO openminion.modules.tool.bootstrap: Git: registered via REGISTRAR (openminion.tools.git)
+2026-10-29 11:04:12,295 INFO openminion.modules.tool.bootstrap: Agent Delegation: registered via REGISTRAR (openminion.tools.agent)
+2026-10-29 11:04:12,351 INFO openminion.modules.tool.bootstrap: tool.contract_drift=clean
+2026-10-29 11:04:12,355 INFO openminion: extension event=ext.discovery payload={'plugins': 1, 'tool_plugins': 0, 'providers': 1, 'channels': 1}
+2026-10-29 11:04:12,357 INFO openminion: extension event=ext.activation payload={'plugins_loaded': 1, 'tools_loaded': 104, 'providers_loaded': 11}
+2026-10-29 11:04:12,365 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:04:12,365 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:04:12,367 INFO alembic.runtime.migration: Running upgrade  -> 0001_baseline
+2026-10-29 11:04:12,384 INFO alembic.runtime.migration: Running upgrade 0001_baseline -> 0002_blockchain_confirmations
+2026-10-29 11:04:12,402 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:04:12,402 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:04:12,412 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 1: v1_baseline
+2026-10-29 11:04:12,413 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 2: v2_candidate_meta
+2026-10-29 11:04:12,413 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 3: v3_record_last_hit
+2026-10-29 11:04:12,413 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 4: v4_record_supersession_reason
+2026-10-29 11:04:12,413 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 5: v5_record_tiering
+2026-10-29 11:04:12,413 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 6: v6_record_delete_audit
+2026-10-29 11:04:12,414 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 7: v7_record_bitemporal
+2026-10-29 11:04:12,414 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 8: v8_record_goal_tag
+2026-10-29 11:04:12,414 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 9: v9_record_namespace
+2026-10-29 11:04:12,414 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 10: v10_capture_bundle_receipts
+2026-10-29 11:04:12,422 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:04:12,422 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:04:12,425 INFO alembic.runtime.migration: Running upgrade  -> 0001_baseline
+2026-10-29 11:04:12,442 INFO openminion.modules.tool.selection: selection.mode_resolved
+2026-10-29 11:04:12,443 INFO openminion.agent: BrainBridgeService initialized with home_root=/tmp/pytest-of-runner/pytest-0/test_daemon_runs_a_task_consol0 path_mode=integrated_runtime path_source=explicit_workspace
+2026-10-29 11:04:12,444 INFO openminion.lifecycle: event=component.started component={"capabilities": ["turn_dispatch", "heartbeat"], "component_id": "primary", "component_kind": "runtime_manager", "labels": {"runtime_mode": "hot"}, "owner_module": "openminion-runtime", "scope": "system"}
+2026-10-29 11:04:12,445 INFO openminion.gateway.openminion: gateway single turn channel=console target=api-user
+2026-10-29 11:04:12,495 INFO openminion.agent: BrainBridgeService handling turn for runtime_session=capture brain_session=capture::conv:capture:50f6d1515f4441eea47a1132f08d36b1 forced_tools=[] capability_category=None
+2026-10-29 11:04:12,501 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+2026-10-29 11:04:12,509 INFO openminion.agent: Retrieve adapter initialized with pre-built retrieve service
+2026-10-29 11:04:12,515 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+2026-10-29 11:04:12,541 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 1: v1_baseline
+2026-10-29 11:04:12,542 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 2: v2_candidate_meta
+2026-10-29 11:04:12,542 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 3: v3_record_last_hit
+2026-10-29 11:04:12,542 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 4: v4_record_supersession_reason
+2026-10-29 11:04:12,542 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 5: v5_record_tiering
+2026-10-29 11:04:12,542 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 6: v6_record_delete_audit
+2026-10-29 11:04:12,543 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 7: v7_record_bitemporal
+2026-10-29 11:04:12,543 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 8: v8_record_goal_tag
+2026-10-29 11:04:12,543 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 9: v9_record_namespace
+2026-10-29 11:04:12,543 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 10: v10_capture_bundle_receipts
+2026-10-29 11:04:12,554 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=openminion purpose=reflect sentinel=brain-bridge:fallback:v1
+2026-10-29 11:04:12,557 INFO openminion.modules.context.service: ASPM-05: active_state_prompt_composition metrics: raw_chars=4092 projected_chars=3725 chars_saved=367
+2026-10-29 11:04:12,587 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=openminion purpose=decide sentinel=brain-bridge:fallback:v1
+2026-10-29 11:04:12,591 INFO openminion.modules.context.service: ASPM-05: active_state_prompt_composition metrics: raw_chars=4092 projected_chars=3725 chars_saved=367
+2026-10-29 11:04:12,664 INFO openminion.gateway.openminion: gateway turn complete channel=console target=api-user session_id=capture run_id=f56db500e93e48c1b2e267d013e8c032 request_id=561fba8bb3554f3ea4599e91fa0e3d1a
+2026-10-29 11:04:12,672 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+2026-10-29 11:04:12,674 INFO openminion.lifecycle: event=component.started source=cron.scheduler.started component={"capabilities": ["scheduler"], "component_id": "primary", "component_kind": "cron_scheduler", "host_component_id": "primary", "labels": {"topology": "daemon-hosted"}, "owner_module": "openminion-runtime", "parent_component_id": "primary", "scope": "system"}
+2026-10-29 11:04:12,778 INFO openminion.cronctl: event=cron.run.started payload={"daemon_component_id": "primary", "daemon_id": "daemon-456", "job_id": "1682fd81bc5d4133a1e414a5266590dc", "run_id": "ae390060adb847a69c99a5fa2d60ba40"}
+2026-10-29 11:04:12,785 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=openminion purpose=reflect sentinel=brain-bridge:fallback:v1
+2026-10-29 11:04:12,790 INFO openminion.modules.context.service: ASPM-05: active_state_prompt_composition metrics: raw_chars=190 projected_chars=380 chars_saved=0
+2026-10-29 11:04:12,806 INFO openminion.runtimectl: event=runtime.agent.created payload={"agent_id": "openminion", "created_at": "2026-10-29T11:04:12.806490+00:00", "native_lifecycle_emitted": true, "ts": "2026-10-29T11:04:12.806621+00:00"}
+2026-10-29 11:04:12,806 INFO openminion.lifecycle: event=component.started component={"capabilities": ["turn_execution"], "component_id": "openminion", "component_kind": "agent_runtime", "host_component_id": "primary", "labels": {"runtime_mode": "hot"}, "owner_module": "openminion-runtime", "parent_component_id": "primary", "scope": "agent"}
+2026-10-29 11:04:12,806 INFO openminion.runtimectl: event=runtime.turn.enqueued payload={"agent_id": "openminion", "queued_at": "2026-10-29T11:04:12.806919+00:00", "session_id": "consolidate:1682fd81bc5d4133a1e414a5266590dc", "trace_id": "ae390060adb847a69c99a5fa2d60ba40", "ts": "2026-10-29T11:04:12.806923+00:00"}
+2026-10-29 11:04:12,807 INFO openminion.runtimectl: event=runtime.turn.started payload={"agent_id": "openminion", "queue_wait_ms": 0, "session_id": "consolidate:1682fd81bc5d4133a1e414a5266590dc", "started_at": "2026-10-29T11:04:12.807037+00:00", "trace_id": "ae390060adb847a69c99a5fa2d60ba40", "ts": "2026-10-29T11:04:12.807047+00:00"}
+2026-10-29 11:04:12,807 INFO openminion.gateway.openminion: gateway single turn channel=console target=api-user
+2026-10-29 11:04:12,881 INFO openminion.agent: BrainBridgeService handling turn for runtime_session=consolidate:1682fd81bc5d4133a1e414a5266590dc brain_session=consolidate:1682fd81bc5d4133a1e414a5266590dc::conv:consolidate:1682fd81bc5d4133a1e414a5266590dc:3c49cc95c2e94607b44ba674e1c0ed34 forced_tools=[] capability_category=None
+2026-10-29 11:04:12,908 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=openminion purpose=decide sentinel=brain-bridge:fallback:v1
+2026-10-29 11:04:12,911 INFO openminion.modules.context.service: ASPM-05: active_state_prompt_composition metrics: raw_chars=4390 projected_chars=4011 chars_saved=379
+2026-10-29 11:04:13,009 INFO openminion.gateway.openminion: gateway turn complete channel=console target=api-user session_id=consolidate:1682fd81bc5d4133a1e414a5266590dc run_id=8866d7c574474e3b80cf7bc7605eb6c7 request_id=ae390060adb847a69c99a5fa2d60ba40
+2026-10-29 11:04:13,010 INFO openminion.runtimectl: event=runtime.turn.completed payload={"agent_id": "openminion", "duration_ms": 202, "error_count": 0, "queue_wait_ms": 0, "session_id": "consolidate:1682fd81bc5d4133a1e414a5266590dc", "terminal": true, "trace_id": "ae390060adb847a69c99a5fa2d60ba40", "ts": "2026-10-29T11:04:13.010326+00:00"}
+2026-10-29 11:04:13,011 INFO openminion.cronctl: event=cron.task_outcomes.reconciled payload={"count": 1, "daemon_component_id": "primary", "daemon_id": "daemon-456", "job_id": "1682fd81bc5d4133a1e414a5266590dc"}
+2026-10-29 11:04:13,011 INFO openminion.cronctl: event=cron.run.finished payload={"daemon_component_id": "primary", "daemon_id": "daemon-456", "error": null, "job_id": "1682fd81bc5d4133a1e414a5266590dc", "run_id": "ae390060adb847a69c99a5fa2d60ba40", "state": "finished", "summary": "openminion: Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer. (thinking=minimal)"}
+2026-10-29 11:04:13,085 INFO openminion.cronctl: event=cron.run.started payload={"daemon_component_id": "primary", "daemon_id": "daemon-456", "job_id": "1682fd81bc5d4133a1e414a5266590dc", "run_id": "fe9856d94fa545e0aec095981ea0c62c"}
+2026-10-29 11:04:13,088 INFO openminion.runtimectl: event=runtime.turn.enqueued payload={"agent_id": "openminion", "queued_at": "2026-10-29T11:04:13.087984+00:00", "session_id": "consolidate:1682fd81bc5d4133a1e414a5266590dc", "trace_id": "fe9856d94fa545e0aec095981ea0c62c", "ts": "2026-10-29T11:04:13.087990+00:00"}
+2026-10-29 11:04:13,088 INFO openminion.runtimectl: event=runtime.turn.started payload={"agent_id": "openminion", "queue_wait_ms": 0, "session_id": "consolidate:1682fd81bc5d4133a1e414a5266590dc", "started_at": "2026-10-29T11:04:13.088138+00:00", "trace_id": "fe9856d94fa545e0aec095981ea0c62c", "ts": "2026-10-29T11:04:13.088143+00:00"}
+2026-10-29 11:04:13,089 INFO openminion.gateway.openminion: gateway single turn channel=console target=api-user
+2026-10-29 11:04:13,095 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+2026-10-29 11:04:13,143 INFO openminion.agent: BrainBridgeService handling turn for runtime_session=consolidate:1682fd81bc5d4133a1e414a5266590dc brain_session=consolidate:1682fd81bc5d4133a1e414a5266590dc::conv:consolidate:1682fd81bc5d4133a1e414a5266590dc:f5a97daccc8e44e99b7b826f6e2b6458 forced_tools=[] capability_category=None
+2026-10-29 11:04:13,169 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=openminion purpose=decide sentinel=brain-bridge:fallback:v1
+2026-10-29 11:04:13,172 INFO openminion.modules.context.service: ASPM-05: active_state_prompt_composition metrics: raw_chars=4390 projected_chars=4011 chars_saved=379
+2026-10-29 11:04:13,283 INFO openminion.gateway.openminion: gateway turn complete channel=console target=api-user session_id=consolidate:1682fd81bc5d4133a1e414a5266590dc run_id=8dba11c9ec6b4bc6a6fa7b398d359b78 request_id=fe9856d94fa545e0aec095981ea0c62c
+2026-10-29 11:04:13,285 INFO openminion.runtimectl: event=runtime.turn.completed payload={"agent_id": "openminion", "duration_ms": 196, "error_count": 0, "queue_wait_ms": 0, "session_id": "consolidate:1682fd81bc5d4133a1e414a5266590dc", "terminal": true, "trace_id": "fe9856d94fa545e0aec095981ea0c62c", "ts": "2026-10-29T11:04:13.285368+00:00"}
+2026-10-29 11:04:13,286 INFO openminion.cronctl: event=cron.task_outcomes.reconciled payload={"count": 1, "daemon_component_id": "primary", "daemon_id": "daemon-456", "job_id": "1682fd81bc5d4133a1e414a5266590dc"}
+2026-10-29 11:04:13,286 INFO openminion.cronctl: event=cron.run.finished payload={"daemon_component_id": "primary", "daemon_id": "daemon-456", "error": null, "job_id": "1682fd81bc5d4133a1e414a5266590dc", "run_id": "fe9856d94fa545e0aec095981ea0c62c", "state": "finished", "summary": "openminion: Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer. (thinking=minimal)"}
+2026-10-29 11:04:13,299 INFO openminion.lifecycle: event=component.stopped source=cron.scheduler.stopped component={"capabilities": ["scheduler"], "component_id": "primary", "component_kind": "cron_scheduler", "host_component_id": "primary", "labels": {"topology": "daemon-hosted"}, "owner_module": "openminion-runtime", "parent_component_id": "primary", "scope": "system"}
+2026-10-29 11:04:13,299 INFO openminion.runtimectl: event=runtime.turn.enqueued payload={"agent_id": "openminion", "queued_at": "2026-10-29T11:04:13.299967+00:00", "session_id": "forged", "trace_id": "4c62438a1c3d46f984a90f8ae63f287e", "ts": "2026-10-29T11:04:13.299973+00:00"}
+2026-10-29 11:04:13,300 INFO openminion.runtimectl: event=runtime.turn.started payload={"agent_id": "openminion", "queue_wait_ms": 0, "session_id": "forged", "started_at": "2026-10-29T11:04:13.300101+00:00", "trace_id": "4c62438a1c3d46f984a90f8ae63f287e", "ts": "2026-10-29T11:04:13.300108+00:00"}
+2026-10-29 11:04:13,300 INFO openminion.gateway.openminion: gateway single turn channel=console target=api-user
+2026-10-29 11:04:13,333 INFO openminion.agent: BrainBridgeService handling turn for runtime_session=forged brain_session=forged::conv:forged:9fdc9cd2b824429ebcc08827aa2b07c9 forced_tools=[] capability_category=None
+2026-10-29 11:04:13,347 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=openminion purpose=reflect sentinel=brain-bridge:fallback:v1
+2026-10-29 11:04:13,350 INFO openminion.modules.context.service: ASPM-05: active_state_prompt_composition metrics: raw_chars=4119 projected_chars=3752 chars_saved=367
+2026-10-29 11:04:13,436 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=openminion purpose=decide sentinel=brain-bridge:fallback:v1
+2026-10-29 11:04:13,439 INFO openminion.modules.context.service: ASPM-05: active_state_prompt_composition metrics: raw_chars=4119 projected_chars=3752 chars_saved=367
+2026-10-29 11:04:13,515 INFO openminion.gateway.openminion: gateway turn complete channel=console target=api-user session_id=forged run_id=872d732e211d43cdbb3667abd34cb98a request_id=4c62438a1c3d46f984a90f8ae63f287e
+2026-10-29 11:04:13,516 INFO openminion.runtimectl: event=runtime.turn.completed payload={"agent_id": "openminion", "duration_ms": 216, "error_count": 0, "queue_wait_ms": 0, "session_id": "forged", "terminal": true, "trace_id": "4c62438a1c3d46f984a90f8ae63f287e", "ts": "2026-10-29T11:04:13.516513+00:00"}
+2026-10-29 11:04:13,550 INFO openminion.runtimectl: event=runtime.manager.shutdown payload={"at": "2026-10-29T11:04:13.550760+00:00", "native_lifecycle_emitted": true, "ts": "2026-10-29T11:04:13.550769+00:00"}
+2026-10-29 11:04:13,551 INFO openminion.lifecycle: event=component.stopped component={"capabilities": ["turn_dispatch", "heartbeat"], "component_id": "primary", "component_kind": "runtime_manager", "labels": {"runtime_mode": "hot"}, "owner_module": "openminion-runtime", "scope": "system"}
+=========================== short test summary info ============================
+FAILED tests/runtime/test_cron_capture_recovery.py::test_daemon_runs_a_task_consolidate_memory_job_with_its_persisted_task_kind - AssertionError: assert 'pending' == 'succeeded'
+  
+  - succeeded
+  + pending
+========================= 1 failed, 7 passed in 9.57s ==========================
+
+# setup: openminion==0.1.14 from PyPI in a separate venv (the previously published task.consolidate_memory)
+0.1.14 venv: 0.1.14 3.11.17
+checkout: 0.1.15 3.11.17
+e0552eca test(runtime): wip persisted consolidation owner regression
+
+# home A: a consolidation job created by 0.1.14; replaced before it runs on this package
+config: homeA/agents.json (echo agent 'openminion', daemon_auto_start false)
+
+$ openminion(0.1.14) --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tools run task.consolidate_memory --json '{"interval_hours": 12, "batch_limit": 8}' 
+{
+  "artifact_refs": [
+    {
+      "ref": "artifact://tool/tools/task.consolidate_memory",
+      "tool": "task.consolidate_memory",
+      "type": "tool_result"
+    }
+  ],
+  "ok": true,
+  "runtime_fallback_reason": "openminion daemon is not running",
+  "runtime_source": "inproc",
+  "tool": {
+    "content": "{\"batch_limit\": 8, \"consolidation_session_id\": \"consolidate:bb619fc531e44eeeb92b6968d94ad58a\", \"enabled\": true, \"name\": \"memory consolidation\", \"next_due_at\": \"2026-10-29T23:04:30.148482+00:00\", \"schedule\": {\"every_ms\": 43200000, \"jitter_ms\": 0, \"kind\": \"every\"}, \"scheduler_note\": \"Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start\", \"target_scope\": \"agent:openminion\", \"task_id\": \"bb619fc531e44eeeb92b6968d94ad58a\"}",
+    "data": {
+      "batch_limit": 8,
+      "consolidation_session_id": "consolidate:bb619fc531e44eeeb92b6968d94ad58a",
+      "enabled": true,
+      "model_tool_name": "task.consolidate_memory",
+      "name": "memory consolidation",
+      "next_due_at": "2026-10-29T23:04:30.148482+00:00",
+      "runtime_binding_id": "runtime.task.consolidate_memory",
+      "runtime_fallback_chain": [
+        "task.consolidate_memory"
+      ],
+      "runtime_fallback_used": false,
+      "runtime_resolution_source": "runtime_direct",
+      "runtime_tool_name": "task.consolidate_memory",
+      "schedule": {
+        "every_ms": 43200000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "scheduler_note": "Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start",
+      "target_scope": "agent:openminion",
+      "task_id": "bb619fc531e44eeeb92b6968d94ad58a",
+      "tool_blast_radius": "local_mutation",
+      "tool_min_scope": "WRITE_SAFE"
+    },
+    "error": "",
+    "name": "task.consolidate_memory",
+    "ok": true,
+    "verified": true
+  }
+}
+[exit 0]
+[setup] legacy task in A: bb619fc531e44eeeb92b6968d94ad58a
+
+# A. inspect: list the tasks and show the consolidation task
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks list --json 
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "bb619fc531e44eeeb92b6968d94ad58a",
+      "title": "memory consolidation",
+      "status": "ACTIVE",
+      "lifecycle_state": "active",
+      "due_at": "2026-10-29T23:04:30.148482+00:00",
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "bb619fc531e44eeeb92b6968d94ad58a",
+      "created_at": "2026-10-29T11:04:30.148642+00:00",
+      "updated_at": "2026-10-29T11:04:30.148642+00:00",
+      "operator_state": "running",
+      "resume_action": "continue",
+      "valid_actions": [
+        "pause",
+        "cancel",
+        "run-now",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 43200000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:43200000ms",
+      "schedule_revision": "2026-10-29T11:04:30.148482+00:00",
+      "enabled": true,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    }
+  ],
+  "pending_actions": [],
+  "count": 1,
+  "source": "task_manager",
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:04:32.906423+00:00",
+    "updated_by": null
+  }
+}
+[stderr]
+2026-10-29 11:04:32,714 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:04:32,722 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 1: v1_baseline
+2026-10-29 11:04:32,723 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 2: v2_candidate_meta
+2026-10-29 11:04:32,723 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 3: v3_record_last_hit
+2026-10-29 11:04:32,723 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 4: v4_record_supersession_reason
+2026-10-29 11:04:32,723 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 5: v5_record_tiering
+2026-10-29 11:04:32,723 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 6: v6_record_delete_audit
+2026-10-29 11:04:32,724 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 7: v7_record_bitemporal
+2026-10-29 11:04:32,724 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 8: v8_record_goal_tag
+2026-10-29 11:04:32,724 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 9: v9_record_namespace
+2026-10-29 11:04:32,724 INFO openminion.modules.memory.storage.sqlite.migrations: Applying migration 10: v10_capture_bundle_receipts
+2026-10-29 11:04:32,733 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:04:32,733 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:04:32,736 INFO alembic.runtime.migration: Running upgrade  -> 0001_baseline
+2026-10-29 11:04:32,770 INFO openminion.modules.tool.selection: selection.mode_resolved
+2026-10-29 11:04:32,770 INFO openminion.agent: BrainBridgeService initialized with home_root=<work>/homeA path_mode=integrated_runtime path_source=explicit_workspace
+2026-10-29 11:04:32,772 INFO openminion.lifecycle: event=component.started component={"capabilities": ["turn_dispatch", "heartbeat"], "component_id": "primary", "component_kind": "runtime_manager", "labels": {"runtime_mode": "hot"}, "owner_module": "openminion-runtime", "scope": "system"}
+2026-10-29 11:04:32,781 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+2026-10-29 11:04:32,785 INFO openminion.agent: Retrieve adapter initialized with pre-built retrieve service
+2026-10-29 11:04:32,804 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+[exit 0]
+consolidation tasks:
+  bb619fc531e44eeeb92b6968d94ad58a  lifecycle_state=active  enabled=True  last_run=None  valid_actions=['pause', 'cancel', 'run-now', 'delete-history']
+enabled: ['bb619fc531e44eeeb92b6968d94ad58a']
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks show bb619fc531e44eeeb92b6968d94ad58a --json 
+{
+  "ok": true,
+  "task": {
+    "id": "bb619fc531e44eeeb92b6968d94ad58a",
+    "title": "memory consolidation",
+    "status": "ACTIVE",
+    "lifecycle_state": "active",
+    "due_at": "2026-10-29T23:04:30.148482+00:00",
+    "steps": [],
+    "pending_actions": [],
+    "agent_id": "openminion",
+    "cron_job_id": "bb619fc531e44eeeb92b6968d94ad58a",
+    "created_at": "2026-10-29T11:04:30.148642+00:00",
+    "updated_at": "2026-10-29T11:04:30.148642+00:00",
+    "operator_state": "running",
+    "resume_action": "continue",
+    "valid_actions": [
+      "pause",
+      "cancel",
+      "run-now",
+      "delete-history"
+    ],
+    "schedule": {
+      "every_ms": 43200000,
+      "jitter_ms": 0,
+      "kind": "every"
+    },
+    "schedule_summary": "every:43200000ms",
+    "schedule_revision": "2026-10-29T11:04:30.148482+00:00",
+    "enabled": true,
+    "task_kind": "scheduled_recurring",
+    "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+    "session_target": "isolated",
+    "recent_runs_limit": 5,
+    "recent_runs": [],
+    "last_run": null,
+    "daemon_required": true
+  },
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:04:32.906423+00:00",
+    "updated_by": null
+  }
+}
+[stderr]
+2026-10-29 11:04:35,512 INFO openminion: extension event=ext.discovery payload={'plugins': 1, 'tool_plugins': 0, 'providers': 1, 'channels': 1}
+2026-10-29 11:04:35,513 INFO openminion: extension event=ext.activation payload={'plugins_loaded': 1, 'tools_loaded': 104, 'providers_loaded': 11}
+2026-10-29 11:04:35,580 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.schemas
+2026-10-29 11:04:35,580 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.tables
+2026-10-29 11:04:35,580 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.types
+2026-10-29 11:04:35,580 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.constraints
+2026-10-29 11:04:35,580 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.defaults
+2026-10-29 11:04:35,580 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.comments
+2026-10-29 11:04:35,593 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:04:35,593 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:04:35,604 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:04:35,605 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:04:35,613 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:04:35,613 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:04:35,634 INFO openminion.modules.tool.selection: selection.mode_resolved
+2026-10-29 11:04:35,635 INFO openminion.agent: BrainBridgeService initialized with home_root=<work>/homeA path_mode=integrated_runtime path_source=explicit_workspace
+2026-10-29 11:04:35,636 INFO openminion.lifecycle: event=component.started component={"capabilities": ["turn_dispatch", "heartbeat"], "component_id": "primary", "component_kind": "runtime_manager", "labels": {"runtime_mode": "hot"}, "owner_module": "openminion-runtime", "scope": "system"}
+2026-10-29 11:04:35,644 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+2026-10-29 11:04:35,648 INFO openminion.agent: Retrieve adapter initialized with pre-built retrieve service
+2026-10-29 11:04:35,660 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tools run task.list --json '{"limit": 50}' 
+{
+  "artifact_refs": [
+    {
+      "ref": "artifact://tool/tools/task.list",
+      "tool": "task.list",
+      "type": "tool_result"
+    }
+  ],
+  "ok": true,
+  "runtime_fallback_reason": "openminion daemon is not running",
+  "runtime_source": "inproc",
+  "tool": {
+    "content": "{\"count\": 1, \"limit\": 50, \"tasks\": [{\"agent_id\": \"openminion\", \"concurrency_key\": \"memory-consolidation:agent:openminion\", \"consolidation\": {\"batch_limit\": 8, \"max_iterations\": 2, \"target_scope\": \"agent:openminion\", \"timeout_seconds\": 30}, \"created_at\": \"2026-10-29T11:04:30.148482+00:00\", \"enabled\": true, \"id\": \"bb619fc531e44eeeb92b6968d94ad58a\", \"last_run_at\": null, \"last_run_note\": \"No runs recorded yet. Scheduled runs execute only while the openminion daemon is running.\", \"last_run_state\": \"pending\", \"lifecycle_state\": \"active\", \"name\": \"memory consolidation\", \"next_due_at\": \"2026-10-29T23:04:30.148482+00:00\", \"pending_first_run\": true, \"retry_policy\": {\"max_attempts\": 3, \"retry_backoff_s\": 30}, \"schedule\": {\"every_ms\": 43200000, \"jitter_ms\": 0, \"kind\": \"every\", \"summary\": \"every:43200000ms\"}, \"status\": \"ACTIVE\", \"task_id\": \"bb619fc531e44eeeb92b6968d94ad58a\", \"task_kind\": \"scheduled_recurring\", \"valid_actions\": [\"pause\", \"cancel\", \"run-now\", \"delete-history\"], \"watch\": null}]}",
+    "data": {
+      "count": 1,
+      "limit": 50,
+      "model_tool_name": "task.list",
+      "runtime_binding_id": "runtime.task.list",
+      "runtime_fallback_chain": [
+        "task.list"
+      ],
+      "runtime_fallback_used": false,
+      "runtime_resolution_source": "runtime_direct",
+      "runtime_tool_name": "task.list",
+      "tasks": [
+        {
+          "agent_id": "openminion",
+          "concurrency_key": "memory-consolidation:agent:openminion",
+          "consolidation": {
+            "batch_limit": 8,
+            "max_iterations": 2,
+            "target_scope": "agent:openminion",
+            "timeout_seconds": 30
+          },
+          "created_at": "2026-10-29T11:04:30.148482+00:00",
+          "enabled": true,
+          "id": "bb619fc531e44eeeb92b6968d94ad58a",
+          "last_run_at": null,
+          "last_run_note": "No runs recorded yet. Scheduled runs execute only while the openminion daemon is running.",
+          "last_run_state": "pending",
+          "lifecycle_state": "active",
+          "name": "memory consolidation",
+          "next_due_at": "2026-10-29T23:04:30.148482+00:00",
+          "pending_first_run": true,
+          "retry_policy": {
+            "max_attempts": 3,
+            "retry_backoff_s": 30
+          },
+          "schedule": {
+            "every_ms": 43200000,
+            "jitter_ms": 0,
+            "kind": "every",
+            "summary": "every:43200000ms"
+          },
+          "status": "ACTIVE",
+          "task_id": "bb619fc531e44eeeb92b6968d94ad58a",
+          "task_kind": "scheduled_recurring",
+          "valid_actions": [
+            "pause",
+            "cancel",
+            "run-now",
+            "delete-history"
+          ],
+          "watch": null
+        }
+      ],
+      "tool_blast_radius": "read_only",
+      "tool_min_scope": "READ_ONLY"
+    },
+    "error": "",
+    "name": "task.list",
+    "ok": true,
+    "verified": true
+  }
+}
+[exit 0]
+
+# A. pause the old job before creating its replacement
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks pause bb619fc531e44eeeb92b6968d94ad58a --json 
+{
+  "ok": true,
+  "action": "pause",
+  "error": "",
+  "task_id": "bb619fc531e44eeeb92b6968d94ad58a",
+  "paused": true,
+  "enabled": false,
+  "schedule": {
+    "every_ms": 43200000,
+    "jitter_ms": 0,
+    "kind": "every"
+  },
+  "next_due_at": null,
+  "last_run_state": null,
+  "model_tool_name": "task.pause",
+  "runtime_binding_id": "runtime.task.pause",
+  "runtime_tool_name": "task.pause",
+  "runtime_fallback_chain": [
+    "task.pause"
+  ],
+  "runtime_fallback_used": false,
+  "runtime_resolution_source": "runtime_direct",
+  "tool_blast_radius": "local_mutation",
+  "tool_min_scope": "WRITE_SAFE",
+  "task": {
+    "id": "bb619fc531e44eeeb92b6968d94ad58a",
+    "title": "memory consolidation",
+    "status": "WAITING",
+    "lifecycle_state": "paused",
+    "due_at": null,
+    "steps": [],
+    "pending_actions": [],
+    "agent_id": "openminion",
+    "cron_job_id": "bb619fc531e44eeeb92b6968d94ad58a",
+    "created_at": "2026-10-29T11:04:30.148642+00:00",
+    "updated_at": "2026-10-29T11:04:40.251627+00:00",
+    "operator_state": "waiting",
+    "resume_action": "continue",
+    "valid_actions": [
+      "resume",
+      "cancel",
+      "delete-history"
+    ],
+    "schedule": {
+      "every_ms": 43200000,
+      "jitter_ms": 0,
+      "kind": "every"
+    },
+    "schedule_summary": "every:43200000ms",
+    "schedule_revision": "2026-10-29T11:04:40.252789+00:00",
+    "enabled": false,
+    "task_kind": "scheduled_recurring",
+    "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+    "session_target": "isolated",
+    "recent_runs_limit": 5,
+    "recent_runs": [],
+    "last_run": null,
+    "daemon_required": true
+  },
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:04:32.906423+00:00",
+    "updated_by": null
+  }
+}
+[stderr]
+2026-10-29 11:04:40,051 INFO openminion: extension event=ext.activation payload={'plugins_loaded': 1, 'tools_loaded': 104, 'providers_loaded': 11}
+2026-10-29 11:04:40,118 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.schemas
+2026-10-29 11:04:40,118 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.tables
+2026-10-29 11:04:40,118 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.types
+2026-10-29 11:04:40,118 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.constraints
+2026-10-29 11:04:40,118 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.defaults
+2026-10-29 11:04:40,118 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.comments
+2026-10-29 11:04:40,130 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:04:40,130 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:04:40,189 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:04:40,189 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:04:40,197 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:04:40,197 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:04:40,218 INFO openminion.modules.tool.selection: selection.mode_resolved
+2026-10-29 11:04:40,218 INFO openminion.agent: BrainBridgeService initialized with home_root=<work>/homeA path_mode=integrated_runtime path_source=explicit_workspace
+2026-10-29 11:04:40,219 INFO openminion.lifecycle: event=component.started component={"capabilities": ["turn_dispatch", "heartbeat"], "component_id": "primary", "component_kind": "runtime_manager", "labels": {"runtime_mode": "hot"}, "owner_module": "openminion-runtime", "scope": "system"}
+2026-10-29 11:04:40,227 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+2026-10-29 11:04:40,230 INFO openminion.agent: Retrieve adapter initialized with pre-built retrieve service
+2026-10-29 11:04:40,243 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+2026-10-29 11:04:40,248 INFO openminion.modules.tool.selection: selection.mode_resolved
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tools run task.consolidate_memory --json '{"interval_hours": 12, "batch_limit": 8}' 
+{
+  "artifact_refs": [
+    {
+      "ref": "artifact://tool/tools/task.consolidate_memory",
+      "tool": "task.consolidate_memory",
+      "type": "tool_result"
+    }
+  ],
+  "ok": true,
+  "runtime_fallback_reason": "openminion daemon is not running",
+  "runtime_source": "inproc",
+  "tool": {
+    "content": "{\"batch_limit\": 8, \"consolidation_session_id\": \"consolidate:18def3d61901412e8a6faaf7db8406ea\", \"enabled\": true, \"name\": \"memory consolidation\", \"next_due_at\": \"2026-10-29T23:04:42.442476+00:00\", \"schedule\": {\"every_ms\": 43200000, \"jitter_ms\": 0, \"kind\": \"every\"}, \"scheduler_note\": \"Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start\", \"target_scope\": \"agent:openminion\", \"task_id\": \"18def3d61901412e8a6faaf7db8406ea\"}",
+    "data": {
+      "batch_limit": 8,
+      "consolidation_session_id": "consolidate:18def3d61901412e8a6faaf7db8406ea",
+      "enabled": true,
+      "model_tool_name": "task.consolidate_memory",
+      "name": "memory consolidation",
+      "next_due_at": "2026-10-29T23:04:42.442476+00:00",
+      "runtime_binding_id": "runtime.task.consolidate_memory",
+      "runtime_fallback_chain": [
+        "task.consolidate_memory"
+      ],
+      "runtime_fallback_used": false,
+      "runtime_resolution_source": "runtime_direct",
+      "runtime_tool_name": "task.consolidate_memory",
+      "schedule": {
+        "every_ms": 43200000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "scheduler_note": "Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start",
+      "target_scope": "agent:openminion",
+      "task_id": "18def3d61901412e8a6faaf7db8406ea",
+      "tool_blast_radius": "local_mutation",
+      "tool_min_scope": "WRITE_SAFE"
+    },
+    "error": "",
+    "name": "task.consolidate_memory",
+    "ok": true,
+    "verified": true
+  }
+}
+[exit 0]
+[replacement in A: 18def3d61901412e8a6faaf7db8406ea]
+
+# A. verify: only the replacement is enabled
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks list --json 
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "18def3d61901412e8a6faaf7db8406ea",
+      "title": "memory consolidation",
+      "status": "ACTIVE",
+      "lifecycle_state": "active",
+      "due_at": "2026-10-29T23:04:42.442476+00:00",
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "18def3d61901412e8a6faaf7db8406ea",
+      "created_at": "2026-10-29T11:04:42.443578+00:00",
+      "updated_at": "2026-10-29T11:04:42.443578+00:00",
+      "operator_state": "running",
+      "resume_action": "continue",
+      "valid_actions": [
+        "pause",
+        "cancel",
+        "run-now",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 43200000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:43200000ms",
+      "schedule_revision": "2026-10-29T11:04:42.442476+00:00",
+      "enabled": true,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    },
+    {
+      "id": "bb619fc531e44eeeb92b6968d94ad58a",
+      "title": "memory consolidation",
+      "status": "WAITING",
+      "lifecycle_state": "paused",
+      "due_at": null,
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "bb619fc531e44eeeb92b6968d94ad58a",
+      "created_at": "2026-10-29T11:04:30.148642+00:00",
+      "updated_at": "2026-10-29T11:04:40.251627+00:00",
+      "operator_state": "waiting",
+      "resume_action": "continue",
+      "valid_actions": [
+        "resume",
+        "cancel",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 43200000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:43200000ms",
+      "schedule_revision": "2026-10-29T11:04:40.252789+00:00",
+      "enabled": false,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    }
+  ],
+  "pending_actions": [],
+  "count": 2,
+  "source": "task_manager",
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:04:32.906423+00:00",
+    "updated_by": null
+  }
+}
+[stderr]
+2026-10-29 11:04:44,619 INFO openminion: extension event=ext.discovery payload={'plugins': 1, 'tool_plugins': 0, 'providers': 1, 'channels': 1}
+2026-10-29 11:04:44,620 INFO openminion: extension event=ext.activation payload={'plugins_loaded': 1, 'tools_loaded': 104, 'providers_loaded': 11}
+2026-10-29 11:04:44,685 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.schemas
+2026-10-29 11:04:44,685 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.tables
+2026-10-29 11:04:44,685 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.types
+2026-10-29 11:04:44,685 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.constraints
+2026-10-29 11:04:44,685 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.defaults
+2026-10-29 11:04:44,685 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.comments
+2026-10-29 11:04:44,697 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:04:44,697 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:04:44,707 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:04:44,708 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:04:44,715 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:04:44,715 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:04:44,735 INFO openminion.modules.tool.selection: selection.mode_resolved
+2026-10-29 11:04:44,735 INFO openminion.agent: BrainBridgeService initialized with home_root=<work>/homeA path_mode=integrated_runtime path_source=explicit_workspace
+2026-10-29 11:04:44,736 INFO openminion.lifecycle: event=component.started component={"capabilities": ["turn_dispatch", "heartbeat"], "component_id": "primary", "component_kind": "runtime_manager", "labels": {"runtime_mode": "hot"}, "owner_module": "openminion-runtime", "scope": "system"}
+2026-10-29 11:04:44,744 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+2026-10-29 11:04:44,747 INFO openminion.agent: Retrieve adapter initialized with pre-built retrieve service
+2026-10-29 11:04:44,760 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+[exit 0]
+consolidation tasks:
+  18def3d61901412e8a6faaf7db8406ea  lifecycle_state=active  enabled=True  last_run=None  valid_actions=['pause', 'cancel', 'run-now', 'delete-history']
+  bb619fc531e44eeeb92b6968d94ad58a  lifecycle_state=paused  enabled=False  last_run=None  valid_actions=['resume', 'cancel', 'delete-history']
+enabled: ['18def3d61901412e8a6faaf7db8406ea']
+
+# A. the replacement runs as a consolidation turn under the daemon
+[setup] .openminion/state/brain/sessions.db: cron_jobs.next_due_at of 18def3d61901412e8a6faaf7db8406ea: 2026-10-29T23:04:42.442476+00:00 -> 2026-10-29T11:04:45.428673+00:00
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check daemon start 
+Started daemon pid=5119 (127.0.0.1:18789)
+[exit 0]
+[wait] last_run.state=finished
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks show 18def3d61901412e8a6faaf7db8406ea --json 
+{
+  "ok": true,
+  "task": {
+    "id": "18def3d61901412e8a6faaf7db8406ea",
+    "title": "memory consolidation",
+    "status": "ACTIVE",
+    "lifecycle_state": "active",
+    "due_at": "2026-10-29T23:04:45.428673+00:00",
+    "steps": [],
+    "pending_actions": [],
+    "agent_id": "openminion",
+    "cron_job_id": "18def3d61901412e8a6faaf7db8406ea",
+    "created_at": "2026-10-29T11:04:42.443578+00:00",
+    "updated_at": "2026-10-29T11:04:49.680072+00:00",
+    "operator_state": "running",
+    "resume_action": "continue",
+    "valid_actions": [
+      "pause",
+      "cancel",
+      "run-now",
+      "delete-history"
+    ],
+    "schedule": {
+      "every_ms": 43200000,
+      "jitter_ms": 0,
+      "kind": "every"
+    },
+    "schedule_summary": "every:43200000ms",
+    "schedule_revision": "2026-10-29T11:04:49.679497+00:00",
+    "enabled": true,
+    "task_kind": "scheduled_recurring",
+    "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+    "session_target": "isolated",
+    "recent_runs_limit": 5,
+    "recent_runs": [
+      {
+        "run_id": "8f7380cc5b1648d8be9387ef2d8376bb",
+        "state": "finished",
+        "due_at": "2026-10-29T11:04:45.428673+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:04:49.425182+00:00",
+        "finished_at": "2026-10-29T11:04:49.679497+00:00",
+        "summary": "openminion: Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer. (thinking=minimal)",
+        "attempts": 1,
+        "error": null,
+        "isolated_session_id": "consolidate:18def3d61901412e8a6faaf7db8406ea",
+        "delivery": {
+          "mode": "none",
+          "state": "not_requested",
+          "targets": []
+        },
+        "delivery_targets": []
+      }
+    ],
+    "last_run": {
+      "run_id": "8f7380cc5b1648d8be9387ef2d8376bb",
+      "state": "finished",
+      "due_at": "2026-10-29T11:04:45.428673+00:00",
+      "available_at": null,
+      "started_at": "2026-10-29T11:04:49.425182+00:00",
+      "finished_at": "2026-10-29T11:04:49.679497+00:00",
+      "summary": "openminion: Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer. (thinking=minimal)",
+      "attempts": 1,
+      "error": null,
+      "isolated_session_id": "consolidate:18def3d61901412e8a6faaf7db8406ea",
+      "delivery": {
+        "mode": "none",
+        "state": "not_requested",
+        "targets": []
+      },
+      "delivery_targets": [],
+      "last_error": null
+    },
+    "daemon_required": true
+  },
+  "scheduler": {
+    "state": "ready",
+    "hosted_by": "daemon",
+    "reason": null,
+    "last_heartbeat_at": "2026-10-29T11:04:53.937303+00:00",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:04:32.906423+00:00",
+    "updated_by": null
+  }
+}
+[stderr]
+2026-10-29 11:04:54,010 INFO openminion: extension event=ext.discovery payload={'plugins': 1, 'tool_plugins': 0, 'providers': 1, 'channels': 1}
+2026-10-29 11:04:54,011 INFO openminion: extension event=ext.activation payload={'plugins_loaded': 1, 'tools_loaded': 104, 'providers_loaded': 11}
+2026-10-29 11:04:54,080 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.schemas
+2026-10-29 11:04:54,080 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.tables
+2026-10-29 11:04:54,080 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.types
+2026-10-29 11:04:54,080 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.constraints
+2026-10-29 11:04:54,080 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.defaults
+2026-10-29 11:04:54,080 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.comments
+2026-10-29 11:04:54,093 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:04:54,093 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:04:54,101 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:04:54,102 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:04:54,109 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:04:54,110 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:04:54,128 INFO openminion.modules.tool.selection: selection.mode_resolved
+2026-10-29 11:04:54,129 INFO openminion.agent: BrainBridgeService initialized with home_root=<work>/homeA path_mode=integrated_runtime path_source=explicit_workspace
+2026-10-29 11:04:54,130 INFO openminion.lifecycle: event=component.started component={"capabilities": ["turn_dispatch", "heartbeat"], "component_id": "primary", "component_kind": "runtime_manager", "labels": {"runtime_mode": "hot"}, "owner_module": "openminion-runtime", "scope": "system"}
+2026-10-29 11:04:54,140 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+2026-10-29 11:04:54,143 INFO openminion.agent: Retrieve adapter initialized with pre-built retrieve service
+2026-10-29 11:04:54,156 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check daemon stop 
+Stopped daemon pid=5119
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks list --json 
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "18def3d61901412e8a6faaf7db8406ea",
+      "title": "memory consolidation",
+      "status": "ACTIVE",
+      "lifecycle_state": "active",
+      "due_at": "2026-10-29T23:04:45.428673+00:00",
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "18def3d61901412e8a6faaf7db8406ea",
+      "created_at": "2026-10-29T11:04:42.443578+00:00",
+      "updated_at": "2026-10-29T11:04:49.680072+00:00",
+      "operator_state": "running",
+      "resume_action": "continue",
+      "valid_actions": [
+        "pause",
+        "cancel",
+        "run-now",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 43200000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:43200000ms",
+      "schedule_revision": "2026-10-29T11:04:49.679497+00:00",
+      "enabled": true,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [
+        {
+          "run_id": "8f7380cc5b1648d8be9387ef2d8376bb",
+          "state": "finished",
+          "due_at": "2026-10-29T11:04:45.428673+00:00",
+          "available_at": null,
+          "started_at": "2026-10-29T11:04:49.425182+00:00",
+          "finished_at": "2026-10-29T11:04:49.679497+00:00",
+          "summary": "openminion: Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer. (thinking=minimal)",
+          "attempts": 1,
+          "error": null,
+          "isolated_session_id": "consolidate:18def3d61901412e8a6faaf7db8406ea",
+          "delivery": {
+            "mode": "none",
+            "state": "not_requested",
+            "targets": []
+          },
+          "delivery_targets": []
+        }
+      ],
+      "last_run": {
+        "run_id": "8f7380cc5b1648d8be9387ef2d8376bb",
+        "state": "finished",
+        "due_at": "2026-10-29T11:04:45.428673+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:04:49.425182+00:00",
+        "finished_at": "2026-10-29T11:04:49.679497+00:00",
+        "summary": "openminion: Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer. (thinking=minimal)",
+        "attempts": 1,
+        "error": null,
+        "isolated_session_id": "consolidate:18def3d61901412e8a6faaf7db8406ea",
+        "delivery": {
+          "mode": "none",
+          "state": "not_requested",
+          "targets": []
+        },
+        "delivery_targets": [],
+        "last_error": null
+      },
+      "daemon_required": true
+    },
+    {
+      "id": "bb619fc531e44eeeb92b6968d94ad58a",
+      "title": "memory consolidation",
+      "status": "WAITING",
+      "lifecycle_state": "paused",
+      "due_at": null,
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "bb619fc531e44eeeb92b6968d94ad58a",
+      "created_at": "2026-10-29T11:04:30.148642+00:00",
+      "updated_at": "2026-10-29T11:04:40.251627+00:00",
+      "operator_state": "waiting",
+      "resume_action": "continue",
+      "valid_actions": [
+        "resume",
+        "cancel",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 43200000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:43200000ms",
+      "schedule_revision": "2026-10-29T11:04:40.252789+00:00",
+      "enabled": false,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    }
+  ],
+  "pending_actions": [],
+  "count": 2,
+  "source": "task_manager",
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:04:32.906423+00:00",
+    "updated_by": null
+  }
+}
+[stderr]
+2026-10-29 11:04:59,131 INFO openminion: extension event=ext.discovery payload={'plugins': 1, 'tool_plugins': 0, 'providers': 1, 'channels': 1}
+2026-10-29 11:04:59,132 INFO openminion: extension event=ext.activation payload={'plugins_loaded': 1, 'tools_loaded': 104, 'providers_loaded': 11}
+2026-10-29 11:04:59,198 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.schemas
+2026-10-29 11:04:59,198 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.tables
+2026-10-29 11:04:59,198 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.types
+2026-10-29 11:04:59,198 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.constraints
+2026-10-29 11:04:59,198 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.defaults
+2026-10-29 11:04:59,198 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.comments
+2026-10-29 11:04:59,211 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:04:59,211 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:04:59,220 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:04:59,221 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:04:59,229 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:04:59,229 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:04:59,251 INFO openminion.modules.tool.selection: selection.mode_resolved
+2026-10-29 11:04:59,252 INFO openminion.agent: BrainBridgeService initialized with home_root=<work>/homeA path_mode=integrated_runtime path_source=explicit_workspace
+2026-10-29 11:04:59,253 INFO openminion.lifecycle: event=component.started component={"capabilities": ["turn_dispatch", "heartbeat"], "component_id": "primary", "component_kind": "runtime_manager", "labels": {"runtime_mode": "hot"}, "owner_module": "openminion-runtime", "scope": "system"}
+2026-10-29 11:04:59,261 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+2026-10-29 11:04:59,265 INFO openminion.agent: Retrieve adapter initialized with pre-built retrieve service
+2026-10-29 11:04:59,277 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+[exit 0]
+consolidation tasks:
+  18def3d61901412e8a6faaf7db8406ea  lifecycle_state=active  enabled=True  last_run=finished  valid_actions=['pause', 'cancel', 'run-now', 'delete-history']
+  bb619fc531e44eeeb92b6968d94ad58a  lifecycle_state=paused  enabled=False  last_run=None  valid_actions=['resume', 'cancel', 'delete-history']
+enabled: ['18def3d61901412e8a6faaf7db8406ea']
+
+# home B: a consolidation job created by 0.1.14 that runs once on this package
+config: homeB/agents.json (echo agent 'openminion', daemon_auto_start false)
+
+$ openminion(0.1.14) --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tools run task.consolidate_memory --json '{"interval_hours": 6, "batch_limit": 5}' 
+{
+  "artifact_refs": [
+    {
+      "ref": "artifact://tool/tools/task.consolidate_memory",
+      "tool": "task.consolidate_memory",
+      "type": "tool_result"
+    }
+  ],
+  "ok": true,
+  "runtime_fallback_reason": "openminion daemon is not running",
+  "runtime_source": "inproc",
+  "tool": {
+    "content": "{\"batch_limit\": 5, \"consolidation_session_id\": \"consolidate:ff4ea525f6e940c98f9d3268177f01a8\", \"enabled\": true, \"name\": \"memory consolidation\", \"next_due_at\": \"2026-10-29T17:05:01.621345+00:00\", \"schedule\": {\"every_ms\": 21600000, \"jitter_ms\": 0, \"kind\": \"every\"}, \"scheduler_note\": \"Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start\", \"target_scope\": \"agent:openminion\", \"task_id\": \"ff4ea525f6e940c98f9d3268177f01a8\"}",
+    "data": {
+      "batch_limit": 5,
+      "consolidation_session_id": "consolidate:ff4ea525f6e940c98f9d3268177f01a8",
+      "enabled": true,
+      "model_tool_name": "task.consolidate_memory",
+      "name": "memory consolidation",
+      "next_due_at": "2026-10-29T17:05:01.621345+00:00",
+      "runtime_binding_id": "runtime.task.consolidate_memory",
+      "runtime_fallback_chain": [
+        "task.consolidate_memory"
+      ],
+      "runtime_fallback_used": false,
+      "runtime_resolution_source": "runtime_direct",
+      "runtime_tool_name": "task.consolidate_memory",
+      "schedule": {
+        "every_ms": 21600000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "scheduler_note": "Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start",
+      "target_scope": "agent:openminion",
+      "task_id": "ff4ea525f6e940c98f9d3268177f01a8",
+      "tool_blast_radius": "local_mutation",
+      "tool_min_scope": "WRITE_SAFE"
+    },
+    "error": "",
+    "name": "task.consolidate_memory",
+    "ok": true,
+    "verified": true
+  }
+}
+[exit 0]
+[setup] legacy task in B: ff4ea525f6e940c98f9d3268177f01a8
+[setup] .openminion/state/brain/sessions.db: cron_jobs.next_due_at of ff4ea525f6e940c98f9d3268177f01a8: 2026-10-29T17:05:01.621345+00:00 -> 2026-10-29T11:05:02.162424+00:00
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check daemon start 
+Started daemon pid=5314 (127.0.0.1:18789)
+[exit 0]
+[wait] last_run.state=failed
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check daemon stop 
+Stopped daemon pid=5314
+[exit 0]
+
+# B. inspect the paused job
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks list --json 
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "ff4ea525f6e940c98f9d3268177f01a8",
+      "title": "memory consolidation",
+      "status": "WAITING",
+      "lifecycle_state": "paused",
+      "due_at": null,
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "ff4ea525f6e940c98f9d3268177f01a8",
+      "created_at": "2026-10-29T11:05:01.621509+00:00",
+      "updated_at": "2026-10-29T11:05:05.876282+00:00",
+      "operator_state": "waiting",
+      "resume_action": "continue",
+      "valid_actions": [
+        "resume",
+        "cancel",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 21600000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:21600000ms",
+      "schedule_revision": "2026-10-29T11:05:05.875869+00:00",
+      "enabled": false,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [
+        {
+          "run_id": "7c6d2e13afb94b33a420dbb722e95ab2",
+          "state": "failed",
+          "due_at": "2026-10-29T11:05:02.162424+00:00",
+          "available_at": null,
+          "started_at": "2026-10-29T11:05:05.871794+00:00",
+          "finished_at": "2026-10-29T11:05:05.875869+00:00",
+          "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+          "attempts": 1,
+          "error": {
+            "code": "cron_failed",
+            "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+          },
+          "isolated_session_id": "cron:ff4ea525f6e940c98f9d3268177f01a8:7c6d2e13afb94b33a420dbb722e95ab2",
+          "delivery": null,
+          "delivery_targets": []
+        }
+      ],
+      "last_run": {
+        "run_id": "7c6d2e13afb94b33a420dbb722e95ab2",
+        "state": "failed",
+        "due_at": "2026-10-29T11:05:02.162424+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:05:05.871794+00:00",
+        "finished_at": "2026-10-29T11:05:05.875869+00:00",
+        "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+        "attempts": 1,
+        "error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        },
+        "isolated_session_id": "cron:ff4ea525f6e940c98f9d3268177f01a8:7c6d2e13afb94b33a420dbb722e95ab2",
+        "delivery": null,
+        "delivery_targets": [],
+        "last_error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        }
+      },
+      "daemon_required": true
+    }
+  ],
+  "pending_actions": [],
+  "count": 1,
+  "source": "task_manager",
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:05:05.870639+00:00",
+    "updated_by": null
+  }
+}
+[stderr]
+2026-10-29 11:05:12,787 INFO openminion: extension event=ext.discovery payload={'plugins': 1, 'tool_plugins': 0, 'providers': 1, 'channels': 1}
+2026-10-29 11:05:12,788 INFO openminion: extension event=ext.activation payload={'plugins_loaded': 1, 'tools_loaded': 104, 'providers_loaded': 11}
+2026-10-29 11:05:12,852 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.schemas
+2026-10-29 11:05:12,852 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.tables
+2026-10-29 11:05:12,852 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.types
+2026-10-29 11:05:12,852 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.constraints
+2026-10-29 11:05:12,852 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.defaults
+2026-10-29 11:05:12,852 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.comments
+2026-10-29 11:05:12,865 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:05:12,865 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:05:12,875 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:05:12,875 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:05:12,883 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:05:12,883 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:05:12,902 INFO openminion.modules.tool.selection: selection.mode_resolved
+2026-10-29 11:05:12,903 INFO openminion.agent: BrainBridgeService initialized with home_root=<work>/homeB path_mode=integrated_runtime path_source=explicit_workspace
+2026-10-29 11:05:12,904 INFO openminion.lifecycle: event=component.started component={"capabilities": ["turn_dispatch", "heartbeat"], "component_id": "primary", "component_kind": "runtime_manager", "labels": {"runtime_mode": "hot"}, "owner_module": "openminion-runtime", "scope": "system"}
+2026-10-29 11:05:12,912 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+2026-10-29 11:05:12,915 INFO openminion.agent: Retrieve adapter initialized with pre-built retrieve service
+2026-10-29 11:05:12,928 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+[exit 0]
+consolidation tasks:
+  ff4ea525f6e940c98f9d3268177f01a8  lifecycle_state=paused  enabled=False  last_run=failed  valid_actions=['resume', 'cancel', 'delete-history']
+enabled: []
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks show ff4ea525f6e940c98f9d3268177f01a8 --json 
+{
+  "ok": true,
+  "task": {
+    "id": "ff4ea525f6e940c98f9d3268177f01a8",
+    "title": "memory consolidation",
+    "status": "WAITING",
+    "lifecycle_state": "paused",
+    "due_at": null,
+    "steps": [],
+    "pending_actions": [],
+    "agent_id": "openminion",
+    "cron_job_id": "ff4ea525f6e940c98f9d3268177f01a8",
+    "created_at": "2026-10-29T11:05:01.621509+00:00",
+    "updated_at": "2026-10-29T11:05:05.876282+00:00",
+    "operator_state": "waiting",
+    "resume_action": "continue",
+    "valid_actions": [
+      "resume",
+      "cancel",
+      "delete-history"
+    ],
+    "schedule": {
+      "every_ms": 21600000,
+      "jitter_ms": 0,
+      "kind": "every"
+    },
+    "schedule_summary": "every:21600000ms",
+    "schedule_revision": "2026-10-29T11:05:05.875869+00:00",
+    "enabled": false,
+    "task_kind": "scheduled_recurring",
+    "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+    "session_target": "isolated",
+    "recent_runs_limit": 5,
+    "recent_runs": [
+      {
+        "run_id": "7c6d2e13afb94b33a420dbb722e95ab2",
+        "state": "failed",
+        "due_at": "2026-10-29T11:05:02.162424+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:05:05.871794+00:00",
+        "finished_at": "2026-10-29T11:05:05.875869+00:00",
+        "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+        "attempts": 1,
+        "error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        },
+        "isolated_session_id": "cron:ff4ea525f6e940c98f9d3268177f01a8:7c6d2e13afb94b33a420dbb722e95ab2",
+        "delivery": null,
+        "delivery_targets": []
+      }
+    ],
+    "last_run": {
+      "run_id": "7c6d2e13afb94b33a420dbb722e95ab2",
+      "state": "failed",
+      "due_at": "2026-10-29T11:05:02.162424+00:00",
+      "available_at": null,
+      "started_at": "2026-10-29T11:05:05.871794+00:00",
+      "finished_at": "2026-10-29T11:05:05.875869+00:00",
+      "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+      "attempts": 1,
+      "error": {
+        "code": "cron_failed",
+        "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+      },
+      "isolated_session_id": "cron:ff4ea525f6e940c98f9d3268177f01a8:7c6d2e13afb94b33a420dbb722e95ab2",
+      "delivery": null,
+      "delivery_targets": [],
+      "last_error": {
+        "code": "cron_failed",
+        "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+      }
+    },
+    "daemon_required": true
+  },
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:05:05.870639+00:00",
+    "updated_by": null
+  }
+}
+[stderr]
+2026-10-29 11:05:15,117 INFO openminion: extension event=ext.discovery payload={'plugins': 1, 'tool_plugins': 0, 'providers': 1, 'channels': 1}
+2026-10-29 11:05:15,118 INFO openminion: extension event=ext.activation payload={'plugins_loaded': 1, 'tools_loaded': 104, 'providers_loaded': 11}
+2026-10-29 11:05:15,184 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.schemas
+2026-10-29 11:05:15,184 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.tables
+2026-10-29 11:05:15,184 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.types
+2026-10-29 11:05:15,184 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.constraints
+2026-10-29 11:05:15,184 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.defaults
+2026-10-29 11:05:15,184 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.comments
+2026-10-29 11:05:15,196 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:05:15,196 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:05:15,208 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:05:15,208 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:05:15,216 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:05:15,216 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:05:15,236 INFO openminion.modules.tool.selection: selection.mode_resolved
+2026-10-29 11:05:15,237 INFO openminion.agent: BrainBridgeService initialized with home_root=<work>/homeB path_mode=integrated_runtime path_source=explicit_workspace
+2026-10-29 11:05:15,238 INFO openminion.lifecycle: event=component.started component={"capabilities": ["turn_dispatch", "heartbeat"], "component_id": "primary", "component_kind": "runtime_manager", "labels": {"runtime_mode": "hot"}, "owner_module": "openminion-runtime", "scope": "system"}
+2026-10-29 11:05:15,246 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+2026-10-29 11:05:15,249 INFO openminion.agent: Retrieve adapter initialized with pre-built retrieve service
+2026-10-29 11:05:15,261 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tools run task.list --json '{"limit": 50}' 
+{
+  "artifact_refs": [
+    {
+      "ref": "artifact://tool/tools/task.list",
+      "tool": "task.list",
+      "type": "tool_result"
+    }
+  ],
+  "ok": true,
+  "runtime_fallback_reason": "openminion daemon is not running",
+  "runtime_source": "inproc",
+  "tool": {
+    "content": "{\"count\": 1, \"limit\": 50, \"tasks\": [{\"agent_id\": \"openminion\", \"concurrency_key\": \"memory-consolidation:agent:openminion\", \"consolidation\": {\"batch_limit\": 5, \"max_iterations\": 2, \"target_scope\": \"agent:openminion\", \"timeout_seconds\": 30}, \"created_at\": \"2026-10-29T11:05:01.621345+00:00\", \"enabled\": false, \"id\": \"ff4ea525f6e940c98f9d3268177f01a8\", \"last_run_at\": \"2026-10-29T11:05:05.875869+00:00\", \"last_run_note\": null, \"last_run_state\": \"failed\", \"lifecycle_state\": \"paused\", \"name\": \"memory consolidation\", \"next_due_at\": null, \"pending_first_run\": false, \"retry_policy\": {\"max_attempts\": 3, \"retry_backoff_s\": 30}, \"schedule\": {\"every_ms\": 21600000, \"jitter_ms\": 0, \"kind\": \"every\", \"summary\": \"every:21600000ms\"}, \"status\": \"WAITING\", \"task_id\": \"ff4ea525f6e940c98f9d3268177f01a8\", \"task_kind\": \"scheduled_recurring\", \"valid_actions\": [\"resume\", \"cancel\", \"delete-history\"], \"watch\": null}]}",
+    "data": {
+      "count": 1,
+      "limit": 50,
+      "model_tool_name": "task.list",
+      "runtime_binding_id": "runtime.task.list",
+      "runtime_fallback_chain": [
+        "task.list"
+      ],
+      "runtime_fallback_used": false,
+      "runtime_resolution_source": "runtime_direct",
+      "runtime_tool_name": "task.list",
+      "tasks": [
+        {
+          "agent_id": "openminion",
+          "concurrency_key": "memory-consolidation:agent:openminion",
+          "consolidation": {
+            "batch_limit": 5,
+            "max_iterations": 2,
+            "target_scope": "agent:openminion",
+            "timeout_seconds": 30
+          },
+          "created_at": "2026-10-29T11:05:01.621345+00:00",
+          "enabled": false,
+          "id": "ff4ea525f6e940c98f9d3268177f01a8",
+          "last_run_at": "2026-10-29T11:05:05.875869+00:00",
+          "last_run_note": null,
+          "last_run_state": "failed",
+          "lifecycle_state": "paused",
+          "name": "memory consolidation",
+          "next_due_at": null,
+          "pending_first_run": false,
+          "retry_policy": {
+            "max_attempts": 3,
+            "retry_backoff_s": 30
+          },
+          "schedule": {
+            "every_ms": 21600000,
+            "jitter_ms": 0,
+            "kind": "every",
+            "summary": "every:21600000ms"
+          },
+          "status": "WAITING",
+          "task_id": "ff4ea525f6e940c98f9d3268177f01a8",
+          "task_kind": "scheduled_recurring",
+          "valid_actions": [
+            "resume",
+            "cancel",
+            "delete-history"
+          ],
+          "watch": null
+        }
+      ],
+      "tool_blast_radius": "read_only",
+      "tool_min_scope": "READ_ONLY"
+    },
+    "error": "",
+    "name": "task.list",
+    "ok": true,
+    "verified": true
+  }
+}
+[exit 0]
+
+# B. resume only re-enables it (observation)
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks resume ff4ea525f6e940c98f9d3268177f01a8 --json 
+{
+  "ok": true,
+  "action": "resume",
+  "error": "",
+  "task_id": "ff4ea525f6e940c98f9d3268177f01a8",
+  "resumed": true,
+  "enabled": true,
+  "schedule": {
+    "every_ms": 21600000,
+    "jitter_ms": 0,
+    "kind": "every"
+  },
+  "next_due_at": "2026-10-29T17:05:20.066381+00:00",
+  "model_tool_name": "task.resume",
+  "runtime_binding_id": "runtime.task.resume",
+  "runtime_tool_name": "task.resume",
+  "runtime_fallback_chain": [
+    "task.resume"
+  ],
+  "runtime_fallback_used": false,
+  "runtime_resolution_source": "runtime_direct",
+  "tool_blast_radius": "local_mutation",
+  "tool_min_scope": "WRITE_SAFE",
+  "task": {
+    "id": "ff4ea525f6e940c98f9d3268177f01a8",
+    "title": "memory consolidation",
+    "status": "ACTIVE",
+    "lifecycle_state": "active",
+    "due_at": "2026-10-29T17:05:20.066381+00:00",
+    "steps": [],
+    "pending_actions": [],
+    "agent_id": "openminion",
+    "cron_job_id": "ff4ea525f6e940c98f9d3268177f01a8",
+    "created_at": "2026-10-29T11:05:01.621509+00:00",
+    "updated_at": "2026-10-29T11:05:20.067004+00:00",
+    "operator_state": "running",
+    "resume_action": "continue",
+    "valid_actions": [
+      "pause",
+      "cancel",
+      "run-now",
+      "delete-history"
+    ],
+    "schedule": {
+      "every_ms": 21600000,
+      "jitter_ms": 0,
+      "kind": "every"
+    },
+    "schedule_summary": "every:21600000ms",
+    "schedule_revision": "2026-10-29T11:05:20.066381+00:00",
+    "enabled": true,
+    "task_kind": "scheduled_recurring",
+    "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+    "session_target": "isolated",
+    "recent_runs_limit": 5,
+    "recent_runs": [
+      {
+        "run_id": "7c6d2e13afb94b33a420dbb722e95ab2",
+        "state": "failed",
+        "due_at": "2026-10-29T11:05:02.162424+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:05:05.871794+00:00",
+        "finished_at": "2026-10-29T11:05:05.875869+00:00",
+        "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+        "attempts": 1,
+        "error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        },
+        "isolated_session_id": "cron:ff4ea525f6e940c98f9d3268177f01a8:7c6d2e13afb94b33a420dbb722e95ab2",
+        "delivery": null,
+        "delivery_targets": []
+      }
+    ],
+    "last_run": {
+      "run_id": "7c6d2e13afb94b33a420dbb722e95ab2",
+      "state": "failed",
+      "due_at": "2026-10-29T11:05:02.162424+00:00",
+      "available_at": null,
+      "started_at": "2026-10-29T11:05:05.871794+00:00",
+      "finished_at": "2026-10-29T11:05:05.875869+00:00",
+      "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+      "attempts": 1,
+      "error": {
+        "code": "cron_failed",
+        "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+      },
+      "isolated_session_id": "cron:ff4ea525f6e940c98f9d3268177f01a8:7c6d2e13afb94b33a420dbb722e95ab2",
+      "delivery": null,
+      "delivery_targets": [],
+      "last_error": {
+        "code": "cron_failed",
+        "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+      }
+    },
+    "daemon_required": true
+  },
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:05:05.870639+00:00",
+    "updated_by": null
+  }
+}
+[stderr]
+2026-10-29 11:05:19,917 INFO openminion: extension event=ext.activation payload={'plugins_loaded': 1, 'tools_loaded': 104, 'providers_loaded': 11}
+2026-10-29 11:05:19,984 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.schemas
+2026-10-29 11:05:19,984 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.tables
+2026-10-29 11:05:19,984 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.types
+2026-10-29 11:05:19,984 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.constraints
+2026-10-29 11:05:19,984 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.defaults
+2026-10-29 11:05:19,984 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.comments
+2026-10-29 11:05:19,996 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:05:19,996 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:05:20,006 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:05:20,007 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:05:20,014 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:05:20,014 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:05:20,034 INFO openminion.modules.tool.selection: selection.mode_resolved
+2026-10-29 11:05:20,034 INFO openminion.agent: BrainBridgeService initialized with home_root=<work>/homeB path_mode=integrated_runtime path_source=explicit_workspace
+2026-10-29 11:05:20,035 INFO openminion.lifecycle: event=component.started component={"capabilities": ["turn_dispatch", "heartbeat"], "component_id": "primary", "component_kind": "runtime_manager", "labels": {"runtime_mode": "hot"}, "owner_module": "openminion-runtime", "scope": "system"}
+2026-10-29 11:05:20,043 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+2026-10-29 11:05:20,046 INFO openminion.agent: Retrieve adapter initialized with pre-built retrieve service
+2026-10-29 11:05:20,059 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+2026-10-29 11:05:20,063 INFO openminion.modules.tool.selection: selection.mode_resolved
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks list --json 
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "ff4ea525f6e940c98f9d3268177f01a8",
+      "title": "memory consolidation",
+      "status": "ACTIVE",
+      "lifecycle_state": "active",
+      "due_at": "2026-10-29T17:05:20.066381+00:00",
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "ff4ea525f6e940c98f9d3268177f01a8",
+      "created_at": "2026-10-29T11:05:01.621509+00:00",
+      "updated_at": "2026-10-29T11:05:20.067004+00:00",
+      "operator_state": "running",
+      "resume_action": "continue",
+      "valid_actions": [
+        "pause",
+        "cancel",
+        "run-now",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 21600000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:21600000ms",
+      "schedule_revision": "2026-10-29T11:05:20.066381+00:00",
+      "enabled": true,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [
+        {
+          "run_id": "7c6d2e13afb94b33a420dbb722e95ab2",
+          "state": "failed",
+          "due_at": "2026-10-29T11:05:02.162424+00:00",
+          "available_at": null,
+          "started_at": "2026-10-29T11:05:05.871794+00:00",
+          "finished_at": "2026-10-29T11:05:05.875869+00:00",
+          "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+          "attempts": 1,
+          "error": {
+            "code": "cron_failed",
+            "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+          },
+          "isolated_session_id": "cron:ff4ea525f6e940c98f9d3268177f01a8:7c6d2e13afb94b33a420dbb722e95ab2",
+          "delivery": null,
+          "delivery_targets": []
+        }
+      ],
+      "last_run": {
+        "run_id": "7c6d2e13afb94b33a420dbb722e95ab2",
+        "state": "failed",
+        "due_at": "2026-10-29T11:05:02.162424+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:05:05.871794+00:00",
+        "finished_at": "2026-10-29T11:05:05.875869+00:00",
+        "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+        "attempts": 1,
+        "error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        },
+        "isolated_session_id": "cron:ff4ea525f6e940c98f9d3268177f01a8:7c6d2e13afb94b33a420dbb722e95ab2",
+        "delivery": null,
+        "delivery_targets": [],
+        "last_error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        }
+      },
+      "daemon_required": true
+    }
+  ],
+  "pending_actions": [],
+  "count": 1,
+  "source": "task_manager",
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:05:05.870639+00:00",
+    "updated_by": null
+  }
+}
+[stderr]
+2026-10-29 11:05:22,307 INFO openminion: extension event=ext.discovery payload={'plugins': 1, 'tool_plugins': 0, 'providers': 1, 'channels': 1}
+2026-10-29 11:05:22,308 INFO openminion: extension event=ext.activation payload={'plugins_loaded': 1, 'tools_loaded': 104, 'providers_loaded': 11}
+2026-10-29 11:05:22,374 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.schemas
+2026-10-29 11:05:22,374 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.tables
+2026-10-29 11:05:22,374 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.types
+2026-10-29 11:05:22,374 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.constraints
+2026-10-29 11:05:22,374 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.defaults
+2026-10-29 11:05:22,374 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.comments
+2026-10-29 11:05:22,386 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:05:22,386 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:05:22,396 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:05:22,396 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:05:22,404 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:05:22,405 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:05:22,425 INFO openminion.modules.tool.selection: selection.mode_resolved
+2026-10-29 11:05:22,426 INFO openminion.agent: BrainBridgeService initialized with home_root=<work>/homeB path_mode=integrated_runtime path_source=explicit_workspace
+2026-10-29 11:05:22,426 INFO openminion.lifecycle: event=component.started component={"capabilities": ["turn_dispatch", "heartbeat"], "component_id": "primary", "component_kind": "runtime_manager", "labels": {"runtime_mode": "hot"}, "owner_module": "openminion-runtime", "scope": "system"}
+2026-10-29 11:05:22,435 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+2026-10-29 11:05:22,438 INFO openminion.agent: Retrieve adapter initialized with pre-built retrieve service
+2026-10-29 11:05:22,451 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+[exit 0]
+consolidation tasks:
+  ff4ea525f6e940c98f9d3268177f01a8  lifecycle_state=active  enabled=True  last_run=failed  valid_actions=['pause', 'cancel', 'run-now', 'delete-history']
+enabled: ['ff4ea525f6e940c98f9d3268177f01a8']
+
+# B. cancel the old job, then create its replacement
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks cancel ff4ea525f6e940c98f9d3268177f01a8 --json 
+{
+  "ok": true,
+  "action": "cancel",
+  "error": "",
+  "task_id": "ff4ea525f6e940c98f9d3268177f01a8",
+  "cancelled": true,
+  "task_cancelled": true,
+  "model_tool_name": "task.cancel",
+  "runtime_binding_id": "runtime.task.cancel",
+  "runtime_tool_name": "task.cancel",
+  "runtime_fallback_chain": [
+    "task.cancel"
+  ],
+  "runtime_fallback_used": false,
+  "runtime_resolution_source": "runtime_direct",
+  "tool_blast_radius": "local_mutation",
+  "tool_min_scope": "WRITE_SAFE",
+  "task": {
+    "id": "ff4ea525f6e940c98f9d3268177f01a8",
+    "title": "memory consolidation",
+    "status": "CANCELED",
+    "lifecycle_state": "cancelled",
+    "due_at": null,
+    "steps": [],
+    "pending_actions": [],
+    "agent_id": "openminion",
+    "cron_job_id": "ff4ea525f6e940c98f9d3268177f01a8",
+    "created_at": "2026-10-29T11:05:01.621509+00:00",
+    "updated_at": "2026-10-29T11:05:24.865381+00:00",
+    "operator_state": "cancelled",
+    "resume_action": "none",
+    "valid_actions": [
+      "delete-history"
+    ],
+    "schedule": {
+      "every_ms": 21600000,
+      "jitter_ms": 0,
+      "kind": "every"
+    },
+    "schedule_summary": "every:21600000ms",
+    "schedule_revision": "2026-10-29T11:05:24.866593+00:00",
+    "enabled": false,
+    "task_kind": "scheduled_recurring",
+    "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+    "session_target": "isolated",
+    "recent_runs_limit": 5,
+    "recent_runs": [
+      {
+        "run_id": "7c6d2e13afb94b33a420dbb722e95ab2",
+        "state": "failed",
+        "due_at": "2026-10-29T11:05:02.162424+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:05:05.871794+00:00",
+        "finished_at": "2026-10-29T11:05:05.875869+00:00",
+        "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+        "attempts": 1,
+        "error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        },
+        "isolated_session_id": "cron:ff4ea525f6e940c98f9d3268177f01a8:7c6d2e13afb94b33a420dbb722e95ab2",
+        "delivery": null,
+        "delivery_targets": []
+      }
+    ],
+    "last_run": {
+      "run_id": "7c6d2e13afb94b33a420dbb722e95ab2",
+      "state": "failed",
+      "due_at": "2026-10-29T11:05:02.162424+00:00",
+      "available_at": null,
+      "started_at": "2026-10-29T11:05:05.871794+00:00",
+      "finished_at": "2026-10-29T11:05:05.875869+00:00",
+      "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+      "attempts": 1,
+      "error": {
+        "code": "cron_failed",
+        "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+      },
+      "isolated_session_id": "cron:ff4ea525f6e940c98f9d3268177f01a8:7c6d2e13afb94b33a420dbb722e95ab2",
+      "delivery": null,
+      "delivery_targets": [],
+      "last_error": {
+        "code": "cron_failed",
+        "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+      }
+    },
+    "daemon_required": true
+  },
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:05:05.870639+00:00",
+    "updated_by": null
+  }
+}
+[stderr]
+2026-10-29 11:05:24,711 INFO openminion: extension event=ext.activation payload={'plugins_loaded': 1, 'tools_loaded': 104, 'providers_loaded': 11}
+2026-10-29 11:05:24,781 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.schemas
+2026-10-29 11:05:24,781 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.tables
+2026-10-29 11:05:24,781 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.types
+2026-10-29 11:05:24,781 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.constraints
+2026-10-29 11:05:24,781 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.defaults
+2026-10-29 11:05:24,781 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.comments
+2026-10-29 11:05:24,793 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:05:24,793 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:05:24,803 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:05:24,804 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:05:24,811 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:05:24,812 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:05:24,831 INFO openminion.modules.tool.selection: selection.mode_resolved
+2026-10-29 11:05:24,832 INFO openminion.agent: BrainBridgeService initialized with home_root=<work>/homeB path_mode=integrated_runtime path_source=explicit_workspace
+2026-10-29 11:05:24,833 INFO openminion.lifecycle: event=component.started component={"capabilities": ["turn_dispatch", "heartbeat"], "component_id": "primary", "component_kind": "runtime_manager", "labels": {"runtime_mode": "hot"}, "owner_module": "openminion-runtime", "scope": "system"}
+2026-10-29 11:05:24,841 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+2026-10-29 11:05:24,844 INFO openminion.agent: Retrieve adapter initialized with pre-built retrieve service
+2026-10-29 11:05:24,857 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+2026-10-29 11:05:24,862 INFO openminion.modules.tool.selection: selection.mode_resolved
+[exit 0]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tools run task.consolidate_memory --json '{"interval_hours": 6, "batch_limit": 5}' 
+{
+  "artifact_refs": [
+    {
+      "ref": "artifact://tool/tools/task.consolidate_memory",
+      "tool": "task.consolidate_memory",
+      "type": "tool_result"
+    }
+  ],
+  "ok": true,
+  "runtime_fallback_reason": "openminion daemon is not running",
+  "runtime_source": "inproc",
+  "tool": {
+    "content": "{\"batch_limit\": 5, \"consolidation_session_id\": \"consolidate:006b95e396544884bc53346a88d2d481\", \"enabled\": true, \"name\": \"memory consolidation\", \"next_due_at\": \"2026-10-29T17:05:27.213995+00:00\", \"schedule\": {\"every_ms\": 21600000, \"jitter_ms\": 0, \"kind\": \"every\"}, \"scheduler_note\": \"Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start\", \"target_scope\": \"agent:openminion\", \"task_id\": \"006b95e396544884bc53346a88d2d481\"}",
+    "data": {
+      "batch_limit": 5,
+      "consolidation_session_id": "consolidate:006b95e396544884bc53346a88d2d481",
+      "enabled": true,
+      "model_tool_name": "task.consolidate_memory",
+      "name": "memory consolidation",
+      "next_due_at": "2026-10-29T17:05:27.213995+00:00",
+      "runtime_binding_id": "runtime.task.consolidate_memory",
+      "runtime_fallback_chain": [
+        "task.consolidate_memory"
+      ],
+      "runtime_fallback_used": false,
+      "runtime_resolution_source": "runtime_direct",
+      "runtime_tool_name": "task.consolidate_memory",
+      "schedule": {
+        "every_ms": 21600000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "scheduler_note": "Memory consolidation scheduled. Runs execute only while the openminion daemon is running. Start it with: openminion daemon start",
+      "target_scope": "agent:openminion",
+      "task_id": "006b95e396544884bc53346a88d2d481",
+      "tool_blast_radius": "local_mutation",
+      "tool_min_scope": "WRITE_SAFE"
+    },
+    "error": "",
+    "name": "task.consolidate_memory",
+    "ok": true,
+    "verified": true
+  }
+}
+[exit 0]
+[replacement in B: 006b95e396544884bc53346a88d2d481]
+
+# B. verify: only the replacement is enabled
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks list --json 
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "006b95e396544884bc53346a88d2d481",
+      "title": "memory consolidation",
+      "status": "ACTIVE",
+      "lifecycle_state": "active",
+      "due_at": "2026-10-29T17:05:27.213995+00:00",
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "006b95e396544884bc53346a88d2d481",
+      "created_at": "2026-10-29T11:05:27.214931+00:00",
+      "updated_at": "2026-10-29T11:05:27.214931+00:00",
+      "operator_state": "running",
+      "resume_action": "continue",
+      "valid_actions": [
+        "pause",
+        "cancel",
+        "run-now",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 21600000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:21600000ms",
+      "schedule_revision": "2026-10-29T11:05:27.213995+00:00",
+      "enabled": true,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    },
+    {
+      "id": "ff4ea525f6e940c98f9d3268177f01a8",
+      "title": "memory consolidation",
+      "status": "CANCELED",
+      "lifecycle_state": "cancelled",
+      "due_at": null,
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "ff4ea525f6e940c98f9d3268177f01a8",
+      "created_at": "2026-10-29T11:05:01.621509+00:00",
+      "updated_at": "2026-10-29T11:05:24.865381+00:00",
+      "operator_state": "cancelled",
+      "resume_action": "none",
+      "valid_actions": [
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 21600000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:21600000ms",
+      "schedule_revision": "2026-10-29T11:05:24.866593+00:00",
+      "enabled": false,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [
+        {
+          "run_id": "7c6d2e13afb94b33a420dbb722e95ab2",
+          "state": "failed",
+          "due_at": "2026-10-29T11:05:02.162424+00:00",
+          "available_at": null,
+          "started_at": "2026-10-29T11:05:05.871794+00:00",
+          "finished_at": "2026-10-29T11:05:05.875869+00:00",
+          "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+          "attempts": 1,
+          "error": {
+            "code": "cron_failed",
+            "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+          },
+          "isolated_session_id": "cron:ff4ea525f6e940c98f9d3268177f01a8:7c6d2e13afb94b33a420dbb722e95ab2",
+          "delivery": null,
+          "delivery_targets": []
+        }
+      ],
+      "last_run": {
+        "run_id": "7c6d2e13afb94b33a420dbb722e95ab2",
+        "state": "failed",
+        "due_at": "2026-10-29T11:05:02.162424+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:05:05.871794+00:00",
+        "finished_at": "2026-10-29T11:05:05.875869+00:00",
+        "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+        "attempts": 1,
+        "error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        },
+        "isolated_session_id": "cron:ff4ea525f6e940c98f9d3268177f01a8:7c6d2e13afb94b33a420dbb722e95ab2",
+        "delivery": null,
+        "delivery_targets": [],
+        "last_error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        }
+      },
+      "daemon_required": true
+    }
+  ],
+  "pending_actions": [],
+  "count": 2,
+  "source": "task_manager",
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:05:05.870639+00:00",
+    "updated_by": null
+  }
+}
+[stderr]
+2026-10-29 11:05:29,615 INFO openminion: extension event=ext.discovery payload={'plugins': 1, 'tool_plugins': 0, 'providers': 1, 'channels': 1}
+2026-10-29 11:05:29,617 INFO openminion: extension event=ext.activation payload={'plugins_loaded': 1, 'tools_loaded': 104, 'providers_loaded': 11}
+2026-10-29 11:05:29,690 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.schemas
+2026-10-29 11:05:29,690 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.tables
+2026-10-29 11:05:29,690 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.types
+2026-10-29 11:05:29,690 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.constraints
+2026-10-29 11:05:29,690 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.defaults
+2026-10-29 11:05:29,690 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.comments
+2026-10-29 11:05:29,702 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:05:29,702 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:05:29,712 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:05:29,712 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:05:29,720 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:05:29,720 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:05:29,739 INFO openminion.modules.tool.selection: selection.mode_resolved
+2026-10-29 11:05:29,740 INFO openminion.agent: BrainBridgeService initialized with home_root=<work>/homeB path_mode=integrated_runtime path_source=explicit_workspace
+2026-10-29 11:05:29,741 INFO openminion.lifecycle: event=component.started component={"capabilities": ["turn_dispatch", "heartbeat"], "component_id": "primary", "component_kind": "runtime_manager", "labels": {"runtime_mode": "hot"}, "owner_module": "openminion-runtime", "scope": "system"}
+2026-10-29 11:05:29,749 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+2026-10-29 11:05:29,753 INFO openminion.agent: Retrieve adapter initialized with pre-built retrieve service
+2026-10-29 11:05:29,766 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+[exit 0]
+consolidation tasks:
+  006b95e396544884bc53346a88d2d481  lifecycle_state=active  enabled=True  last_run=None  valid_actions=['pause', 'cancel', 'run-now', 'delete-history']
+  ff4ea525f6e940c98f9d3268177f01a8  lifecycle_state=cancelled  enabled=False  last_run=failed  valid_actions=['delete-history']
+enabled: ['006b95e396544884bc53346a88d2d481']
+
+# raw cron API: creating a job with the reserved payload is rejected
+2026-10-29 11:05:31,814 INFO openminion.modules.tool.bootstrap: File: registered via REGISTRAR (openminion.tools.file)
+2026-10-29 11:05:31,821 INFO openminion.modules.tool.bootstrap: Code: registered via REGISTRAR (openminion.tools.code)
+2026-10-29 11:05:31,823 INFO openminion.modules.tool.bootstrap: Exec: registered via REGISTRAR (openminion.tools.exec)
+2026-10-29 11:05:31,849 INFO openminion.modules.tool.bootstrap: Browser: registered via REGISTRAR (openminion.tools.browser)
+2026-10-29 11:05:31,850 INFO openminion.modules.tool.bootstrap: Browser Playwright: registered via REGISTRAR (openminion.tools.browser.providers.playwright)
+2026-10-29 11:05:31,850 INFO openminion.modules.tool.bootstrap: PinchTab: registered via REGISTRAR (openminion.tools.browser.providers.pinchtab)
+2026-10-29 11:05:31,858 INFO openminion.modules.tool.bootstrap: Search: registered via REGISTRAR (openminion.tools.search)
+2026-10-29 11:05:31,861 INFO openminion.modules.tool.bootstrap: Tavily: registered via REGISTRAR (openminion.tools.search.providers.tavily)
+2026-10-29 11:05:31,862 INFO openminion.modules.tool.bootstrap: Weather: registered via REGISTRAR (openminion.tools.weather)
+2026-10-29 11:05:31,866 INFO openminion.modules.tool.bootstrap: Weather OpenMeteo: registered via REGISTRAR (openminion.tools.weather.providers.openmeteo)
+2026-10-29 11:05:31,867 INFO openminion.modules.tool.bootstrap: Weather WeatherAPI: registered via REGISTRAR (openminion.tools.weather.providers.weatherapi)
+2026-10-29 11:05:31,868 INFO openminion.modules.tool.bootstrap: Utility: registered via REGISTRAR (openminion.tools.utility)
+2026-10-29 11:05:31,872 INFO openminion.modules.tool.bootstrap: Time: registered via REGISTRAR (openminion.tools.time)
+2026-10-29 11:05:31,875 INFO openminion.modules.tool.bootstrap: Location: registered via REGISTRAR (openminion.tools.location)
+2026-10-29 11:05:31,876 INFO openminion.modules.tool.bootstrap: Host: registered via REGISTRAR (openminion.tools.host)
+2026-10-29 11:05:31,876 INFO openminion.modules.tool.bootstrap: System operations: registered via REGISTRAR (openminion.tools.ops)
+2026-10-29 11:05:31,878 INFO openminion.modules.tool.bootstrap: Cloud operations: registered via REGISTRAR (openminion.tools.cloud_ops)
+2026-10-29 11:05:31,881 INFO openminion.modules.tool.bootstrap: Observability operations: registered via REGISTRAR (openminion.tools.observability)
+2026-10-29 11:05:31,881 INFO openminion.modules.tool.bootstrap: Security scanning: registered via REGISTRAR (openminion.tools.security)
+2026-10-29 11:05:31,885 INFO openminion.modules.tool.bootstrap: Kubernetes operations: registered via REGISTRAR (openminion.tools.k8s)
+2026-10-29 11:05:31,888 INFO openminion.modules.tool.bootstrap: IaC planning: registered via REGISTRAR (openminion.tools.iac)
+2026-10-29 11:05:31,890 INFO openminion.modules.tool.bootstrap: GitOps operations: registered via REGISTRAR (openminion.tools.gitops)
+2026-10-29 11:05:31,892 INFO openminion.modules.tool.bootstrap: Configuration management checks: registered via REGISTRAR (openminion.tools.config_mgmt)
+2026-10-29 11:05:31,893 INFO openminion.modules.tool.bootstrap: IP: registered via REGISTRAR (openminion.tools.ip)
+2026-10-29 11:05:31,893 INFO openminion.modules.tool.bootstrap: GitHub: registered via REGISTRAR (openminion.tools.github)
+2026-10-29 11:05:31,898 INFO openminion.modules.tool.bootstrap: Fetch: registered via REGISTRAR (openminion.tools.fetch)
+2026-10-29 11:05:31,899 INFO openminion.modules.tool.bootstrap: Fetch Scrapling: registered via REGISTRAR (openminion.tools.fetch.providers.scrapling)
+2026-10-29 11:05:31,901 INFO openminion.modules.tool.bootstrap: Fetch Firecrawl: registered via REGISTRAR (openminion.tools.fetch.providers.firecrawl)
+2026-10-29 11:05:31,903 INFO openminion.modules.tool.bootstrap: Fetch TinyFish: registered via REGISTRAR (openminion.tools.fetch.providers.tinyfish)
+2026-10-29 11:05:31,911 INFO openminion.modules.tool.bootstrap: Reactions: registered via REGISTRAR (openminion.tools.reaction)
+2026-10-29 11:05:31,919 INFO openminion.modules.tool.bootstrap: GWS: registered via REGISTRAR (openminion.tools.gws)
+2026-10-29 11:05:31,920 INFO openminion.modules.tool.bootstrap: Brave Search: registered via REGISTRAR (openminion.tools.search.providers.brave)
+2026-10-29 11:05:31,922 INFO openminion.modules.tool.bootstrap: SerpApi Search: registered via REGISTRAR (openminion.tools.search.providers.serpapi)
+2026-10-29 11:05:31,923 INFO openminion.modules.tool.bootstrap: Serper Search: registered via REGISTRAR (openminion.tools.search.providers.serper)
+2026-10-29 11:05:31,924 INFO openminion.modules.tool.bootstrap: TinyFish Search: registered via REGISTRAR (openminion.tools.search.providers.tinyfish)
+2026-10-29 11:05:31,981 INFO openminion.modules.tool.bootstrap: Firecrawl Search: registered via REGISTRAR (openminion.tools.search.providers.firecrawl)
+2026-10-29 11:05:31,984 INFO openminion.modules.tool.bootstrap: DuckDuckGo Search: registered via REGISTRAR (openminion.tools.search.providers.duckduckgo)
+2026-10-29 11:05:31,985 INFO openminion.modules.tool.bootstrap: Tool Catalog: registered via REGISTRAR (openminion.tools.tool_catalog)
+2026-10-29 11:05:31,990 INFO openminion.modules.tool.bootstrap: Skill: registered via REGISTRAR (openminion.tools.skill)
+2026-10-29 11:05:31,993 INFO openminion.modules.tool.bootstrap: Memory: registered via REGISTRAR (openminion.tools.memory)
+2026-10-29 11:05:31,995 INFO openminion.modules.tool.bootstrap: Graph: registered via REGISTRAR (openminion.tools.graph)
+2026-10-29 11:05:31,995 INFO openminion.modules.tool.bootstrap: Tool Authoring: registered via REGISTRAR (openminion.tools.tool_authoring)
+2026-10-29 11:05:32,002 INFO openminion.modules.tool.bootstrap: Task: registered via REGISTRAR (openminion.tools.task)
+2026-10-29 11:05:32,005 INFO openminion.modules.tool.bootstrap: Plan: registered via REGISTRAR (openminion.tools.todo)
+2026-10-29 11:05:32,006 INFO openminion.modules.tool.bootstrap: Git: registered via REGISTRAR (openminion.tools.git)
+2026-10-29 11:05:32,008 INFO openminion.modules.tool.bootstrap: Agent Delegation: registered via REGISTRAR (openminion.tools.agent)
+2026-10-29 11:05:32,064 INFO openminion.modules.tool.bootstrap: tool.contract_drift=clean
+2026-10-29 11:05:32,069 INFO openminion: extension event=ext.discovery payload={'plugins': 1, 'tool_plugins': 0, 'providers': 1, 'channels': 1}
+2026-10-29 11:05:32,070 INFO openminion: extension event=ext.activation payload={'plugins_loaded': 1, 'tools_loaded': 104, 'providers_loaded': 11}
+2026-10-29 11:05:32,141 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.schemas
+2026-10-29 11:05:32,141 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.tables
+2026-10-29 11:05:32,141 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.types
+2026-10-29 11:05:32,141 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.constraints
+2026-10-29 11:05:32,141 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.defaults
+2026-10-29 11:05:32,141 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.comments
+2026-10-29 11:05:32,154 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:05:32,154 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:05:32,163 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:05:32,164 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:05:32,171 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:05:32,171 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:05:32,186 INFO openminion.modules.tool.selection: selection.mode_resolved
+2026-10-29 11:05:32,187 INFO openminion.agent: BrainBridgeService initialized with home_root=<work>/homeB path_mode=integrated_runtime path_source=explicit_workspace
+2026-10-29 11:05:32,188 INFO openminion.lifecycle: event=component.started component={"capabilities": ["turn_dispatch", "heartbeat"], "component_id": "primary", "component_kind": "runtime_manager", "labels": {"runtime_mode": "hot"}, "owner_module": "openminion-runtime", "scope": "system"}
+
+$ curl -sS -X POST http://127.0.0.1:18766/v1/cron/jobs -H "Content-Type: application/json" -d \{\"name\":\ \"raw\ consolidation\"\,\ \"agent_id\":\ \"openminion\"\,\ \"schedule\":\ \{\"kind\":\ \"every\"\,\ \"every_ms\":\ 43200000\}\,\ \"payload\":\ \{\"kind\":\ \"agentTurn\"\,\ \"message\":\ \"review\ memory\ candidates\"\,\ \"_openminion_memory_consolidation\":\ \{\"target_scope\":\ \"agent:openminion\"\}\}\}
+{"ok":false,"error":{"code":"invalid_request","message":"memory consolidation jobs must be created through task.consolidate_memory","details":{},"retryable":false,"retry_after_ms":null},"meta":{"request_id":"b66997e66d6d459094fa86010d4e4d48","method":"POST","path":"/v1/cron/jobs"}}
+[http 400]
+
+$ curl -sS http://127.0.0.1:18766/v1/cron/jobs
+{"ok":true,"jobs":[{"job_id":"006b95e396544884bc53346a88d2d481","name":"memory consolidation","description":"Recurring memory consolidation","enabled":true,"agent_id":"openminion","schedule":{"every_ms":21600000,"jitter_ms":0,"kind":"every"},"payload":{"_openminion_memory_consolidation":{"batch_limit":5,"max_iterations":2,"target_scope":"agent:openminion","timeout_seconds":30},"kind":"agentTurn","message":"Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.","session_id":"consolidate:006b95e396544884bc53346a88d2d481"},"delivery":{"best_effort":false,"channel":"","mode":"none","to":""},"session_target":"isolated","wake_mode":"now","delete_after_run":false,"misfire_policy":"skip","max_lateness_s":600,"max_concurrency":1,"concurrency_key":"memory-consolidation:agent:openminion","max_attempts":3,"retry_backoff_s":30,"next_due_at":"2026-10-29T17:05:27.213995+00:00","last_run_at":null,"created_at":"2026-10-29T11:05:27.213995+00:00","updated_at":"2026-10-29T11:05:27.213995+00:00"},{"job_id":"system-cron-cleanup","name":"system-cron-cleanup","description":"Prune old cron history","enabled":true,"agent_id":"system","schedule":{"every_ms":86400000,"jitter_ms":0,"kind":"every"},"payload":{"event_text":"prune_cron_runs","kind":"systemEvent","kwargs":{"days":7}},"delivery":{"best_effort":false,"channel":"","mode":"none","to":""},"session_target":"main","wake_mode":"now","delete_after_run":false,"misfire_policy":"run_once","max_lateness_s":600,"max_concurrency":1,"concurrency_key":null,"max_attempts":3,"retry_backoff_s":30,"next_due_at":"2026-10-30T11:05:05.871937+00:00","last_run_at":null,"created_at":"2026-10-29T11:05:05.871937+00:00","updated_at":"2026-10-29T11:05:05.871937+00:00"},{"job_id":"ff4ea525f6e940c98f9d3268177f01a8","name":"memory consolidation","description":"Recurring memory consolidation","enabled":false,"agent_id":"openminion","schedule":{"every_ms":21600000,"jitter_ms":0,"kind":"every"},"payload":{"_openminion_memory_consolidation":{"batch_limit":5,"max_iterations":2,"target_scope":"agent:openminion","timeout_seconds":30},"kind":"agentTurn","message":"Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.","session_id":"consolidate:ff4ea525f6e940c98f9d3268177f01a8"},"delivery":{"best_effort":false,"channel":"","mode":"none","to":""},"session_target":"isolated","wake_mode":"now","delete_after_run":false,"misfire_policy":"skip","max_lateness_s":600,"max_concurrency":1,"concurrency_key":"memory-consolidation:agent:openminion","max_attempts":3,"retry_backoff_s":30,"next_due_at":null,"last_run_at":"2026-10-29T11:05:05.875869+00:00","created_at":"2026-10-29T11:05:01.621345+00:00","updated_at":"2026-10-29T11:05:24.866593+00:00"}],"meta":{"request_id":"385667c218de4e028b01853275d498c3","method":"GET","path":"/v1/cron/jobs"}}
+[http 200]
+
+$ openminion --home-root <home> --data-root <home>/.openminion --config <home>/agents.json --no-update-check tasks list --json 
+{
+  "ok": true,
+  "tasks": [
+    {
+      "id": "006b95e396544884bc53346a88d2d481",
+      "title": "memory consolidation",
+      "status": "ACTIVE",
+      "lifecycle_state": "active",
+      "due_at": "2026-10-29T17:05:27.213995+00:00",
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "006b95e396544884bc53346a88d2d481",
+      "created_at": "2026-10-29T11:05:27.214931+00:00",
+      "updated_at": "2026-10-29T11:05:27.214931+00:00",
+      "operator_state": "running",
+      "resume_action": "continue",
+      "valid_actions": [
+        "pause",
+        "cancel",
+        "run-now",
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 21600000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:21600000ms",
+      "schedule_revision": "2026-10-29T11:05:27.213995+00:00",
+      "enabled": true,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [],
+      "last_run": null,
+      "daemon_required": true
+    },
+    {
+      "id": "ff4ea525f6e940c98f9d3268177f01a8",
+      "title": "memory consolidation",
+      "status": "CANCELED",
+      "lifecycle_state": "cancelled",
+      "due_at": null,
+      "steps": [],
+      "pending_actions": [],
+      "agent_id": "openminion",
+      "cron_job_id": "ff4ea525f6e940c98f9d3268177f01a8",
+      "created_at": "2026-10-29T11:05:01.621509+00:00",
+      "updated_at": "2026-10-29T11:05:24.865381+00:00",
+      "operator_state": "cancelled",
+      "resume_action": "none",
+      "valid_actions": [
+        "delete-history"
+      ],
+      "schedule": {
+        "every_ms": 21600000,
+        "jitter_ms": 0,
+        "kind": "every"
+      },
+      "schedule_summary": "every:21600000ms",
+      "schedule_revision": "2026-10-29T11:05:24.866593+00:00",
+      "enabled": false,
+      "task_kind": "scheduled_recurring",
+      "instruction": "Review the provided memory candidates, decide which to promote, discard, or defer, then provide a brief summary and the memory_consolidation trailer.",
+      "session_target": "isolated",
+      "recent_runs_limit": 5,
+      "recent_runs": [
+        {
+          "run_id": "7c6d2e13afb94b33a420dbb722e95ab2",
+          "state": "failed",
+          "due_at": "2026-10-29T11:05:02.162424+00:00",
+          "available_at": null,
+          "started_at": "2026-10-29T11:05:05.871794+00:00",
+          "finished_at": "2026-10-29T11:05:05.875869+00:00",
+          "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+          "attempts": 1,
+          "error": {
+            "code": "cron_failed",
+            "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+          },
+          "isolated_session_id": "cron:ff4ea525f6e940c98f9d3268177f01a8:7c6d2e13afb94b33a420dbb722e95ab2",
+          "delivery": null,
+          "delivery_targets": []
+        }
+      ],
+      "last_run": {
+        "run_id": "7c6d2e13afb94b33a420dbb722e95ab2",
+        "state": "failed",
+        "due_at": "2026-10-29T11:05:02.162424+00:00",
+        "available_at": null,
+        "started_at": "2026-10-29T11:05:05.871794+00:00",
+        "finished_at": "2026-10-29T11:05:05.875869+00:00",
+        "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+        "attempts": 1,
+        "error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        },
+        "isolated_session_id": "cron:ff4ea525f6e940c98f9d3268177f01a8:7c6d2e13afb94b33a420dbb722e95ab2",
+        "delivery": null,
+        "delivery_targets": [],
+        "last_error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory"
+        }
+      },
+      "daemon_required": true
+    }
+  ],
+  "pending_actions": [],
+  "count": 2,
+  "source": "task_manager",
+  "scheduler": {
+    "state": "unreachable",
+    "hosted_by": "daemon",
+    "reason": null,
+    "check_command": "openminion service status cron",
+    "paused": false,
+    "actor": null,
+    "updated_at": "2026-10-29T11:05:05.870639+00:00",
+    "updated_by": null
+  }
+}
+[stderr]
+2026-10-29 11:06:32,200 INFO openminion: extension event=ext.discovery payload={'plugins': 1, 'tool_plugins': 0, 'providers': 1, 'channels': 1}
+2026-10-29 11:06:32,202 INFO openminion: extension event=ext.activation payload={'plugins_loaded': 1, 'tools_loaded': 104, 'providers_loaded': 11}
+2026-10-29 11:06:32,270 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.schemas
+2026-10-29 11:06:32,270 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.tables
+2026-10-29 11:06:32,270 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.types
+2026-10-29 11:06:32,270 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.constraints
+2026-10-29 11:06:32,270 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.defaults
+2026-10-29 11:06:32,270 INFO alembic.runtime.plugins: setup plugin alembic.autogenerate.comments
+2026-10-29 11:06:32,282 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:06:32,282 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:06:32,292 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:06:32,292 INFO openminion.storage: storage_provider_selected module=retrieve provider=sqlite path_mode=integrated_runtime
+2026-10-29 11:06:32,301 INFO alembic.runtime.migration: Context impl SQLiteImpl.
+2026-10-29 11:06:32,301 INFO alembic.runtime.migration: Will assume non-transactional DDL.
+2026-10-29 11:06:32,321 INFO openminion.modules.tool.selection: selection.mode_resolved
+2026-10-29 11:06:32,322 INFO openminion.agent: BrainBridgeService initialized with home_root=<work>/homeB path_mode=integrated_runtime path_source=explicit_workspace
+2026-10-29 11:06:32,322 INFO openminion.lifecycle: event=component.started component={"capabilities": ["turn_dispatch", "heartbeat"], "component_id": "primary", "component_kind": "runtime_manager", "labels": {"runtime_mode": "hot"}, "owner_module": "openminion-runtime", "scope": "system"}
+2026-10-29 11:06:32,331 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+2026-10-29 11:06:32,334 INFO openminion.agent: Retrieve adapter initialized with pre-built retrieve service
+2026-10-29 11:06:32,346 INFO openminion.storage: storage_provider_selected module=session provider=sqlite
+[exit 0]
+consolidation tasks:
+  006b95e396544884bc53346a88d2d481  lifecycle_state=active  enabled=True  last_run=None  valid_actions=['pause', 'cancel', 'run-now', 'delete-history']
+  ff4ea525f6e940c98f9d3268177f01a8  lifecycle_state=cancelled  enabled=False  last_run=failed  valid_actions=['delete-history']
+enabled: ['006b95e396544884bc53346a88d2d481']
+
+# done
+transcript-exit=0
