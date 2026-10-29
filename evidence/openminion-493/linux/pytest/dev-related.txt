@@ -1,0 +1,209 @@
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+........s............................................................... [  3%]
+........................................................................ [  6%]
+...............FFF...................................................... [  9%]
+......s.s........................................F...................... [ 12%]
+........................................................................ [ 16%]
+........................................................................ [ 19%]
+........................................................................ [ 22%]
+........................................................................ [ 25%]
+........................................................................ [ 28%]
+........................................................................ [ 32%]
+........................................................................ [ 35%]
+........................................................................ [ 38%]
+........................................................................ [ 41%]
+........................................................................ [ 45%]
+........................................................................ [ 48%]
+........................................................................ [ 51%]
+........................................................................ [ 54%]
+........................................................................ [ 57%]
+........................................................................ [ 61%]
+........................................................................ [ 64%]
+........................................................................ [ 67%]
+........................................................................ [ 70%]
+........................................................................ [ 74%]
+........................................................................ [ 77%]
+........................................................................ [ 80%]
+........................................................................ [ 83%]
+........................................................................ [ 86%]
+.............................................F.......................... [ 90%]
+........................................................................ [ 93%]
+........................................................................ [ 96%]
+........................................................................ [ 99%]
+.....                                                                    [100%]
+=================================== FAILURES ===================================
+_______ test_module_run_migrations_bootstraps_alembic_baseline[compress] _______
+tests/storage/test_module_alembic_onboarding.py:53: in test_module_run_migrations_bootstraps_alembic_baseline
+    migrations.run_migrations(db_path)
+src/openminion/modules/context/compress/storage/migrations/__init__.py:15: in run_migrations
+    run_module_alembic_migrations(
+src/openminion/modules/storage/migrations/alembic.py:81: in run_module_alembic_migrations
+    raise RuntimeError(
+E   RuntimeError: Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.
+______________ test_discovery_finds_the_compress_storage_package _______________
+tests/storage/test_module_alembic_onboarding.py:79: in test_discovery_finds_the_compress_storage_package
+    assert script_location == storage_root / "migrations"
+E   AssertionError: assert None == (PosixPath('/home/runner/work/linux-runner/linux-runner/src/openminion/modules/context/compress/storage') / 'migrations')
+__________ test_every_postgres_validated_module_has_a_script_location __________
+tests/storage/test_module_alembic_onboarding.py:92: in test_every_postgres_validated_module_has_a_script_location
+    assert missing == []
+E   AssertionError: assert ['compress'] == []
+E     
+E     Left contains one more item: 'compress'
+E     
+E     Full diff:
+E     - []
+E     + [
+E     +     'compress',
+E     + ]
+_ TestValidatePostgresConnectionFailure.test_unreachable_db_raises_with_redacted_url _
+tests/storage/test_startup_validation.py:86: in test_unreachable_db_raises_with_redacted_url
+    validate_postgres_config(url, check_connection=True, check_migrations=False)
+src/openminion/modules/storage/runtime/validation.py:58: in validate_postgres_config
+    with engine.connect() as conn:
+         ^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3275: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3299: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1324: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:916: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:912: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:645: in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:869: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/psycopg/connection.py:109: in connect
+    rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/psycopg/waiting.py:141: in wait_conn
+    if not (rlist := sel.select(timeout=t)):
+                     ^^^^^^^^^^^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/selectors.py:468: in select
+    fd_event_list = self._selector.poll(timeout, max_ev)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: Timeout (>60.0s) from pytest-timeout.
+___ TestStorageMigrateApply.test_compress_module_migrates_a_new_sqlite_file ____
+tests/cli/test_storage_migration_commands.py:233: in test_compress_module_migrates_a_new_sqlite_file
+    assert json.loads(capsys.readouterr().out)["modules"] == [
+E   AssertionError: assert [{'error': 'A...cess': False}] == [{'module_id'...ccess': True}]
+E     
+E     At index 0 diff: {'module_id': 'compress', 'status': 'error', 'success': False, 'error': 'Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.'} != {'module_id': 'compress', 'status': 'ok', 'success': True}
+E     
+E     Full diff:
+E       [
+E           {
+E     +         'error': 'Alembic configuration missing. Provide alembic_ini_path or '
+E     +         'alembic_script_location.',
+E               'module_id': 'compress',
+E     -         'status': 'ok',
+E     ?                     ^
+E     +         'status': 'error',
+E     ?                    +++ ^
+E     -         'success': True,
+E     ?                    ^^^
+E     +         'success': False,
+E     ?                    ^^^^
+E           },
+E       ]
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/websockets/legacy/__init__.py:6
+  /home/runner/work/linux-runner/linux-runner/.venv/lib/python3.11/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+tests/cli/test_channel_telegram_cli.py::test_pair_known_id_prints_deep_link_and_access_warning
+tests/cli/test_channel_telegram_cli.py::test_pair_wait_confirms_candidate_before_issuing_token
+  /home/runner/work/linux-runner/linux-runner/src/openminion/modules/controlplane/channels/telegram/cli.py:253: DeprecationWarning: TelegramPairingService is a compatibility wrapper; use ControlPlanePairingService with TelegramPairingAdapter for new code.
+    pairing = TelegramPairingService(
+
+tests/cli/test_status_telemetry_command.py::test_status_telemetry_text_and_json_share_latest_selection
+  /home/runner/work/linux-runner/linux-runner/src/openminion/base/config/paths.py:54: RuntimeWarning: telemetry_db_path must be under data_root (/tmp/pytest-of-runner/pytest-13/test_status_telemetry_text_and0/.openminion), got /tmp/pytest-of-runner/pytest-13/test_status_telemetry_text_and0/data/telemetry/telemetry.db
+    warnings.warn(message, RuntimeWarning)
+
+tests/cli/test_status_telemetry_command.py::test_status_telemetry_failed_and_opaque_lookup
+  /home/runner/work/linux-runner/linux-runner/src/openminion/base/config/paths.py:54: RuntimeWarning: telemetry_db_path must be under data_root (/tmp/pytest-of-runner/pytest-13/test_status_telemetry_failed_a0/.openminion), got /tmp/pytest-of-runner/pytest-13/test_status_telemetry_failed_a0/data/telemetry/telemetry.db
+    warnings.warn(message, RuntimeWarning)
+
+tests/cli/test_status_telemetry_command.py::test_status_telemetry_uuid_equivalence_and_ambiguity
+  /home/runner/work/linux-runner/linux-runner/src/openminion/base/config/paths.py:54: RuntimeWarning: telemetry_db_path must be under data_root (/tmp/pytest-of-runner/pytest-13/test_status_telemetry_uuid_equ0/.openminion), got /tmp/pytest-of-runner/pytest-13/test_status_telemetry_uuid_equ0/data/telemetry/telemetry.db
+    warnings.warn(message, RuntimeWarning)
+
+tests/cli/test_status_telemetry_command.py::test_status_telemetry_unreadable_database_is_normalized
+  /home/runner/work/linux-runner/linux-runner/src/openminion/base/config/paths.py:54: RuntimeWarning: telemetry_db_path must be under data_root (/tmp/pytest-of-runner/pytest-13/test_status_telemetry_unreadab0/.openminion), got /tmp/pytest-of-runner/pytest-13/test_status_telemetry_unreadab0/data/telemetry/telemetry.db
+    warnings.warn(message, RuntimeWarning)
+
+tests/cli/test_status_telemetry_command.py::test_status_telemetry_can_select_latest_within_one_session
+  /home/runner/work/linux-runner/linux-runner/src/openminion/base/config/paths.py:54: RuntimeWarning: telemetry_db_path must be under data_root (/tmp/pytest-of-runner/pytest-13/test_status_telemetry_can_sele0/.openminion), got /tmp/pytest-of-runner/pytest-13/test_status_telemetry_can_sele0/data/telemetry/telemetry.db
+    warnings.warn(message, RuntimeWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/storage/test_module_alembic_onboarding.py::test_module_run_migrations_bootstraps_alembic_baseline[compress] - RuntimeError: Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.
+FAILED tests/storage/test_module_alembic_onboarding.py::test_discovery_finds_the_compress_storage_package - AssertionError: assert None == (PosixPath('/home/runner/work/linux-runner/linux-runner/src/openminion/modules/context/compress/storage') / 'migrations')
+FAILED tests/storage/test_module_alembic_onboarding.py::test_every_postgres_validated_module_has_a_script_location - AssertionError: assert ['compress'] == []
+  
+  Left contains one more item: 'compress'
+  
+  Full diff:
+  - []
+  + [
+  +     'compress',
+  + ]
+FAILED tests/storage/test_startup_validation.py::TestValidatePostgresConnectionFailure::test_unreachable_db_raises_with_redacted_url - Failed: Timeout (>60.0s) from pytest-timeout.
+FAILED tests/cli/test_storage_migration_commands.py::TestStorageMigrateApply::test_compress_module_migrates_a_new_sqlite_file - AssertionError: assert [{'error': 'A...cess': False}] == [{'module_id'...ccess': True}]
+  
+  At index 0 diff: {'module_id': 'compress', 'status': 'error', 'success': False, 'error': 'Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.'} != {'module_id': 'compress', 'status': 'ok', 'success': True}
+  
+  Full diff:
+    [
+        {
+  +         'error': 'Alembic configuration missing. Provide alembic_ini_path or '
+  +         'alembic_script_location.',
+            'module_id': 'compress',
+  -         'status': 'ok',
+  ?                     ^
+  +         'status': 'error',
+  ?                    +++ ^
+  -         'success': True,
+  ?                    ^^^
+  +         'success': False,
+  ?                    ^^^^
+        },
+    ]
+5 failed, 2229 passed, 3 skipped, 57 deselected, 8 warnings in 103.05s (0:01:43)

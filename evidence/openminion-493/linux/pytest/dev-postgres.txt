@@ -1,0 +1,52 @@
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+_____________ test_postgres_compress_module_migrates_a_new_schema ______________
+tests/integration/test_storage_migrate_report_postgres.py:107: in test_postgres_compress_module_migrates_a_new_schema
+    assert json.loads(capsys.readouterr().out)["modules"] == [
+E   AssertionError: assert [{'error': 'A...cess': False}] == [{'module_id'...ccess': True}]
+E     
+E     At index 0 diff: {'module_id': 'compress', 'status': 'error', 'success': False, 'error': 'Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.'} != {'module_id': 'compress', 'status': 'ok', 'success': True}
+E     
+E     Full diff:
+E       [
+E           {
+E     +         'error': 'Alembic configuration missing. Provide alembic_ini_path or '
+E     +         'alembic_script_location.',
+E               'module_id': 'compress',
+E     -         'status': 'ok',
+E     ?                     ^
+E     +         'status': 'error',
+E     ?                    +++ ^
+E     -         'success': True,
+E     ?                    ^^^
+E     +         'success': False,
+E     ?                    ^^^^
+E           },
+E       ]
+=========================== short test summary info ============================
+FAILED tests/integration/test_storage_migrate_report_postgres.py::test_postgres_compress_module_migrates_a_new_schema - AssertionError: assert [{'error': 'A...cess': False}] == [{'module_id'...ccess': True}]
+  
+  At index 0 diff: {'module_id': 'compress', 'status': 'error', 'success': False, 'error': 'Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.'} != {'module_id': 'compress', 'status': 'ok', 'success': True}
+  
+  Full diff:
+    [
+        {
+  +         'error': 'Alembic configuration missing. Provide alembic_ini_path or '
+  +         'alembic_script_location.',
+            'module_id': 'compress',
+  -         'status': 'ok',
+  ?                     ^
+  +         'status': 'error',
+  ?                    +++ ^
+  -         'success': True,
+  ?                    ^^^
+  +         'success': False,
+  ?                    ^^^^
+        },
+    ]
+1 failed, 1 passed in 0.33s

@@ -1,0 +1,87 @@
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+...............FFF............F..............................            [100%]
+=================================== FAILURES ===================================
+_______ test_module_run_migrations_bootstraps_alembic_baseline[compress] _______
+tests/storage/test_module_alembic_onboarding.py:53: in test_module_run_migrations_bootstraps_alembic_baseline
+    migrations.run_migrations(db_path)
+src/openminion/modules/context/compress/storage/migrations/__init__.py:15: in run_migrations
+    run_module_alembic_migrations(
+src/openminion/modules/storage/migrations/alembic.py:81: in run_module_alembic_migrations
+    raise RuntimeError(
+E   RuntimeError: Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.
+______________ test_discovery_finds_the_compress_storage_package _______________
+tests/storage/test_module_alembic_onboarding.py:79: in test_discovery_finds_the_compress_storage_package
+    assert script_location == storage_root / "migrations"
+E   AssertionError: assert None == (PosixPath('/home/runner/work/linux-runner/linux-runner/src/openminion/modules/context/compress/storage') / 'migrations')
+__________ test_every_postgres_validated_module_has_a_script_location __________
+tests/storage/test_module_alembic_onboarding.py:92: in test_every_postgres_validated_module_has_a_script_location
+    assert missing == []
+E   AssertionError: assert ['compress'] == []
+E     
+E     Left contains one more item: 'compress'
+E     
+E     Full diff:
+E     - []
+E     + [
+E     +     'compress',
+E     + ]
+___ TestStorageMigrateApply.test_compress_module_migrates_a_new_sqlite_file ____
+tests/cli/test_storage_migration_commands.py:233: in test_compress_module_migrates_a_new_sqlite_file
+    assert json.loads(capsys.readouterr().out)["modules"] == [
+E   AssertionError: assert [{'error': 'A...cess': False}] == [{'module_id'...ccess': True}]
+E     
+E     At index 0 diff: {'module_id': 'compress', 'status': 'error', 'success': False, 'error': 'Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.'} != {'module_id': 'compress', 'status': 'ok', 'success': True}
+E     
+E     Full diff:
+E       [
+E           {
+E     +         'error': 'Alembic configuration missing. Provide alembic_ini_path or '
+E     +         'alembic_script_location.',
+E               'module_id': 'compress',
+E     -         'status': 'ok',
+E     ?                     ^
+E     +         'status': 'error',
+E     ?                    +++ ^
+E     -         'success': True,
+E     ?                    ^^^
+E     +         'success': False,
+E     ?                    ^^^^
+E           },
+E       ]
+=========================== short test summary info ============================
+FAILED tests/storage/test_module_alembic_onboarding.py::test_module_run_migrations_bootstraps_alembic_baseline[compress] - RuntimeError: Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.
+FAILED tests/storage/test_module_alembic_onboarding.py::test_discovery_finds_the_compress_storage_package - AssertionError: assert None == (PosixPath('/home/runner/work/linux-runner/linux-runner/src/openminion/modules/context/compress/storage') / 'migrations')
+FAILED tests/storage/test_module_alembic_onboarding.py::test_every_postgres_validated_module_has_a_script_location - AssertionError: assert ['compress'] == []
+  
+  Left contains one more item: 'compress'
+  
+  Full diff:
+  - []
+  + [
+  +     'compress',
+  + ]
+FAILED tests/cli/test_storage_migration_commands.py::TestStorageMigrateApply::test_compress_module_migrates_a_new_sqlite_file - AssertionError: assert [{'error': 'A...cess': False}] == [{'module_id'...ccess': True}]
+  
+  At index 0 diff: {'module_id': 'compress', 'status': 'error', 'success': False, 'error': 'Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.'} != {'module_id': 'compress', 'status': 'ok', 'success': True}
+  
+  Full diff:
+    [
+        {
+  +         'error': 'Alembic configuration missing. Provide alembic_ini_path or '
+  +         'alembic_script_location.',
+            'module_id': 'compress',
+  -         'status': 'ok',
+  ?                     ^
+  +         'status': 'error',
+  ?                    +++ ^
+  -         'success': True,
+  ?                    ^^^
+  +         'success': False,
+  ?                    ^^^^
+        },
+    ]
+4 failed, 57 passed in 1.28s
