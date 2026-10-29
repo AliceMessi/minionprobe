@@ -1,0 +1,50 @@
+head: 02334926 docs(memory): document the memory.write answer for optional turn writes
+== ruff format --diff (whole tree)
+--- tests/runtime/test_turn_optional_memory_writes.py
++++ tests/runtime/test_turn_optional_memory_writes.py
+@@ -154,9 +154,9 @@
+         if case == "require-approval"
+         else ("deny", "missing_tool_scope")
+     )
+-    assert [
+-        (d[1], *d[4:]) for d in recorder.decisions if d[1] == "memory-capture"
+-    ] == [("memory-capture", *expected)] * 2
++    assert [(d[1], *d[4:]) for d in recorder.decisions if d[1] == "memory-capture"] == [
++        ("memory-capture", *expected)
++    ] * 2
+     # The model's memory.write call keeps its approval: asked once, and the
+     # record is written only when the user approves.
+     assert [(name, args) for name, args, _id in approvals] == [
+
+1 file would be reformatted, 5160 files already formatted
+== services_layout
+validate/services_layout.py
+
+[INFO] Summary
+  services root: /home/runner/work/linux-runner/linux-runner/src/openminion/services
+  scan roots: 3
+== failing case
+            events = _record_decision_memory_events(monkeypatch)
+        assert rows == {"decision": [], "tool_outcome": []}
+>       assert events == [skipped] * 2
+E       AssertionError: assert [('brain.deci..._authorized')] == [('brain.deci..._authorized')]
+E         
+E         Left contains one more item: ('brain.decision_memory.skipped', 'memory_write_not_authorized')
+E         
+E         Full diff:
+E           [
+E               (
+E                   'brain.decision_memory.skipped',
+E                   'memory_write_not_authorized',
+E               ),
+E               (
+E                   'brain.decision_memory.skipped',
+E                   'memory_write_not_authorized',
+E               ),
+E         +     (
+E         +         'brain.decision_memory.skipped',
+E         +         'memory_write_not_authorized',
+E         +     ),
+E           ]
+tests/runtime/test_turn_optional_memory_writes.py:148: AssertionError
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_turn_without_memory_write_writes_no_decision_record_or_tool_outcome[require-approval-model-call-approved] - AssertionError: assert [('brain.deci..._authorized')] == [('brain.deci..._authorized')]

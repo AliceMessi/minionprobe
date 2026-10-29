@@ -1,0 +1,40 @@
+{
+  "probe": "probe_turn_memory_writes",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.15",
+  "python": "3.12.15",
+  "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty-pr496-44a6e239-probe_turn_memory_writes",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "provider": "openai (OpenAI-compatible HTTP) -> scripted ThreadingHTTPServer on 127.0.0.1",
+  "dist_versions": {
+    "openminion": "0.1.15",
+    "sophiagraph": "0.0.12",
+    "pydantic": "2.14.1"
+  },
+  "openminion_direct_url": {
+    "url": "https://github.com/AliceMessi/openminion",
+    "vcs_info": {
+      "vcs": "git",
+      "commit_id": "44a6e239f18b00e84a3e49f4fbc6ccca4f83578b",
+      "requested_revision": "44a6e239f18b00e84a3e49f4fbc6ccca4f83578b"
+    }
+  }
+}
+[04:50:51Z] openminion: Noted.
+[04:50:53Z] openminion: Noted.
+[04:50:55Z] openminion: Noted.
+PASS W. the identity profile is loaded, and memory.write is refused for the agent: recovery's gate for T1's capture returns False (require_approval, identity_hard_constraint_restricted) and the turn's tool adapter does not allow memory.write (requires confirmation, identity_hard_constraint_restricted) | observed={'constraints': ['NEVER write memory records'], 'recovery_gate': {'returned': False, 'decisions': [{'channel': 'cron', 'target': 'memory-capture-recovery', 'session_id': 's1', 'run_id': '1e620cb24ec545edbca41a0292e55d1f', 'decision': 'require_approval', 'reason_code': 'identity_hard_constraint_restricted'}]}, 'tool_adapter': {'allowed': False, 'requires_confirm': True, 'reason': 'identity_hard_constraint_restricted'}}
+FAIL W. each of the six turns writes one `decision` record to memory_records (scope session:<session>::conv:<id>, title `Decision: <route>`) through the brain memory API's write_record from write_decision_memory; no memory.write decision is asked for it (the only target asked in a turn, if any, is the turn capture's `memory-capture`) | observed={'T1': {'run_state': 'completed', 'records': [], 'writer': [], 'memory_write_targets': ['memory-capture']}, 'T2': {'run_state': 'completed', 'records': [], 'writer': [], 'memory_write_targets': ['memory-capture']}, 'T3': {'run_state': 'completed', 'records': [], 'writer': [], 'memory_write_targets': ['memory-capture']}, 'T4': {'run_state': 'completed', 'records': [], 'writer': [], 'memory_write_targets': ['memory-capture']}, 'T5': {'run_state': 'completed', 'records': [], 'writer': [], 'memory_write_targets': ['memory-capture']}, 'T6': {'run_state': 'completed', 'records': [], 'writer': [], 'memory_write_targets': ['memory-capture']}}
+FAIL W. T3: the model's memory.write call asks the approval callback once (denied) and writes no record; one `tool_outcome` candidate is staged in memory_candidates through stage_candidate from _stage_tool_outcome_candidate: scope agent:openminion, status proposed, title tool_outcome:memory.write:policy_denied, content.outcome policy_denied, content.args_signature and meta.source_args_signature = the refused call's arguments; no memory.write decision is asked for it | observed={'approvals': [{'tool': 'memory.write', 'args': {'record_type': 'fact', 'key': 'fact:indentation', 'title': 'Indentation', 'content': 'The user prefers tabs.'}}], 'text': 'openminion: Confirmation denied. The action was not run.', 'candidates': [], 'writer': [], 'memory_write_targets': ['memory-capture'], 'fact_records_with_tool_key': []}
+FAIL W. read-back by id: within one conversation (T4 -> T5, APIRuntime.run_turn with conversation `chat`) the next turn's requests carry T4's decision record id; T2 (a new Agent.run conversation) carries no T1 decision id, and T5 carries no s1 decision id | observed={'T5_T4_decision_ids': [], 'T2_T1_decision_ids': [], 'T5_s1_decision_ids': []}
+PASS W/N/X. no apply_outcome_feedback call in any turn or consolidation run (no built-in tool result carries memory_use_refs, and the scripted judge cites none) | observed={'W': [], 'N': [], 'X': []}
+FAIL N. control (NEVER reveal secrets): memory.write is allowed (recovery's gate True, tool adapter allows), and the same writes land: one decision record per turn and the same tool_outcome candidate for the denied memory.write call | observed={'constraints': ['NEVER reveal secrets'], 'recovery_gate': True, 'tool_adapter': {'allowed': True, 'requires_confirm': False, 'reason': 'policy passed'}, 'shape_equals_W': False}
+FAIL X. control (no identity profile): memory.write is allowed (recovery's gate True, tool adapter allows), and the same writes land: one decision record per turn and the same tool_outcome candidate for the denied memory.write call | observed={'constraints': [], 'recovery_gate': True, 'tool_adapter': {'allowed': True, 'requires_confirm': False, 'reason': 'policy passed'}, 'shape_equals_W': False}
+FAIL W. C: the consolidation turn's act-loop request lists the agent's proposed candidates ([MEMORY CONSOLIDATION CANDIDATES]); the `tool_outcome` candidate is there with its id, and its preview holds the start of the refused content | observed={'requests': ['consolidation_entry', 'freshness', 'freshness', 'consolidation_other', 'judge'], 'batch_requests': [18], 'candidate_id_in': [], 'refused_text_line': []}
+FAIL W. C: the scripted `promote` decision is parsed and applied to the selected batch, and the promotion policy refuses it (`Source 'agent_inferred' requires explicit approval for auto-promotion`): the candidate stays `proposed` and no `tool_outcome` record is written; the only memory.write decisions in the run, if any, are recovery's (`memory-capture-recovery`) | observed={'state': 'finished', 'recovery': [[5, 0, 5]], 'signal_parsed': [], 'decisions_applied': [], 'final_candidate_status': [], 'final_tool_outcome_records': [], 'memory_write_targets': ['memory-capture', 'memory-capture-recovery']}
+FAIL W. the candidate is not shown to later ordinary turns: no T4, T5 or T6 request (sessions s2 and s3) holds its id, the refused content or the refused key | observed=[]
+PASS Offline provider and no case error: every case's openai base URL is the scripted server on 127.0.0.1 | observed={'hosts': ['127.0.0.1'], 'errors': {}}
+SUMMARY passed=3 failed=8 total=11

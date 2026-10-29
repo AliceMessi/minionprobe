@@ -1,0 +1,1543 @@
+{
+  "info": {
+    "probe": "probe_user_denied_tool_args",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.15",
+    "python": "3.12.15",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<RUNNER_TEMP>/empty-pr471-6064d6d7-probe_user_denied_tool_args",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "provider": "openai (OpenAI-compatible HTTP) -> scripted ThreadingHTTPServer on 127.0.0.1",
+    "dist_versions": {
+      "openminion": "0.1.15",
+      "sophiagraph": "0.0.12",
+      "pydantic": "2.14.1"
+    },
+    "openminion_direct_url": {
+      "url": "https://github.com/AliceMessi/openminion",
+      "vcs_info": {
+        "vcs": "git",
+        "commit_id": "6064d6d78dc2fee872c581805ca53dd84cca0026",
+        "requested_revision": "6064d6d78dc2fee872c581805ca53dd84cca0026"
+      }
+    }
+  },
+  "summary": {
+    "passed": 9,
+    "failed": 0,
+    "total": 9
+  },
+  "all_pass": true,
+  "checks": [
+    {
+      "check": "N (NEVER reveal secrets). D: memory.write is allowed for the agent (the turn's memory-capture decision, where the tree asks one, is allow); the approval callback is asked once for the model's memory.write call with its arguments and denies it; no `fact:indentation` record is written",
+      "pass": true,
+      "observed": {
+        "run_state": "completed",
+        "text": "openminion: Confirmation denied. The action was not run.",
+        "error": null,
+        "approval_callback_calls": [
+          {
+            "tool": "memory.write",
+            "args": {
+              "record_type": "fact",
+              "key": "fact:indentation",
+              "title": "Indentation",
+              "content": "The user prefers tabs."
+            }
+          }
+        ],
+        "memory_write_decisions": [
+          {
+            "target": "memory-capture",
+            "decision": "allow",
+            "reason_code": "allowed"
+          }
+        ],
+        "new_tool_records": 0,
+        "new_tool_outcomes": [
+          {
+            "title": "tool_outcome:memory.write:policy_denied",
+            "proposed_scope": "agent:openminion",
+            "status": "proposed",
+            "source": "agent_inferred",
+            "outcome": "policy_denied",
+            "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+            "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+            "source_command_id": "call-memory-write-1"
+          }
+        ],
+        "stagers": [
+          "modules/brain/tools/executor/tool.py:183 _stage_tool_outcome_candidate <- modules/brain/tools/executor/command_executor.py:156 stage_tool_outcome_candidate <- modules/brain/tools/executor/command_executor.py:209 prepare_tool_dispatch"
+        ]
+      }
+    },
+    {
+      "check": "N. D: one `tool_outcome` candidate is staged from _stage_tool_outcome_candidate: scope agent:openminion, status proposed, title tool_outcome:memory.write:policy_denied, content.outcome policy_denied, and content.args_signature and meta.source_args_signature hold the denied call's arguments",
+      "pass": true,
+      "observed": [
+        {
+          "title": "tool_outcome:memory.write:policy_denied",
+          "proposed_scope": "agent:openminion",
+          "status": "proposed",
+          "source": "agent_inferred",
+          "outcome": "policy_denied",
+          "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+          "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+          "source_command_id": "call-memory-write-1"
+        }
+      ]
+    },
+    {
+      "check": "N. A (control): the callback approves; the `fact:indentation` record is written and no `tool_outcome` candidate is staged",
+      "pass": true,
+      "observed": {
+        "run_state": "completed",
+        "text": "openminion: Consolidation reviewed; nothing to change.",
+        "error": null,
+        "approval_callback_calls": [
+          {
+            "tool": "memory.write",
+            "args": {
+              "record_type": "fact",
+              "key": "fact:indentation",
+              "title": "Indentation",
+              "content": "The user prefers tabs."
+            }
+          }
+        ],
+        "memory_write_decisions": [
+          {
+            "target": "memory-capture",
+            "decision": "allow",
+            "reason_code": "allowed"
+          },
+          {
+            "target": "tool-runtime",
+            "decision": "allow",
+            "reason_code": "allowed"
+          }
+        ],
+        "new_tool_records": 1,
+        "new_tool_outcomes": [],
+        "stagers": []
+      }
+    },
+    {
+      "check": "N. the memory consolidation context lists the D candidate (collect_memory_consolidation_candidates, agent scope) with the denied content in its preview",
+      "pass": true,
+      "observed": [
+        {
+          "candidate_id": "cand_3de07d0e0da3",
+          "record_type": "tool_outcome",
+          "title": "tool_outcome:memory.write:policy_denied",
+          "content_preview": "{'tool_name': 'memory.write', 'tool_family': 'memory', 'outcome': 'policy_denied', 'error_code': None, 'turn_index': 1, 'intent_id': None, 'args_signature': '{\"content\":\"The user prefers",
+          "confidence": 0.4,
+          "created_at": "2026-10-29T04:50:41.497780+00:00",
+          "source_session": "openminion",
+          "proposed_scope": "agent:openminion",
+          "source": "agent_inferred"
+        }
+      ]
+    },
+    {
+      "check": "X (no identity profile). D: memory.write is allowed for the agent (the turn's memory-capture decision, where the tree asks one, is allow); the approval callback is asked once for the model's memory.write call with its arguments and denies it; no `fact:indentation` record is written",
+      "pass": true,
+      "observed": {
+        "run_state": "completed",
+        "text": "openminion: Confirmation denied. The action was not run.",
+        "error": null,
+        "approval_callback_calls": [
+          {
+            "tool": "memory.write",
+            "args": {
+              "record_type": "fact",
+              "key": "fact:indentation",
+              "title": "Indentation",
+              "content": "The user prefers tabs."
+            }
+          }
+        ],
+        "memory_write_decisions": [
+          {
+            "target": "memory-capture",
+            "decision": "allow",
+            "reason_code": "allowed"
+          }
+        ],
+        "new_tool_records": 0,
+        "new_tool_outcomes": [
+          {
+            "title": "tool_outcome:memory.write:policy_denied",
+            "proposed_scope": "agent:openminion",
+            "status": "proposed",
+            "source": "agent_inferred",
+            "outcome": "policy_denied",
+            "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+            "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+            "source_command_id": "call-memory-write-1"
+          }
+        ],
+        "stagers": [
+          "modules/brain/tools/executor/tool.py:183 _stage_tool_outcome_candidate <- modules/brain/tools/executor/command_executor.py:156 stage_tool_outcome_candidate <- modules/brain/tools/executor/command_executor.py:209 prepare_tool_dispatch"
+        ]
+      }
+    },
+    {
+      "check": "X. D: one `tool_outcome` candidate is staged from _stage_tool_outcome_candidate: scope agent:openminion, status proposed, title tool_outcome:memory.write:policy_denied, content.outcome policy_denied, and content.args_signature and meta.source_args_signature hold the denied call's arguments",
+      "pass": true,
+      "observed": [
+        {
+          "title": "tool_outcome:memory.write:policy_denied",
+          "proposed_scope": "agent:openminion",
+          "status": "proposed",
+          "source": "agent_inferred",
+          "outcome": "policy_denied",
+          "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+          "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+          "source_command_id": "call-memory-write-1"
+        }
+      ]
+    },
+    {
+      "check": "X. A (control): the callback approves; the `fact:indentation` record is written and no `tool_outcome` candidate is staged",
+      "pass": true,
+      "observed": {
+        "run_state": "completed",
+        "text": "openminion: Consolidation reviewed; nothing to change.",
+        "error": null,
+        "approval_callback_calls": [
+          {
+            "tool": "memory.write",
+            "args": {
+              "record_type": "fact",
+              "key": "fact:indentation",
+              "title": "Indentation",
+              "content": "The user prefers tabs."
+            }
+          }
+        ],
+        "memory_write_decisions": [
+          {
+            "target": "memory-capture",
+            "decision": "allow",
+            "reason_code": "allowed"
+          },
+          {
+            "target": "tool-runtime",
+            "decision": "allow",
+            "reason_code": "allowed"
+          }
+        ],
+        "new_tool_records": 1,
+        "new_tool_outcomes": [],
+        "stagers": []
+      }
+    },
+    {
+      "check": "X. the memory consolidation context lists the D candidate (collect_memory_consolidation_candidates, agent scope) with the denied content in its preview",
+      "pass": true,
+      "observed": [
+        {
+          "candidate_id": "cand_2264f3631a0b",
+          "record_type": "tool_outcome",
+          "title": "tool_outcome:memory.write:policy_denied",
+          "content_preview": "{'tool_name': 'memory.write', 'tool_family': 'memory', 'outcome': 'policy_denied', 'error_code': None, 'turn_index': 1, 'intent_id': None, 'args_signature': '{\"content\":\"The user prefers",
+          "confidence": 0.4,
+          "created_at": "2026-10-29T04:50:42.799182+00:00",
+          "source_session": "openminion",
+          "proposed_scope": "agent:openminion",
+          "source": "agent_inferred"
+        }
+      ]
+    },
+    {
+      "check": "Offline provider and no case error: every case's openai base URL is the scripted server on 127.0.0.1",
+      "pass": true,
+      "observed": {
+        "hosts": [
+          "127.0.0.1"
+        ],
+        "errors": {}
+      }
+    }
+  ],
+  "observed": {
+    "cases": {
+      "N": {
+        "case": "N",
+        "constraint": "NEVER reveal secrets",
+        "identity_constraints": [
+          "NEVER reveal secrets"
+        ],
+        "steps": {
+          "D": {
+            "label": "D",
+            "approval_callback": "denies",
+            "run_state": "completed",
+            "text": "openminion: Confirmation denied. The action was not run.",
+            "provider_requests": [
+              "extraction",
+              "tool_call",
+              "freshness",
+              "freshness"
+            ],
+            "approval_callback_calls": [
+              {
+                "tool": "memory.write",
+                "args": {
+                  "record_type": "fact",
+                  "key": "fact:indentation",
+                  "title": "Indentation",
+                  "content": "The user prefers tabs."
+                }
+              }
+            ],
+            "memory_write_decisions": [
+              {
+                "target": "memory-capture",
+                "decision": "allow",
+                "reason_code": "allowed"
+              }
+            ],
+            "stage_candidate_calls": [
+              {
+                "callers": [
+                  "modules/brain/tools/executor/tool.py:183 _stage_tool_outcome_candidate",
+                  "modules/brain/tools/executor/command_executor.py:156 stage_tool_outcome_candidate",
+                  "modules/brain/tools/executor/command_executor.py:209 prepare_tool_dispatch",
+                  "modules/brain/loop/adaptive/context.py:197 prepare_tool_dispatch"
+                ],
+                "record_type": "tool_outcome",
+                "title": "tool_outcome:memory.write:policy_denied",
+                "result": "cand_3de07d0e0da3"
+              }
+            ],
+            "new_tool_records": [],
+            "new_tool_outcomes": [
+              {
+                "candidate_id": "cand_3de07d0e0da3",
+                "session_id": "openminion",
+                "proposed_scope": "agent:openminion",
+                "type": "tool_outcome",
+                "title": "tool_outcome:memory.write:policy_denied",
+                "content_json": {
+                  "tool_name": "memory.write",
+                  "tool_family": "memory",
+                  "outcome": "policy_denied",
+                  "error_code": null,
+                  "turn_index": 1,
+                  "intent_id": null,
+                  "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                  "artifact_ref": null
+                },
+                "meta_json": {
+                  "source_kind": "tool_outcome",
+                  "source_negative_outcome": true,
+                  "source_success_path": false,
+                  "source_outcome_status": "policy_denied",
+                  "source_tool_name": "memory.write",
+                  "source_tool_family": "memory",
+                  "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                  "source_command_id": "call-memory-write-1",
+                  "polarity": "asserts"
+                },
+                "source": "agent_inferred",
+                "confidence": 0.4,
+                "status": "proposed"
+              }
+            ]
+          },
+          "A": {
+            "label": "A",
+            "approval_callback": "approves",
+            "run_state": "completed",
+            "text": "openminion: Consolidation reviewed; nothing to change.",
+            "provider_requests": [
+              "extraction",
+              "tool_call",
+              "freshness",
+              "freshness",
+              "other_text",
+              "other_text",
+              "other_structured",
+              "judge",
+              "decide"
+            ],
+            "approval_callback_calls": [
+              {
+                "tool": "memory.write",
+                "args": {
+                  "record_type": "fact",
+                  "key": "fact:indentation",
+                  "title": "Indentation",
+                  "content": "The user prefers tabs."
+                }
+              }
+            ],
+            "memory_write_decisions": [
+              {
+                "target": "memory-capture",
+                "decision": "allow",
+                "reason_code": "allowed"
+              },
+              {
+                "target": "tool-runtime",
+                "decision": "allow",
+                "reason_code": "allowed"
+              }
+            ],
+            "stage_candidate_calls": [],
+            "new_tool_records": [
+              {
+                "id": "08bab611e15d41e2a859cbeb00292eae",
+                "type": "fact",
+                "key": "fact:indentation",
+                "title": "Indentation"
+              }
+            ],
+            "new_tool_outcomes": []
+          },
+          "P": {
+            "label": "P",
+            "approval_callback": null,
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes or allow_once to allow once, session or allow_session to allow this tool for the session, or no or deny to cancel.",
+            "provider_requests": [
+              "extraction",
+              "tool_call",
+              "freshness",
+              "freshness"
+            ],
+            "approval_callback_calls": [],
+            "memory_write_decisions": [
+              {
+                "target": "memory-capture",
+                "decision": "allow",
+                "reason_code": "allowed"
+              }
+            ],
+            "stage_candidate_calls": [
+              {
+                "callers": [
+                  "modules/brain/tools/executor/tool.py:183 _stage_tool_outcome_candidate",
+                  "modules/brain/tools/executor/command_executor.py:156 stage_tool_outcome_candidate",
+                  "modules/brain/tools/executor/command_executor.py:209 prepare_tool_dispatch",
+                  "modules/brain/loop/adaptive/context.py:197 prepare_tool_dispatch"
+                ],
+                "record_type": "tool_outcome",
+                "title": "tool_outcome:memory.write:policy_denied",
+                "result": "cand_e79e8f0c3995"
+              }
+            ],
+            "new_tool_records": [],
+            "new_tool_outcomes": [
+              {
+                "candidate_id": "cand_e79e8f0c3995",
+                "session_id": "openminion",
+                "proposed_scope": "agent:openminion",
+                "type": "tool_outcome",
+                "title": "tool_outcome:memory.write:policy_denied",
+                "content_json": {
+                  "tool_name": "memory.write",
+                  "tool_family": "memory",
+                  "outcome": "policy_denied",
+                  "error_code": null,
+                  "turn_index": 1,
+                  "intent_id": null,
+                  "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                  "artifact_ref": null
+                },
+                "meta_json": {
+                  "source_kind": "tool_outcome",
+                  "source_negative_outcome": true,
+                  "source_success_path": false,
+                  "source_outcome_status": "policy_denied",
+                  "source_tool_name": "memory.write",
+                  "source_tool_family": "memory",
+                  "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                  "source_command_id": "call-memory-write-14",
+                  "polarity": "asserts"
+                },
+                "source": "agent_inferred",
+                "confidence": 0.4,
+                "status": "proposed"
+              }
+            ]
+          }
+        },
+        "consolidation_batch": [
+          {
+            "candidate_id": "cand_3de07d0e0da3",
+            "record_type": "tool_outcome",
+            "title": "tool_outcome:memory.write:policy_denied",
+            "content_preview": "{'tool_name': 'memory.write', 'tool_family': 'memory', 'outcome': 'policy_denied', 'error_code': None, 'turn_index': 1, 'intent_id': None, 'args_signature': '{\"content\":\"The user prefers",
+            "confidence": 0.4,
+            "created_at": "2026-10-29T04:50:41.497780+00:00",
+            "source_session": "openminion",
+            "proposed_scope": "agent:openminion",
+            "source": "agent_inferred"
+          },
+          {
+            "candidate_id": "cand_e79e8f0c3995",
+            "record_type": "tool_outcome",
+            "title": "tool_outcome:memory.write:policy_denied",
+            "content_preview": "{'tool_name': 'memory.write', 'tool_family': 'memory', 'outcome': 'policy_denied', 'error_code': None, 'turn_index': 1, 'intent_id': None, 'args_signature': '{\"content\":\"The user prefers",
+            "confidence": 0.4,
+            "created_at": "2026-10-29T04:50:41.981363+00:00",
+            "source_session": "openminion",
+            "proposed_scope": "agent:openminion",
+            "source": "agent_inferred"
+          }
+        ],
+        "final": {
+          "tool_records": [
+            {
+              "id": "08bab611e15d41e2a859cbeb00292eae",
+              "type": "fact",
+              "key": "fact:indentation",
+              "title": "Indentation"
+            }
+          ],
+          "tool_outcomes": [
+            {
+              "candidate_id": "cand_3de07d0e0da3",
+              "session_id": "openminion",
+              "proposed_scope": "agent:openminion",
+              "type": "tool_outcome",
+              "title": "tool_outcome:memory.write:policy_denied",
+              "content_json": {
+                "tool_name": "memory.write",
+                "tool_family": "memory",
+                "outcome": "policy_denied",
+                "error_code": null,
+                "turn_index": 1,
+                "intent_id": null,
+                "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                "artifact_ref": null
+              },
+              "meta_json": {
+                "source_kind": "tool_outcome",
+                "source_negative_outcome": true,
+                "source_success_path": false,
+                "source_outcome_status": "policy_denied",
+                "source_tool_name": "memory.write",
+                "source_tool_family": "memory",
+                "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                "source_command_id": "call-memory-write-1",
+                "polarity": "asserts"
+              },
+              "source": "agent_inferred",
+              "confidence": 0.4,
+              "status": "proposed"
+            },
+            {
+              "candidate_id": "cand_e79e8f0c3995",
+              "session_id": "openminion",
+              "proposed_scope": "agent:openminion",
+              "type": "tool_outcome",
+              "title": "tool_outcome:memory.write:policy_denied",
+              "content_json": {
+                "tool_name": "memory.write",
+                "tool_family": "memory",
+                "outcome": "policy_denied",
+                "error_code": null,
+                "turn_index": 1,
+                "intent_id": null,
+                "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                "artifact_ref": null
+              },
+              "meta_json": {
+                "source_kind": "tool_outcome",
+                "source_negative_outcome": true,
+                "source_success_path": false,
+                "source_outcome_status": "policy_denied",
+                "source_tool_name": "memory.write",
+                "source_tool_family": "memory",
+                "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                "source_command_id": "call-memory-write-14",
+                "polarity": "asserts"
+              },
+              "source": "agent_inferred",
+              "confidence": 0.4,
+              "status": "proposed"
+            }
+          ]
+        },
+        "provider_hosts": [
+          "127.0.0.1"
+        ]
+      },
+      "X": {
+        "case": "X",
+        "constraint": null,
+        "identity_constraints": [],
+        "steps": {
+          "D": {
+            "label": "D",
+            "approval_callback": "denies",
+            "run_state": "completed",
+            "text": "openminion: Confirmation denied. The action was not run.",
+            "provider_requests": [
+              "extraction",
+              "tool_call",
+              "freshness",
+              "freshness"
+            ],
+            "approval_callback_calls": [
+              {
+                "tool": "memory.write",
+                "args": {
+                  "record_type": "fact",
+                  "key": "fact:indentation",
+                  "title": "Indentation",
+                  "content": "The user prefers tabs."
+                }
+              }
+            ],
+            "memory_write_decisions": [
+              {
+                "target": "memory-capture",
+                "decision": "allow",
+                "reason_code": "allowed"
+              }
+            ],
+            "stage_candidate_calls": [
+              {
+                "callers": [
+                  "modules/brain/tools/executor/tool.py:183 _stage_tool_outcome_candidate",
+                  "modules/brain/tools/executor/command_executor.py:156 stage_tool_outcome_candidate",
+                  "modules/brain/tools/executor/command_executor.py:209 prepare_tool_dispatch",
+                  "modules/brain/loop/adaptive/context.py:197 prepare_tool_dispatch"
+                ],
+                "record_type": "tool_outcome",
+                "title": "tool_outcome:memory.write:policy_denied",
+                "result": "cand_2264f3631a0b"
+              }
+            ],
+            "new_tool_records": [],
+            "new_tool_outcomes": [
+              {
+                "candidate_id": "cand_2264f3631a0b",
+                "session_id": "openminion",
+                "proposed_scope": "agent:openminion",
+                "type": "tool_outcome",
+                "title": "tool_outcome:memory.write:policy_denied",
+                "content_json": {
+                  "tool_name": "memory.write",
+                  "tool_family": "memory",
+                  "outcome": "policy_denied",
+                  "error_code": null,
+                  "turn_index": 1,
+                  "intent_id": null,
+                  "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                  "artifact_ref": null
+                },
+                "meta_json": {
+                  "source_kind": "tool_outcome",
+                  "source_negative_outcome": true,
+                  "source_success_path": false,
+                  "source_outcome_status": "policy_denied",
+                  "source_tool_name": "memory.write",
+                  "source_tool_family": "memory",
+                  "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                  "source_command_id": "call-memory-write-1",
+                  "polarity": "asserts"
+                },
+                "source": "agent_inferred",
+                "confidence": 0.4,
+                "status": "proposed"
+              }
+            ]
+          },
+          "A": {
+            "label": "A",
+            "approval_callback": "approves",
+            "run_state": "completed",
+            "text": "openminion: Consolidation reviewed; nothing to change.",
+            "provider_requests": [
+              "extraction",
+              "tool_call",
+              "freshness",
+              "freshness",
+              "other_text",
+              "other_text",
+              "other_structured",
+              "judge",
+              "decide"
+            ],
+            "approval_callback_calls": [
+              {
+                "tool": "memory.write",
+                "args": {
+                  "record_type": "fact",
+                  "key": "fact:indentation",
+                  "title": "Indentation",
+                  "content": "The user prefers tabs."
+                }
+              }
+            ],
+            "memory_write_decisions": [
+              {
+                "target": "memory-capture",
+                "decision": "allow",
+                "reason_code": "allowed"
+              },
+              {
+                "target": "tool-runtime",
+                "decision": "allow",
+                "reason_code": "allowed"
+              }
+            ],
+            "stage_candidate_calls": [],
+            "new_tool_records": [
+              {
+                "id": "ca931b13f8af46698e8f65abc8255464",
+                "type": "fact",
+                "key": "fact:indentation",
+                "title": "Indentation"
+              }
+            ],
+            "new_tool_outcomes": []
+          },
+          "P": {
+            "label": "P",
+            "approval_callback": null,
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes or allow_once to allow once, session or allow_session to allow this tool for the session, or no or deny to cancel.",
+            "provider_requests": [
+              "extraction",
+              "tool_call",
+              "freshness",
+              "freshness"
+            ],
+            "approval_callback_calls": [],
+            "memory_write_decisions": [
+              {
+                "target": "memory-capture",
+                "decision": "allow",
+                "reason_code": "allowed"
+              }
+            ],
+            "stage_candidate_calls": [
+              {
+                "callers": [
+                  "modules/brain/tools/executor/tool.py:183 _stage_tool_outcome_candidate",
+                  "modules/brain/tools/executor/command_executor.py:156 stage_tool_outcome_candidate",
+                  "modules/brain/tools/executor/command_executor.py:209 prepare_tool_dispatch",
+                  "modules/brain/loop/adaptive/context.py:197 prepare_tool_dispatch"
+                ],
+                "record_type": "tool_outcome",
+                "title": "tool_outcome:memory.write:policy_denied",
+                "result": "cand_2e99a7dbff4d"
+              }
+            ],
+            "new_tool_records": [],
+            "new_tool_outcomes": [
+              {
+                "candidate_id": "cand_2e99a7dbff4d",
+                "session_id": "openminion",
+                "proposed_scope": "agent:openminion",
+                "type": "tool_outcome",
+                "title": "tool_outcome:memory.write:policy_denied",
+                "content_json": {
+                  "tool_name": "memory.write",
+                  "tool_family": "memory",
+                  "outcome": "policy_denied",
+                  "error_code": null,
+                  "turn_index": 1,
+                  "intent_id": null,
+                  "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                  "artifact_ref": null
+                },
+                "meta_json": {
+                  "source_kind": "tool_outcome",
+                  "source_negative_outcome": true,
+                  "source_success_path": false,
+                  "source_outcome_status": "policy_denied",
+                  "source_tool_name": "memory.write",
+                  "source_tool_family": "memory",
+                  "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                  "source_command_id": "call-memory-write-14",
+                  "polarity": "asserts"
+                },
+                "source": "agent_inferred",
+                "confidence": 0.4,
+                "status": "proposed"
+              }
+            ]
+          }
+        },
+        "consolidation_batch": [
+          {
+            "candidate_id": "cand_2264f3631a0b",
+            "record_type": "tool_outcome",
+            "title": "tool_outcome:memory.write:policy_denied",
+            "content_preview": "{'tool_name': 'memory.write', 'tool_family': 'memory', 'outcome': 'policy_denied', 'error_code': None, 'turn_index': 1, 'intent_id': None, 'args_signature': '{\"content\":\"The user prefers",
+            "confidence": 0.4,
+            "created_at": "2026-10-29T04:50:42.799182+00:00",
+            "source_session": "openminion",
+            "proposed_scope": "agent:openminion",
+            "source": "agent_inferred"
+          },
+          {
+            "candidate_id": "cand_2e99a7dbff4d",
+            "record_type": "tool_outcome",
+            "title": "tool_outcome:memory.write:policy_denied",
+            "content_preview": "{'tool_name': 'memory.write', 'tool_family': 'memory', 'outcome': 'policy_denied', 'error_code': None, 'turn_index': 1, 'intent_id': None, 'args_signature': '{\"content\":\"The user prefers",
+            "confidence": 0.4,
+            "created_at": "2026-10-29T04:50:43.278333+00:00",
+            "source_session": "openminion",
+            "proposed_scope": "agent:openminion",
+            "source": "agent_inferred"
+          }
+        ],
+        "final": {
+          "tool_records": [
+            {
+              "id": "ca931b13f8af46698e8f65abc8255464",
+              "type": "fact",
+              "key": "fact:indentation",
+              "title": "Indentation"
+            }
+          ],
+          "tool_outcomes": [
+            {
+              "candidate_id": "cand_2264f3631a0b",
+              "session_id": "openminion",
+              "proposed_scope": "agent:openminion",
+              "type": "tool_outcome",
+              "title": "tool_outcome:memory.write:policy_denied",
+              "content_json": {
+                "tool_name": "memory.write",
+                "tool_family": "memory",
+                "outcome": "policy_denied",
+                "error_code": null,
+                "turn_index": 1,
+                "intent_id": null,
+                "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                "artifact_ref": null
+              },
+              "meta_json": {
+                "source_kind": "tool_outcome",
+                "source_negative_outcome": true,
+                "source_success_path": false,
+                "source_outcome_status": "policy_denied",
+                "source_tool_name": "memory.write",
+                "source_tool_family": "memory",
+                "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                "source_command_id": "call-memory-write-1",
+                "polarity": "asserts"
+              },
+              "source": "agent_inferred",
+              "confidence": 0.4,
+              "status": "proposed"
+            },
+            {
+              "candidate_id": "cand_2e99a7dbff4d",
+              "session_id": "openminion",
+              "proposed_scope": "agent:openminion",
+              "type": "tool_outcome",
+              "title": "tool_outcome:memory.write:policy_denied",
+              "content_json": {
+                "tool_name": "memory.write",
+                "tool_family": "memory",
+                "outcome": "policy_denied",
+                "error_code": null,
+                "turn_index": 1,
+                "intent_id": null,
+                "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                "artifact_ref": null
+              },
+              "meta_json": {
+                "source_kind": "tool_outcome",
+                "source_negative_outcome": true,
+                "source_success_path": false,
+                "source_outcome_status": "policy_denied",
+                "source_tool_name": "memory.write",
+                "source_tool_family": "memory",
+                "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                "source_command_id": "call-memory-write-14",
+                "polarity": "asserts"
+              },
+              "source": "agent_inferred",
+              "confidence": 0.4,
+              "status": "proposed"
+            }
+          ]
+        },
+        "provider_hosts": [
+          "127.0.0.1"
+        ]
+      },
+      "W": {
+        "case": "W",
+        "constraint": "NEVER write memory records",
+        "identity_constraints": [
+          "NEVER write memory records"
+        ],
+        "steps": {
+          "D": {
+            "label": "D",
+            "approval_callback": "denies",
+            "run_state": "completed",
+            "text": "openminion: Confirmation denied. The action was not run.",
+            "provider_requests": [
+              "tool_call",
+              "freshness",
+              "freshness"
+            ],
+            "approval_callback_calls": [
+              {
+                "tool": "memory.write",
+                "args": {
+                  "record_type": "fact",
+                  "key": "fact:indentation",
+                  "title": "Indentation",
+                  "content": "The user prefers tabs."
+                }
+              }
+            ],
+            "memory_write_decisions": [
+              {
+                "target": "memory-capture",
+                "decision": "require_approval",
+                "reason_code": "identity_hard_constraint_restricted"
+              }
+            ],
+            "stage_candidate_calls": [
+              {
+                "callers": [
+                  "modules/brain/tools/executor/tool.py:183 _stage_tool_outcome_candidate",
+                  "modules/brain/tools/executor/command_executor.py:156 stage_tool_outcome_candidate",
+                  "modules/brain/tools/executor/command_executor.py:209 prepare_tool_dispatch",
+                  "modules/brain/loop/adaptive/context.py:197 prepare_tool_dispatch"
+                ],
+                "record_type": "tool_outcome",
+                "title": "tool_outcome:memory.write:policy_denied",
+                "result": "cand_2203127437b4"
+              }
+            ],
+            "new_tool_records": [],
+            "new_tool_outcomes": [
+              {
+                "candidate_id": "cand_2203127437b4",
+                "session_id": "openminion",
+                "proposed_scope": "agent:openminion",
+                "type": "tool_outcome",
+                "title": "tool_outcome:memory.write:policy_denied",
+                "content_json": {
+                  "tool_name": "memory.write",
+                  "tool_family": "memory",
+                  "outcome": "policy_denied",
+                  "error_code": null,
+                  "turn_index": 1,
+                  "intent_id": null,
+                  "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                  "artifact_ref": null
+                },
+                "meta_json": {
+                  "source_kind": "tool_outcome",
+                  "source_negative_outcome": true,
+                  "source_success_path": false,
+                  "source_outcome_status": "policy_denied",
+                  "source_tool_name": "memory.write",
+                  "source_tool_family": "memory",
+                  "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                  "source_command_id": "call-memory-write-0",
+                  "polarity": "asserts"
+                },
+                "source": "agent_inferred",
+                "confidence": 0.4,
+                "status": "proposed"
+              }
+            ]
+          },
+          "A": {
+            "label": "A",
+            "approval_callback": "approves",
+            "run_state": "completed",
+            "text": "openminion: Consolidation reviewed; nothing to change.",
+            "provider_requests": [
+              "tool_call",
+              "freshness",
+              "freshness",
+              "other_text",
+              "other_text",
+              "other_structured",
+              "judge",
+              "decide"
+            ],
+            "approval_callback_calls": [
+              {
+                "tool": "memory.write",
+                "args": {
+                  "record_type": "fact",
+                  "key": "fact:indentation",
+                  "title": "Indentation",
+                  "content": "The user prefers tabs."
+                }
+              }
+            ],
+            "memory_write_decisions": [
+              {
+                "target": "memory-capture",
+                "decision": "require_approval",
+                "reason_code": "identity_hard_constraint_restricted"
+              },
+              {
+                "target": "tool-runtime",
+                "decision": "require_approval",
+                "reason_code": "identity_hard_constraint_restricted"
+              }
+            ],
+            "stage_candidate_calls": [],
+            "new_tool_records": [
+              {
+                "id": "4a71782624ff44d58ae1ebe0274908b8",
+                "type": "fact",
+                "key": "fact:indentation",
+                "title": "Indentation"
+              }
+            ],
+            "new_tool_outcomes": []
+          },
+          "P": {
+            "label": "P",
+            "approval_callback": null,
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes or allow_once to allow once, session or allow_session to allow this tool for the session, or no or deny to cancel.",
+            "provider_requests": [
+              "tool_call",
+              "freshness",
+              "freshness"
+            ],
+            "approval_callback_calls": [],
+            "memory_write_decisions": [
+              {
+                "target": "memory-capture",
+                "decision": "require_approval",
+                "reason_code": "identity_hard_constraint_restricted"
+              }
+            ],
+            "stage_candidate_calls": [
+              {
+                "callers": [
+                  "modules/brain/tools/executor/tool.py:183 _stage_tool_outcome_candidate",
+                  "modules/brain/tools/executor/command_executor.py:156 stage_tool_outcome_candidate",
+                  "modules/brain/tools/executor/command_executor.py:209 prepare_tool_dispatch",
+                  "modules/brain/loop/adaptive/context.py:197 prepare_tool_dispatch"
+                ],
+                "record_type": "tool_outcome",
+                "title": "tool_outcome:memory.write:policy_denied",
+                "result": "cand_e5954ffb19d3"
+              }
+            ],
+            "new_tool_records": [],
+            "new_tool_outcomes": [
+              {
+                "candidate_id": "cand_e5954ffb19d3",
+                "session_id": "openminion",
+                "proposed_scope": "agent:openminion",
+                "type": "tool_outcome",
+                "title": "tool_outcome:memory.write:policy_denied",
+                "content_json": {
+                  "tool_name": "memory.write",
+                  "tool_family": "memory",
+                  "outcome": "policy_denied",
+                  "error_code": null,
+                  "turn_index": 1,
+                  "intent_id": null,
+                  "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                  "artifact_ref": null
+                },
+                "meta_json": {
+                  "source_kind": "tool_outcome",
+                  "source_negative_outcome": true,
+                  "source_success_path": false,
+                  "source_outcome_status": "policy_denied",
+                  "source_tool_name": "memory.write",
+                  "source_tool_family": "memory",
+                  "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                  "source_command_id": "call-memory-write-11",
+                  "polarity": "asserts"
+                },
+                "source": "agent_inferred",
+                "confidence": 0.4,
+                "status": "proposed"
+              }
+            ]
+          }
+        },
+        "consolidation_batch": [
+          {
+            "candidate_id": "cand_2203127437b4",
+            "record_type": "tool_outcome",
+            "title": "tool_outcome:memory.write:policy_denied",
+            "content_preview": "{'tool_name': 'memory.write', 'tool_family': 'memory', 'outcome': 'policy_denied', 'error_code': None, 'turn_index': 1, 'intent_id': None, 'args_signature': '{\"content\":\"The user prefers",
+            "confidence": 0.4,
+            "created_at": "2026-10-29T04:50:44.069350+00:00",
+            "source_session": "openminion",
+            "proposed_scope": "agent:openminion",
+            "source": "agent_inferred"
+          },
+          {
+            "candidate_id": "cand_e5954ffb19d3",
+            "record_type": "tool_outcome",
+            "title": "tool_outcome:memory.write:policy_denied",
+            "content_preview": "{'tool_name': 'memory.write', 'tool_family': 'memory', 'outcome': 'policy_denied', 'error_code': None, 'turn_index': 1, 'intent_id': None, 'args_signature': '{\"content\":\"The user prefers",
+            "confidence": 0.4,
+            "created_at": "2026-10-29T04:50:44.521194+00:00",
+            "source_session": "openminion",
+            "proposed_scope": "agent:openminion",
+            "source": "agent_inferred"
+          }
+        ],
+        "final": {
+          "tool_records": [
+            {
+              "id": "4a71782624ff44d58ae1ebe0274908b8",
+              "type": "fact",
+              "key": "fact:indentation",
+              "title": "Indentation"
+            }
+          ],
+          "tool_outcomes": [
+            {
+              "candidate_id": "cand_2203127437b4",
+              "session_id": "openminion",
+              "proposed_scope": "agent:openminion",
+              "type": "tool_outcome",
+              "title": "tool_outcome:memory.write:policy_denied",
+              "content_json": {
+                "tool_name": "memory.write",
+                "tool_family": "memory",
+                "outcome": "policy_denied",
+                "error_code": null,
+                "turn_index": 1,
+                "intent_id": null,
+                "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                "artifact_ref": null
+              },
+              "meta_json": {
+                "source_kind": "tool_outcome",
+                "source_negative_outcome": true,
+                "source_success_path": false,
+                "source_outcome_status": "policy_denied",
+                "source_tool_name": "memory.write",
+                "source_tool_family": "memory",
+                "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                "source_command_id": "call-memory-write-0",
+                "polarity": "asserts"
+              },
+              "source": "agent_inferred",
+              "confidence": 0.4,
+              "status": "proposed"
+            },
+            {
+              "candidate_id": "cand_e5954ffb19d3",
+              "session_id": "openminion",
+              "proposed_scope": "agent:openminion",
+              "type": "tool_outcome",
+              "title": "tool_outcome:memory.write:policy_denied",
+              "content_json": {
+                "tool_name": "memory.write",
+                "tool_family": "memory",
+                "outcome": "policy_denied",
+                "error_code": null,
+                "turn_index": 1,
+                "intent_id": null,
+                "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                "artifact_ref": null
+              },
+              "meta_json": {
+                "source_kind": "tool_outcome",
+                "source_negative_outcome": true,
+                "source_success_path": false,
+                "source_outcome_status": "policy_denied",
+                "source_tool_name": "memory.write",
+                "source_tool_family": "memory",
+                "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                "source_command_id": "call-memory-write-11",
+                "polarity": "asserts"
+              },
+              "source": "agent_inferred",
+              "confidence": 0.4,
+              "status": "proposed"
+            }
+          ]
+        },
+        "provider_hosts": [
+          "127.0.0.1"
+        ]
+      }
+    },
+    "facts": {
+      "N": {
+        "D": {
+          "run_state": "completed",
+          "text": "openminion: Confirmation denied. The action was not run.",
+          "error": null,
+          "approval_callback_calls": [
+            {
+              "tool": "memory.write",
+              "args": {
+                "record_type": "fact",
+                "key": "fact:indentation",
+                "title": "Indentation",
+                "content": "The user prefers tabs."
+              }
+            }
+          ],
+          "memory_write_decisions": [
+            {
+              "target": "memory-capture",
+              "decision": "allow",
+              "reason_code": "allowed"
+            }
+          ],
+          "new_tool_records": 0,
+          "new_tool_outcomes": [
+            {
+              "title": "tool_outcome:memory.write:policy_denied",
+              "proposed_scope": "agent:openminion",
+              "status": "proposed",
+              "source": "agent_inferred",
+              "outcome": "policy_denied",
+              "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+              "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+              "source_command_id": "call-memory-write-1"
+            }
+          ],
+          "stagers": [
+            "modules/brain/tools/executor/tool.py:183 _stage_tool_outcome_candidate <- modules/brain/tools/executor/command_executor.py:156 stage_tool_outcome_candidate <- modules/brain/tools/executor/command_executor.py:209 prepare_tool_dispatch"
+          ]
+        },
+        "A": {
+          "run_state": "completed",
+          "text": "openminion: Consolidation reviewed; nothing to change.",
+          "error": null,
+          "approval_callback_calls": [
+            {
+              "tool": "memory.write",
+              "args": {
+                "record_type": "fact",
+                "key": "fact:indentation",
+                "title": "Indentation",
+                "content": "The user prefers tabs."
+              }
+            }
+          ],
+          "memory_write_decisions": [
+            {
+              "target": "memory-capture",
+              "decision": "allow",
+              "reason_code": "allowed"
+            },
+            {
+              "target": "tool-runtime",
+              "decision": "allow",
+              "reason_code": "allowed"
+            }
+          ],
+          "new_tool_records": 1,
+          "new_tool_outcomes": [],
+          "stagers": []
+        },
+        "P": {
+          "run_state": "completed",
+          "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes or allow_once to allow once, session or allow_session to allow this tool for the session, or no or deny to cancel.",
+          "error": null,
+          "approval_callback_calls": [],
+          "memory_write_decisions": [
+            {
+              "target": "memory-capture",
+              "decision": "allow",
+              "reason_code": "allowed"
+            }
+          ],
+          "new_tool_records": 0,
+          "new_tool_outcomes": [
+            {
+              "title": "tool_outcome:memory.write:policy_denied",
+              "proposed_scope": "agent:openminion",
+              "status": "proposed",
+              "source": "agent_inferred",
+              "outcome": "policy_denied",
+              "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+              "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+              "source_command_id": "call-memory-write-14"
+            }
+          ],
+          "stagers": [
+            "modules/brain/tools/executor/tool.py:183 _stage_tool_outcome_candidate <- modules/brain/tools/executor/command_executor.py:156 stage_tool_outcome_candidate <- modules/brain/tools/executor/command_executor.py:209 prepare_tool_dispatch"
+          ]
+        }
+      },
+      "X": {
+        "D": {
+          "run_state": "completed",
+          "text": "openminion: Confirmation denied. The action was not run.",
+          "error": null,
+          "approval_callback_calls": [
+            {
+              "tool": "memory.write",
+              "args": {
+                "record_type": "fact",
+                "key": "fact:indentation",
+                "title": "Indentation",
+                "content": "The user prefers tabs."
+              }
+            }
+          ],
+          "memory_write_decisions": [
+            {
+              "target": "memory-capture",
+              "decision": "allow",
+              "reason_code": "allowed"
+            }
+          ],
+          "new_tool_records": 0,
+          "new_tool_outcomes": [
+            {
+              "title": "tool_outcome:memory.write:policy_denied",
+              "proposed_scope": "agent:openminion",
+              "status": "proposed",
+              "source": "agent_inferred",
+              "outcome": "policy_denied",
+              "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+              "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+              "source_command_id": "call-memory-write-1"
+            }
+          ],
+          "stagers": [
+            "modules/brain/tools/executor/tool.py:183 _stage_tool_outcome_candidate <- modules/brain/tools/executor/command_executor.py:156 stage_tool_outcome_candidate <- modules/brain/tools/executor/command_executor.py:209 prepare_tool_dispatch"
+          ]
+        },
+        "A": {
+          "run_state": "completed",
+          "text": "openminion: Consolidation reviewed; nothing to change.",
+          "error": null,
+          "approval_callback_calls": [
+            {
+              "tool": "memory.write",
+              "args": {
+                "record_type": "fact",
+                "key": "fact:indentation",
+                "title": "Indentation",
+                "content": "The user prefers tabs."
+              }
+            }
+          ],
+          "memory_write_decisions": [
+            {
+              "target": "memory-capture",
+              "decision": "allow",
+              "reason_code": "allowed"
+            },
+            {
+              "target": "tool-runtime",
+              "decision": "allow",
+              "reason_code": "allowed"
+            }
+          ],
+          "new_tool_records": 1,
+          "new_tool_outcomes": [],
+          "stagers": []
+        },
+        "P": {
+          "run_state": "completed",
+          "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes or allow_once to allow once, session or allow_session to allow this tool for the session, or no or deny to cancel.",
+          "error": null,
+          "approval_callback_calls": [],
+          "memory_write_decisions": [
+            {
+              "target": "memory-capture",
+              "decision": "allow",
+              "reason_code": "allowed"
+            }
+          ],
+          "new_tool_records": 0,
+          "new_tool_outcomes": [
+            {
+              "title": "tool_outcome:memory.write:policy_denied",
+              "proposed_scope": "agent:openminion",
+              "status": "proposed",
+              "source": "agent_inferred",
+              "outcome": "policy_denied",
+              "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+              "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+              "source_command_id": "call-memory-write-14"
+            }
+          ],
+          "stagers": [
+            "modules/brain/tools/executor/tool.py:183 _stage_tool_outcome_candidate <- modules/brain/tools/executor/command_executor.py:156 stage_tool_outcome_candidate <- modules/brain/tools/executor/command_executor.py:209 prepare_tool_dispatch"
+          ]
+        }
+      },
+      "W": {
+        "D": {
+          "run_state": "completed",
+          "text": "openminion: Confirmation denied. The action was not run.",
+          "error": null,
+          "approval_callback_calls": [
+            {
+              "tool": "memory.write",
+              "args": {
+                "record_type": "fact",
+                "key": "fact:indentation",
+                "title": "Indentation",
+                "content": "The user prefers tabs."
+              }
+            }
+          ],
+          "memory_write_decisions": [
+            {
+              "target": "memory-capture",
+              "decision": "require_approval",
+              "reason_code": "identity_hard_constraint_restricted"
+            }
+          ],
+          "new_tool_records": 0,
+          "new_tool_outcomes": [
+            {
+              "title": "tool_outcome:memory.write:policy_denied",
+              "proposed_scope": "agent:openminion",
+              "status": "proposed",
+              "source": "agent_inferred",
+              "outcome": "policy_denied",
+              "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+              "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+              "source_command_id": "call-memory-write-0"
+            }
+          ],
+          "stagers": [
+            "modules/brain/tools/executor/tool.py:183 _stage_tool_outcome_candidate <- modules/brain/tools/executor/command_executor.py:156 stage_tool_outcome_candidate <- modules/brain/tools/executor/command_executor.py:209 prepare_tool_dispatch"
+          ]
+        },
+        "A": {
+          "run_state": "completed",
+          "text": "openminion: Consolidation reviewed; nothing to change.",
+          "error": null,
+          "approval_callback_calls": [
+            {
+              "tool": "memory.write",
+              "args": {
+                "record_type": "fact",
+                "key": "fact:indentation",
+                "title": "Indentation",
+                "content": "The user prefers tabs."
+              }
+            }
+          ],
+          "memory_write_decisions": [
+            {
+              "target": "memory-capture",
+              "decision": "require_approval",
+              "reason_code": "identity_hard_constraint_restricted"
+            },
+            {
+              "target": "tool-runtime",
+              "decision": "require_approval",
+              "reason_code": "identity_hard_constraint_restricted"
+            }
+          ],
+          "new_tool_records": 1,
+          "new_tool_outcomes": [],
+          "stagers": []
+        },
+        "P": {
+          "run_state": "completed",
+          "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes or allow_once to allow once, session or allow_session to allow this tool for the session, or no or deny to cancel.",
+          "error": null,
+          "approval_callback_calls": [],
+          "memory_write_decisions": [
+            {
+              "target": "memory-capture",
+              "decision": "require_approval",
+              "reason_code": "identity_hard_constraint_restricted"
+            }
+          ],
+          "new_tool_records": 0,
+          "new_tool_outcomes": [
+            {
+              "title": "tool_outcome:memory.write:policy_denied",
+              "proposed_scope": "agent:openminion",
+              "status": "proposed",
+              "source": "agent_inferred",
+              "outcome": "policy_denied",
+              "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+              "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+              "source_command_id": "call-memory-write-11"
+            }
+          ],
+          "stagers": [
+            "modules/brain/tools/executor/tool.py:183 _stage_tool_outcome_candidate <- modules/brain/tools/executor/command_executor.py:156 stage_tool_outcome_candidate <- modules/brain/tools/executor/command_executor.py:209 prepare_tool_dispatch"
+          ]
+        }
+      },
+      "P_steps": {
+        "N": {
+          "run_state": "completed",
+          "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes or allow_once to allow once, session or allow_session to allow this tool for the session, or no or deny to cancel.",
+          "error": null,
+          "approval_callback_calls": [],
+          "memory_write_decisions": [
+            {
+              "target": "memory-capture",
+              "decision": "allow",
+              "reason_code": "allowed"
+            }
+          ],
+          "new_tool_records": 0,
+          "new_tool_outcomes": [
+            {
+              "title": "tool_outcome:memory.write:policy_denied",
+              "proposed_scope": "agent:openminion",
+              "status": "proposed",
+              "source": "agent_inferred",
+              "outcome": "policy_denied",
+              "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+              "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+              "source_command_id": "call-memory-write-14"
+            }
+          ],
+          "stagers": [
+            "modules/brain/tools/executor/tool.py:183 _stage_tool_outcome_candidate <- modules/brain/tools/executor/command_executor.py:156 stage_tool_outcome_candidate <- modules/brain/tools/executor/command_executor.py:209 prepare_tool_dispatch"
+          ]
+        },
+        "X": {
+          "run_state": "completed",
+          "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes or allow_once to allow once, session or allow_session to allow this tool for the session, or no or deny to cancel.",
+          "error": null,
+          "approval_callback_calls": [],
+          "memory_write_decisions": [
+            {
+              "target": "memory-capture",
+              "decision": "allow",
+              "reason_code": "allowed"
+            }
+          ],
+          "new_tool_records": 0,
+          "new_tool_outcomes": [
+            {
+              "title": "tool_outcome:memory.write:policy_denied",
+              "proposed_scope": "agent:openminion",
+              "status": "proposed",
+              "source": "agent_inferred",
+              "outcome": "policy_denied",
+              "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+              "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+              "source_command_id": "call-memory-write-14"
+            }
+          ],
+          "stagers": [
+            "modules/brain/tools/executor/tool.py:183 _stage_tool_outcome_candidate <- modules/brain/tools/executor/command_executor.py:156 stage_tool_outcome_candidate <- modules/brain/tools/executor/command_executor.py:209 prepare_tool_dispatch"
+          ]
+        }
+      }
+    }
+  }
+}

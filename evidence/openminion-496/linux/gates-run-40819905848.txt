@@ -1,0 +1,115 @@
+head: 44a6e239 docs(memory): document the memory.write answer for optional turn writes
+base: 6064d6d7 chore(runtime): reconcile capture authorization with dev
+dev:  ce3b6771 Merge pull request #470 from AliceMessi/fix/447-failed-start-cleanup
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+OPENMINION_TEST_POSTGRES_URL set: yes
+
+== make lint
+make typecheck
+make[1]: Entering directory '/home/runner/work/linux-runner/linux-runner'
+cd "/home/runner/work/linux-runner/linux-runner" && /home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4306; baseline total: 4306
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 287
+[tcr] api: 76 / 76 | monthly quota -50 | next target <= 26 | headroom 0
+[tcr] cli: 308 / 308 | monthly quota -50 | next target <= 258 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 221 / 221 | monthly quota -50 | next target <= 171 | headroom 0
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+make lint exit: 0
+
+== python -m scripts.validate.services_layout
+validate/services_layout.py
+
+
+== [head] upstream postgres-memory-retrieval job, its command list from .github/workflows/ci.yml
+$ python -m pytest -q -m postgres tests/memory/test_memory_postgres_conformance.py
+19 passed in 2.50s
+$ python -m pytest -q -m postgres tests/memory/test_memory_search_quality.py::test_postgres_lexical_score_contributes_to_semantic_order
+1 passed in 0.35s
+$ python -m pytest -q -m postgres tests/memory/test_gc_evidence_postgres.py
+7 passed in 1.14s
+$ python -m pytest -q -m postgres tests/skill/test_skill_postgres_conformance.py
+6 passed, 6 deselected in 0.88s
+$ python -m pytest -q -m postgres tests/integration/test_runtime_storage_postgres.py
+51 passed in 33.43s
+$ python -m pytest -q -m postgres tests/integration/test_runtime_memory_postgres.py
+8 passed in 4.39s
+$ python -m pytest -q -m postgres tests/integration/test_storage_migrate_report_postgres.py
+1 passed in 0.35s
+$ python -m pytest -q -m postgres tests/memory/test_gc_postgres.py
+13 passed in 2.39s
+
+== [head] pytest <focused>
+265 passed in 44.25s
+
+== [head] pytest -m "<test-ci markers>" <related>
+8382 passed, 6 skipped, 151 deselected, 1 xfailed, 46 warnings in 473.45s (0:07:53)
+
+== #471 head sources from here on: git checkout 6064d6d78dc2fee872c581805ca53dd84cca0026 -- src (5 paths differ)
+
+== [base] pytest <focused>
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_turn_without_memory_write_writes_no_decision_record_or_tool_outcome[require-approval] - AssertionError: assert {'decision': ...icy_denied')]} == {'decision': ..._outcome': []}
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_turn_without_memory_write_writes_no_decision_record_or_tool_outcome[require-approval-model-call-approved] - AssertionError: assert {'decision': ..._outcome': []} == {'decision': ..._outcome': []}
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_turn_without_memory_write_writes_no_decision_record_or_tool_outcome[deny] - AssertionError: assert {'decision': ...icy_denied')]} == {'decision': ..._outcome': []}
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_reused_runner_asks_the_memory_write_answer_on_every_turn - assert [(True, None,..., False), ...] == [(True, True,..., False), ...]
+FAILED tests/brain/test_decision_rationale_memory.py::test_write_decision_memory_skips_when_the_turn_may_not_write_memory - AssertionError: assert ['mem_decision_1'] == []
+FAILED tests/brain/test_decision_rationale_memory.py::test_dispatch_keeps_decision_metadata_when_the_turn_may_not_write_memory - AssertionError: assert [{'confidence...orized', ...}] == []
+FAILED tests/brain/test_runner_tools.py::test_tool_outcome_is_not_staged_when_the_turn_may_not_write_memory - assert [{'confidence...4c0429', ...}] == []
+  Left contains one more item: {'confidence': 0.4, 'content': {'args_signature': '{"msg":"hi"}', 'artifact_ref': None, 'error_code': None, 'intent_id': None, ...}, 'evidence_refs': [], 'id': 'cand_4e3e541e-7c82-43dc-a4b9-dd119a4c0429', ...}
+  +             'error_code': None,
+FAILED tests/memory/runtime/test_capture_authorization.py::test_bridge_asks_with_the_turn_channel_session_and_root_turn - AttributeError: '_Bridge' object has no attribute '_turn_memory_write_allowed'
+FAILED tests/memory/runtime/test_capture_authorization.py::test_bridge_asks_for_a_turn_without_capture[excluded] - AttributeError: '_Bridge' object has no attribute '_turn_memory_write_allowed'
+FAILED tests/memory/runtime/test_capture_authorization.py::test_bridge_asks_for_a_turn_without_capture[disabled] - AttributeError: '_Bridge' object has no attribute '_turn_memory_write_allowed'
+FAILED tests/memory/runtime/test_capture_authorization.py::test_bridge_with_a_policy_and_no_tools_does_not_authorize - AttributeError: '_Bridge' object has no attribute '_turn_memory_write_allowed'
+FAILED tests/runtime/test_turn_capture_authorization.py::test_recovery_commits_a_denied_turn_capture_once_the_write_is_allowed - AssertionError: assert [('console', ..._restricted')] == [('console', ..._restricted')]
+FAILED tests/runtime/test_turn_capture_authorization.py::test_each_service_turn_sets_the_capture_decision_on_the_reused_runner - AssertionError: assert ['allow', 'al...low', 'allow'] == ['allow', 'al... 'allow', ...]
+13 failed, 252 passed in 43.49s
+
+== [base] pytest -m "<test-ci markers>" <related>
+FAILED tests/memory/runtime/test_capture_authorization.py::test_bridge_asks_with_the_turn_channel_session_and_root_turn - AttributeError: '_Bridge' object has no attribute '_turn_memory_write_allowed'
+FAILED tests/memory/runtime/test_capture_authorization.py::test_bridge_asks_for_a_turn_without_capture[excluded] - AttributeError: '_Bridge' object has no attribute '_turn_memory_write_allowed'
+FAILED tests/memory/runtime/test_capture_authorization.py::test_bridge_asks_for_a_turn_without_capture[disabled] - AttributeError: '_Bridge' object has no attribute '_turn_memory_write_allowed'
+FAILED tests/memory/runtime/test_capture_authorization.py::test_bridge_with_a_policy_and_no_tools_does_not_authorize - AttributeError: '_Bridge' object has no attribute '_turn_memory_write_allowed'
+FAILED tests/runtime/test_turn_capture_authorization.py::test_recovery_commits_a_denied_turn_capture_once_the_write_is_allowed - AssertionError: assert [('console', ..._restricted')] == [('console', ..._restricted')]
+FAILED tests/runtime/test_turn_capture_authorization.py::test_each_service_turn_sets_the_capture_decision_on_the_reused_runner - AssertionError: assert ['allow', 'al...low', 'allow'] == ['allow', 'al... 'allow', ...]
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_turn_without_memory_write_writes_no_decision_record_or_tool_outcome[require-approval] - AssertionError: assert {'decision': ...icy_denied')]} == {'decision': ..._outcome': []}
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_turn_without_memory_write_writes_no_decision_record_or_tool_outcome[require-approval-model-call-approved] - AssertionError: assert {'decision': ..._outcome': []} == {'decision': ..._outcome': []}
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_turn_without_memory_write_writes_no_decision_record_or_tool_outcome[deny] - AssertionError: assert {'decision': ...icy_denied')]} == {'decision': ..._outcome': []}
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_reused_runner_asks_the_memory_write_answer_on_every_turn - assert [(True, None,..., False), ...] == [(True, True,..., False), ...]
+FAILED tests/brain/test_decision_rationale_memory.py::test_write_decision_memory_skips_when_the_turn_may_not_write_memory - AssertionError: assert ['mem_decision_1'] == []
+FAILED tests/brain/test_decision_rationale_memory.py::test_dispatch_keeps_decision_metadata_when_the_turn_may_not_write_memory - AssertionError: assert [{'confidence...orized', ...}] == []
+FAILED tests/brain/test_runner_tools.py::test_tool_outcome_is_not_staged_when_the_turn_may_not_write_memory - assert [{'confidence...221506', ...}] == []
+  Left contains one more item: {'confidence': 0.4, 'content': {'args_signature': '{"msg":"hi"}', 'artifact_ref': None, 'error_code': None, 'intent_id': None, ...}, 'evidence_refs': [], 'id': 'cand_4f5ac254-6f9a-4afa-a0dc-4d2145221506', ...}
+  +             'error_code': None,
+13 failed, 8369 passed, 6 skipped, 151 deselected, 1 xfailed, 46 warnings in 463.00s (0:07:43)
+
+== dev sources: git checkout ce3b677173e0f344d85a729113e04cf708fa6587 -- src (7 paths differ)
+
+== [dev] pytest tests/runtime/test_turn_optional_memory_writes.py
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_turn_without_memory_write_writes_no_decision_record_or_tool_outcome[require-approval] - AssertionError: assert {'decision': ...icy_denied')]} == {'decision': ..._outcome': []}
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_turn_without_memory_write_writes_no_decision_record_or_tool_outcome[require-approval-model-call-approved] - AssertionError: assert {'decision': ..._outcome': []} == {'decision': ..._outcome': []}
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_turn_without_memory_write_writes_no_decision_record_or_tool_outcome[deny] - AssertionError: assert {'decision': ...icy_denied')]} == {'decision': ..._outcome': []}
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_allowed_turn_writes_decision_records_and_tool_outcome_as_before[neutral-constraint] - AssertionError: assert [] == [('memory-cap...', 'allowed')]
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_allowed_turn_writes_decision_records_and_tool_outcome_as_before[no-identity] - AssertionError: assert [] == [('memory-cap...', 'allowed')]
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_reused_runner_asks_the_memory_write_answer_on_every_turn - assert [(True, None,...e, None), ...] == [(True, True,..., False), ...]
+6 failed, 1 passed in 11.36s
+
+== back to the branch head: 0 paths differ
+
+== [head] new and changed tests, 5 runs
+79 passed in 25.61s
+79 passed in 25.64s
+79 passed in 25.47s
+79 passed in 25.22s
+79 passed in 24.89s
+
+== ruff check .
+All checks passed!
+
+== make format-check
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m ruff format --check "/home/runner/work/linux-runner/linux-runner"
+5161 files already formatted

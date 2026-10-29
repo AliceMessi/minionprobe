@@ -1,0 +1,4233 @@
+{
+  "info": {
+    "probe": "probe_turn_memory_writes",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.15",
+    "python": "3.12.15",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<RUNNER_TEMP>/empty-pr496-44a6e239-probe_turn_memory_writes",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "provider": "openai (OpenAI-compatible HTTP) -> scripted ThreadingHTTPServer on 127.0.0.1",
+    "dist_versions": {
+      "openminion": "0.1.15",
+      "sophiagraph": "0.0.12",
+      "pydantic": "2.14.1"
+    },
+    "openminion_direct_url": {
+      "url": "https://github.com/AliceMessi/openminion",
+      "vcs_info": {
+        "vcs": "git",
+        "commit_id": "44a6e239f18b00e84a3e49f4fbc6ccca4f83578b",
+        "requested_revision": "44a6e239f18b00e84a3e49f4fbc6ccca4f83578b"
+      }
+    }
+  },
+  "summary": {
+    "passed": 3,
+    "failed": 8,
+    "total": 11
+  },
+  "all_pass": false,
+  "checks": [
+    {
+      "check": "W. the identity profile is loaded, and memory.write is refused for the agent: recovery's gate for T1's capture returns False (require_approval, identity_hard_constraint_restricted) and the turn's tool adapter does not allow memory.write (requires confirmation, identity_hard_constraint_restricted)",
+      "pass": true,
+      "observed": {
+        "constraints": [
+          "NEVER write memory records"
+        ],
+        "recovery_gate": {
+          "returned": false,
+          "decisions": [
+            {
+              "channel": "cron",
+              "target": "memory-capture-recovery",
+              "session_id": "s1",
+              "run_id": "1e620cb24ec545edbca41a0292e55d1f",
+              "decision": "require_approval",
+              "reason_code": "identity_hard_constraint_restricted"
+            }
+          ]
+        },
+        "tool_adapter": {
+          "allowed": false,
+          "requires_confirm": true,
+          "reason": "identity_hard_constraint_restricted"
+        }
+      }
+    },
+    {
+      "check": "W. each of the six turns writes one `decision` record to memory_records (scope session:<session>::conv:<id>, title `Decision: <route>`) through the brain memory API's write_record from write_decision_memory; no memory.write decision is asked for it (the only target asked in a turn, if any, is the turn capture's `memory-capture`)",
+      "pass": false,
+      "observed": {
+        "T1": {
+          "run_state": "completed",
+          "records": [],
+          "writer": [],
+          "memory_write_targets": [
+            "memory-capture"
+          ]
+        },
+        "T2": {
+          "run_state": "completed",
+          "records": [],
+          "writer": [],
+          "memory_write_targets": [
+            "memory-capture"
+          ]
+        },
+        "T3": {
+          "run_state": "completed",
+          "records": [],
+          "writer": [],
+          "memory_write_targets": [
+            "memory-capture"
+          ]
+        },
+        "T4": {
+          "run_state": "completed",
+          "records": [],
+          "writer": [],
+          "memory_write_targets": [
+            "memory-capture"
+          ]
+        },
+        "T5": {
+          "run_state": "completed",
+          "records": [],
+          "writer": [],
+          "memory_write_targets": [
+            "memory-capture"
+          ]
+        },
+        "T6": {
+          "run_state": "completed",
+          "records": [],
+          "writer": [],
+          "memory_write_targets": [
+            "memory-capture"
+          ]
+        }
+      }
+    },
+    {
+      "check": "W. T3: the model's memory.write call asks the approval callback once (denied) and writes no record; one `tool_outcome` candidate is staged in memory_candidates through stage_candidate from _stage_tool_outcome_candidate: scope agent:openminion, status proposed, title tool_outcome:memory.write:policy_denied, content.outcome policy_denied, content.args_signature and meta.source_args_signature = the refused call's arguments; no memory.write decision is asked for it",
+      "pass": false,
+      "observed": {
+        "approvals": [
+          {
+            "tool": "memory.write",
+            "args": {
+              "record_type": "fact",
+              "key": "fact:indentation",
+              "title": "Indentation",
+              "content": "The user prefers tabs."
+            }
+          }
+        ],
+        "text": "openminion: Confirmation denied. The action was not run.",
+        "candidates": [],
+        "writer": [],
+        "memory_write_targets": [
+          "memory-capture"
+        ],
+        "fact_records_with_tool_key": []
+      }
+    },
+    {
+      "check": "W. read-back by id: within one conversation (T4 -> T5, APIRuntime.run_turn with conversation `chat`) the next turn's requests carry T4's decision record id; T2 (a new Agent.run conversation) carries no T1 decision id, and T5 carries no s1 decision id",
+      "pass": false,
+      "observed": {
+        "T5_T4_decision_ids": [],
+        "T2_T1_decision_ids": [],
+        "T5_s1_decision_ids": []
+      }
+    },
+    {
+      "check": "W/N/X. no apply_outcome_feedback call in any turn or consolidation run (no built-in tool result carries memory_use_refs, and the scripted judge cites none)",
+      "pass": true,
+      "observed": {
+        "W": [],
+        "N": [],
+        "X": []
+      }
+    },
+    {
+      "check": "N. control (NEVER reveal secrets): memory.write is allowed (recovery's gate True, tool adapter allows), and the same writes land: one decision record per turn and the same tool_outcome candidate for the denied memory.write call",
+      "pass": false,
+      "observed": {
+        "constraints": [
+          "NEVER reveal secrets"
+        ],
+        "recovery_gate": true,
+        "tool_adapter": {
+          "allowed": true,
+          "requires_confirm": false,
+          "reason": "policy passed"
+        },
+        "shape_equals_W": false
+      }
+    },
+    {
+      "check": "X. control (no identity profile): memory.write is allowed (recovery's gate True, tool adapter allows), and the same writes land: one decision record per turn and the same tool_outcome candidate for the denied memory.write call",
+      "pass": false,
+      "observed": {
+        "constraints": [],
+        "recovery_gate": true,
+        "tool_adapter": {
+          "allowed": true,
+          "requires_confirm": false,
+          "reason": "policy passed"
+        },
+        "shape_equals_W": false
+      }
+    },
+    {
+      "check": "W. C: the consolidation turn's act-loop request lists the agent's proposed candidates ([MEMORY CONSOLIDATION CANDIDATES]); the `tool_outcome` candidate is there with its id, and its preview holds the start of the refused content",
+      "pass": false,
+      "observed": {
+        "requests": [
+          "consolidation_entry",
+          "freshness",
+          "freshness",
+          "consolidation_other",
+          "judge"
+        ],
+        "batch_requests": [
+          18
+        ],
+        "candidate_id_in": [],
+        "refused_text_line": []
+      }
+    },
+    {
+      "check": "W. C: the scripted `promote` decision is parsed and applied to the selected batch, and the promotion policy refuses it (`Source 'agent_inferred' requires explicit approval for auto-promotion`): the candidate stays `proposed` and no `tool_outcome` record is written; the only memory.write decisions in the run, if any, are recovery's (`memory-capture-recovery`)",
+      "pass": false,
+      "observed": {
+        "state": "finished",
+        "recovery": [
+          [
+            5,
+            0,
+            5
+          ]
+        ],
+        "signal_parsed": [],
+        "decisions_applied": [],
+        "final_candidate_status": [],
+        "final_tool_outcome_records": [],
+        "memory_write_targets": [
+          "memory-capture",
+          "memory-capture-recovery"
+        ]
+      }
+    },
+    {
+      "check": "W. the candidate is not shown to later ordinary turns: no T4, T5 or T6 request (sessions s2 and s3) holds its id, the refused content or the refused key",
+      "pass": false,
+      "observed": []
+    },
+    {
+      "check": "Offline provider and no case error: every case's openai base URL is the scripted server on 127.0.0.1",
+      "pass": true,
+      "observed": {
+        "hosts": [
+          "127.0.0.1"
+        ],
+        "errors": {}
+      }
+    }
+  ],
+  "observed": {
+    "cases": {
+      "W": {
+        "case": "W",
+        "constraint": "NEVER write memory records",
+        "runner_memory_api_is_assembly_memctl": true,
+        "identity_constraints": [
+          "NEVER write memory records"
+        ],
+        "security_policy_present": true,
+        "memory_db": "memory.db",
+        "turns": {
+          "T1": {
+            "label": "T1",
+            "entry": "Agent.run",
+            "session_id": "s1",
+            "conversation_id": null,
+            "message": "Please remember that I prefer tabs over spaces for indentation.",
+            "forced_tools": null,
+            "run_state": "completed",
+            "text": "openminion: Noted: tabs over spaces.",
+            "memory_capture_state": "pending",
+            "memory_capture_bundle_result": {
+              "capture_id": "capture:8898ae3a9e1d72bb935869936039c0514f3630466e5b15e4fb2703b8f92eac97",
+              "disposition": "pending",
+              "error_code": "CAPTURE_RECOVERY_UNAUTHORIZED"
+            },
+            "intent": {
+              "canonical_event_id": "turn.outcome:8898ae3a9e1d72bb935869936039c0514f3630466e5b15e4fb2703b8f92eac97",
+              "capture_id": "capture:8898ae3a9e1d72bb935869936039c0514f3630466e5b15e4fb2703b8f92eac97",
+              "capture_state": "pending",
+              "root_turn_id": "1e620cb24ec545edbca41a0292e55d1f",
+              "runtime_session_id": "s1",
+              "agent_id": "openminion"
+            },
+            "provider_requests": [
+              "decide",
+              "freshness",
+              "freshness"
+            ],
+            "request_range": [
+              0,
+              3
+            ],
+            "approval_callback_calls": [],
+            "memory_write_decisions": [
+              {
+                "channel": "console",
+                "target": "memory-capture",
+                "session_id": "s1",
+                "run_id": "1e620cb24ec545edbca41a0292e55d1f",
+                "decision": "require_approval",
+                "reason_code": "identity_hard_constraint_restricted"
+              }
+            ],
+            "memory_api_writes": [],
+            "store": {
+              "new_records": [],
+              "changed_records": [],
+              "new_candidates": [],
+              "changed_candidates": []
+            }
+          },
+          "T2": {
+            "label": "T2",
+            "entry": "Agent.run",
+            "session_id": "s1",
+            "conversation_id": null,
+            "message": "Which indentation style do I prefer?",
+            "forced_tools": null,
+            "run_state": "completed",
+            "text": "openminion: You prefer tabs.",
+            "memory_capture_state": "pending",
+            "memory_capture_bundle_result": {
+              "capture_id": "capture:ea85003e483e73c54a93d195f7cc273ce5720bad232fff83f6d6e96ecab68363",
+              "disposition": "pending",
+              "error_code": "CAPTURE_RECOVERY_UNAUTHORIZED"
+            },
+            "intent": {
+              "canonical_event_id": "turn.outcome:ea85003e483e73c54a93d195f7cc273ce5720bad232fff83f6d6e96ecab68363",
+              "capture_id": "capture:ea85003e483e73c54a93d195f7cc273ce5720bad232fff83f6d6e96ecab68363",
+              "capture_state": "pending",
+              "root_turn_id": "e0471d00328546e8a6dd4f2d8a73ba71",
+              "runtime_session_id": "s1",
+              "agent_id": "openminion"
+            },
+            "provider_requests": [
+              "decide",
+              "freshness",
+              "freshness"
+            ],
+            "request_range": [
+              3,
+              6
+            ],
+            "approval_callback_calls": [],
+            "memory_write_decisions": [
+              {
+                "channel": "console",
+                "target": "memory-capture",
+                "session_id": "s1",
+                "run_id": "e0471d00328546e8a6dd4f2d8a73ba71",
+                "decision": "require_approval",
+                "reason_code": "identity_hard_constraint_restricted"
+              }
+            ],
+            "memory_api_writes": [],
+            "store": {
+              "new_records": [],
+              "changed_records": [],
+              "new_candidates": [],
+              "changed_candidates": []
+            }
+          },
+          "T3": {
+            "label": "T3",
+            "entry": "Agent.run",
+            "session_id": "s1",
+            "conversation_id": null,
+            "message": "Which indentation style do I prefer?",
+            "forced_tools": [
+              "memory.write"
+            ],
+            "run_state": "completed",
+            "text": "openminion: Confirmation denied. The action was not run.",
+            "memory_capture_state": "pending",
+            "memory_capture_bundle_result": {
+              "capture_id": "capture:0e45c3ac5cd6bc03084f4d390a621ed0c73b732678bc07d7514207a2c82caf33",
+              "disposition": "pending",
+              "error_code": "CAPTURE_RECOVERY_UNAUTHORIZED"
+            },
+            "intent": {
+              "canonical_event_id": "turn.outcome:0e45c3ac5cd6bc03084f4d390a621ed0c73b732678bc07d7514207a2c82caf33",
+              "capture_id": "capture:0e45c3ac5cd6bc03084f4d390a621ed0c73b732678bc07d7514207a2c82caf33",
+              "capture_state": "pending",
+              "root_turn_id": "b0699795f9984737b1e621a1b9d5d56f",
+              "runtime_session_id": "s1",
+              "agent_id": "openminion"
+            },
+            "provider_requests": [
+              "tool_call",
+              "freshness",
+              "freshness"
+            ],
+            "request_range": [
+              6,
+              9
+            ],
+            "approval_callback_calls": [
+              {
+                "tool": "memory.write",
+                "args": {
+                  "record_type": "fact",
+                  "key": "fact:indentation",
+                  "title": "Indentation",
+                  "content": "The user prefers tabs."
+                }
+              }
+            ],
+            "memory_write_decisions": [
+              {
+                "channel": "console",
+                "target": "memory-capture",
+                "session_id": "s1",
+                "run_id": "b0699795f9984737b1e621a1b9d5d56f",
+                "decision": "require_approval",
+                "reason_code": "identity_hard_constraint_restricted"
+              }
+            ],
+            "memory_api_writes": [],
+            "store": {
+              "new_records": [],
+              "changed_records": [],
+              "new_candidates": [],
+              "changed_candidates": []
+            }
+          },
+          "T4": {
+            "label": "T4",
+            "entry": "APIRuntime.run_turn",
+            "session_id": "s2",
+            "conversation_id": "chat",
+            "message": "Say hello.",
+            "forced_tools": null,
+            "run_state": "completed",
+            "text": "openminion: Hello.",
+            "memory_capture_state": "pending",
+            "memory_capture_bundle_result": {
+              "capture_id": "capture:b2c44b1c70bec04c8a1a8fb3641f04cc2e178260d6e4bbc097f93e9bd6d810af",
+              "disposition": "pending",
+              "error_code": "CAPTURE_RECOVERY_UNAUTHORIZED"
+            },
+            "intent": {
+              "canonical_event_id": "turn.outcome:b2c44b1c70bec04c8a1a8fb3641f04cc2e178260d6e4bbc097f93e9bd6d810af",
+              "capture_id": "capture:b2c44b1c70bec04c8a1a8fb3641f04cc2e178260d6e4bbc097f93e9bd6d810af",
+              "capture_state": "pending",
+              "root_turn_id": "a1255584fd364458aa64df85c727b941",
+              "runtime_session_id": "s2",
+              "agent_id": "openminion"
+            },
+            "provider_requests": [
+              "decide",
+              "freshness",
+              "freshness"
+            ],
+            "request_range": [
+              9,
+              12
+            ],
+            "approval_callback_calls": [],
+            "memory_write_decisions": [
+              {
+                "channel": "console",
+                "target": "memory-capture",
+                "session_id": "s2",
+                "run_id": "a1255584fd364458aa64df85c727b941",
+                "decision": "require_approval",
+                "reason_code": "identity_hard_constraint_restricted"
+              }
+            ],
+            "memory_api_writes": [],
+            "store": {
+              "new_records": [],
+              "changed_records": [],
+              "new_candidates": [],
+              "changed_candidates": []
+            }
+          },
+          "T5": {
+            "label": "T5",
+            "entry": "APIRuntime.run_turn",
+            "session_id": "s2",
+            "conversation_id": "chat",
+            "message": "Which indentation style do I prefer?",
+            "forced_tools": null,
+            "run_state": "completed",
+            "text": "openminion: You prefer tabs.",
+            "memory_capture_state": "pending",
+            "memory_capture_bundle_result": {
+              "capture_id": "capture:6e927ccfd2dfd1482f5a2dcc87dc1c9c0cffe93f45da8fc45cda556fbdce1447",
+              "disposition": "pending",
+              "error_code": "CAPTURE_RECOVERY_UNAUTHORIZED"
+            },
+            "intent": {
+              "canonical_event_id": "turn.outcome:6e927ccfd2dfd1482f5a2dcc87dc1c9c0cffe93f45da8fc45cda556fbdce1447",
+              "capture_id": "capture:6e927ccfd2dfd1482f5a2dcc87dc1c9c0cffe93f45da8fc45cda556fbdce1447",
+              "capture_state": "pending",
+              "root_turn_id": "3bc6750e566740afa3ccee8727e40765",
+              "runtime_session_id": "s2",
+              "agent_id": "openminion"
+            },
+            "provider_requests": [
+              "decide",
+              "freshness",
+              "freshness"
+            ],
+            "request_range": [
+              12,
+              15
+            ],
+            "approval_callback_calls": [],
+            "memory_write_decisions": [
+              {
+                "channel": "console",
+                "target": "memory-capture",
+                "session_id": "s2",
+                "run_id": "3bc6750e566740afa3ccee8727e40765",
+                "decision": "require_approval",
+                "reason_code": "identity_hard_constraint_restricted"
+              }
+            ],
+            "memory_api_writes": [],
+            "store": {
+              "new_records": [],
+              "changed_records": [],
+              "new_candidates": [],
+              "changed_candidates": []
+            }
+          },
+          "T6": {
+            "label": "T6",
+            "entry": "Agent.run",
+            "session_id": "s3",
+            "conversation_id": null,
+            "message": "Say hello.",
+            "forced_tools": null,
+            "run_state": "completed",
+            "text": "openminion: Hello.",
+            "memory_capture_state": "pending",
+            "memory_capture_bundle_result": {
+              "capture_id": "capture:2be6b9689448e7996d6874c2c43e8216b2435230ee6668a08a6bfedeaf7690de",
+              "disposition": "pending",
+              "error_code": "CAPTURE_RECOVERY_UNAUTHORIZED"
+            },
+            "intent": {
+              "canonical_event_id": "turn.outcome:2be6b9689448e7996d6874c2c43e8216b2435230ee6668a08a6bfedeaf7690de",
+              "capture_id": "capture:2be6b9689448e7996d6874c2c43e8216b2435230ee6668a08a6bfedeaf7690de",
+              "capture_state": "pending",
+              "root_turn_id": "52dbf8da0c4d44dcb2b2a6be40854519",
+              "runtime_session_id": "s3",
+              "agent_id": "openminion"
+            },
+            "provider_requests": [
+              "decide",
+              "freshness",
+              "freshness"
+            ],
+            "request_range": [
+              20,
+              23
+            ],
+            "approval_callback_calls": [],
+            "memory_write_decisions": [
+              {
+                "channel": "console",
+                "target": "memory-capture",
+                "session_id": "s3",
+                "run_id": "52dbf8da0c4d44dcb2b2a6be40854519",
+                "decision": "require_approval",
+                "reason_code": "identity_hard_constraint_restricted"
+              }
+            ],
+            "memory_api_writes": [],
+            "store": {
+              "new_records": [],
+              "changed_records": [],
+              "new_candidates": [],
+              "changed_candidates": []
+            }
+          }
+        },
+        "recovery_gate_T1": {
+          "returned": false,
+          "decisions": [
+            {
+              "channel": "cron",
+              "target": "memory-capture-recovery",
+              "session_id": "s1",
+              "run_id": "1e620cb24ec545edbca41a0292e55d1f",
+              "decision": "require_approval",
+              "reason_code": "identity_hard_constraint_restricted"
+            }
+          ]
+        },
+        "tool_adapter_memory_write": {
+          "allowed": false,
+          "requires_confirm": true,
+          "reason": "identity_hard_constraint_restricted"
+        },
+        "tool_outcome_candidate_ids": [],
+        "job_id": "eb975e32e1b4421b9ae6a31cc24bb190",
+        "consolidation": {
+          "state": "finished",
+          "error": null,
+          "summary": "openminion: Noted.",
+          "recovery": [
+            [
+              5,
+              0,
+              5
+            ]
+          ],
+          "extractor_calls": 0,
+          "submitted_turn_sessions": [
+            "consolidate:eb975e32e1b4421b9ae6a31cc24bb190"
+          ],
+          "provider_requests": [
+            "consolidation_entry",
+            "freshness",
+            "freshness",
+            "consolidation_other",
+            "judge"
+          ],
+          "request_range": [
+            15,
+            20
+          ],
+          "memory_write_decisions": [
+            {
+              "channel": "cron",
+              "target": "memory-capture-recovery",
+              "session_id": "s1",
+              "run_id": "1e620cb24ec545edbca41a0292e55d1f",
+              "decision": "require_approval",
+              "reason_code": "identity_hard_constraint_restricted"
+            },
+            {
+              "channel": "cron",
+              "target": "memory-capture-recovery",
+              "session_id": "s1",
+              "run_id": "e0471d00328546e8a6dd4f2d8a73ba71",
+              "decision": "require_approval",
+              "reason_code": "identity_hard_constraint_restricted"
+            },
+            {
+              "channel": "cron",
+              "target": "memory-capture-recovery",
+              "session_id": "s1",
+              "run_id": "b0699795f9984737b1e621a1b9d5d56f",
+              "decision": "require_approval",
+              "reason_code": "identity_hard_constraint_restricted"
+            },
+            {
+              "channel": "cron",
+              "target": "memory-capture-recovery",
+              "session_id": "s2",
+              "run_id": "a1255584fd364458aa64df85c727b941",
+              "decision": "require_approval",
+              "reason_code": "identity_hard_constraint_restricted"
+            },
+            {
+              "channel": "cron",
+              "target": "memory-capture-recovery",
+              "session_id": "s2",
+              "run_id": "3bc6750e566740afa3ccee8727e40765",
+              "decision": "require_approval",
+              "reason_code": "identity_hard_constraint_restricted"
+            },
+            {
+              "channel": "console",
+              "target": "memory-capture",
+              "session_id": "consolidate:eb975e32e1b4421b9ae6a31cc24bb190",
+              "run_id": "1dbc8b8ce8ac40a09e1a1dcf61091936",
+              "decision": "require_approval",
+              "reason_code": "identity_hard_constraint_restricted"
+            }
+          ],
+          "memory_api_writes": [],
+          "store": {
+            "new_records": [],
+            "changed_records": [],
+            "new_candidates": [],
+            "changed_candidates": []
+          },
+          "signal_parsed": [],
+          "decisions_applied": []
+        },
+        "final_store": {
+          "records": {},
+          "candidates": {}
+        },
+        "request_log": [
+          {
+            "index": 0,
+            "kind": "decide",
+            "tools": [
+              "clarify",
+              "coding",
+              "decompose",
+              "plan",
+              "research",
+              "respond",
+              "review_diff",
+              "tool_request"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 1,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 2,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 3,
+            "kind": "decide",
+            "tools": [
+              "clarify",
+              "coding",
+              "decompose",
+              "plan",
+              "research",
+              "respond",
+              "review_diff",
+              "tool_request"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 4,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 5,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 6,
+            "kind": "tool_call",
+            "tools": [
+              "clarify",
+              "memory_write"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 7,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 8,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 9,
+            "kind": "decide",
+            "tools": [
+              "clarify",
+              "coding",
+              "decompose",
+              "plan",
+              "research",
+              "respond",
+              "review_diff",
+              "tool_request"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 10,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 11,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 12,
+            "kind": "decide",
+            "tools": [
+              "clarify",
+              "coding",
+              "decompose",
+              "plan",
+              "research",
+              "respond",
+              "review_diff",
+              "tool_request"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 13,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 14,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 15,
+            "kind": "consolidation_entry",
+            "tools": [
+              "clarify",
+              "coding",
+              "decompose",
+              "plan",
+              "research",
+              "respond",
+              "review_diff",
+              "tool_request"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 16,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 17,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 18,
+            "kind": "consolidation_other",
+            "tools": [
+              "plan"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": true
+          },
+          {
+            "index": 19,
+            "kind": "judge",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 20,
+            "kind": "decide",
+            "tools": [
+              "clarify",
+              "coding",
+              "decompose",
+              "plan",
+              "research",
+              "respond",
+              "review_diff",
+              "tool_request"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 21,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 22,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          }
+        ],
+        "readback": {
+          "T2_T1_decision_ids": [],
+          "T5_T4_decision_ids": [],
+          "T5_s1_decision_ids": [],
+          "C_candidate_id": [],
+          "C_refused_text": [],
+          "T6_promoted_ids": [],
+          "T6_refused_text": [],
+          "T6_candidate_id": [],
+          "T4_T6_candidate_or_refused_text": []
+        },
+        "all_outcome_feedback_calls": [],
+        "provider_hosts": [
+          "127.0.0.1"
+        ]
+      },
+      "N": {
+        "case": "N",
+        "constraint": "NEVER reveal secrets",
+        "runner_memory_api_is_assembly_memctl": true,
+        "identity_constraints": [
+          "NEVER reveal secrets"
+        ],
+        "security_policy_present": true,
+        "memory_db": "memory.db",
+        "turns": {
+          "T1": {
+            "label": "T1",
+            "entry": "Agent.run",
+            "session_id": "s1",
+            "conversation_id": null,
+            "message": "Please remember that I prefer tabs over spaces for indentation.",
+            "forced_tools": null,
+            "run_state": "completed",
+            "text": "openminion: Noted: tabs over spaces.",
+            "memory_capture_state": "succeeded",
+            "memory_capture_bundle_result": {
+              "capture_id": "capture:3b66b82da75ee8cbfb98d9e129062c6ee78265032ea418749d96d56f0ab98a86",
+              "committed_at": "2026-10-29T04:50:52.574931+00:00",
+              "disposition": "succeeded",
+              "output_ids": [
+                "cand_1376e284c52efc23f581bc36"
+              ],
+              "report_hash": "979e625bf10cf46876fe06658b7b47a149acc8a3ad9fe3a7f847029bd00cc6e9",
+              "result_hash": "53b81a98d97ded08b65eb15c18a8885e345a9212b1b2630898dc89f125b4635d"
+            },
+            "intent": {
+              "canonical_event_id": "turn.outcome:3b66b82da75ee8cbfb98d9e129062c6ee78265032ea418749d96d56f0ab98a86",
+              "capture_id": "capture:3b66b82da75ee8cbfb98d9e129062c6ee78265032ea418749d96d56f0ab98a86",
+              "capture_state": "pending",
+              "root_turn_id": "63bb6aad1f4141e0aed4980433cbc476",
+              "runtime_session_id": "s1",
+              "agent_id": "openminion"
+            },
+            "provider_requests": [
+              "extraction",
+              "decide",
+              "freshness",
+              "freshness"
+            ],
+            "request_range": [
+              0,
+              4
+            ],
+            "approval_callback_calls": [],
+            "memory_write_decisions": [
+              {
+                "channel": "console",
+                "target": "memory-capture",
+                "session_id": "s1",
+                "run_id": "63bb6aad1f4141e0aed4980433cbc476",
+                "decision": "allow",
+                "reason_code": "allowed"
+              }
+            ],
+            "memory_api_writes": [
+              {
+                "method": "write_record",
+                "callers": [
+                  "modules/brain/adapters/memory/runtime.py:49 write_record",
+                  "modules/brain/execution/memory/base.py:111 write_decision_memory",
+                  "modules/brain/execution/runtime/turn/dispatch.py:636 _record_accepted_decision",
+                  "modules/brain/execution/runtime/turn/dispatch.py:510 _accept_or_redecide"
+                ],
+                "scope": "session:s1::conv:s1:e98d382504474a458919aa6a6b1efc5b",
+                "record_type": "decision",
+                "key": null,
+                "title": "Decision: respond",
+                "tags": [
+                  "decision",
+                  "route:respond"
+                ],
+                "access_context": {
+                  "agent_id": "openminion",
+                  "session_id": "s1::conv:s1:e98d382504474a458919aa6a6b1efc5b"
+                },
+                "result": "mem_fe37c542e812"
+              }
+            ],
+            "store": {
+              "new_records": [
+                {
+                  "id": "mem_fe37c542e812",
+                  "scope": "session:s1::conv:s1:e98d382504474a458919aa6a6b1efc5b",
+                  "type": "decision",
+                  "key": null,
+                  "title": "Decision: respond",
+                  "content_json": {
+                    "type": "decision",
+                    "scope": "session",
+                    "session_id": "s1::conv:s1:e98d382504474a458919aa6a6b1efc5b",
+                    "route_chosen": "respond",
+                    "reason_code": "entry_text_response",
+                    "sub_intents": [],
+                    "rationale": "",
+                    "confidence": 0.5,
+                    "created_at": "2026-10-29T04:50:52.560023+00:00",
+                    "respond_kind": "answer"
+                  },
+                  "tags_json": [
+                    "decision",
+                    "route:respond"
+                  ],
+                  "source": "agent_inferred",
+                  "confidence": 0.5,
+                  "meta_json": {},
+                  "tier": "working",
+                  "created_at": "2026-10-29T04:50:52.561013+00:00",
+                  "updated_at": "2026-10-29T04:50:52.561013+00:00",
+                  "is_deleted": 0
+                }
+              ],
+              "changed_records": [],
+              "new_candidates": [
+                {
+                  "candidate_id": "cand_1376e284c52efc23f581bc36",
+                  "session_id": "s1",
+                  "proposed_scope": "agent:openminion",
+                  "type": "user_preference",
+                  "key": "user_preference:indentation",
+                  "title": "Prefers tabs for indentation",
+                  "content_json": "The user prefers tabs over spaces for indentation.",
+                  "tags_json": [
+                    "probe-420"
+                  ],
+                  "source": "agent_inferred",
+                  "confidence": 0.3,
+                  "meta_json": {
+                    "capture_id": "capture:3b66b82da75ee8cbfb98d9e129062c6ee78265032ea418749d96d56f0ab98a86",
+                    "capture_ordinal": 0,
+                    "normalized_key": "user_preference:indentation",
+                    "source": "auto_extracted",
+                    "source_agent_id": "openminion",
+                    "source_kind": "user_preference",
+                    "source_root_turn_id": "63bb6aad1f4141e0aed4980433cbc476",
+                    "source_session_id": "s1"
+                  },
+                  "status": "proposed",
+                  "created_at": "2026-10-29T04:50:52.574931+00:00",
+                  "updated_at": "2026-10-29T04:50:52.574931+00:00"
+                }
+              ],
+              "changed_candidates": []
+            }
+          },
+          "T2": {
+            "label": "T2",
+            "entry": "Agent.run",
+            "session_id": "s1",
+            "conversation_id": null,
+            "message": "Which indentation style do I prefer?",
+            "forced_tools": null,
+            "run_state": "completed",
+            "text": "openminion: You prefer tabs.",
+            "memory_capture_state": "succeeded_no_output",
+            "memory_capture_bundle_result": {
+              "capture_id": "capture:9bd5f69e37cee2e52e5be119d3819718760a58f285575a5677a45805ab7323cb",
+              "committed_at": "2026-10-29T04:50:52.740279+00:00",
+              "disposition": "succeeded_no_output",
+              "output_ids": [],
+              "report_hash": "fe3606dfbc31f789b78c82b07d84e704fe86c4527f7319ea2eff940b0142e6e4",
+              "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+            },
+            "intent": {
+              "canonical_event_id": "turn.outcome:9bd5f69e37cee2e52e5be119d3819718760a58f285575a5677a45805ab7323cb",
+              "capture_id": "capture:9bd5f69e37cee2e52e5be119d3819718760a58f285575a5677a45805ab7323cb",
+              "capture_state": "pending",
+              "root_turn_id": "983c72d28afa4768ada39fa813ab5cf1",
+              "runtime_session_id": "s1",
+              "agent_id": "openminion"
+            },
+            "provider_requests": [
+              "extraction",
+              "decide",
+              "freshness",
+              "freshness"
+            ],
+            "request_range": [
+              4,
+              8
+            ],
+            "approval_callback_calls": [],
+            "memory_write_decisions": [
+              {
+                "channel": "console",
+                "target": "memory-capture",
+                "session_id": "s1",
+                "run_id": "983c72d28afa4768ada39fa813ab5cf1",
+                "decision": "allow",
+                "reason_code": "allowed"
+              }
+            ],
+            "memory_api_writes": [
+              {
+                "method": "write_record",
+                "callers": [
+                  "modules/brain/adapters/memory/runtime.py:49 write_record",
+                  "modules/brain/execution/memory/base.py:111 write_decision_memory",
+                  "modules/brain/execution/runtime/turn/dispatch.py:636 _record_accepted_decision",
+                  "modules/brain/execution/runtime/turn/dispatch.py:510 _accept_or_redecide"
+                ],
+                "scope": "session:s1::conv:s1:ce1d6266ddfa410f95480fea2992f415",
+                "record_type": "decision",
+                "key": null,
+                "title": "Decision: respond",
+                "tags": [
+                  "decision",
+                  "route:respond"
+                ],
+                "access_context": {
+                  "agent_id": "openminion",
+                  "session_id": "s1::conv:s1:ce1d6266ddfa410f95480fea2992f415"
+                },
+                "result": "mem_52e1e9359305"
+              }
+            ],
+            "store": {
+              "new_records": [
+                {
+                  "id": "mem_52e1e9359305",
+                  "scope": "session:s1::conv:s1:ce1d6266ddfa410f95480fea2992f415",
+                  "type": "decision",
+                  "key": null,
+                  "title": "Decision: respond",
+                  "content_json": {
+                    "type": "decision",
+                    "scope": "session",
+                    "session_id": "s1::conv:s1:ce1d6266ddfa410f95480fea2992f415",
+                    "route_chosen": "respond",
+                    "reason_code": "entry_text_response",
+                    "sub_intents": [],
+                    "rationale": "",
+                    "confidence": 0.5,
+                    "created_at": "2026-10-29T04:50:52.696948+00:00",
+                    "respond_kind": "answer"
+                  },
+                  "tags_json": [
+                    "decision",
+                    "route:respond"
+                  ],
+                  "source": "agent_inferred",
+                  "confidence": 0.5,
+                  "meta_json": {},
+                  "tier": "working",
+                  "created_at": "2026-10-29T04:50:52.697133+00:00",
+                  "updated_at": "2026-10-29T04:50:52.697133+00:00",
+                  "is_deleted": 0
+                }
+              ],
+              "changed_records": [],
+              "new_candidates": [],
+              "changed_candidates": []
+            }
+          },
+          "T3": {
+            "label": "T3",
+            "entry": "Agent.run",
+            "session_id": "s1",
+            "conversation_id": null,
+            "message": "Which indentation style do I prefer?",
+            "forced_tools": [
+              "memory.write"
+            ],
+            "run_state": "completed",
+            "text": "openminion: Confirmation denied. The action was not run.",
+            "memory_capture_state": "succeeded_no_output",
+            "memory_capture_bundle_result": {
+              "capture_id": "capture:7bf8c25e8ff6576c0cab9f52e0a7995df045d1d92892ab0ffa0d0d2beb74c4af",
+              "committed_at": "2026-10-29T04:50:52.913127+00:00",
+              "disposition": "succeeded_no_output",
+              "output_ids": [],
+              "report_hash": "6dd0687821537fa0fcd8a70c49486fb23329935c096c4423834d7ae6f92764f9",
+              "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+            },
+            "intent": {
+              "canonical_event_id": "turn.outcome:7bf8c25e8ff6576c0cab9f52e0a7995df045d1d92892ab0ffa0d0d2beb74c4af",
+              "capture_id": "capture:7bf8c25e8ff6576c0cab9f52e0a7995df045d1d92892ab0ffa0d0d2beb74c4af",
+              "capture_state": "pending",
+              "root_turn_id": "c1c7a7f7fc464894a102fb16d45e063d",
+              "runtime_session_id": "s1",
+              "agent_id": "openminion"
+            },
+            "provider_requests": [
+              "extraction",
+              "tool_call",
+              "freshness",
+              "freshness"
+            ],
+            "request_range": [
+              8,
+              12
+            ],
+            "approval_callback_calls": [
+              {
+                "tool": "memory.write",
+                "args": {
+                  "record_type": "fact",
+                  "key": "fact:indentation",
+                  "title": "Indentation",
+                  "content": "The user prefers tabs."
+                }
+              }
+            ],
+            "memory_write_decisions": [
+              {
+                "channel": "console",
+                "target": "memory-capture",
+                "session_id": "s1",
+                "run_id": "c1c7a7f7fc464894a102fb16d45e063d",
+                "decision": "allow",
+                "reason_code": "allowed"
+              }
+            ],
+            "memory_api_writes": [
+              {
+                "method": "write_record",
+                "callers": [
+                  "modules/brain/adapters/memory/runtime.py:49 write_record",
+                  "modules/brain/execution/memory/base.py:111 write_decision_memory",
+                  "modules/brain/execution/runtime/turn/dispatch.py:636 _record_accepted_decision",
+                  "modules/brain/execution/runtime/turn/dispatch.py:510 _accept_or_redecide"
+                ],
+                "scope": "session:s1::conv:s1:5c028911bd5d4d9990258777c387657e",
+                "record_type": "decision",
+                "key": null,
+                "title": "Decision: act",
+                "tags": [
+                  "decision",
+                  "route:act"
+                ],
+                "access_context": {
+                  "agent_id": "openminion",
+                  "session_id": "s1::conv:s1:5c028911bd5d4d9990258777c387657e"
+                },
+                "result": "mem_05107833adb0"
+              },
+              {
+                "method": "stage_candidate",
+                "callers": [
+                  "modules/brain/tools/executor/tool.py:184 _stage_tool_outcome_candidate",
+                  "modules/brain/tools/executor/command_executor.py:156 stage_tool_outcome_candidate",
+                  "modules/brain/tools/executor/command_executor.py:209 prepare_tool_dispatch",
+                  "modules/brain/loop/adaptive/context.py:197 prepare_tool_dispatch"
+                ],
+                "scope": "agent:openminion",
+                "record_type": "tool_outcome",
+                "title": "tool_outcome:memory.write:policy_denied",
+                "content": {
+                  "tool_name": "memory.write",
+                  "tool_family": "memory",
+                  "outcome": "policy_denied",
+                  "error_code": null,
+                  "turn_index": 1,
+                  "intent_id": null,
+                  "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                  "artifact_ref": null
+                },
+                "tags": [
+                  "tool_outcome",
+                  "tool_family:memory",
+                  "outcome:policy_denied"
+                ],
+                "meta": {
+                  "source_kind": "tool_outcome",
+                  "source_negative_outcome": true,
+                  "source_success_path": false,
+                  "source_outcome_status": "policy_denied",
+                  "source_tool_name": "memory.write",
+                  "source_tool_family": "memory",
+                  "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                  "source_command_id": "call-memory-write-9"
+                },
+                "result": "cand_4f63a6e18483"
+              }
+            ],
+            "store": {
+              "new_records": [
+                {
+                  "id": "mem_05107833adb0",
+                  "scope": "session:s1::conv:s1:5c028911bd5d4d9990258777c387657e",
+                  "type": "decision",
+                  "key": null,
+                  "title": "Decision: act",
+                  "content_json": {
+                    "type": "decision",
+                    "scope": "session",
+                    "session_id": "s1::conv:s1:5c028911bd5d4d9990258777c387657e",
+                    "route_chosen": "act",
+                    "reason_code": "entry_tool_call",
+                    "sub_intents": [],
+                    "rationale": "",
+                    "confidence": 0.5,
+                    "created_at": "2026-10-29T04:50:52.885438+00:00",
+                    "act_profile": "general",
+                    "execution_target_kind": "local"
+                  },
+                  "tags_json": [
+                    "decision",
+                    "route:act"
+                  ],
+                  "source": "agent_inferred",
+                  "confidence": 0.5,
+                  "meta_json": {},
+                  "tier": "working",
+                  "created_at": "2026-10-29T04:50:52.885642+00:00",
+                  "updated_at": "2026-10-29T04:50:52.885642+00:00",
+                  "is_deleted": 0
+                }
+              ],
+              "changed_records": [],
+              "new_candidates": [
+                {
+                  "candidate_id": "cand_4f63a6e18483",
+                  "session_id": "openminion",
+                  "proposed_scope": "agent:openminion",
+                  "type": "tool_outcome",
+                  "key": null,
+                  "title": "tool_outcome:memory.write:policy_denied",
+                  "content_json": {
+                    "tool_name": "memory.write",
+                    "tool_family": "memory",
+                    "outcome": "policy_denied",
+                    "error_code": null,
+                    "turn_index": 1,
+                    "intent_id": null,
+                    "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                    "artifact_ref": null
+                  },
+                  "tags_json": [
+                    "tool_outcome",
+                    "tool_family:memory",
+                    "outcome:policy_denied"
+                  ],
+                  "source": "agent_inferred",
+                  "confidence": 0.4,
+                  "meta_json": {
+                    "source_kind": "tool_outcome",
+                    "source_negative_outcome": true,
+                    "source_success_path": false,
+                    "source_outcome_status": "policy_denied",
+                    "source_tool_name": "memory.write",
+                    "source_tool_family": "memory",
+                    "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                    "source_command_id": "call-memory-write-9",
+                    "polarity": "asserts"
+                  },
+                  "status": "proposed",
+                  "created_at": "2026-10-29T04:50:52.902676+00:00",
+                  "updated_at": "2026-10-29T04:50:52.902676+00:00"
+                }
+              ],
+              "changed_candidates": []
+            }
+          },
+          "T4": {
+            "label": "T4",
+            "entry": "APIRuntime.run_turn",
+            "session_id": "s2",
+            "conversation_id": "chat",
+            "message": "Say hello.",
+            "forced_tools": null,
+            "run_state": "completed",
+            "text": "openminion: Hello.",
+            "memory_capture_state": "succeeded_no_output",
+            "memory_capture_bundle_result": {
+              "capture_id": "capture:af12120aa6e1b5fb8206b2e24a021aaedd10c96d82fb6119cc818a84db13a544",
+              "committed_at": "2026-10-29T04:50:53.068014+00:00",
+              "disposition": "succeeded_no_output",
+              "output_ids": [],
+              "report_hash": "471d5a38b353706ab2b70e01d54805f755e143254ce6442410e830fb0ccbbf80",
+              "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+            },
+            "intent": {
+              "canonical_event_id": "turn.outcome:af12120aa6e1b5fb8206b2e24a021aaedd10c96d82fb6119cc818a84db13a544",
+              "capture_id": "capture:af12120aa6e1b5fb8206b2e24a021aaedd10c96d82fb6119cc818a84db13a544",
+              "capture_state": "pending",
+              "root_turn_id": "42004bbd45964e4a9058e4cb58eb64a8",
+              "runtime_session_id": "s2",
+              "agent_id": "openminion"
+            },
+            "provider_requests": [
+              "extraction",
+              "decide",
+              "freshness",
+              "freshness"
+            ],
+            "request_range": [
+              12,
+              16
+            ],
+            "approval_callback_calls": [],
+            "memory_write_decisions": [
+              {
+                "channel": "console",
+                "target": "memory-capture",
+                "session_id": "s2",
+                "run_id": "42004bbd45964e4a9058e4cb58eb64a8",
+                "decision": "allow",
+                "reason_code": "allowed"
+              }
+            ],
+            "memory_api_writes": [
+              {
+                "method": "write_record",
+                "callers": [
+                  "modules/brain/adapters/memory/runtime.py:49 write_record",
+                  "modules/brain/execution/memory/base.py:111 write_decision_memory",
+                  "modules/brain/execution/runtime/turn/dispatch.py:636 _record_accepted_decision",
+                  "modules/brain/execution/runtime/turn/dispatch.py:510 _accept_or_redecide"
+                ],
+                "scope": "session:s2::conv:chat",
+                "record_type": "decision",
+                "key": null,
+                "title": "Decision: respond",
+                "tags": [
+                  "decision",
+                  "route:respond"
+                ],
+                "access_context": {
+                  "agent_id": "openminion",
+                  "session_id": "s2::conv:chat"
+                },
+                "result": "mem_bf63f8c7e94b"
+              }
+            ],
+            "store": {
+              "new_records": [
+                {
+                  "id": "mem_bf63f8c7e94b",
+                  "scope": "session:s2::conv:chat",
+                  "type": "decision",
+                  "key": null,
+                  "title": "Decision: respond",
+                  "content_json": {
+                    "type": "decision",
+                    "scope": "session",
+                    "session_id": "s2::conv:chat",
+                    "route_chosen": "respond",
+                    "reason_code": "entry_text_response",
+                    "sub_intents": [],
+                    "rationale": "",
+                    "confidence": 0.5,
+                    "created_at": "2026-10-29T04:50:53.047779+00:00",
+                    "respond_kind": "answer"
+                  },
+                  "tags_json": [
+                    "decision",
+                    "route:respond"
+                  ],
+                  "source": "agent_inferred",
+                  "confidence": 0.5,
+                  "meta_json": {},
+                  "tier": "working",
+                  "created_at": "2026-10-29T04:50:53.047956+00:00",
+                  "updated_at": "2026-10-29T04:50:53.047956+00:00",
+                  "is_deleted": 0
+                }
+              ],
+              "changed_records": [],
+              "new_candidates": [],
+              "changed_candidates": []
+            }
+          },
+          "T5": {
+            "label": "T5",
+            "entry": "APIRuntime.run_turn",
+            "session_id": "s2",
+            "conversation_id": "chat",
+            "message": "Which indentation style do I prefer?",
+            "forced_tools": null,
+            "run_state": "completed",
+            "text": "openminion: You prefer tabs.",
+            "memory_capture_state": "succeeded_no_output",
+            "memory_capture_bundle_result": {
+              "capture_id": "capture:f49e6bb16b333e29dad2351d051640669c500420d52a281c36c3e7fc9da83154",
+              "committed_at": "2026-10-29T04:50:53.200638+00:00",
+              "disposition": "succeeded_no_output",
+              "output_ids": [],
+              "report_hash": "36c33edc3200c719110c9a6b0dc17b391fda2e08042972f392d3218eefca084a",
+              "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+            },
+            "intent": {
+              "canonical_event_id": "turn.outcome:f49e6bb16b333e29dad2351d051640669c500420d52a281c36c3e7fc9da83154",
+              "capture_id": "capture:f49e6bb16b333e29dad2351d051640669c500420d52a281c36c3e7fc9da83154",
+              "capture_state": "pending",
+              "root_turn_id": "d52116fb2cb446d093b78a3a89f8e974",
+              "runtime_session_id": "s2",
+              "agent_id": "openminion"
+            },
+            "provider_requests": [
+              "extraction",
+              "decide",
+              "freshness",
+              "freshness"
+            ],
+            "request_range": [
+              16,
+              20
+            ],
+            "approval_callback_calls": [],
+            "memory_write_decisions": [
+              {
+                "channel": "console",
+                "target": "memory-capture",
+                "session_id": "s2",
+                "run_id": "d52116fb2cb446d093b78a3a89f8e974",
+                "decision": "allow",
+                "reason_code": "allowed"
+              }
+            ],
+            "memory_api_writes": [
+              {
+                "method": "write_record",
+                "callers": [
+                  "modules/brain/adapters/memory/runtime.py:49 write_record",
+                  "modules/brain/execution/memory/base.py:111 write_decision_memory",
+                  "modules/brain/execution/runtime/turn/dispatch.py:636 _record_accepted_decision",
+                  "modules/brain/execution/runtime/turn/dispatch.py:510 _accept_or_redecide"
+                ],
+                "scope": "session:s2::conv:chat",
+                "record_type": "decision",
+                "key": null,
+                "title": "Decision: respond",
+                "tags": [
+                  "decision",
+                  "route:respond"
+                ],
+                "access_context": {
+                  "agent_id": "openminion",
+                  "session_id": "s2::conv:chat"
+                },
+                "result": "mem_c91cb87575ee"
+              }
+            ],
+            "store": {
+              "new_records": [
+                {
+                  "id": "mem_c91cb87575ee",
+                  "scope": "session:s2::conv:chat",
+                  "type": "decision",
+                  "key": null,
+                  "title": "Decision: respond",
+                  "content_json": {
+                    "type": "decision",
+                    "scope": "session",
+                    "session_id": "s2::conv:chat",
+                    "route_chosen": "respond",
+                    "reason_code": "entry_text_response",
+                    "sub_intents": [],
+                    "rationale": "",
+                    "confidence": 0.5,
+                    "created_at": "2026-10-29T04:50:53.188231+00:00",
+                    "respond_kind": "answer"
+                  },
+                  "tags_json": [
+                    "decision",
+                    "route:respond"
+                  ],
+                  "source": "agent_inferred",
+                  "confidence": 0.5,
+                  "meta_json": {},
+                  "tier": "working",
+                  "created_at": "2026-10-29T04:50:53.188416+00:00",
+                  "updated_at": "2026-10-29T04:50:53.188416+00:00",
+                  "is_deleted": 0
+                }
+              ],
+              "changed_records": [],
+              "new_candidates": [],
+              "changed_candidates": []
+            }
+          },
+          "T6": {
+            "label": "T6",
+            "entry": "Agent.run",
+            "session_id": "s3",
+            "conversation_id": null,
+            "message": "Say hello.",
+            "forced_tools": null,
+            "run_state": "completed",
+            "text": "openminion: Hello.",
+            "memory_capture_state": "succeeded_no_output",
+            "memory_capture_bundle_result": {
+              "capture_id": "capture:0af430302957a6a346c881727819892fc4fe401185f902dcea927bb17ce5d672",
+              "committed_at": "2026-10-29T04:50:53.976090+00:00",
+              "disposition": "succeeded_no_output",
+              "output_ids": [],
+              "report_hash": "44eb1b53896a6066cd943552b91c76eef53258b4ec34e2618b9f61e0a8d7b081",
+              "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+            },
+            "intent": {
+              "canonical_event_id": "turn.outcome:0af430302957a6a346c881727819892fc4fe401185f902dcea927bb17ce5d672",
+              "capture_id": "capture:0af430302957a6a346c881727819892fc4fe401185f902dcea927bb17ce5d672",
+              "capture_state": "pending",
+              "root_turn_id": "8abdd1512dd44b63b936545f5236a0f8",
+              "runtime_session_id": "s3",
+              "agent_id": "openminion"
+            },
+            "provider_requests": [
+              "extraction",
+              "decide",
+              "freshness",
+              "freshness"
+            ],
+            "request_range": [
+              25,
+              29
+            ],
+            "approval_callback_calls": [],
+            "memory_write_decisions": [
+              {
+                "channel": "console",
+                "target": "memory-capture",
+                "session_id": "s3",
+                "run_id": "8abdd1512dd44b63b936545f5236a0f8",
+                "decision": "allow",
+                "reason_code": "allowed"
+              }
+            ],
+            "memory_api_writes": [
+              {
+                "method": "write_record",
+                "callers": [
+                  "modules/brain/adapters/memory/runtime.py:49 write_record",
+                  "modules/brain/execution/memory/base.py:111 write_decision_memory",
+                  "modules/brain/execution/runtime/turn/dispatch.py:636 _record_accepted_decision",
+                  "modules/brain/execution/runtime/turn/dispatch.py:510 _accept_or_redecide"
+                ],
+                "scope": "session:s3::conv:s3:7cc0dd400aac4a178b778bb22ab04111",
+                "record_type": "decision",
+                "key": null,
+                "title": "Decision: respond",
+                "tags": [
+                  "decision",
+                  "route:respond"
+                ],
+                "access_context": {
+                  "agent_id": "openminion",
+                  "session_id": "s3::conv:s3:7cc0dd400aac4a178b778bb22ab04111"
+                },
+                "result": "mem_1f780de6622c"
+              }
+            ],
+            "store": {
+              "new_records": [
+                {
+                  "id": "mem_1f780de6622c",
+                  "scope": "session:s3::conv:s3:7cc0dd400aac4a178b778bb22ab04111",
+                  "type": "decision",
+                  "key": null,
+                  "title": "Decision: respond",
+                  "content_json": {
+                    "type": "decision",
+                    "scope": "session",
+                    "session_id": "s3::conv:s3:7cc0dd400aac4a178b778bb22ab04111",
+                    "route_chosen": "respond",
+                    "reason_code": "entry_text_response",
+                    "sub_intents": [],
+                    "rationale": "",
+                    "confidence": 0.5,
+                    "created_at": "2026-10-29T04:50:53.957295+00:00",
+                    "respond_kind": "answer"
+                  },
+                  "tags_json": [
+                    "decision",
+                    "route:respond"
+                  ],
+                  "source": "agent_inferred",
+                  "confidence": 0.5,
+                  "meta_json": {},
+                  "tier": "working",
+                  "created_at": "2026-10-29T04:50:53.957488+00:00",
+                  "updated_at": "2026-10-29T04:50:53.957488+00:00",
+                  "is_deleted": 0
+                }
+              ],
+              "changed_records": [],
+              "new_candidates": [],
+              "changed_candidates": []
+            }
+          }
+        },
+        "recovery_gate_T1": {
+          "returned": true,
+          "decisions": [
+            {
+              "channel": "cron",
+              "target": "memory-capture-recovery",
+              "session_id": "s1",
+              "run_id": "63bb6aad1f4141e0aed4980433cbc476",
+              "decision": "allow",
+              "reason_code": "allowed"
+            }
+          ]
+        },
+        "tool_adapter_memory_write": {
+          "allowed": true,
+          "requires_confirm": false,
+          "reason": "policy passed"
+        },
+        "tool_outcome_candidate_ids": [
+          "cand_4f63a6e18483"
+        ],
+        "job_id": "2dccd29b65904f9484b207b0e19bd4a6",
+        "consolidation": {
+          "state": "finished",
+          "error": null,
+          "summary": "openminion: Noted.",
+          "recovery": [
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "extractor_calls": 0,
+          "submitted_turn_sessions": [
+            "consolidate:2dccd29b65904f9484b207b0e19bd4a6"
+          ],
+          "provider_requests": [
+            "consolidation_entry",
+            "freshness",
+            "freshness",
+            "consolidation_reply",
+            "judge"
+          ],
+          "request_range": [
+            20,
+            25
+          ],
+          "memory_write_decisions": [
+            {
+              "channel": "console",
+              "target": "memory-capture",
+              "session_id": "consolidate:2dccd29b65904f9484b207b0e19bd4a6",
+              "run_id": "fe1c4e41274d4afabe199e4be14ab2d0",
+              "decision": "allow",
+              "reason_code": "allowed"
+            }
+          ],
+          "memory_api_writes": [
+            {
+              "method": "write_record",
+              "callers": [
+                "modules/brain/adapters/memory/runtime.py:49 write_record",
+                "modules/brain/execution/memory/base.py:111 write_decision_memory",
+                "modules/brain/execution/runtime/turn/dispatch.py:636 _record_accepted_decision",
+                "modules/brain/execution/runtime/turn/dispatch.py:510 _accept_or_redecide"
+              ],
+              "scope": "session:consolidate:2dccd29b65904f9484b207b0e19bd4a6::conv:consolidate:2dccd29b65904f9484b207b0e19bd4a6:4c82ca62f9314fccb2820270679e7faf",
+              "record_type": "decision",
+              "key": null,
+              "title": "Decision: act",
+              "tags": [
+                "decision",
+                "route:act"
+              ],
+              "access_context": {
+                "agent_id": "openminion",
+                "session_id": "consolidate:2dccd29b65904f9484b207b0e19bd4a6::conv:consolidate:2dccd29b65904f9484b207b0e19bd4a6:4c82ca62f9314fccb2820270679e7faf"
+              },
+              "result": "mem_d011dd433f69"
+            }
+          ],
+          "store": {
+            "new_records": [
+              {
+                "id": "mem_d011dd433f69",
+                "scope": "session:consolidate:2dccd29b65904f9484b207b0e19bd4a6::conv:consolidate:2dccd29b65904f9484b207b0e19bd4a6:4c82ca62f9314fccb2820270679e7faf",
+                "type": "decision",
+                "key": null,
+                "title": "Decision: act",
+                "content_json": {
+                  "type": "decision",
+                  "scope": "session",
+                  "session_id": "consolidate:2dccd29b65904f9484b207b0e19bd4a6::conv:consolidate:2dccd29b65904f9484b207b0e19bd4a6:4c82ca62f9314fccb2820270679e7faf",
+                  "route_chosen": "act",
+                  "reason_code": "entry_decompose_declined",
+                  "sub_intents": [],
+                  "rationale": "",
+                  "confidence": 0.5,
+                  "created_at": "2026-10-29T04:50:53.534250+00:00",
+                  "act_profile": "general",
+                  "execution_target_kind": "local"
+                },
+                "tags_json": [
+                  "decision",
+                  "route:act"
+                ],
+                "source": "agent_inferred",
+                "confidence": 0.5,
+                "meta_json": {},
+                "tier": "working",
+                "created_at": "2026-10-29T04:50:53.534439+00:00",
+                "updated_at": "2026-10-29T04:50:53.534439+00:00",
+                "is_deleted": 0
+              }
+            ],
+            "changed_records": [],
+            "new_candidates": [],
+            "changed_candidates": []
+          },
+          "signal_parsed": [
+            {
+              "signal": {
+                "decisions": [
+                  {
+                    "candidate_id": "cand_4f63a6e18483",
+                    "action": "promote",
+                    "reasoning": "probe: promote the staged tool outcome"
+                  }
+                ]
+              }
+            }
+          ],
+          "decisions_applied": [
+            {
+              "decisions": [
+                {
+                  "candidate_id": "cand_4f63a6e18483",
+                  "action": "promote",
+                  "reasoning": "probe: promote the staged tool outcome"
+                }
+              ],
+              "target_scope": "agent:openminion",
+              "selected_candidate_ids": [
+                "cand_1376e284c52efc23f581bc36",
+                "cand_4f63a6e18483"
+              ],
+              "result": {
+                "applied_count": 0,
+                "promoted_count": 0,
+                "discarded_count": 0,
+                "deferred_count": 0,
+                "applied_candidate_ids": [],
+                "errors": [
+                  "cand_4f63a6e18483: Source 'agent_inferred' requires explicit approval for auto-promotion"
+                ]
+              }
+            }
+          ]
+        },
+        "final_store": {
+          "records": {
+            "mem_fe37c542e812": {
+              "id": "mem_fe37c542e812",
+              "scope": "session:s1::conv:s1:e98d382504474a458919aa6a6b1efc5b",
+              "type": "decision",
+              "key": null,
+              "title": "Decision: respond",
+              "content_json": {
+                "type": "decision",
+                "scope": "session",
+                "session_id": "s1::conv:s1:e98d382504474a458919aa6a6b1efc5b",
+                "route_chosen": "respond",
+                "reason_code": "entry_text_response",
+                "sub_intents": [],
+                "rationale": "",
+                "confidence": 0.5,
+                "created_at": "2026-10-29T04:50:52.560023+00:00",
+                "respond_kind": "answer"
+              },
+              "tags_json": [
+                "decision",
+                "route:respond"
+              ],
+              "source": "agent_inferred",
+              "confidence": 0.5,
+              "meta_json": {},
+              "tier": "working",
+              "created_at": "2026-10-29T04:50:52.561013+00:00",
+              "updated_at": "2026-10-29T04:50:52.561013+00:00",
+              "is_deleted": 0
+            },
+            "mem_52e1e9359305": {
+              "id": "mem_52e1e9359305",
+              "scope": "session:s1::conv:s1:ce1d6266ddfa410f95480fea2992f415",
+              "type": "decision",
+              "key": null,
+              "title": "Decision: respond",
+              "content_json": {
+                "type": "decision",
+                "scope": "session",
+                "session_id": "s1::conv:s1:ce1d6266ddfa410f95480fea2992f415",
+                "route_chosen": "respond",
+                "reason_code": "entry_text_response",
+                "sub_intents": [],
+                "rationale": "",
+                "confidence": 0.5,
+                "created_at": "2026-10-29T04:50:52.696948+00:00",
+                "respond_kind": "answer"
+              },
+              "tags_json": [
+                "decision",
+                "route:respond"
+              ],
+              "source": "agent_inferred",
+              "confidence": 0.5,
+              "meta_json": {},
+              "tier": "working",
+              "created_at": "2026-10-29T04:50:52.697133+00:00",
+              "updated_at": "2026-10-29T04:50:52.697133+00:00",
+              "is_deleted": 0
+            },
+            "mem_05107833adb0": {
+              "id": "mem_05107833adb0",
+              "scope": "session:s1::conv:s1:5c028911bd5d4d9990258777c387657e",
+              "type": "decision",
+              "key": null,
+              "title": "Decision: act",
+              "content_json": {
+                "type": "decision",
+                "scope": "session",
+                "session_id": "s1::conv:s1:5c028911bd5d4d9990258777c387657e",
+                "route_chosen": "act",
+                "reason_code": "entry_tool_call",
+                "sub_intents": [],
+                "rationale": "",
+                "confidence": 0.5,
+                "created_at": "2026-10-29T04:50:52.885438+00:00",
+                "act_profile": "general",
+                "execution_target_kind": "local"
+              },
+              "tags_json": [
+                "decision",
+                "route:act"
+              ],
+              "source": "agent_inferred",
+              "confidence": 0.5,
+              "meta_json": {},
+              "tier": "working",
+              "created_at": "2026-10-29T04:50:52.885642+00:00",
+              "updated_at": "2026-10-29T04:50:52.885642+00:00",
+              "is_deleted": 0
+            },
+            "mem_bf63f8c7e94b": {
+              "id": "mem_bf63f8c7e94b",
+              "scope": "session:s2::conv:chat",
+              "type": "decision",
+              "key": null,
+              "title": "Decision: respond",
+              "content_json": {
+                "type": "decision",
+                "scope": "session",
+                "session_id": "s2::conv:chat",
+                "route_chosen": "respond",
+                "reason_code": "entry_text_response",
+                "sub_intents": [],
+                "rationale": "",
+                "confidence": 0.5,
+                "created_at": "2026-10-29T04:50:53.047779+00:00",
+                "respond_kind": "answer"
+              },
+              "tags_json": [
+                "decision",
+                "route:respond"
+              ],
+              "source": "agent_inferred",
+              "confidence": 0.5,
+              "meta_json": {},
+              "tier": "working",
+              "created_at": "2026-10-29T04:50:53.047956+00:00",
+              "updated_at": "2026-10-29T04:50:53.047956+00:00",
+              "is_deleted": 0
+            },
+            "mem_c91cb87575ee": {
+              "id": "mem_c91cb87575ee",
+              "scope": "session:s2::conv:chat",
+              "type": "decision",
+              "key": null,
+              "title": "Decision: respond",
+              "content_json": {
+                "type": "decision",
+                "scope": "session",
+                "session_id": "s2::conv:chat",
+                "route_chosen": "respond",
+                "reason_code": "entry_text_response",
+                "sub_intents": [],
+                "rationale": "",
+                "confidence": 0.5,
+                "created_at": "2026-10-29T04:50:53.188231+00:00",
+                "respond_kind": "answer"
+              },
+              "tags_json": [
+                "decision",
+                "route:respond"
+              ],
+              "source": "agent_inferred",
+              "confidence": 0.5,
+              "meta_json": {},
+              "tier": "working",
+              "created_at": "2026-10-29T04:50:53.188416+00:00",
+              "updated_at": "2026-10-29T04:50:53.188416+00:00",
+              "is_deleted": 0
+            },
+            "mem_d011dd433f69": {
+              "id": "mem_d011dd433f69",
+              "scope": "session:consolidate:2dccd29b65904f9484b207b0e19bd4a6::conv:consolidate:2dccd29b65904f9484b207b0e19bd4a6:4c82ca62f9314fccb2820270679e7faf",
+              "type": "decision",
+              "key": null,
+              "title": "Decision: act",
+              "content_json": {
+                "type": "decision",
+                "scope": "session",
+                "session_id": "consolidate:2dccd29b65904f9484b207b0e19bd4a6::conv:consolidate:2dccd29b65904f9484b207b0e19bd4a6:4c82ca62f9314fccb2820270679e7faf",
+                "route_chosen": "act",
+                "reason_code": "entry_decompose_declined",
+                "sub_intents": [],
+                "rationale": "",
+                "confidence": 0.5,
+                "created_at": "2026-10-29T04:50:53.534250+00:00",
+                "act_profile": "general",
+                "execution_target_kind": "local"
+              },
+              "tags_json": [
+                "decision",
+                "route:act"
+              ],
+              "source": "agent_inferred",
+              "confidence": 0.5,
+              "meta_json": {},
+              "tier": "working",
+              "created_at": "2026-10-29T04:50:53.534439+00:00",
+              "updated_at": "2026-10-29T04:50:53.534439+00:00",
+              "is_deleted": 0
+            },
+            "mem_1f780de6622c": {
+              "id": "mem_1f780de6622c",
+              "scope": "session:s3::conv:s3:7cc0dd400aac4a178b778bb22ab04111",
+              "type": "decision",
+              "key": null,
+              "title": "Decision: respond",
+              "content_json": {
+                "type": "decision",
+                "scope": "session",
+                "session_id": "s3::conv:s3:7cc0dd400aac4a178b778bb22ab04111",
+                "route_chosen": "respond",
+                "reason_code": "entry_text_response",
+                "sub_intents": [],
+                "rationale": "",
+                "confidence": 0.5,
+                "created_at": "2026-10-29T04:50:53.957295+00:00",
+                "respond_kind": "answer"
+              },
+              "tags_json": [
+                "decision",
+                "route:respond"
+              ],
+              "source": "agent_inferred",
+              "confidence": 0.5,
+              "meta_json": {},
+              "tier": "working",
+              "created_at": "2026-10-29T04:50:53.957488+00:00",
+              "updated_at": "2026-10-29T04:50:53.957488+00:00",
+              "is_deleted": 0
+            }
+          },
+          "candidates": {
+            "cand_1376e284c52efc23f581bc36": {
+              "candidate_id": "cand_1376e284c52efc23f581bc36",
+              "session_id": "s1",
+              "proposed_scope": "agent:openminion",
+              "type": "user_preference",
+              "key": "user_preference:indentation",
+              "title": "Prefers tabs for indentation",
+              "content_json": "The user prefers tabs over spaces for indentation.",
+              "tags_json": [
+                "probe-420"
+              ],
+              "source": "agent_inferred",
+              "confidence": 0.3,
+              "meta_json": {
+                "capture_id": "capture:3b66b82da75ee8cbfb98d9e129062c6ee78265032ea418749d96d56f0ab98a86",
+                "capture_ordinal": 0,
+                "normalized_key": "user_preference:indentation",
+                "source": "auto_extracted",
+                "source_agent_id": "openminion",
+                "source_kind": "user_preference",
+                "source_root_turn_id": "63bb6aad1f4141e0aed4980433cbc476",
+                "source_session_id": "s1"
+              },
+              "status": "proposed",
+              "created_at": "2026-10-29T04:50:52.574931+00:00",
+              "updated_at": "2026-10-29T04:50:52.574931+00:00"
+            },
+            "cand_4f63a6e18483": {
+              "candidate_id": "cand_4f63a6e18483",
+              "session_id": "openminion",
+              "proposed_scope": "agent:openminion",
+              "type": "tool_outcome",
+              "key": null,
+              "title": "tool_outcome:memory.write:policy_denied",
+              "content_json": {
+                "tool_name": "memory.write",
+                "tool_family": "memory",
+                "outcome": "policy_denied",
+                "error_code": null,
+                "turn_index": 1,
+                "intent_id": null,
+                "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                "artifact_ref": null
+              },
+              "tags_json": [
+                "tool_outcome",
+                "tool_family:memory",
+                "outcome:policy_denied"
+              ],
+              "source": "agent_inferred",
+              "confidence": 0.4,
+              "meta_json": {
+                "source_kind": "tool_outcome",
+                "source_negative_outcome": true,
+                "source_success_path": false,
+                "source_outcome_status": "policy_denied",
+                "source_tool_name": "memory.write",
+                "source_tool_family": "memory",
+                "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                "source_command_id": "call-memory-write-9",
+                "polarity": "asserts"
+              },
+              "status": "proposed",
+              "created_at": "2026-10-29T04:50:52.902676+00:00",
+              "updated_at": "2026-10-29T04:50:52.902676+00:00"
+            }
+          }
+        },
+        "request_log": [
+          {
+            "index": 0,
+            "kind": "extraction",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 1,
+            "kind": "decide",
+            "tools": [
+              "clarify",
+              "coding",
+              "decompose",
+              "plan",
+              "research",
+              "respond",
+              "review_diff",
+              "tool_request"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 2,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 3,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 4,
+            "kind": "extraction",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 5,
+            "kind": "decide",
+            "tools": [
+              "clarify",
+              "coding",
+              "decompose",
+              "plan",
+              "research",
+              "respond",
+              "review_diff",
+              "tool_request"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 6,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 7,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 8,
+            "kind": "extraction",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 9,
+            "kind": "tool_call",
+            "tools": [
+              "clarify",
+              "memory_write"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 10,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 11,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 12,
+            "kind": "extraction",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 13,
+            "kind": "decide",
+            "tools": [
+              "clarify",
+              "coding",
+              "decompose",
+              "plan",
+              "research",
+              "respond",
+              "review_diff",
+              "tool_request"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 14,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 15,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 16,
+            "kind": "extraction",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 17,
+            "kind": "decide",
+            "tools": [
+              "clarify",
+              "coding",
+              "decompose",
+              "plan",
+              "research",
+              "respond",
+              "review_diff",
+              "tool_request"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 18,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 19,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 20,
+            "kind": "consolidation_entry",
+            "tools": [
+              "clarify",
+              "coding",
+              "decompose",
+              "plan",
+              "research",
+              "respond",
+              "review_diff",
+              "tool_request"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 21,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 22,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 23,
+            "kind": "consolidation_reply",
+            "tools": [
+              "plan"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": true
+          },
+          {
+            "index": 24,
+            "kind": "judge",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 25,
+            "kind": "extraction",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 26,
+            "kind": "decide",
+            "tools": [
+              "clarify",
+              "coding",
+              "decompose",
+              "plan",
+              "research",
+              "respond",
+              "review_diff",
+              "tool_request"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 27,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 28,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          }
+        ],
+        "readback": {
+          "T2_T1_decision_ids": [],
+          "T5_T4_decision_ids": [
+            {
+              "request": 16,
+              "kind": "extraction",
+              "line": "asibility_report\":null,\"decision_feasibility_state\":{},\"decision_memory_refs\":[\"mem_bf63f8c7e94b\"],\"decision_rationale\":\"\",\"decision_reason_code\":\"entry_text_response\",\"decision_success_criteria\":{},\"delegation_goal\":\"\",\"delegation_job_id\":null,\"delegation_synthesize_result\":false,\"delegation_target_agent_id\":null,\"delegation_task_id\""
+            },
+            {
+              "request": 17,
+              "kind": "decide",
+              "line": "asibility_report\":null,\"decision_feasibility_state\":{},\"decision_memory_refs\":[\"mem_bf63f8c7e94b\"],\"decision_rationale\":\"\",\"decision_reason_code\":\"entry_text_response\",\"decision_success_criteria\":{},\"delegation_goal\":\"\",\"delegation_job_id\":null,\"delegation_synthesize_result\":false,\"delegation_target_agent_id\":null,\"delegation_task_id\""
+            }
+          ],
+          "T5_s1_decision_ids": [],
+          "C_candidate_id": [
+            {
+              "request": 23,
+              "kind": "consolidation_reply",
+              "line": "2. id=cand_4f63a6e18483 type=tool_outcome confidence=0.40 source_session=openminion\n   title: tool_outcome:memory.write:policy_denied\n   preview: {'tool_name': 'memory.write', 'tool_family': 'memory', 'outcome': 'policy_denied', 'error_code': None, 'turn_index': 1, 'intent_id': None, 'args_signature': '{\"content\":\"The user prefers"
+            }
+          ],
+          "C_refused_text": [
+            {
+              "request": 23,
+              "kind": "consolidation_reply",
+              "line": "d', 'error_code': None, 'turn_index': 1, 'intent_id': None, 'args_signature': '{\"content\":\"The user prefers\n\nWhen ending an act turn that requires finalization, populate the structured finalization_status signal before ending the turn with final text. Use status=final_answer only when the final deliverable is already present. Use status=incomplete"
+            }
+          ],
+          "T6_promoted_ids": [],
+          "T6_refused_text": [],
+          "T6_candidate_id": [],
+          "T4_T6_candidate_or_refused_text": []
+        },
+        "all_outcome_feedback_calls": [],
+        "provider_hosts": [
+          "127.0.0.1"
+        ]
+      },
+      "X": {
+        "case": "X",
+        "constraint": null,
+        "runner_memory_api_is_assembly_memctl": true,
+        "identity_constraints": [],
+        "security_policy_present": true,
+        "memory_db": "memory.db",
+        "turns": {
+          "T1": {
+            "label": "T1",
+            "entry": "Agent.run",
+            "session_id": "s1",
+            "conversation_id": null,
+            "message": "Please remember that I prefer tabs over spaces for indentation.",
+            "forced_tools": null,
+            "run_state": "completed",
+            "text": "openminion: Noted: tabs over spaces.",
+            "memory_capture_state": "succeeded",
+            "memory_capture_bundle_result": {
+              "capture_id": "capture:f77659d5812f50b30ec5981ddf1639495ebb147e0bb139902bda7525c6d53a6d",
+              "committed_at": "2026-10-29T04:50:54.778086+00:00",
+              "disposition": "succeeded",
+              "output_ids": [
+                "cand_2e7dd6abac16ff6942a79b86"
+              ],
+              "report_hash": "830a4e441330992ae16135d37ad08d3d3ae4aa57d1355200ac2dd44be26809fe",
+              "result_hash": "4c1af81a75408f8ece4904580072e4eb6f406bdd7b42be783b2c8dff467b06c4"
+            },
+            "intent": {
+              "canonical_event_id": "turn.outcome:f77659d5812f50b30ec5981ddf1639495ebb147e0bb139902bda7525c6d53a6d",
+              "capture_id": "capture:f77659d5812f50b30ec5981ddf1639495ebb147e0bb139902bda7525c6d53a6d",
+              "capture_state": "pending",
+              "root_turn_id": "8fa0b05b633643e69fd5043cae5d94e2",
+              "runtime_session_id": "s1",
+              "agent_id": "openminion"
+            },
+            "provider_requests": [
+              "extraction",
+              "decide",
+              "freshness",
+              "freshness"
+            ],
+            "request_range": [
+              0,
+              4
+            ],
+            "approval_callback_calls": [],
+            "memory_write_decisions": [
+              {
+                "channel": "console",
+                "target": "memory-capture",
+                "session_id": "s1",
+                "run_id": "8fa0b05b633643e69fd5043cae5d94e2",
+                "decision": "allow",
+                "reason_code": "allowed"
+              }
+            ],
+            "memory_api_writes": [
+              {
+                "method": "write_record",
+                "callers": [
+                  "modules/brain/adapters/memory/runtime.py:49 write_record",
+                  "modules/brain/execution/memory/base.py:111 write_decision_memory",
+                  "modules/brain/execution/runtime/turn/dispatch.py:636 _record_accepted_decision",
+                  "modules/brain/execution/runtime/turn/dispatch.py:510 _accept_or_redecide"
+                ],
+                "scope": "session:s1::conv:s1:fde7395bc6f549838ba930ce9173ea9e",
+                "record_type": "decision",
+                "key": null,
+                "title": "Decision: respond",
+                "tags": [
+                  "decision",
+                  "route:respond"
+                ],
+                "access_context": {
+                  "agent_id": "openminion",
+                  "session_id": "s1::conv:s1:fde7395bc6f549838ba930ce9173ea9e"
+                },
+                "result": "mem_05505d330e96"
+              }
+            ],
+            "store": {
+              "new_records": [
+                {
+                  "id": "mem_05505d330e96",
+                  "scope": "session:s1::conv:s1:fde7395bc6f549838ba930ce9173ea9e",
+                  "type": "decision",
+                  "key": null,
+                  "title": "Decision: respond",
+                  "content_json": {
+                    "type": "decision",
+                    "scope": "session",
+                    "session_id": "s1::conv:s1:fde7395bc6f549838ba930ce9173ea9e",
+                    "route_chosen": "respond",
+                    "reason_code": "entry_text_response",
+                    "sub_intents": [],
+                    "rationale": "",
+                    "confidence": 0.5,
+                    "created_at": "2026-10-29T04:50:54.764291+00:00",
+                    "respond_kind": "answer"
+                  },
+                  "tags_json": [
+                    "decision",
+                    "route:respond"
+                  ],
+                  "source": "agent_inferred",
+                  "confidence": 0.5,
+                  "meta_json": {},
+                  "tier": "working",
+                  "created_at": "2026-10-29T04:50:54.764489+00:00",
+                  "updated_at": "2026-10-29T04:50:54.764489+00:00",
+                  "is_deleted": 0
+                }
+              ],
+              "changed_records": [],
+              "new_candidates": [
+                {
+                  "candidate_id": "cand_2e7dd6abac16ff6942a79b86",
+                  "session_id": "s1",
+                  "proposed_scope": "agent:openminion",
+                  "type": "user_preference",
+                  "key": "user_preference:indentation",
+                  "title": "Prefers tabs for indentation",
+                  "content_json": "The user prefers tabs over spaces for indentation.",
+                  "tags_json": [
+                    "probe-420"
+                  ],
+                  "source": "agent_inferred",
+                  "confidence": 0.3,
+                  "meta_json": {
+                    "capture_id": "capture:f77659d5812f50b30ec5981ddf1639495ebb147e0bb139902bda7525c6d53a6d",
+                    "capture_ordinal": 0,
+                    "normalized_key": "user_preference:indentation",
+                    "source": "auto_extracted",
+                    "source_agent_id": "openminion",
+                    "source_kind": "user_preference",
+                    "source_root_turn_id": "8fa0b05b633643e69fd5043cae5d94e2",
+                    "source_session_id": "s1"
+                  },
+                  "status": "proposed",
+                  "created_at": "2026-10-29T04:50:54.778086+00:00",
+                  "updated_at": "2026-10-29T04:50:54.778086+00:00"
+                }
+              ],
+              "changed_candidates": []
+            }
+          },
+          "T2": {
+            "label": "T2",
+            "entry": "Agent.run",
+            "session_id": "s1",
+            "conversation_id": null,
+            "message": "Which indentation style do I prefer?",
+            "forced_tools": null,
+            "run_state": "completed",
+            "text": "openminion: You prefer tabs.",
+            "memory_capture_state": "succeeded_no_output",
+            "memory_capture_bundle_result": {
+              "capture_id": "capture:1524ef2257c0bd607be572478b0bfac88e7efb9bbcaf7d68f67d909fd009b479",
+              "committed_at": "2026-10-29T04:50:54.918853+00:00",
+              "disposition": "succeeded_no_output",
+              "output_ids": [],
+              "report_hash": "c975cdf8f4410d80f34f4ccf6340ad507e95c795a594218b1e9c011e722a1921",
+              "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+            },
+            "intent": {
+              "canonical_event_id": "turn.outcome:1524ef2257c0bd607be572478b0bfac88e7efb9bbcaf7d68f67d909fd009b479",
+              "capture_id": "capture:1524ef2257c0bd607be572478b0bfac88e7efb9bbcaf7d68f67d909fd009b479",
+              "capture_state": "pending",
+              "root_turn_id": "28c622f2856647a18be09cae7c04d124",
+              "runtime_session_id": "s1",
+              "agent_id": "openminion"
+            },
+            "provider_requests": [
+              "extraction",
+              "decide",
+              "freshness",
+              "freshness"
+            ],
+            "request_range": [
+              4,
+              8
+            ],
+            "approval_callback_calls": [],
+            "memory_write_decisions": [
+              {
+                "channel": "console",
+                "target": "memory-capture",
+                "session_id": "s1",
+                "run_id": "28c622f2856647a18be09cae7c04d124",
+                "decision": "allow",
+                "reason_code": "allowed"
+              }
+            ],
+            "memory_api_writes": [
+              {
+                "method": "write_record",
+                "callers": [
+                  "modules/brain/adapters/memory/runtime.py:49 write_record",
+                  "modules/brain/execution/memory/base.py:111 write_decision_memory",
+                  "modules/brain/execution/runtime/turn/dispatch.py:636 _record_accepted_decision",
+                  "modules/brain/execution/runtime/turn/dispatch.py:510 _accept_or_redecide"
+                ],
+                "scope": "session:s1::conv:s1:dc02f229e4ab433f94dad08e29e4a4d7",
+                "record_type": "decision",
+                "key": null,
+                "title": "Decision: respond",
+                "tags": [
+                  "decision",
+                  "route:respond"
+                ],
+                "access_context": {
+                  "agent_id": "openminion",
+                  "session_id": "s1::conv:s1:dc02f229e4ab433f94dad08e29e4a4d7"
+                },
+                "result": "mem_72f798c2e301"
+              }
+            ],
+            "store": {
+              "new_records": [
+                {
+                  "id": "mem_72f798c2e301",
+                  "scope": "session:s1::conv:s1:dc02f229e4ab433f94dad08e29e4a4d7",
+                  "type": "decision",
+                  "key": null,
+                  "title": "Decision: respond",
+                  "content_json": {
+                    "type": "decision",
+                    "scope": "session",
+                    "session_id": "s1::conv:s1:dc02f229e4ab433f94dad08e29e4a4d7",
+                    "route_chosen": "respond",
+                    "reason_code": "entry_text_response",
+                    "sub_intents": [],
+                    "rationale": "",
+                    "confidence": 0.5,
+                    "created_at": "2026-10-29T04:50:54.903283+00:00",
+                    "respond_kind": "answer"
+                  },
+                  "tags_json": [
+                    "decision",
+                    "route:respond"
+                  ],
+                  "source": "agent_inferred",
+                  "confidence": 0.5,
+                  "meta_json": {},
+                  "tier": "working",
+                  "created_at": "2026-10-29T04:50:54.903470+00:00",
+                  "updated_at": "2026-10-29T04:50:54.903470+00:00",
+                  "is_deleted": 0
+                }
+              ],
+              "changed_records": [],
+              "new_candidates": [],
+              "changed_candidates": []
+            }
+          },
+          "T3": {
+            "label": "T3",
+            "entry": "Agent.run",
+            "session_id": "s1",
+            "conversation_id": null,
+            "message": "Which indentation style do I prefer?",
+            "forced_tools": [
+              "memory.write"
+            ],
+            "run_state": "completed",
+            "text": "openminion: Confirmation denied. The action was not run.",
+            "memory_capture_state": "succeeded_no_output",
+            "memory_capture_bundle_result": {
+              "capture_id": "capture:2b3aebd2cec4403cd090175c0de6c77f7d35df74125aad8dac7c8fc41925cad7",
+              "committed_at": "2026-10-29T04:50:55.107882+00:00",
+              "disposition": "succeeded_no_output",
+              "output_ids": [],
+              "report_hash": "58b86513cf7f1f36b96b7af799c416d880e100cfc82b8bcb9a6ce6a03a928221",
+              "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+            },
+            "intent": {
+              "canonical_event_id": "turn.outcome:2b3aebd2cec4403cd090175c0de6c77f7d35df74125aad8dac7c8fc41925cad7",
+              "capture_id": "capture:2b3aebd2cec4403cd090175c0de6c77f7d35df74125aad8dac7c8fc41925cad7",
+              "capture_state": "pending",
+              "root_turn_id": "50737392aa484af7b398a77e19e20d1a",
+              "runtime_session_id": "s1",
+              "agent_id": "openminion"
+            },
+            "provider_requests": [
+              "extraction",
+              "tool_call",
+              "freshness",
+              "freshness"
+            ],
+            "request_range": [
+              8,
+              12
+            ],
+            "approval_callback_calls": [
+              {
+                "tool": "memory.write",
+                "args": {
+                  "record_type": "fact",
+                  "key": "fact:indentation",
+                  "title": "Indentation",
+                  "content": "The user prefers tabs."
+                }
+              }
+            ],
+            "memory_write_decisions": [
+              {
+                "channel": "console",
+                "target": "memory-capture",
+                "session_id": "s1",
+                "run_id": "50737392aa484af7b398a77e19e20d1a",
+                "decision": "allow",
+                "reason_code": "allowed"
+              }
+            ],
+            "memory_api_writes": [
+              {
+                "method": "write_record",
+                "callers": [
+                  "modules/brain/adapters/memory/runtime.py:49 write_record",
+                  "modules/brain/execution/memory/base.py:111 write_decision_memory",
+                  "modules/brain/execution/runtime/turn/dispatch.py:636 _record_accepted_decision",
+                  "modules/brain/execution/runtime/turn/dispatch.py:510 _accept_or_redecide"
+                ],
+                "scope": "session:s1::conv:s1:bd15cc42d6b2448da5fe0a813afce3d4",
+                "record_type": "decision",
+                "key": null,
+                "title": "Decision: act",
+                "tags": [
+                  "decision",
+                  "route:act"
+                ],
+                "access_context": {
+                  "agent_id": "openminion",
+                  "session_id": "s1::conv:s1:bd15cc42d6b2448da5fe0a813afce3d4"
+                },
+                "result": "mem_152d80bc7891"
+              },
+              {
+                "method": "stage_candidate",
+                "callers": [
+                  "modules/brain/tools/executor/tool.py:184 _stage_tool_outcome_candidate",
+                  "modules/brain/tools/executor/command_executor.py:156 stage_tool_outcome_candidate",
+                  "modules/brain/tools/executor/command_executor.py:209 prepare_tool_dispatch",
+                  "modules/brain/loop/adaptive/context.py:197 prepare_tool_dispatch"
+                ],
+                "scope": "agent:openminion",
+                "record_type": "tool_outcome",
+                "title": "tool_outcome:memory.write:policy_denied",
+                "content": {
+                  "tool_name": "memory.write",
+                  "tool_family": "memory",
+                  "outcome": "policy_denied",
+                  "error_code": null,
+                  "turn_index": 1,
+                  "intent_id": null,
+                  "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                  "artifact_ref": null
+                },
+                "tags": [
+                  "tool_outcome",
+                  "tool_family:memory",
+                  "outcome:policy_denied"
+                ],
+                "meta": {
+                  "source_kind": "tool_outcome",
+                  "source_negative_outcome": true,
+                  "source_success_path": false,
+                  "source_outcome_status": "policy_denied",
+                  "source_tool_name": "memory.write",
+                  "source_tool_family": "memory",
+                  "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                  "source_command_id": "call-memory-write-9"
+                },
+                "result": "cand_f5e2361cc519"
+              }
+            ],
+            "store": {
+              "new_records": [
+                {
+                  "id": "mem_152d80bc7891",
+                  "scope": "session:s1::conv:s1:bd15cc42d6b2448da5fe0a813afce3d4",
+                  "type": "decision",
+                  "key": null,
+                  "title": "Decision: act",
+                  "content_json": {
+                    "type": "decision",
+                    "scope": "session",
+                    "session_id": "s1::conv:s1:bd15cc42d6b2448da5fe0a813afce3d4",
+                    "route_chosen": "act",
+                    "reason_code": "entry_tool_call",
+                    "sub_intents": [],
+                    "rationale": "",
+                    "confidence": 0.5,
+                    "created_at": "2026-10-29T04:50:55.081524+00:00",
+                    "act_profile": "general",
+                    "execution_target_kind": "local"
+                  },
+                  "tags_json": [
+                    "decision",
+                    "route:act"
+                  ],
+                  "source": "agent_inferred",
+                  "confidence": 0.5,
+                  "meta_json": {},
+                  "tier": "working",
+                  "created_at": "2026-10-29T04:50:55.081736+00:00",
+                  "updated_at": "2026-10-29T04:50:55.081736+00:00",
+                  "is_deleted": 0
+                }
+              ],
+              "changed_records": [],
+              "new_candidates": [
+                {
+                  "candidate_id": "cand_f5e2361cc519",
+                  "session_id": "openminion",
+                  "proposed_scope": "agent:openminion",
+                  "type": "tool_outcome",
+                  "key": null,
+                  "title": "tool_outcome:memory.write:policy_denied",
+                  "content_json": {
+                    "tool_name": "memory.write",
+                    "tool_family": "memory",
+                    "outcome": "policy_denied",
+                    "error_code": null,
+                    "turn_index": 1,
+                    "intent_id": null,
+                    "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                    "artifact_ref": null
+                  },
+                  "tags_json": [
+                    "tool_outcome",
+                    "tool_family:memory",
+                    "outcome:policy_denied"
+                  ],
+                  "source": "agent_inferred",
+                  "confidence": 0.4,
+                  "meta_json": {
+                    "source_kind": "tool_outcome",
+                    "source_negative_outcome": true,
+                    "source_success_path": false,
+                    "source_outcome_status": "policy_denied",
+                    "source_tool_name": "memory.write",
+                    "source_tool_family": "memory",
+                    "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                    "source_command_id": "call-memory-write-9",
+                    "polarity": "asserts"
+                  },
+                  "status": "proposed",
+                  "created_at": "2026-10-29T04:50:55.097683+00:00",
+                  "updated_at": "2026-10-29T04:50:55.097683+00:00"
+                }
+              ],
+              "changed_candidates": []
+            }
+          },
+          "T4": {
+            "label": "T4",
+            "entry": "APIRuntime.run_turn",
+            "session_id": "s2",
+            "conversation_id": "chat",
+            "message": "Say hello.",
+            "forced_tools": null,
+            "run_state": "completed",
+            "text": "openminion: Hello.",
+            "memory_capture_state": "succeeded_no_output",
+            "memory_capture_bundle_result": {
+              "capture_id": "capture:e0f01fefa28c7fad33d7778cf0184e528deaf7c9d952d586c090eec589d220d4",
+              "committed_at": "2026-10-29T04:50:55.258949+00:00",
+              "disposition": "succeeded_no_output",
+              "output_ids": [],
+              "report_hash": "bd6d969cb184ea5cb06b865b01f6b74295b69cf70d7bc58b56011d7599e9a3fa",
+              "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+            },
+            "intent": {
+              "canonical_event_id": "turn.outcome:e0f01fefa28c7fad33d7778cf0184e528deaf7c9d952d586c090eec589d220d4",
+              "capture_id": "capture:e0f01fefa28c7fad33d7778cf0184e528deaf7c9d952d586c090eec589d220d4",
+              "capture_state": "pending",
+              "root_turn_id": "0672e83e0a724f9e9e41f400227967b2",
+              "runtime_session_id": "s2",
+              "agent_id": "openminion"
+            },
+            "provider_requests": [
+              "extraction",
+              "decide",
+              "freshness",
+              "freshness"
+            ],
+            "request_range": [
+              12,
+              16
+            ],
+            "approval_callback_calls": [],
+            "memory_write_decisions": [
+              {
+                "channel": "console",
+                "target": "memory-capture",
+                "session_id": "s2",
+                "run_id": "0672e83e0a724f9e9e41f400227967b2",
+                "decision": "allow",
+                "reason_code": "allowed"
+              }
+            ],
+            "memory_api_writes": [
+              {
+                "method": "write_record",
+                "callers": [
+                  "modules/brain/adapters/memory/runtime.py:49 write_record",
+                  "modules/brain/execution/memory/base.py:111 write_decision_memory",
+                  "modules/brain/execution/runtime/turn/dispatch.py:636 _record_accepted_decision",
+                  "modules/brain/execution/runtime/turn/dispatch.py:510 _accept_or_redecide"
+                ],
+                "scope": "session:s2::conv:chat",
+                "record_type": "decision",
+                "key": null,
+                "title": "Decision: respond",
+                "tags": [
+                  "decision",
+                  "route:respond"
+                ],
+                "access_context": {
+                  "agent_id": "openminion",
+                  "session_id": "s2::conv:chat"
+                },
+                "result": "mem_65c4285383e8"
+              }
+            ],
+            "store": {
+              "new_records": [
+                {
+                  "id": "mem_65c4285383e8",
+                  "scope": "session:s2::conv:chat",
+                  "type": "decision",
+                  "key": null,
+                  "title": "Decision: respond",
+                  "content_json": {
+                    "type": "decision",
+                    "scope": "session",
+                    "session_id": "s2::conv:chat",
+                    "route_chosen": "respond",
+                    "reason_code": "entry_text_response",
+                    "sub_intents": [],
+                    "rationale": "",
+                    "confidence": 0.5,
+                    "created_at": "2026-10-29T04:50:55.233540+00:00",
+                    "respond_kind": "answer"
+                  },
+                  "tags_json": [
+                    "decision",
+                    "route:respond"
+                  ],
+                  "source": "agent_inferred",
+                  "confidence": 0.5,
+                  "meta_json": {},
+                  "tier": "working",
+                  "created_at": "2026-10-29T04:50:55.233743+00:00",
+                  "updated_at": "2026-10-29T04:50:55.233743+00:00",
+                  "is_deleted": 0
+                }
+              ],
+              "changed_records": [],
+              "new_candidates": [],
+              "changed_candidates": []
+            }
+          },
+          "T5": {
+            "label": "T5",
+            "entry": "APIRuntime.run_turn",
+            "session_id": "s2",
+            "conversation_id": "chat",
+            "message": "Which indentation style do I prefer?",
+            "forced_tools": null,
+            "run_state": "completed",
+            "text": "openminion: You prefer tabs.",
+            "memory_capture_state": "succeeded_no_output",
+            "memory_capture_bundle_result": {
+              "capture_id": "capture:b1770ae931dd6530830d3ea1d89bed6a2bf8f64a4577253578cc42dfce9e7c14",
+              "committed_at": "2026-10-29T04:50:55.397698+00:00",
+              "disposition": "succeeded_no_output",
+              "output_ids": [],
+              "report_hash": "1ced9e1d41f82b6d62b0f2d030cb4ac7cc85852faac172e9067162e1596dd096",
+              "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+            },
+            "intent": {
+              "canonical_event_id": "turn.outcome:b1770ae931dd6530830d3ea1d89bed6a2bf8f64a4577253578cc42dfce9e7c14",
+              "capture_id": "capture:b1770ae931dd6530830d3ea1d89bed6a2bf8f64a4577253578cc42dfce9e7c14",
+              "capture_state": "pending",
+              "root_turn_id": "a27c376168744d928cc77cefc3a5c1d3",
+              "runtime_session_id": "s2",
+              "agent_id": "openminion"
+            },
+            "provider_requests": [
+              "extraction",
+              "decide",
+              "freshness",
+              "freshness"
+            ],
+            "request_range": [
+              16,
+              20
+            ],
+            "approval_callback_calls": [],
+            "memory_write_decisions": [
+              {
+                "channel": "console",
+                "target": "memory-capture",
+                "session_id": "s2",
+                "run_id": "a27c376168744d928cc77cefc3a5c1d3",
+                "decision": "allow",
+                "reason_code": "allowed"
+              }
+            ],
+            "memory_api_writes": [
+              {
+                "method": "write_record",
+                "callers": [
+                  "modules/brain/adapters/memory/runtime.py:49 write_record",
+                  "modules/brain/execution/memory/base.py:111 write_decision_memory",
+                  "modules/brain/execution/runtime/turn/dispatch.py:636 _record_accepted_decision",
+                  "modules/brain/execution/runtime/turn/dispatch.py:510 _accept_or_redecide"
+                ],
+                "scope": "session:s2::conv:chat",
+                "record_type": "decision",
+                "key": null,
+                "title": "Decision: respond",
+                "tags": [
+                  "decision",
+                  "route:respond"
+                ],
+                "access_context": {
+                  "agent_id": "openminion",
+                  "session_id": "s2::conv:chat"
+                },
+                "result": "mem_c20415bde075"
+              }
+            ],
+            "store": {
+              "new_records": [
+                {
+                  "id": "mem_c20415bde075",
+                  "scope": "session:s2::conv:chat",
+                  "type": "decision",
+                  "key": null,
+                  "title": "Decision: respond",
+                  "content_json": {
+                    "type": "decision",
+                    "scope": "session",
+                    "session_id": "s2::conv:chat",
+                    "route_chosen": "respond",
+                    "reason_code": "entry_text_response",
+                    "sub_intents": [],
+                    "rationale": "",
+                    "confidence": 0.5,
+                    "created_at": "2026-10-29T04:50:55.385436+00:00",
+                    "respond_kind": "answer"
+                  },
+                  "tags_json": [
+                    "decision",
+                    "route:respond"
+                  ],
+                  "source": "agent_inferred",
+                  "confidence": 0.5,
+                  "meta_json": {},
+                  "tier": "working",
+                  "created_at": "2026-10-29T04:50:55.385632+00:00",
+                  "updated_at": "2026-10-29T04:50:55.385632+00:00",
+                  "is_deleted": 0
+                }
+              ],
+              "changed_records": [],
+              "new_candidates": [],
+              "changed_candidates": []
+            }
+          },
+          "T6": {
+            "label": "T6",
+            "entry": "Agent.run",
+            "session_id": "s3",
+            "conversation_id": null,
+            "message": "Say hello.",
+            "forced_tools": null,
+            "run_state": "completed",
+            "text": "openminion: Hello.",
+            "memory_capture_state": "succeeded_no_output",
+            "memory_capture_bundle_result": {
+              "capture_id": "capture:59ea06404a6978603e376be5a08bf0ac4e60764e6cc4d17f9f6bc61b54cde2f3",
+              "committed_at": "2026-10-29T04:50:56.203986+00:00",
+              "disposition": "succeeded_no_output",
+              "output_ids": [],
+              "report_hash": "114056522a57f8c36ce25a0b7b8b3d1393f57710f7e49a7e0aa8f114323248ce",
+              "result_hash": "5649e1013d38c888980fe1df5ca586df633ffe83205f0fd31dfd019676cfcb80"
+            },
+            "intent": {
+              "canonical_event_id": "turn.outcome:59ea06404a6978603e376be5a08bf0ac4e60764e6cc4d17f9f6bc61b54cde2f3",
+              "capture_id": "capture:59ea06404a6978603e376be5a08bf0ac4e60764e6cc4d17f9f6bc61b54cde2f3",
+              "capture_state": "pending",
+              "root_turn_id": "d23d398387d04bf39434c815371c8fd4",
+              "runtime_session_id": "s3",
+              "agent_id": "openminion"
+            },
+            "provider_requests": [
+              "extraction",
+              "decide",
+              "freshness",
+              "freshness"
+            ],
+            "request_range": [
+              25,
+              29
+            ],
+            "approval_callback_calls": [],
+            "memory_write_decisions": [
+              {
+                "channel": "console",
+                "target": "memory-capture",
+                "session_id": "s3",
+                "run_id": "d23d398387d04bf39434c815371c8fd4",
+                "decision": "allow",
+                "reason_code": "allowed"
+              }
+            ],
+            "memory_api_writes": [
+              {
+                "method": "write_record",
+                "callers": [
+                  "modules/brain/adapters/memory/runtime.py:49 write_record",
+                  "modules/brain/execution/memory/base.py:111 write_decision_memory",
+                  "modules/brain/execution/runtime/turn/dispatch.py:636 _record_accepted_decision",
+                  "modules/brain/execution/runtime/turn/dispatch.py:510 _accept_or_redecide"
+                ],
+                "scope": "session:s3::conv:s3:20b5cce42f584d02a3dd9d43ef236ae6",
+                "record_type": "decision",
+                "key": null,
+                "title": "Decision: respond",
+                "tags": [
+                  "decision",
+                  "route:respond"
+                ],
+                "access_context": {
+                  "agent_id": "openminion",
+                  "session_id": "s3::conv:s3:20b5cce42f584d02a3dd9d43ef236ae6"
+                },
+                "result": "mem_4326f3f9308e"
+              }
+            ],
+            "store": {
+              "new_records": [
+                {
+                  "id": "mem_4326f3f9308e",
+                  "scope": "session:s3::conv:s3:20b5cce42f584d02a3dd9d43ef236ae6",
+                  "type": "decision",
+                  "key": null,
+                  "title": "Decision: respond",
+                  "content_json": {
+                    "type": "decision",
+                    "scope": "session",
+                    "session_id": "s3::conv:s3:20b5cce42f584d02a3dd9d43ef236ae6",
+                    "route_chosen": "respond",
+                    "reason_code": "entry_text_response",
+                    "sub_intents": [],
+                    "rationale": "",
+                    "confidence": 0.5,
+                    "created_at": "2026-10-29T04:50:56.192399+00:00",
+                    "respond_kind": "answer"
+                  },
+                  "tags_json": [
+                    "decision",
+                    "route:respond"
+                  ],
+                  "source": "agent_inferred",
+                  "confidence": 0.5,
+                  "meta_json": {},
+                  "tier": "working",
+                  "created_at": "2026-10-29T04:50:56.192619+00:00",
+                  "updated_at": "2026-10-29T04:50:56.192619+00:00",
+                  "is_deleted": 0
+                }
+              ],
+              "changed_records": [],
+              "new_candidates": [],
+              "changed_candidates": []
+            }
+          }
+        },
+        "recovery_gate_T1": {
+          "returned": true,
+          "decisions": [
+            {
+              "channel": "cron",
+              "target": "memory-capture-recovery",
+              "session_id": "s1",
+              "run_id": "8fa0b05b633643e69fd5043cae5d94e2",
+              "decision": "allow",
+              "reason_code": "allowed"
+            }
+          ]
+        },
+        "tool_adapter_memory_write": {
+          "allowed": true,
+          "requires_confirm": false,
+          "reason": "policy passed"
+        },
+        "tool_outcome_candidate_ids": [
+          "cand_f5e2361cc519"
+        ],
+        "job_id": "b0009abff2534aceb15a22a27f29d605",
+        "consolidation": {
+          "state": "finished",
+          "error": null,
+          "summary": "openminion: Noted.",
+          "recovery": [
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "extractor_calls": 0,
+          "submitted_turn_sessions": [
+            "consolidate:b0009abff2534aceb15a22a27f29d605"
+          ],
+          "provider_requests": [
+            "consolidation_entry",
+            "freshness",
+            "freshness",
+            "consolidation_reply",
+            "judge"
+          ],
+          "request_range": [
+            20,
+            25
+          ],
+          "memory_write_decisions": [
+            {
+              "channel": "console",
+              "target": "memory-capture",
+              "session_id": "consolidate:b0009abff2534aceb15a22a27f29d605",
+              "run_id": "9f4bb0d831de4cdb8d60ccd11a39ebf8",
+              "decision": "allow",
+              "reason_code": "allowed"
+            }
+          ],
+          "memory_api_writes": [
+            {
+              "method": "write_record",
+              "callers": [
+                "modules/brain/adapters/memory/runtime.py:49 write_record",
+                "modules/brain/execution/memory/base.py:111 write_decision_memory",
+                "modules/brain/execution/runtime/turn/dispatch.py:636 _record_accepted_decision",
+                "modules/brain/execution/runtime/turn/dispatch.py:510 _accept_or_redecide"
+              ],
+              "scope": "session:consolidate:b0009abff2534aceb15a22a27f29d605::conv:consolidate:b0009abff2534aceb15a22a27f29d605:008a9fe40d304e65bac8fa04298c6cc6",
+              "record_type": "decision",
+              "key": null,
+              "title": "Decision: act",
+              "tags": [
+                "decision",
+                "route:act"
+              ],
+              "access_context": {
+                "agent_id": "openminion",
+                "session_id": "consolidate:b0009abff2534aceb15a22a27f29d605::conv:consolidate:b0009abff2534aceb15a22a27f29d605:008a9fe40d304e65bac8fa04298c6cc6"
+              },
+              "result": "mem_56f1d57ff7cf"
+            }
+          ],
+          "store": {
+            "new_records": [
+              {
+                "id": "mem_56f1d57ff7cf",
+                "scope": "session:consolidate:b0009abff2534aceb15a22a27f29d605::conv:consolidate:b0009abff2534aceb15a22a27f29d605:008a9fe40d304e65bac8fa04298c6cc6",
+                "type": "decision",
+                "key": null,
+                "title": "Decision: act",
+                "content_json": {
+                  "type": "decision",
+                  "scope": "session",
+                  "session_id": "consolidate:b0009abff2534aceb15a22a27f29d605::conv:consolidate:b0009abff2534aceb15a22a27f29d605:008a9fe40d304e65bac8fa04298c6cc6",
+                  "route_chosen": "act",
+                  "reason_code": "entry_decompose_declined",
+                  "sub_intents": [],
+                  "rationale": "",
+                  "confidence": 0.5,
+                  "created_at": "2026-10-29T04:50:55.762331+00:00",
+                  "act_profile": "general",
+                  "execution_target_kind": "local"
+                },
+                "tags_json": [
+                  "decision",
+                  "route:act"
+                ],
+                "source": "agent_inferred",
+                "confidence": 0.5,
+                "meta_json": {},
+                "tier": "working",
+                "created_at": "2026-10-29T04:50:55.762532+00:00",
+                "updated_at": "2026-10-29T04:50:55.762532+00:00",
+                "is_deleted": 0
+              }
+            ],
+            "changed_records": [],
+            "new_candidates": [],
+            "changed_candidates": []
+          },
+          "signal_parsed": [
+            {
+              "signal": {
+                "decisions": [
+                  {
+                    "candidate_id": "cand_f5e2361cc519",
+                    "action": "promote",
+                    "reasoning": "probe: promote the staged tool outcome"
+                  }
+                ]
+              }
+            }
+          ],
+          "decisions_applied": [
+            {
+              "decisions": [
+                {
+                  "candidate_id": "cand_f5e2361cc519",
+                  "action": "promote",
+                  "reasoning": "probe: promote the staged tool outcome"
+                }
+              ],
+              "target_scope": "agent:openminion",
+              "selected_candidate_ids": [
+                "cand_2e7dd6abac16ff6942a79b86",
+                "cand_f5e2361cc519"
+              ],
+              "result": {
+                "applied_count": 0,
+                "promoted_count": 0,
+                "discarded_count": 0,
+                "deferred_count": 0,
+                "applied_candidate_ids": [],
+                "errors": [
+                  "cand_f5e2361cc519: Source 'agent_inferred' requires explicit approval for auto-promotion"
+                ]
+              }
+            }
+          ]
+        },
+        "final_store": {
+          "records": {
+            "mem_05505d330e96": {
+              "id": "mem_05505d330e96",
+              "scope": "session:s1::conv:s1:fde7395bc6f549838ba930ce9173ea9e",
+              "type": "decision",
+              "key": null,
+              "title": "Decision: respond",
+              "content_json": {
+                "type": "decision",
+                "scope": "session",
+                "session_id": "s1::conv:s1:fde7395bc6f549838ba930ce9173ea9e",
+                "route_chosen": "respond",
+                "reason_code": "entry_text_response",
+                "sub_intents": [],
+                "rationale": "",
+                "confidence": 0.5,
+                "created_at": "2026-10-29T04:50:54.764291+00:00",
+                "respond_kind": "answer"
+              },
+              "tags_json": [
+                "decision",
+                "route:respond"
+              ],
+              "source": "agent_inferred",
+              "confidence": 0.5,
+              "meta_json": {},
+              "tier": "working",
+              "created_at": "2026-10-29T04:50:54.764489+00:00",
+              "updated_at": "2026-10-29T04:50:54.764489+00:00",
+              "is_deleted": 0
+            },
+            "mem_72f798c2e301": {
+              "id": "mem_72f798c2e301",
+              "scope": "session:s1::conv:s1:dc02f229e4ab433f94dad08e29e4a4d7",
+              "type": "decision",
+              "key": null,
+              "title": "Decision: respond",
+              "content_json": {
+                "type": "decision",
+                "scope": "session",
+                "session_id": "s1::conv:s1:dc02f229e4ab433f94dad08e29e4a4d7",
+                "route_chosen": "respond",
+                "reason_code": "entry_text_response",
+                "sub_intents": [],
+                "rationale": "",
+                "confidence": 0.5,
+                "created_at": "2026-10-29T04:50:54.903283+00:00",
+                "respond_kind": "answer"
+              },
+              "tags_json": [
+                "decision",
+                "route:respond"
+              ],
+              "source": "agent_inferred",
+              "confidence": 0.5,
+              "meta_json": {},
+              "tier": "working",
+              "created_at": "2026-10-29T04:50:54.903470+00:00",
+              "updated_at": "2026-10-29T04:50:54.903470+00:00",
+              "is_deleted": 0
+            },
+            "mem_152d80bc7891": {
+              "id": "mem_152d80bc7891",
+              "scope": "session:s1::conv:s1:bd15cc42d6b2448da5fe0a813afce3d4",
+              "type": "decision",
+              "key": null,
+              "title": "Decision: act",
+              "content_json": {
+                "type": "decision",
+                "scope": "session",
+                "session_id": "s1::conv:s1:bd15cc42d6b2448da5fe0a813afce3d4",
+                "route_chosen": "act",
+                "reason_code": "entry_tool_call",
+                "sub_intents": [],
+                "rationale": "",
+                "confidence": 0.5,
+                "created_at": "2026-10-29T04:50:55.081524+00:00",
+                "act_profile": "general",
+                "execution_target_kind": "local"
+              },
+              "tags_json": [
+                "decision",
+                "route:act"
+              ],
+              "source": "agent_inferred",
+              "confidence": 0.5,
+              "meta_json": {},
+              "tier": "working",
+              "created_at": "2026-10-29T04:50:55.081736+00:00",
+              "updated_at": "2026-10-29T04:50:55.081736+00:00",
+              "is_deleted": 0
+            },
+            "mem_65c4285383e8": {
+              "id": "mem_65c4285383e8",
+              "scope": "session:s2::conv:chat",
+              "type": "decision",
+              "key": null,
+              "title": "Decision: respond",
+              "content_json": {
+                "type": "decision",
+                "scope": "session",
+                "session_id": "s2::conv:chat",
+                "route_chosen": "respond",
+                "reason_code": "entry_text_response",
+                "sub_intents": [],
+                "rationale": "",
+                "confidence": 0.5,
+                "created_at": "2026-10-29T04:50:55.233540+00:00",
+                "respond_kind": "answer"
+              },
+              "tags_json": [
+                "decision",
+                "route:respond"
+              ],
+              "source": "agent_inferred",
+              "confidence": 0.5,
+              "meta_json": {},
+              "tier": "working",
+              "created_at": "2026-10-29T04:50:55.233743+00:00",
+              "updated_at": "2026-10-29T04:50:55.233743+00:00",
+              "is_deleted": 0
+            },
+            "mem_c20415bde075": {
+              "id": "mem_c20415bde075",
+              "scope": "session:s2::conv:chat",
+              "type": "decision",
+              "key": null,
+              "title": "Decision: respond",
+              "content_json": {
+                "type": "decision",
+                "scope": "session",
+                "session_id": "s2::conv:chat",
+                "route_chosen": "respond",
+                "reason_code": "entry_text_response",
+                "sub_intents": [],
+                "rationale": "",
+                "confidence": 0.5,
+                "created_at": "2026-10-29T04:50:55.385436+00:00",
+                "respond_kind": "answer"
+              },
+              "tags_json": [
+                "decision",
+                "route:respond"
+              ],
+              "source": "agent_inferred",
+              "confidence": 0.5,
+              "meta_json": {},
+              "tier": "working",
+              "created_at": "2026-10-29T04:50:55.385632+00:00",
+              "updated_at": "2026-10-29T04:50:55.385632+00:00",
+              "is_deleted": 0
+            },
+            "mem_56f1d57ff7cf": {
+              "id": "mem_56f1d57ff7cf",
+              "scope": "session:consolidate:b0009abff2534aceb15a22a27f29d605::conv:consolidate:b0009abff2534aceb15a22a27f29d605:008a9fe40d304e65bac8fa04298c6cc6",
+              "type": "decision",
+              "key": null,
+              "title": "Decision: act",
+              "content_json": {
+                "type": "decision",
+                "scope": "session",
+                "session_id": "consolidate:b0009abff2534aceb15a22a27f29d605::conv:consolidate:b0009abff2534aceb15a22a27f29d605:008a9fe40d304e65bac8fa04298c6cc6",
+                "route_chosen": "act",
+                "reason_code": "entry_decompose_declined",
+                "sub_intents": [],
+                "rationale": "",
+                "confidence": 0.5,
+                "created_at": "2026-10-29T04:50:55.762331+00:00",
+                "act_profile": "general",
+                "execution_target_kind": "local"
+              },
+              "tags_json": [
+                "decision",
+                "route:act"
+              ],
+              "source": "agent_inferred",
+              "confidence": 0.5,
+              "meta_json": {},
+              "tier": "working",
+              "created_at": "2026-10-29T04:50:55.762532+00:00",
+              "updated_at": "2026-10-29T04:50:55.762532+00:00",
+              "is_deleted": 0
+            },
+            "mem_4326f3f9308e": {
+              "id": "mem_4326f3f9308e",
+              "scope": "session:s3::conv:s3:20b5cce42f584d02a3dd9d43ef236ae6",
+              "type": "decision",
+              "key": null,
+              "title": "Decision: respond",
+              "content_json": {
+                "type": "decision",
+                "scope": "session",
+                "session_id": "s3::conv:s3:20b5cce42f584d02a3dd9d43ef236ae6",
+                "route_chosen": "respond",
+                "reason_code": "entry_text_response",
+                "sub_intents": [],
+                "rationale": "",
+                "confidence": 0.5,
+                "created_at": "2026-10-29T04:50:56.192399+00:00",
+                "respond_kind": "answer"
+              },
+              "tags_json": [
+                "decision",
+                "route:respond"
+              ],
+              "source": "agent_inferred",
+              "confidence": 0.5,
+              "meta_json": {},
+              "tier": "working",
+              "created_at": "2026-10-29T04:50:56.192619+00:00",
+              "updated_at": "2026-10-29T04:50:56.192619+00:00",
+              "is_deleted": 0
+            }
+          },
+          "candidates": {
+            "cand_2e7dd6abac16ff6942a79b86": {
+              "candidate_id": "cand_2e7dd6abac16ff6942a79b86",
+              "session_id": "s1",
+              "proposed_scope": "agent:openminion",
+              "type": "user_preference",
+              "key": "user_preference:indentation",
+              "title": "Prefers tabs for indentation",
+              "content_json": "The user prefers tabs over spaces for indentation.",
+              "tags_json": [
+                "probe-420"
+              ],
+              "source": "agent_inferred",
+              "confidence": 0.3,
+              "meta_json": {
+                "capture_id": "capture:f77659d5812f50b30ec5981ddf1639495ebb147e0bb139902bda7525c6d53a6d",
+                "capture_ordinal": 0,
+                "normalized_key": "user_preference:indentation",
+                "source": "auto_extracted",
+                "source_agent_id": "openminion",
+                "source_kind": "user_preference",
+                "source_root_turn_id": "8fa0b05b633643e69fd5043cae5d94e2",
+                "source_session_id": "s1"
+              },
+              "status": "proposed",
+              "created_at": "2026-10-29T04:50:54.778086+00:00",
+              "updated_at": "2026-10-29T04:50:54.778086+00:00"
+            },
+            "cand_f5e2361cc519": {
+              "candidate_id": "cand_f5e2361cc519",
+              "session_id": "openminion",
+              "proposed_scope": "agent:openminion",
+              "type": "tool_outcome",
+              "key": null,
+              "title": "tool_outcome:memory.write:policy_denied",
+              "content_json": {
+                "tool_name": "memory.write",
+                "tool_family": "memory",
+                "outcome": "policy_denied",
+                "error_code": null,
+                "turn_index": 1,
+                "intent_id": null,
+                "args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                "artifact_ref": null
+              },
+              "tags_json": [
+                "tool_outcome",
+                "tool_family:memory",
+                "outcome:policy_denied"
+              ],
+              "source": "agent_inferred",
+              "confidence": 0.4,
+              "meta_json": {
+                "source_kind": "tool_outcome",
+                "source_negative_outcome": true,
+                "source_success_path": false,
+                "source_outcome_status": "policy_denied",
+                "source_tool_name": "memory.write",
+                "source_tool_family": "memory",
+                "source_args_signature": "{\"content\":\"The user prefers tabs.\",\"key\":\"fact:indentation\",\"record_type\":\"fact\",\"title\":\"Indentation\"}",
+                "source_command_id": "call-memory-write-9",
+                "polarity": "asserts"
+              },
+              "status": "proposed",
+              "created_at": "2026-10-29T04:50:55.097683+00:00",
+              "updated_at": "2026-10-29T04:50:55.097683+00:00"
+            }
+          }
+        },
+        "request_log": [
+          {
+            "index": 0,
+            "kind": "extraction",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 1,
+            "kind": "decide",
+            "tools": [
+              "clarify",
+              "coding",
+              "decompose",
+              "plan",
+              "research",
+              "respond",
+              "review_diff",
+              "tool_request"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 2,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 3,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 4,
+            "kind": "extraction",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 5,
+            "kind": "decide",
+            "tools": [
+              "clarify",
+              "coding",
+              "decompose",
+              "plan",
+              "research",
+              "respond",
+              "review_diff",
+              "tool_request"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 6,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 7,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 8,
+            "kind": "extraction",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 9,
+            "kind": "tool_call",
+            "tools": [
+              "clarify",
+              "memory_write"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 10,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 11,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 12,
+            "kind": "extraction",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 13,
+            "kind": "decide",
+            "tools": [
+              "clarify",
+              "coding",
+              "decompose",
+              "plan",
+              "research",
+              "respond",
+              "review_diff",
+              "tool_request"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 14,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 15,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 16,
+            "kind": "extraction",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 17,
+            "kind": "decide",
+            "tools": [
+              "clarify",
+              "coding",
+              "decompose",
+              "plan",
+              "research",
+              "respond",
+              "review_diff",
+              "tool_request"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 18,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 19,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 20,
+            "kind": "consolidation_entry",
+            "tools": [
+              "clarify",
+              "coding",
+              "decompose",
+              "plan",
+              "research",
+              "respond",
+              "review_diff",
+              "tool_request"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 21,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 22,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 23,
+            "kind": "consolidation_reply",
+            "tools": [
+              "plan"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": true
+          },
+          {
+            "index": 24,
+            "kind": "judge",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 25,
+            "kind": "extraction",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 26,
+            "kind": "decide",
+            "tools": [
+              "clarify",
+              "coding",
+              "decompose",
+              "plan",
+              "research",
+              "respond",
+              "review_diff",
+              "tool_request"
+            ],
+            "forced": null,
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 27,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          },
+          {
+            "index": 28,
+            "kind": "freshness",
+            "tools": [
+              "submit_output"
+            ],
+            "forced": "submit_output",
+            "decision_memory_section": false,
+            "consolidation_batch": false
+          }
+        ],
+        "readback": {
+          "T2_T1_decision_ids": [],
+          "T5_T4_decision_ids": [
+            {
+              "request": 16,
+              "kind": "extraction",
+              "line": "asibility_report\":null,\"decision_feasibility_state\":{},\"decision_memory_refs\":[\"mem_65c4285383e8\"],\"decision_rationale\":\"\",\"decision_reason_code\":\"entry_text_response\",\"decision_success_criteria\":{},\"delegation_goal\":\"\",\"delegation_job_id\":null,\"delegation_synthesize_result\":false,\"delegation_target_agent_id\":null,\"delegation_task_id\""
+            },
+            {
+              "request": 17,
+              "kind": "decide",
+              "line": "asibility_report\":null,\"decision_feasibility_state\":{},\"decision_memory_refs\":[\"mem_65c4285383e8\"],\"decision_rationale\":\"\",\"decision_reason_code\":\"entry_text_response\",\"decision_success_criteria\":{},\"delegation_goal\":\"\",\"delegation_job_id\":null,\"delegation_synthesize_result\":false,\"delegation_target_agent_id\":null,\"delegation_task_id\""
+            }
+          ],
+          "T5_s1_decision_ids": [],
+          "C_candidate_id": [
+            {
+              "request": 23,
+              "kind": "consolidation_reply",
+              "line": "2. id=cand_f5e2361cc519 type=tool_outcome confidence=0.40 source_session=openminion\n   title: tool_outcome:memory.write:policy_denied\n   preview: {'tool_name': 'memory.write', 'tool_family': 'memory', 'outcome': 'policy_denied', 'error_code': None, 'turn_index': 1, 'intent_id': None, 'args_signature': '{\"content\":\"The user prefers"
+            }
+          ],
+          "C_refused_text": [
+            {
+              "request": 23,
+              "kind": "consolidation_reply",
+              "line": "d', 'error_code': None, 'turn_index': 1, 'intent_id': None, 'args_signature': '{\"content\":\"The user prefers\n\nWhen ending an act turn that requires finalization, populate the structured finalization_status signal before ending the turn with final text. Use status=final_answer only when the final deliverable is already present. Use status=incomplete"
+            }
+          ],
+          "T6_promoted_ids": [],
+          "T6_refused_text": [],
+          "T6_candidate_id": [],
+          "T4_T6_candidate_or_refused_text": []
+        },
+        "all_outcome_feedback_calls": [],
+        "provider_hosts": [
+          "127.0.0.1"
+        ]
+      }
+    },
+    "consolidation_W": {
+      "state": "finished",
+      "recovery": [
+        [
+          5,
+          0,
+          5
+        ]
+      ],
+      "requests": [
+        "consolidation_entry",
+        "freshness",
+        "freshness",
+        "consolidation_other",
+        "judge"
+      ],
+      "batch_requests": [
+        18
+      ],
+      "candidate_id_in": [],
+      "refused_text_line": [],
+      "candidate_status": [],
+      "new_tool_outcome_records": [],
+      "memory_write_targets": [
+        "memory-capture",
+        "memory-capture-recovery"
+      ],
+      "signal_parsed": [],
+      "decisions_applied": [],
+      "T6_promoted_or_refused_text": [],
+      "T4_T6_candidate_or_refused_text": [],
+      "final_candidate_status": [],
+      "final_tool_outcome_records": []
+    },
+    "shape_W": {
+      "decisions": {
+        "T1": [],
+        "T2": [],
+        "T3": [],
+        "T4": [],
+        "T5": [],
+        "T6": []
+      },
+      "tool_outcome": {
+        "scope": null,
+        "status": null,
+        "title": null,
+        "content": {}
+      }
+    }
+  }
+}
