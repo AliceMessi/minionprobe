@@ -1,0 +1,578 @@
+head: 8d688f7a docs(memory): note that a call that did not run stages no tool outcome
+  8d688f7a docs(memory): note that a call that did not run stages no tool outcome
+  5ec16c08 fix(runtime): stage no tool outcome candidate for a call that did not run
+  4a76fa46 test(runtime): cover tool outcome candidates for calls that did not run
+  aec2df9e fix(runtime): serialize active-agent selection and leave (#520)
+dev:  aec2df9e fix(runtime): serialize active-agent selection and leave (#520)
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+OPENMINION_TEST_POSTGRES_URL set: yes
+
+== git diff --stat aec2df9e851189e0d5bff780eb90f4be2b748ddf..HEAD
+ CHANGELOG.md                                       |   8 +
+ .../modules/brain/tools/executor/tool.py           |   2 +-
+ src/openminion/modules/memory/README.md            |   4 +-
+ tests/brain/test_runner_tools.py                   | 140 +++++++++--
+ tests/runtime/test_turn_denied_call_outcome.py     | 279 +++++++++++++++++++++
+ tests/runtime/test_turn_optional_memory_writes.py  |  12 +-
+ 6 files changed, 416 insertions(+), 29 deletions(-)
+
+== make lint
+make typecheck
+make[1]: Entering directory '/home/runner/work/linux-runner/linux-runner'
+cd "/home/runner/work/linux-runner/linux-runner" && /home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4306; baseline total: 4306
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 287
+[tcr] api: 76 / 76 | monthly quota -50 | next target <= 26 | headroom 0
+[tcr] cli: 308 / 308 | monthly quota -50 | next target <= 258 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 221 / 221 | monthly quota -50 | next target <= 171 | headroom 0
+make[1]: Leaving directory '/home/runner/work/linux-runner/linux-runner'
+make lint exit: 0
+
+== python scripts/validate/max_file_loc.py
+[OK] Result
+  - max-file-LOC baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 1, "ceiling": 1000, "checked": 2749, "over_ceiling": 1}, "ok": true, "validator": "validate_max_file_loc"}
+
+== [head] upstream postgres-memory-retrieval job, its command list from .github/workflows/ci.yml
+$ python -m pytest -q -m postgres tests/memory/test_memory_postgres_conformance.py
+19 passed in 2.22s
+$ python -m pytest -q -m postgres tests/memory/test_memory_search_quality.py::test_postgres_lexical_score_contributes_to_semantic_order
+1 passed in 0.23s
+$ python -m pytest -q -m postgres tests/memory/test_gc_evidence_postgres.py
+7 passed in 0.89s
+$ python -m pytest -q -m postgres tests/skill/test_skill_postgres_conformance.py
+6 passed, 6 deselected in 0.75s
+$ python -m pytest -q -m postgres tests/integration/test_runtime_storage_postgres.py
+54 passed in 30.18s
+$ python -m pytest -q -m postgres tests/integration/test_runtime_memory_postgres.py
+8 passed in 3.29s
+$ python -m pytest -q -m postgres tests/integration/test_storage_migrate_report_postgres.py
+2 passed in 0.28s
+$ python -m pytest -q -m postgres tests/memory/test_gc_postgres.py
+13 passed in 1.82s
+
+== [head] pytest <focused>
+114 passed in 30.49s
+
+== [head] pytest -m "<test-ci markers>" <related>
+8184 passed, 6 skipped, 153 deselected, 1 xfailed, 46 warnings in 339.99s (0:05:39)
+
+== [head] new and changed tests, 3 runs
+56 passed in 17.83s
+56 passed in 18.27s
+56 passed in 17.56s
+
+== dev sources: git checkout aec2df9e851189e0d5bff780eb90f4be2b748ddf -- src (2 paths differ)
+
+== [dev] pytest <new and changed>
+E   assert [('tool_outco...tcome', ...})] == []
+E     
+E     Left contains one more item: ('tool_outcome:memory.write:policy_denied', {'args_signature': '{"content":"The user writes code in Iosevka 14.","key"...rd_type":"fact","title":"Editor font"}', 'source_command_id': 'call-memory_write', 'source_kind': 'tool_outcome', ...})
+E     
+E     Full diff:
+E     - []
+E     + [
+E     +     (
+E     +         'tool_outcome:memory.write:policy_denied',
+E     +         {
+E     +             'args_signature': '{"content":"The user writes code in Iosevka '
+E     +             '14.","key":"fact:editor_font","record_type":"fact","title":"Editor '
+E     +             'font"}',
+E     +             'artifact_ref': None,
+E     +             'error_code': None,
+E     +             'intent_id': None,
+E     +             'outcome': 'policy_denied',
+E     +             'tool_family': 'memory',
+E     +             'tool_name': 'memory.write',
+E     +             'turn_index': 1,
+E     +         },
+E     +         {
+E     +             'polarity': 'asserts',
+E     +             'source_args_signature': '{"content":"The user writes code in Iosevka '
+E     +             '14.","key":"fact:editor_font","record_type":"fact","title":"Editor '
+E     +             'font"}',
+E     +             'source_command_id': 'call-memory_write',
+E     +             'source_kind': 'tool_outcome',
+E     +             'source_negative_outcome': True,
+E     +             'source_outcome_status': 'policy_denied',
+E     +             'source_success_path': False,
+E     +             'source_tool_family': 'memory',
+E     +             'source_tool_name': 'memory.write',
+E     +         },
+E     +     ),
+E     + ]
+2026-10-29 11:08:50,154 INFO openminion.agent: identity startup sync agent_id=openminion yaml_status=synced yaml_profiles=1 yaml_upserted=1 yaml_errors=0 status=skipped_authority imported=False defaulted_fields=0 warnings=0 errors=0
+E   assert [('tool_outco...tcome', ...})] == []
+E     
+E     Left contains one more item: ('tool_outcome:memory.write:policy_denied', {'args_signature': '{"content":"The user writes code in Iosevka 14.","key"...rd_type":"fact","title":"Editor font"}', 'source_command_id': 'call-memory_write', 'source_kind': 'tool_outcome', ...})
+E     
+E     Full diff:
+E     - []
+E     + [
+E     +     (
+E     +         'tool_outcome:memory.write:policy_denied',
+E     +         {
+E     +             'args_signature': '{"content":"The user writes code in Iosevka '
+E     +             '14.","key":"fact:editor_font","record_type":"fact","title":"Editor '
+E     +             'font"}',
+E     +             'artifact_ref': None,
+E     +             'error_code': None,
+E     +             'intent_id': None,
+E     +             'outcome': 'policy_denied',
+E     +             'tool_family': 'memory',
+E     +             'tool_name': 'memory.write',
+E     +             'turn_index': 1,
+E     +         },
+E     +         {
+E     +             'polarity': 'asserts',
+E     +             'source_args_signature': '{"content":"The user writes code in Iosevka '
+E     +             '14.","key":"fact:editor_font","record_type":"fact","title":"Editor '
+E     +             'font"}',
+E     +             'source_command_id': 'call-memory_write',
+E     +             'source_kind': 'tool_outcome',
+E     +             'source_negative_outcome': True,
+E     +             'source_outcome_status': 'policy_denied',
+E     +             'source_success_path': False,
+E     +             'source_tool_family': 'memory',
+E     +             'source_tool_name': 'memory.write',
+E     +         },
+E     +     ),
+E     + ]
+2026-10-29 11:08:51,192 INFO openminion.agent: identity startup sync agent_id=openminion yaml_status=synced yaml_profiles=1 yaml_upserted=1 yaml_errors=0 status=skipped_authority imported=False defaulted_fields=0 warnings=0 errors=0
+E   assert [('tool_outco...tcome', ...})] == []
+E     
+E     Left contains one more item: ('tool_outcome:memory.write:policy_denied', {'args_signature': '{"content":"The user writes code in Iosevka 14.","key"...rd_type":"fact","title":"Editor font"}', 'source_command_id': 'call-memory_write', 'source_kind': 'tool_outcome', ...})
+E     
+E     Full diff:
+E     - []
+E     + [
+E     +     (
+E     +         'tool_outcome:memory.write:policy_denied',
+E     +         {
+E     +             'args_signature': '{"content":"The user writes code in Iosevka '
+E     +             '14.","key":"fact:editor_font","record_type":"fact","title":"Editor '
+E     +             'font"}',
+E     +             'artifact_ref': None,
+E     +             'error_code': None,
+E     +             'intent_id': None,
+E     +             'outcome': 'policy_denied',
+E     +             'tool_family': 'memory',
+E     +             'tool_name': 'memory.write',
+E     +             'turn_index': 1,
+E     +         },
+E     +         {
+E     +             'polarity': 'asserts',
+E     +             'source_args_signature': '{"content":"The user writes code in Iosevka '
+E     +             '14.","key":"fact:editor_font","record_type":"fact","title":"Editor '
+E     +             'font"}',
+E     +             'source_command_id': 'call-memory_write',
+E     +             'source_kind': 'tool_outcome',
+E     +             'source_negative_outcome': True,
+E     +             'source_outcome_status': 'policy_denied',
+E     +             'source_success_path': False,
+E     +             'source_tool_family': 'memory',
+E     +             'source_tool_name': 'memory.write',
+E     +         },
+E     +     ),
+E     + ]
+E   assert [('tool_outco...tcome', ...})] == []
+E     
+E     Left contains one more item: ('tool_outcome:memory.write:policy_denied', {'args_signature': '{"content":"The user writes code in Iosevka 14.","key"...rd_type":"fact","title":"Editor font"}', 'source_command_id': 'call-memory_write', 'source_kind': 'tool_outcome', ...})
+E     
+E     Full diff:
+E     - []
+E     + [
+E     +     (
+E     +         'tool_outcome:memory.write:policy_denied',
+E     +         {
+E     +             'args_signature': '{"content":"The user writes code in Iosevka '
+E     +             '14.","key":"fact:editor_font","record_type":"fact","title":"Editor '
+E     +             'font"}',
+E     +             'artifact_ref': None,
+E     +             'error_code': None,
+E     +             'intent_id': None,
+E     +             'outcome': 'policy_denied',
+E     +             'tool_family': 'memory',
+E     +             'tool_name': 'memory.write',
+E     +             'turn_index': 1,
+E     +         },
+E     +         {
+E     +             'polarity': 'asserts',
+E     +             'source_args_signature': '{"content":"The user writes code in Iosevka '
+E     +             '14.","key":"fact:editor_font","record_type":"fact","title":"Editor '
+E     +             'font"}',
+E     +             'source_command_id': 'call-memory_write',
+E     +             'source_kind': 'tool_outcome',
+E     +             'source_negative_outcome': True,
+E     +             'source_outcome_status': 'policy_denied',
+E     +             'source_success_path': False,
+E     +             'source_tool_family': 'memory',
+E     +             'source_tool_name': 'memory.write',
+E     +         },
+E     +     ),
+E     + ]
+E   assert [('tool_outco...tcome', ...})] == []
+E     
+E     Left contains one more item: ('tool_outcome:memory.write:policy_denied', {'args_signature': '{"content":"The user writes code in Iosevka 14.","key"...rd_type":"fact","title":"Editor font"}', 'source_command_id': 'call-memory_write', 'source_kind': 'tool_outcome', ...})
+E     
+E     Full diff:
+E     - []
+E     + [
+E     +     (
+E     +         'tool_outcome:memory.write:policy_denied',
+E     +         {
+E     +             'args_signature': '{"content":"The user writes code in Iosevka '
+E     +             '14.","key":"fact:editor_font","record_type":"fact","title":"Editor '
+E     +             'font"}',
+E     +             'artifact_ref': None,
+E     +             'error_code': None,
+E     +             'intent_id': None,
+E     +             'outcome': 'policy_denied',
+E     +             'tool_family': 'memory',
+E     +             'tool_name': 'memory.write',
+E     +             'turn_index': 1,
+E     +         },
+E     +         {
+E     +             'polarity': 'asserts',
+E     +             'source_args_signature': '{"content":"The user writes code in Iosevka '
+E     +             '14.","key":"fact:editor_font","record_type":"fact","title":"Editor '
+E     +             'font"}',
+E     +             'source_command_id': 'call-memory_write',
+E     +             'source_kind': 'tool_outcome',
+E     +             'source_negative_outcome': True,
+E     +             'source_outcome_status': 'policy_denied',
+E     +             'source_success_path': False,
+E     +             'source_tool_family': 'memory',
+E     +             'source_tool_name': 'memory.write',
+E     +         },
+E     +     ),
+E     + ]
+2026-10-29 11:08:56,872 INFO openminion.agent: identity startup sync agent_id=openminion yaml_status=synced yaml_profiles=1 yaml_upserted=1 yaml_errors=0 status=skipped_authority imported=False defaulted_fields=0 warnings=0 errors=0
+______ test_pending_call_approved_later_stages_once_after_it_runs[failed] ______
+E   assert [('tool_outco...tcome', ...})] == []
+E     
+E     Left contains one more item: ('tool_outcome:memory.write:policy_denied', {'args_signature': '{"content":"The user writes code in Iosevka 14.","key"...rd_type":"fact","title":"Editor font"}', 'source_command_id': 'call-memory_write', 'source_kind': 'tool_outcome', ...})
+E     
+E     Full diff:
+E     - []
+E     + [
+E     +     (
+E     +         'tool_outcome:memory.write:policy_denied',
+E     +         {
+E     +             'args_signature': '{"content":"The user writes code in Iosevka '
+E     +             '14.","key":"fact:editor_font","record_type":"fact","title":"Editor '
+E     +             'font"}',
+E     +             'artifact_ref': None,
+E     +             'error_code': None,
+E     +             'intent_id': None,
+E     +             'outcome': 'policy_denied',
+E     +             'tool_family': 'memory',
+E     +             'tool_name': 'memory.write',
+E     +             'turn_index': 1,
+E     +         },
+E     +         {
+E     +             'polarity': 'asserts',
+E     +             'source_args_signature': '{"content":"The user writes code in Iosevka '
+E     +             '14.","key":"fact:editor_font","record_type":"fact","title":"Editor '
+E     +             'font"}',
+E     +             'source_command_id': 'call-memory_write',
+E     +             'source_kind': 'tool_outcome',
+E     +             'source_negative_outcome': True,
+E     +             'source_outcome_status': 'policy_denied',
+E     +             'source_success_path': False,
+E     +             'source_tool_family': 'memory',
+E     +             'source_tool_name': 'memory.write',
+E     +         },
+E     +     ),
+E     + ]
+2026-10-29 11:08:58,127 INFO openminion.agent: identity startup sync agent_id=openminion yaml_status=synced yaml_profiles=1 yaml_upserted=1 yaml_errors=0 status=skipped_authority imported=False defaulted_fields=0 warnings=0 errors=0
+E   AssertionError: assert {'decision': ...icy_denied')]} == {'decision': ..._outcome': []}
+E     
+E     Omitting 1 identical items, use -vv to show
+E     Differing items:
+E     {'tool_outcome': [('tool_outcome:memory.write:policy_denied', 'agent:openminion', 'proposed', 'policy_denied')]} != {'tool_outcome': []}
+E     
+E     Full diff:
+E       {
+E           'decision': [
+E               'Decision: respond',
+E               'Decision: act',
+E           ],
+E     -     'tool_outcome': [],
+E     ?                      --
+E     +     'tool_outcome': [
+E     +         (
+E     +             'tool_outcome:memory.write:policy_denied',
+E     +             'agent:openminion',
+E     +             'proposed',
+E     +             'policy_denied',
+E     +         ),
+E     +     ],
+E       }
+2026-10-29 11:09:02,337 INFO openminion.agent: identity startup sync agent_id=openminion yaml_status=synced yaml_profiles=1 yaml_upserted=1 yaml_errors=0 status=skipped_authority imported=False defaulted_fields=0 warnings=0 errors=0
+E   AssertionError: assert {'decision': ...icy_denied')]} == {'decision': ..._outcome': []}
+E     
+E     Omitting 1 identical items, use -vv to show
+E     Differing items:
+E     {'tool_outcome': [('tool_outcome:memory.write:policy_denied', 'agent:openminion', 'proposed', 'policy_denied')]} != {'tool_outcome': []}
+E     
+E     Full diff:
+E       {
+E           'decision': [
+E               'Decision: respond',
+E               'Decision: act',
+E           ],
+E     -     'tool_outcome': [],
+E     ?                      --
+E     +     'tool_outcome': [
+E     +         (
+E     +             'tool_outcome:memory.write:policy_denied',
+E     +             'agent:openminion',
+E     +             'proposed',
+E     +             'policy_denied',
+E     +         ),
+E     +     ],
+E       }
+E   AssertionError: assert {'decision': ...icy_denied')]} == {'decision': ..._outcome': []}
+E     
+E     Omitting 1 identical items, use -vv to show
+E     Differing items:
+E     {'tool_outcome': [('tool_outcome:memory.write:policy_denied', 'agent:openminion', 'proposed', 'policy_denied')]} != {'tool_outcome': []}
+E     
+E     Full diff:
+E       {
+E           'decision': [
+E               'Decision: respond',
+E               'Decision: act',
+E           ],
+E     -     'tool_outcome': [],
+E     ?                      --
+E     +     'tool_outcome': [
+E     +         (
+E     +             'tool_outcome:memory.write:policy_denied',
+E     +             'agent:openminion',
+E     +             'proposed',
+E     +             'policy_denied',
+E     +         ),
+E     +     ],
+E       }
+E   assert [{'confidence...f84bb8', ...}] == []
+E     
+E     Left contains one more item: {'confidence': 0.4, 'content': {'args_signature': '{"msg":"hi"}', 'artifact_ref': None, 'error_code': None, 'intent_id': None, ...}, 'evidence_refs': [], 'id': 'cand_1a590bd2-3668-46d9-b88c-8cc8d5f84bb8', ...}
+E     
+E     Full diff:
+E     - []
+E     + [
+E     +     {
+E     +         'confidence': 0.4,
+E     +         'content': {
+E     +             'args_signature': '{"msg":"hi"}',
+E     +             'artifact_ref': None,
+E     +             'error_code': None,
+E     +             'intent_id': None,
+E     +             'outcome': 'policy_denied',
+E     +             'tool_family': 'echo',
+E     +             'tool_name': 'echo',
+E     +             'turn_index': 0,
+E     +         },
+E     +         'evidence_refs': [],
+E     +         'id': 'cand_1a590bd2-3668-46d9-b88c-8cc8d5f84bb8',
+E     +         'kind': 'candidate',
+E     +         'meta': {
+E     +             'source_args_signature': '{"msg":"hi"}',
+E     +             'source_command_id': 'cmd-tool-confirm',
+E     +             'source_kind': 'tool_outcome',
+E     +             'source_negative_outcome': True,
+E     +             'source_outcome_status': 'policy_denied',
+E     +             'source_success_path': False,
+E     +             'source_tool_family': 'echo',
+E     +             'source_tool_name': 'echo',
+E     +         },
+E     +         'record_type': 'tool_outcome',
+E     +         'scope': 'agent:test-agent',
+E     +         'tags': [
+E     +             'tool_outcome',
+E     +             'tool_family:echo',
+E     +             'outcome:policy_denied',
+E     +         ],
+E     +         'title': 'tool_outcome:echo:policy_denied',
+E     +         'ts': '2026-10-29T11:09:07.289767+00:00',
+E     +     },
+E     + ]
+E   assert [{'confidence...d66838', ...}] == []
+E     
+E     Left contains 3 more items, first extra item: {'confidence': 0.4, 'content': {'args_signature': '{"msg":"hi"}', 'artifact_ref': None, 'error_code': None, 'intent_id': None, ...}, 'evidence_refs': [], 'id': 'cand_e68c056b-c7bc-4ef8-854e-8409a52cddd9', ...}
+E     
+E     Full diff:
+E     - []
+E     + [
+E     +     {
+E     +         'confidence': 0.4,
+E     +         'content': {
+E     +             'args_signature': '{"msg":"hi"}',
+E     +             'artifact_ref': None,
+E     +             'error_code': None,
+E     +             'intent_id': None,
+E     +             'outcome': 'policy_denied',
+E     +             'tool_family': 'echo',
+E     +             'tool_name': 'echo',
+E     +             'turn_index': 0,
+E     +         },
+E     +         'evidence_refs': [],
+E     +         'id': 'cand_e68c056b-c7bc-4ef8-854e-8409a52cddd9',
+E     +         'kind': 'candidate',
+E     +         'meta': {
+E     +             'source_args_signature': '{"msg":"hi"}',
+E     +             'source_command_id': 'cmd-not-run-ask',
+E     +             'source_kind': 'tool_outcome',
+E     +             'source_negative_outcome': True,
+E     +             'source_outcome_status': 'policy_denied',
+E     +             'source_success_path': False,
+E     +             'source_tool_family': 'echo',
+E     +             'source_tool_name': 'echo',
+E     +         },
+E     +         'record_type': 'tool_outcome',
+E     +         'scope': 'agent:test-agent',
+E     +         'tags': [
+E     +             'tool_outcome',
+E     +             'tool_family:echo',
+E     +             'outcome:policy_denied',
+E     +         ],
+E     +         'title': 'tool_outcome:echo:policy_denied',
+E     +         'ts': '2026-10-29T11:09:07.306329+00:00',
+E     +     },
+E     +     {
+E     +         'confidence': 0.4,
+E     +         'content': {
+E     +             'args_signature': '{"url":"https://example.com"}',
+E     +             'artifact_ref': None,
+E     +             'error_code': 'CONFIRM_REQUIRED',
+E     +             'intent_id': None,
+E     +             'outcome': 'policy_denied',
+E     +             'tool_family': 'web',
+E     +             'tool_name': 'web.fetch',
+E     +             'turn_index': 0,
+E     +         },
+E     +         'evidence_refs': [],
+E     +         'id': 'cand_11184247-9d28-42e6-b086-fbbf49eb620a',
+E     +         'kind': 'candidate',
+E     +         'meta': {
+E     +             'source_args_signature': '{"url":"https://example.com"}',
+E     +             'source_command_id': 'cmd-not-run-needs_user',
+E     +             'source_kind': 'tool_outcome',
+E     +             'source_negative_outcome': True,
+E     +             'source_outcome_status': 'policy_denied',
+E     +             'source_success_path': False,
+E     +             'source_tool_family': 'web',
+E     +             'source_tool_name': 'web.fetch',
+E     +         },
+E     +         'record_type': 'tool_outcome',
+E     +         'scope': 'agent:test-agent',
+E     +         'tags': [
+E     +             'tool_outcome',
+E     +             'tool_family:web',
+E     +             'outcome:policy_denied',
+E     +         ],
+E     +         'title': 'tool_outcome:web.fetch:policy_denied:CONFIRM_REQUIRED',
+E     +         'ts': '2026-10-29T11:09:07.306668+00:00',
+E     +     },
+E     +     {
+E     +         'confidence': 0.4,
+E     +         'content': {
+E     +             'args_signature': '{"url":"https://example.com"}',
+E     +             'artifact_ref': None,
+E     +             'error_code': 'PERMISSION_DENIED_READONLY',
+E     +             'intent_id': None,
+E     +             'outcome': 'policy_denied',
+E     +             'tool_family': 'web',
+E     +             'tool_name': 'web.fetch',
+E     +             'turn_index': 0,
+E     +         },
+E     +         'evidence_refs': [],
+E     +         'id': 'cand_fb95f76b-fb5b-4b14-a2d1-0533cdd66838',
+E     +         'kind': 'candidate',
+E     +         'meta': {
+E     +             'source_args_signature': '{"url":"https://example.com"}',
+E     +             'source_command_id': 'cmd-not-run-blocked',
+E     +             'source_kind': 'tool_outcome',
+E     +             'source_negative_outcome': True,
+E     +             'source_outcome_status': 'policy_denied',
+E     +             'source_success_path': False,
+E     +             'source_tool_family': 'web',
+E     +             'source_tool_name': 'web.fetch',
+E     +         },
+E     +         'record_type': 'tool_outcome',
+E     +         'scope': 'agent:test-agent',
+E     +         'tags': [
+E     +             'tool_outcome',
+E     +             'tool_family:web',
+E     +             'outcome:policy_denied',
+E     +         ],
+E     +         'title': 'tool_outcome:web.fetch:policy_denied:PERMISSION_DENIED_READONLY',
+E     +         'ts': '2026-10-29T11:09:07.307054+00:00',
+E     +     },
+E     + ]
+FAILED tests/runtime/test_turn_denied_call_outcome.py::test_call_that_did_not_run_stages_no_tool_outcome[neutral-constraint-denied] - assert [('tool_outco...tcome', ...})] == []
+  +             'error_code': None,
+FAILED tests/runtime/test_turn_denied_call_outcome.py::test_call_that_did_not_run_stages_no_tool_outcome[neutral-constraint-pending] - assert [('tool_outco...tcome', ...})] == []
+  +             'error_code': None,
+FAILED tests/runtime/test_turn_denied_call_outcome.py::test_call_that_did_not_run_stages_no_tool_outcome[no-identity-denied] - assert [('tool_outco...tcome', ...})] == []
+  +             'error_code': None,
+FAILED tests/runtime/test_turn_denied_call_outcome.py::test_call_that_did_not_run_stages_no_tool_outcome[no-identity-pending] - assert [('tool_outco...tcome', ...})] == []
+  +             'error_code': None,
+FAILED tests/runtime/test_turn_denied_call_outcome.py::test_pending_call_approved_later_stages_once_after_it_runs[succeeded] - assert [('tool_outco...tcome', ...})] == []
+  +             'error_code': None,
+FAILED tests/runtime/test_turn_denied_call_outcome.py::test_pending_call_approved_later_stages_once_after_it_runs[failed] - assert [('tool_outco...tcome', ...})] == []
+  +             'error_code': None,
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_allowed_turn_writes_decision_records_as_before[neutral-constraint] - AssertionError: assert {'decision': ...icy_denied')]} == {'decision': ..._outcome': []}
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_allowed_turn_writes_decision_records_as_before[no-identity] - AssertionError: assert {'decision': ...icy_denied')]} == {'decision': ..._outcome': []}
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_allowed_turn_writes_decision_records_as_before[no-security-policy] - AssertionError: assert {'decision': ...icy_denied')]} == {'decision': ..._outcome': []}
+FAILED tests/brain/test_runner_tools.py::test_prepare_tool_dispatch_confirmation_stages_no_tool_outcome - assert [{'confidence...f84bb8', ...}] == []
+  Left contains one more item: {'confidence': 0.4, 'content': {'args_signature': '{"msg":"hi"}', 'artifact_ref': None, 'error_code': None, 'intent_id': None, ...}, 'evidence_refs': [], 'id': 'cand_1a590bd2-3668-46d9-b88c-8cc8d5f84bb8', ...}
+  +             'error_code': None,
+FAILED tests/brain/test_runner_tools.py::test_tool_call_that_did_not_run_stages_no_tool_outcome - assert [{'confidence...d66838', ...}] == []
+  Left contains 3 more items, first extra item: {'confidence': 0.4, 'content': {'args_signature': '{"msg":"hi"}', 'artifact_ref': None, 'error_code': None, 'intent_id': None, ...}, 'evidence_refs': [], 'id': 'cand_e68c056b-c7bc-4ef8-854e-8409a52cddd9', ...}
+  +             'error_code': None,
+  +             'error_code': 'CONFIRM_REQUIRED',
+  +             'error_code': 'PERMISSION_DENIED_READONLY',
+11 failed, 45 passed in 18.28s
+
+== [dev] pytest <focused>
+FAILED tests/runtime/test_turn_denied_call_outcome.py::test_call_that_did_not_run_stages_no_tool_outcome[neutral-constraint-denied] - assert [('tool_outco...tcome', ...})] == []
+  +             'error_code': None,
+FAILED tests/runtime/test_turn_denied_call_outcome.py::test_call_that_did_not_run_stages_no_tool_outcome[neutral-constraint-pending] - assert [('tool_outco...tcome', ...})] == []
+  +             'error_code': None,
+FAILED tests/runtime/test_turn_denied_call_outcome.py::test_call_that_did_not_run_stages_no_tool_outcome[no-identity-denied] - assert [('tool_outco...tcome', ...})] == []
+  +             'error_code': None,
+FAILED tests/runtime/test_turn_denied_call_outcome.py::test_call_that_did_not_run_stages_no_tool_outcome[no-identity-pending] - assert [('tool_outco...tcome', ...})] == []
+  +             'error_code': None,
+FAILED tests/runtime/test_turn_denied_call_outcome.py::test_pending_call_approved_later_stages_once_after_it_runs[succeeded] - assert [('tool_outco...tcome', ...})] == []
+  +             'error_code': None,
+FAILED tests/runtime/test_turn_denied_call_outcome.py::test_pending_call_approved_later_stages_once_after_it_runs[failed] - assert [('tool_outco...tcome', ...})] == []
+  +             'error_code': None,
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_allowed_turn_writes_decision_records_as_before[neutral-constraint] - AssertionError: assert {'decision': ...icy_denied')]} == {'decision': ..._outcome': []}
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_allowed_turn_writes_decision_records_as_before[no-identity] - AssertionError: assert {'decision': ...icy_denied')]} == {'decision': ..._outcome': []}
+FAILED tests/runtime/test_turn_optional_memory_writes.py::test_allowed_turn_writes_decision_records_as_before[no-security-policy] - AssertionError: assert {'decision': ...icy_denied')]} == {'decision': ..._outcome': []}
+FAILED tests/brain/test_runner_tools.py::test_prepare_tool_dispatch_confirmation_stages_no_tool_outcome - assert [{'confidence...bc907d', ...}] == []
+  Left contains one more item: {'confidence': 0.4, 'content': {'args_signature': '{"msg":"hi"}', 'artifact_ref': None, 'error_code': None, 'intent_id': None, ...}, 'evidence_refs': [], 'id': 'cand_018f3b02-15c9-431d-84b8-61bfa3bc907d', ...}
+  +             'error_code': None,
+FAILED tests/brain/test_runner_tools.py::test_tool_call_that_did_not_run_stages_no_tool_outcome - assert [{'confidence...3616f4', ...}] == []
+  Left contains 3 more items, first extra item: {'confidence': 0.4, 'content': {'args_signature': '{"msg":"hi"}', 'artifact_ref': None, 'error_code': None, 'intent_id': None, ...}, 'evidence_refs': [], 'id': 'cand_0dc09c2a-b236-410e-a703-8fa06acd14ce', ...}
+  +             'error_code': None,
+  +             'error_code': 'CONFIRM_REQUIRED',
+  +             'error_code': 'PERMISSION_DENIED_READONLY',
+11 failed, 103 passed in 30.01s
+
+== back to the branch head: 0 paths differ
+
+== ruff check .
+All checks passed!
+
+== make format-check
+/home/runner/work/linux-runner/linux-runner/.venv/bin/python3.11 -m ruff format --check "/home/runner/work/linux-runner/linux-runner"
+5162 files already formatted
