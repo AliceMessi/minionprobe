@@ -1,0 +1,671 @@
+{
+  "banner": {
+    "probe": "probe_364",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.14",
+    "python": "3.12.15",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<RUNNER_TEMP>/empty",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "backend": "postgres",
+    "postgres": {
+      "sqlalchemy": "2.1.6",
+      "psycopg": "3.3.6",
+      "select version()": "PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+      "server_version": "16.15 (Debian 16.15-1.pgdg13+2)",
+      "url_scheme": "postgresql+psycopg"
+    }
+  },
+  "checks": [
+    {
+      "check": "postgres A: `openminion room create --agent first --agent second --agent third --routing-mode broadcast` (console script) exits 0 with participants=3, active_agent=first; `room invite <room> --agent fourth` exits 0 with participants=4",
+      "pass": false,
+      "observed": {
+        "create": {
+          "exit_code": 1,
+          "stderr_tail": [
+            "Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity",
+            "Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy",
+            "Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress",
+            "Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry",
+            "Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry",
+            "openminion room: startup error \u2014 runtime record_store does not expose sqlite connection"
+          ],
+          "seconds": 8.31,
+          "connections_max_while_running": 1,
+          "connections_samples": 132,
+          "connections_after_exit": {
+            "count": 0,
+            "waited_s": 0.01
+          },
+          "stdout": []
+        },
+        "invite": {
+          "exit_code": null,
+          "stdout": []
+        }
+      }
+    },
+    {
+      "check": "postgres A: the participant rows (independent read) are first, second, third, fourth with join_seq 1..4",
+      "pass": false,
+      "observed": []
+    },
+    {
+      "check": "postgres B: `room create --routing-mode broadcast --agent first --agent second --agent third` on one tick, row ids sorting in reverse join order: exit 0, participants=3, active_agent=first",
+      "pass": false,
+      "observed": {
+        "exit_code": 1,
+        "stderr_tail": [
+          "Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity",
+          "Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill",
+          "Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress",
+          "Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact",
+          "Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy",
+          "openminion room: startup error \u2014 runtime record_store does not expose sqlite connection"
+        ],
+        "seconds": 4.57,
+        "connections_max_while_running": 1,
+        "connections_samples": 73,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        },
+        "stdout": []
+      }
+    },
+    {
+      "check": "postgres B: `room create --routing-mode sequential --agent first --agent second --agent third` on one tick, row ids sorting in reverse join order: exit 0, participants=3, active_agent=first",
+      "pass": false,
+      "observed": {
+        "exit_code": 1,
+        "stderr_tail": [
+          "Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory",
+          "Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry",
+          "Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve",
+          "Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill",
+          "Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a",
+          "openminion room: startup error \u2014 runtime record_store does not expose sqlite connection"
+        ],
+        "seconds": 4.54,
+        "connections_max_while_running": 1,
+        "connections_samples": 72,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        },
+        "stdout": []
+      }
+    },
+    {
+      "check": "postgres B: `room create --routing-mode addressed --agent first --agent second --agent third` on one tick, row ids sorting in reverse join order: exit 0, participants=3, active_agent=first",
+      "pass": false,
+      "observed": {
+        "exit_code": 1,
+        "stderr_tail": [
+          "Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress",
+          "Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory",
+          "Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve",
+          "Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill",
+          "Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry",
+          "openminion room: startup error \u2014 runtime record_store does not expose sqlite connection"
+        ],
+        "seconds": 4.57,
+        "connections_max_while_running": 1,
+        "connections_samples": 72,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        },
+        "stdout": []
+      }
+    },
+    {
+      "check": "postgres B: `room invite <broadcast room> --agent fourth` on the same tick (row id sorts before two earlier joins): exit 0, participants=4",
+      "pass": false,
+      "observed": {
+        "exit_code": 1,
+        "stderr_tail": [
+          "Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity",
+          "Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve",
+          "Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress",
+          "Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a",
+          "Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill",
+          "openminion room: startup error \u2014 runtime record_store does not expose sqlite connection"
+        ],
+        "seconds": 4.54,
+        "connections_max_while_running": 1,
+        "connections_samples": 72,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        },
+        "stdout": []
+      }
+    },
+    {
+      "check": "postgres B: the stored rows share one joined_at and their ids sort in reverse join order (first 'f..', second 'c..', third '0..', fourth '1..')",
+      "pass": false,
+      "observed": []
+    },
+    {
+      "check": "postgres B: join_seq is 1, 2, 3, 4 in join order (independent read)",
+      "pass": false,
+      "observed": []
+    },
+    {
+      "check": "postgres B: completes without an exception",
+      "pass": false,
+      "observed": "RuntimeError: runtime record_store does not expose sqlite connection"
+    },
+    {
+      "check": "postgres C: `openminion run --session <room>` starts its runtime and exits 0",
+      "pass": false,
+      "observed": {
+        "exit_code": 2,
+        "stderr_tail": [
+          "Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress",
+          "Postgres module 'secret' has pending migrations. Run: openminion storage migrate --module secret",
+          "Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane",
+          "Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a",
+          "Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity",
+          "openminion: runtime record_store does not expose sqlite connection"
+        ],
+        "seconds": 4.5,
+        "connections_max_while_running": 2,
+        "connections_samples": 72,
+        "connections_after_exit": {
+          "count": 1,
+          "waited_s": 5.0
+        },
+        "stdout": []
+      }
+    },
+    {
+      "check": "postgres: every CLI process connected to PostgreSQL under the database's application_name while running and left no connection after it exited",
+      "pass": false,
+      "observed": [
+        [
+          [
+            "room",
+            "create",
+            "--name"
+          ],
+          1,
+          {
+            "count": 0,
+            "waited_s": 0.01
+          }
+        ],
+        [
+          [
+            "(tied)",
+            "room",
+            "create"
+          ],
+          1,
+          {
+            "count": 0,
+            "waited_s": 0.01
+          }
+        ],
+        [
+          [
+            "(tied)",
+            "room",
+            "create"
+          ],
+          1,
+          {
+            "count": 0,
+            "waited_s": 0.01
+          }
+        ],
+        [
+          [
+            "(tied)",
+            "room",
+            "create"
+          ],
+          1,
+          {
+            "count": 0,
+            "waited_s": 0.01
+          }
+        ],
+        [
+          [
+            "(tied)",
+            "room",
+            "invite"
+          ],
+          1,
+          {
+            "count": 0,
+            "waited_s": 0.01
+          }
+        ],
+        [
+          [
+            "run",
+            "--agent",
+            "first"
+          ],
+          2,
+          {
+            "count": 1,
+            "waited_s": 5.0
+          }
+        ]
+      ]
+    },
+    {
+      "check": "postgres: no runtime SQLite database created at storage.path",
+      "pass": true,
+      "observed": {
+        "storage.path exists": false,
+        "sqlite files": [
+          ".openminion/artifact/index.db",
+          ".openminion/authored_tools/store.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071713012675Z-0-none.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071717673951Z-0-0001_baseline.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071722239372Z-0-0001_baseline.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071726802901Z-0-0001_baseline.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071731376224Z-0-0001_baseline.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071735324873Z-0-0001_baseline.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071739370620Z-0-0001_baseline.sqlite",
+          ".openminion/memory/memory.db",
+          ".openminion/ops/evidence.db",
+          ".openminion/ops/jobs.db",
+          ".openminion/ops/plans.db",
+          ".openminion/policy/policy.db",
+          ".openminion/policy/policy.db.bak/20261029T071712540886Z-0-none.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071717550790Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071722113074Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071726679020Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071731251266Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071735214099Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071739260293Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/retrieve/retrieve.db",
+          ".openminion/telemetry/telemetry.db"
+        ]
+      }
+    }
+  ],
+  "cases": {
+    "database": {
+      "name": "om364_4484e898",
+      "application_name": "om364_4484e898"
+    },
+    "A": {
+      "create": {
+        "exit_code": 1,
+        "stderr_tail": [
+          "Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity",
+          "Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy",
+          "Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress",
+          "Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry",
+          "Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry",
+          "openminion room: startup error \u2014 runtime record_store does not expose sqlite connection"
+        ],
+        "seconds": 8.31,
+        "connections_max_while_running": 1,
+        "connections_samples": 132,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        },
+        "stdout": []
+      },
+      "invite": {
+        "exit_code": null,
+        "stdout": []
+      },
+      "rows": []
+    },
+    "B create broadcast": {
+      "exit_code": 1,
+      "stderr_tail": [
+        "Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity",
+        "Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill",
+        "Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress",
+        "Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact",
+        "Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy",
+        "openminion room: startup error \u2014 runtime record_store does not expose sqlite connection"
+      ],
+      "seconds": 4.57,
+      "connections_max_while_running": 1,
+      "connections_samples": 73,
+      "connections_after_exit": {
+        "count": 0,
+        "waited_s": 0.01
+      },
+      "stdout": []
+    },
+    "B create sequential": {
+      "exit_code": 1,
+      "stderr_tail": [
+        "Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory",
+        "Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry",
+        "Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve",
+        "Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill",
+        "Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a",
+        "openminion room: startup error \u2014 runtime record_store does not expose sqlite connection"
+      ],
+      "seconds": 4.54,
+      "connections_max_while_running": 1,
+      "connections_samples": 72,
+      "connections_after_exit": {
+        "count": 0,
+        "waited_s": 0.01
+      },
+      "stdout": []
+    },
+    "B create addressed": {
+      "exit_code": 1,
+      "stderr_tail": [
+        "Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress",
+        "Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory",
+        "Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve",
+        "Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill",
+        "Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry",
+        "openminion room: startup error \u2014 runtime record_store does not expose sqlite connection"
+      ],
+      "seconds": 4.57,
+      "connections_max_while_running": 1,
+      "connections_samples": 72,
+      "connections_after_exit": {
+        "count": 0,
+        "waited_s": 0.01
+      },
+      "stdout": []
+    },
+    "B invite": {
+      "exit_code": 1,
+      "stderr_tail": [
+        "Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity",
+        "Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve",
+        "Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress",
+        "Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a",
+        "Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill",
+        "openminion room: startup error \u2014 runtime record_store does not expose sqlite connection"
+      ],
+      "seconds": 4.54,
+      "connections_max_while_running": 1,
+      "connections_samples": 72,
+      "connections_after_exit": {
+        "count": 0,
+        "waited_s": 0.01
+      },
+      "stdout": []
+    },
+    "B rows": [],
+    "C run without a room": {
+      "exit_code": 2,
+      "stderr_tail": [
+        "Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress",
+        "Postgres module 'secret' has pending migrations. Run: openminion storage migrate --module secret",
+        "Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane",
+        "Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a",
+        "Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity",
+        "openminion: runtime record_store does not expose sqlite connection"
+      ],
+      "seconds": 4.5,
+      "connections_max_while_running": 2,
+      "connections_samples": 72,
+      "connections_after_exit": {
+        "count": 1,
+        "waited_s": 5.0
+      },
+      "stdout": []
+    },
+    "processes": [
+      {
+        "argv": [
+          "room",
+          "create",
+          "--name",
+          "order",
+          "--agent",
+          "first",
+          "--agent",
+          "second",
+          "--agent",
+          "third",
+          "--routing-mode",
+          "broadcast"
+        ],
+        "exit_code": 1,
+        "connections_max_while_running": 1,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        }
+      },
+      {
+        "argv": [
+          "(tied)",
+          "room",
+          "create",
+          "--name",
+          "tie-broadcast",
+          "--agent",
+          "first",
+          "--agent",
+          "second",
+          "--agent",
+          "third",
+          "--routing-mode",
+          "broadcast",
+          "--channel",
+          "console",
+          "--target",
+          "cli-user"
+        ],
+        "exit_code": 1,
+        "connections_max_while_running": 1,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        }
+      },
+      {
+        "argv": [
+          "(tied)",
+          "room",
+          "create",
+          "--name",
+          "tie-sequential",
+          "--agent",
+          "first",
+          "--agent",
+          "second",
+          "--agent",
+          "third",
+          "--routing-mode",
+          "sequential",
+          "--channel",
+          "console",
+          "--target",
+          "cli-user"
+        ],
+        "exit_code": 1,
+        "connections_max_while_running": 1,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        }
+      },
+      {
+        "argv": [
+          "(tied)",
+          "room",
+          "create",
+          "--name",
+          "tie-addressed",
+          "--agent",
+          "first",
+          "--agent",
+          "second",
+          "--agent",
+          "third",
+          "--routing-mode",
+          "addressed",
+          "--channel",
+          "console",
+          "--target",
+          "cli-user"
+        ],
+        "exit_code": 1,
+        "connections_max_while_running": 1,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        }
+      },
+      {
+        "argv": [
+          "(tied)",
+          "room",
+          "invite",
+          "room-not-created",
+          "--agent",
+          "fourth"
+        ],
+        "exit_code": 1,
+        "connections_max_while_running": 1,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        }
+      },
+      {
+        "argv": [
+          "run",
+          "--agent",
+          "first",
+          "--session",
+          "room-not-created",
+          "--json",
+          "hello room"
+        ],
+        "exit_code": 2,
+        "connections_max_while_running": 2,
+        "connections_after_exit": {
+          "count": 1,
+          "waited_s": 5.0
+        }
+      }
+    ],
+    "sqlite_files_under_root": {
+      ".openminion/artifact/index.db": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071713012675Z-0-none.sqlite": {
+        "tables": 0
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071717673951Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071722239372Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071726802901Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071731376224Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071735324873Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071739370620Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/memory/memory.db": {
+        "tables": 14
+      },
+      ".openminion/ops/evidence.db": {
+        "tables": 1
+      },
+      ".openminion/ops/jobs.db": {
+        "tables": 1
+      },
+      ".openminion/ops/plans.db": {
+        "tables": 1
+      },
+      ".openminion/policy/policy.db": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071712540886Z-0-none.sqlite": {
+        "tables": 0
+      },
+      ".openminion/policy/policy.db.bak/20261029T071717550790Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071722113074Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071726679020Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071731251266Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071735214099Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071739260293Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/retrieve/retrieve.db": {
+        "tables": 11
+      },
+      ".openminion/telemetry/telemetry.db": {
+        "tables": 3
+      }
+    },
+    "postgres_ledger": [
+      {
+        "version": 14,
+        "name": "add_room_participant_join_seq"
+      },
+      {
+        "version": 15,
+        "name": "add_session_metadata_strings"
+      }
+    ],
+    "postgres_join_seq_index": [
+      {
+        "indexname": "idx_room_participants_lookup",
+        "indexdef": "CREATE INDEX idx_room_participants_lookup ON public.room_participants USING btree (session_id, participant_type, participant_id, left_at)"
+      },
+      {
+        "indexname": "idx_room_participants_session_join_seq",
+        "indexdef": "CREATE UNIQUE INDEX idx_room_participants_session_join_seq ON public.room_participants USING btree (session_id, join_seq)"
+      },
+      {
+        "indexname": "idx_room_participants_session_joined",
+        "indexdef": "CREATE INDEX idx_room_participants_session_joined ON public.room_participants USING btree (session_id, joined_at, id)"
+      },
+      {
+        "indexname": "room_participants_pkey",
+        "indexdef": "CREATE UNIQUE INDEX room_participants_pkey ON public.room_participants USING btree (id)"
+      },
+      {
+        "indexname": "room_participants_session_id_participant_type_participant_i_key",
+        "indexdef": "CREATE UNIQUE INDEX room_participants_session_id_participant_type_participant_i_key ON public.room_participants USING btree (session_id, participant_type, participant_id)"
+      }
+    ]
+  },
+  "summary": {
+    "passed": 1,
+    "failed": 11,
+    "total": 12
+  }
+}

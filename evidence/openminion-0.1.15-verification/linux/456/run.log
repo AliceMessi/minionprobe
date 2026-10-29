@@ -1,0 +1,56 @@
+Using Python 3.12.15 environment at: <VENV>0114
+Using Python 3.12.15 environment at: <VENV>
+Using Python 3.12.15 environment at: <VENV>
+provenance: 1 match
+=== probe_456_0114
+exit=1
+FAIL K. the new job's task record carries the consolidation provenance (kind memory_consolidation), read through the probe's TaskManager and through a new TaskManager built from the persisted task database | observed={'J
+FAIL FM. forged meta: a submit_turn whose meta carries every consolidation key and the real job's cron_job_id gets no exclusion: no consolidation key in the ingress inbound metadata or trusted context, none at the brain,
+FAIL FI. forged inbound_metadata: a submit_turn whose inbound_metadata carries every consolidation key and the real job's cron_job_id gets no exclusion: no consolidation key in the ingress inbound metadata or trusted con
+FAIL FN. forged meta.inbound_metadata: a submit_turn whose meta.inbound_metadata carries every consolidation key and the real job's cron_job_id gets no exclusion: no consolidation key in the ingress inbound metadata or t
+FAIL K1. the run finishes; the executor reads the job's provenance through the daemon's own TaskManager (not the probe's), built from the persisted task database, and finds kind memory_consolidation | observed={'state': 
+FAIL K1. trusted context reaches the intended consumer: the manager and ingress requests carry it as trusted_task_context (memory_consolidation_job true, target scope agent:openminion, batch limit 8, 2 iterations, 30 s);
+FAIL K1. the consolidation context carries the captured candidates: the candidate ids it collects are candidates in the memory store's memory_candidates table, with the captured title | observed={'context_candidate_ids':
+FAIL K1. scheduled self-capture is excluded: capture_is_excluded returns True, the turn's intent is 'excluded' with no result, the turn makes no extraction request and no bundle write of its own | observed={'exclusions':
+FAIL K2. the second run is excluded again with the same trusted context and makes no extraction request | observed={'state': 'finished', 'exclusions': [{'session_id': 'consolidate:fb5bf379703f4c8c9e26135d89013f2a', 'cons
+FAIL RAW. the raw cron API operation rejects a new job with the reserved consolidation payload (TaskOwnedCronJobError: create it through task.consolidate_memory); no job is added | observed={'RAW': {'created_job_id': 'c2
+FAIL ROW. a reserved-payload cron row without a task record (forged, or from before the provenance marker) is not run as a consolidation turn: the run fails with 'missing trusted task provenance; it was paused and must b
+FAIL I1/I2. an incapable store preserves pending work: each run reports the intent pending (1, 0, 1) after the capability query, without extracting; the scheduled turns get the trusted context and are excluded, so the pe
+FAIL I3/I4. reopened with the built-in store, the preserved intent recovers once (one extraction) and the next run does nothing; scheduled turns stay excluded | observed={'I3': {'recovery': [[3, 3, 0]], 'recovery_steps_b
+SUMMARY passed=6 failed=13 total=19
+=== probe_456
+exit=0
+SUMMARY passed=19 failed=0 total=19
+=== probe_456_upgrade_create
+exit=0
+SUMMARY passed=1 failed=0 total=1
+=== probe_456_upgrade
+exit=0
+SUMMARY passed=10 failed=0 total=10
+=== probe_456_upgrade_create_0114
+exit=0
+SUMMARY passed=1 failed=0 total=1
+=== probe_456_upgrade_0114
+exit=1
+FAIL P. pre-upgrade job: its first run on this package is not executed as a consolidation turn, so it cannot capture itself or carry consolidation context: the run fails with 'memory consolidation job is missing trusted 
+FAIL P. pre-upgrade job: pending work is preserved through that run (the earlier intent is unchanged and still pending) | observed={'before': ['earlier'], 'after': []}
+FAIL P. the legacy task is paused and its cron job disabled; another run_task_now is refused (task not active); no consolidation schedule is enabled until one is recreated | observed={'P_legacy_task_after': {'state': 'ac
+FAIL P. recreated with task.consolidate_memory: the new task has kind memory_consolidation; its first run carries the trusted context to the brain (capture_is_excluded receives it and returns True; the consolidation cont
+FAIL P. the recreated job's second run recovers nothing and is excluded again; the earlier intent has exactly one result and one receipt | observed={'recovery': [[0, 0, 0]], 'new_intents': [{'label': 'scheduled N run 2',
+FAIL P. after recreation there is exactly one enabled consolidation schedule (the new job); the legacy task stays paused with its job disabled | observed={'P_consolidation_jobs_at_end': [{'job_id': '03a7c02ead4843839fa4a
+FAIL Q. incapable store, job recreated before the legacy job's next run: the legacy run is not executed as a consolidation turn (no submit, no recovery), the legacy task is paused, and the pending intents are unchanged |
+FAIL Q. the recreated job on the incapable store preserves pending work: its run asks the store and reports every pending intent pending without extracting; its scheduled turn is excluded; the pending intents are unchang
+FAIL Q. a resumed legacy task still cannot run a consolidation turn: after 'resume' its next run again submits no turn and runs no recovery, and it is paused again; the pending intents are unchanged | observed={'resume':
+SUMMARY passed=1 failed=9 total=10
+empty dir after: 0 entries
+Name: openminion
+Version: 0.1.15
+Location: <VENV>/lib/python3.12/site-packages
+Requires: aiosqlite, alembic, cryptography, httpx, jsonschema, platformdirs, prompt-toolkit, psutil, pydantic, pyyaml, rich, send2trash, sophiagraph, typer, tzdata
+Required-by:
+Linux runnervm48cm3 7.0.0-1017-azure #17~24.04.1-Ubuntu SMP PREEMPT Thu Sep 24 18:46:57 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+PRETTY_NAME="Ubuntu 24.04.5 LTS"
+VERSION_ID="24.04"
+python 3.12.15 sqlite 3.45.1
+PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+<VENV>/lib/python3.12/site-packages/openminion/__init__.py 0.1.15

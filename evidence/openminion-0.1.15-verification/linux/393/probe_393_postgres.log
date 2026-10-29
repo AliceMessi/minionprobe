@@ -1,0 +1,84 @@
+{
+  "probe": "probe_393",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.15",
+  "python": "3.12.15",
+  "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "backend": "postgres",
+  "rooms_per_stress_case": 200,
+  "hold_seconds": 1.5
+}
+== postgres A
+PASS postgres A: main, first and second are independent PostgreSQL connections (own engine and application_name) on one schema | observed={'main': {'record_store': 'RecordStorePostgres', 'engine_id': 139845204279856, 'schema': 'p393_428923656760', 'app': 'p393-main', 'search_path': 'p393_428923656760'}, 'first': {'record_store': 'RecordStorePostgres', 'engine_id': 139845204785392, 'schema': 'p393_428923656760', 'app': 'p393-first', 'search_path': 'p393_428923656760'}, 'second': {'record_store': 'RecordStorePostgres', 'engine_id': 139845191330528, 'schema': 'p393_428923656760', 'app': 'p393-second', 'search_path': 'p393_428923656760'}}
+== postgres B1
+PASS postgres B1: the held join's activation read found no active agent
+PASS postgres B1: at that read the held join is inside its participant transaction (session-row lock held) | observed=True
+PASS postgres B1: while the join is held, another connection sees neither its participant row nor an active agent | observed={'exists': True, 'stored': None, 'agents': [], 'participants': [['human', 'owner', 'owner', 1]], 'left': []}
+PASS postgres B1: beta's join on the other connection waits for the held join (not finished during the 1.5 s hold; ends after the release; the server shows its backend blocked on a lock held by the held join's backend) | observed={'finished_while_held': False, 'beta_seconds': 1.51, 'pg_lock_wait': {'pid': 133, 'app': 'p393-second', 'state': 'active', 'wait_event_type': 'Lock', 'wait_event': 'transactionid', 'query': 'UPDATE sessions SET updated_at = updated_at WHERE id = $1', 'blocked_by': [130]}}
+PASS postgres B1: no stale overwrite: each caller saw alpha, alpha is stored, agents listed [alpha, beta] | observed={'alpha caller': "ok: 'alpha'", 'beta caller': "ok: 'alpha'", 'final': {'stored': 'alpha', 'active': 'alpha', 'agents': ['alpha', 'beta']}}
+PASS postgres B1: exactly one active-agent write, by alpha's join | observed=[['first', 'B1 join alpha (first, held)', 'alpha']]
+== postgres B2
+PASS postgres B2: the join plus selection on the other connection waits for the held join (server: blocked on the held join's lock) | observed={'finished_while_held': False, 'seconds': 1.512, 'pg_lock_wait': {'pid': 133, 'app': 'p393-second', 'state': 'active', 'wait_event_type': 'Lock', 'wait_event': 'transactionid', 'query': 'UPDATE sessions SET updated_at = updated_at WHERE id = $1', 'blocked_by': [130]}}
+PASS postgres B2: the selection then applies: it returns beta, beta is stored and active, agents [alpha, beta] | observed={'alpha join': "ok: 'alpha'", 'selection': "ok: 'beta'", 'final': {'stored': 'beta', 'active': 'beta', 'agents': ['alpha', 'beta']}}
+PASS postgres B2: the writes are alpha's activation, then the selection's beta (the join wrote nothing over the selection) | observed=[['first', 'B2 join alpha (first, held)', 'alpha'], ['second', 'B2 join beta + select beta (second)', 'beta']]
+== postgres B2b
+PASS postgres B2b: setup: a legacy session whose owner record is listed, with no stored active agent | observed={'stored': None, 'active': 'legacy-agent', 'agents': ['legacy-agent']}
+PASS postgres B2b: a selection alone on the other connection waits for the held join (server: blocked on the held join's lock) | observed={'finished_while_held': False, 'seconds': 1.511, 'pg_lock_wait': {'pid': 133, 'app': 'p393-second', 'state': 'active', 'wait_event_type': 'Lock', 'wait_event': 'transactionid', 'query': 'UPDATE sessions SET active_agent_id = $1, updated_at = $2 WHERE id = $3', 'blocked_by': [130]}}
+PASS postgres B2b: the selection then applies over the join's activation: legacy-agent stored and active | observed={'guest join': "ok: 'guest-agent'", 'selection': "ok: 'legacy-agent'", 'final': {'stored': 'legacy-agent', 'active': 'legacy-agent', 'agents': ['legacy-agent', 'guest-agent']}}
+PASS postgres B2b: the writes are the guest join's activation, then the selection | observed=[['first', 'B2b join guest-agent (first, held)', 'guest-agent'], ['second', 'B2b select legacy-agent (second)', 'legacy-agent']]
+== postgres B3
+PASS postgres B3: the leave on the other connection waits for the held join (server: blocked on the held join's lock) | observed={'finished_while_held': False, 'seconds': 1.51, 'pg_lock_wait': {'pid': 133, 'app': 'p393-second', 'state': 'active', 'wait_event_type': 'Lock', 'wait_event': 'transactionid', 'query': 'UPDATE sessions SET updated_at = updated_at WHERE id = $1', 'blocked_by': [130]}}
+PASS postgres B3: the leave then applies: it returns True, no agent listed, no active agent stored (no departed active agent) | observed={'leave': 'ok: True', 'final': {'stored': None, 'active': None, 'agents': []}}
+PASS postgres B3: the held join reads its participant back after the leave and raises, as before #393 | observed='builtins.RuntimeError: Failed to upsert participant agent:alpha'
+PASS postgres B3: selecting the departed alpha is refused | observed="builtins.ValueError: Agent 'alpha' is not an active participant"
+== postgres C
+PASS postgres C: the first committed activation (alpha) stays through joins, a re-join and a leave of another agent; it changes only on the explicit selection and on leaves of the active agent; both connections read the stored agent after every step | observed=[['first: join alpha (first activation)', 'alpha', True], ['second: join beta', 'alpha', True], ['first: join gamma', 'alpha', True], ['second: join alpha again (already a participant)', 'alpha', True], ['first: gamma leaves (not the active agent)', 'alpha', True], ['second: select beta (intentional selection)', 'beta', True], ['first: join delta', 'beta', True], ['first: beta leaves (the active agent: intentional leave)', 'alpha', True], ['second: alpha leaves (the active agent)', 'delta', True], ['first: delta leaves (the last agent)', None, True], ['second: gamma joins again (rejoin into a room with no agent)', 'gamma', True]]
+PASS postgres C: only the two joins into a room with no active agent wrote it (alpha first, gamma last) | observed=[['first', 'C first: join alpha (first activation)', 'alpha'], ['second', 'C second: gamma joins again (rejoin into a room with no agent)', 'gamma']]
+== postgres D existing
+PASS postgres D existing selection: a selection stored by connections closed before the joins (beta) stays through a join, two concurrent joins, a held join with another join waiting, and a re-join of the first agent; every caller saw beta | observed={'final': {'stored': 'beta', 'active': 'beta', 'agents': ['alpha', 'beta', 'gamma', 'epsilon', 'delta', 'zeta', 'eta']}, 'concurrent': ["ok: 'beta'", "ok: 'beta'"], 'held': ["ok: 'beta'", "ok: 'beta'"], 'held read saw': 'beta'}
+PASS postgres D existing selection: none of those joins wrote the active agent | observed=[]
+PASS postgres D existing selection: every agent that joined is listed once (delta and epsilon in either order) | observed=['alpha', 'beta', 'gamma', 'epsilon', 'delta', 'zeta', 'eta']
+PASS postgres D initial activation: a room created with active_agent_id beta keeps beta when alpha, then beta, join (no join wrote it) | observed={'raw before': 'beta', 'after alpha': {'stored': 'beta', 'active': 'beta', 'agents': ['alpha']}, 'final': {'stored': 'beta', 'active': 'beta', 'agents': ['alpha', 'beta']}, 'writes': []}
+== postgres D blank
+PASS postgres D blank: rooms created with no, empty or spaces-only initial activation (create_room stores each as NULL), and rows whose active_agent_id is '' or '   ' (written directly): the first joining agent (alpha) is stored and active, one write each | observed=[[None, {'stored': 'alpha', 'active': 'alpha', 'agents': ['alpha']}, [['second', 'MainThread', 'alpha']]], [None, {'stored': 'alpha', 'active': 'alpha', 'agents': ['alpha']}, [['second', 'MainThread', 'alpha']]], [None, {'stored': 'alpha', 'active': 'alpha', 'agents': ['alpha']}, [['second', 'MainThread', 'alpha']]], ['', {'stored': 'alpha', 'active': 'alpha', 'agents': ['alpha']}, [['second', 'MainThread', 'alpha']]], ['   ', {'stored': 'alpha', 'active': 'alpha', 'agents': ['alpha']}, [['second', 'MainThread', 'alpha']]]]
+PASS postgres D blank: on a row whose active_agent_id is '   ', a held first join (its session read gives no active agent) activates its agent, and the second join waiting for it keeps it | observed={'held read saw': None, 'results': ["ok: 'alpha'", "ok: 'alpha'"], 'final': {'stored': 'alpha', 'active': 'alpha', 'agents': ['alpha', 'beta']}, 'writes': [['first', 'D blank join alpha (first, held)', 'alpha']], 'waiter finished while held': False}
+== postgres D rejoin
+PASS postgres D rejoin: alpha leaves (beta becomes active), rejoins: beta stays active and alpha is listed after beta with a new join_seq; joining again while present keeps its place | observed={'after leave': {'stored': 'beta', 'active': 'beta', 'agents': ['beta']}, 'after rejoin': {'stored': 'beta', 'active': 'beta', 'agents': ['beta', 'alpha']}, 'join_seq before': {'owner': 1, 'alpha': 2, 'beta': 3}, 'join_seq after': {'owner': 1, 'beta': 3, 'alpha': 4}}
+PASS postgres D rejoin: with no agent left, the rejoining alpha is activated | observed={'after beta leaves': {'stored': 'alpha', 'active': 'alpha', 'agents': ['alpha']}, 'after alpha leaves': {'stored': None, 'active': None, 'agents': []}, 'after rejoin': {'stored': 'alpha', 'active': 'alpha', 'agents': ['alpha']}}
+PASS postgres D rejoin: the active agent was written only by the two joins into a room without one (alpha) and by the leaves of the active agent (beta, alpha, None) | observed=[['first', 'MainThread', 'alpha'], ['second', 'MainThread', 'beta'], ['first', 'MainThread', 'alpha'], ['second', 'MainThread', None], ['first', 'MainThread', 'alpha']]
+== postgres D legacy
+PASS postgres D legacy: reading a legacy session's participants writes its owner record and activates nobody (stored None, get_active_agent answers the session's agent, no write) | observed={'listed': [['legacy-agent', 'owner']], 'view': {'stored': None, 'active': 'legacy-agent', 'agents': ['legacy-agent']}, 'writes': []}
+PASS postgres D legacy: another agent joining writes the owner record without activation, then activates the joining agent (one write) | observed={'listed': [['legacy-agent', 'owner'], ['guest-agent', 'participant']], 'view': {'stored': 'guest-agent', 'active': 'guest-agent', 'agents': ['legacy-agent', 'guest-agent']}, 'writes': [['first', 'D legacy join guest-agent (first)', 'guest-agent']]}
+PASS postgres D legacy: the session's own agent joining is activated | observed={'view': {'stored': 'legacy-agent', 'active': 'legacy-agent', 'agents': ['legacy-agent']}, 'writes': [['second', 'D legacy join legacy-agent (second)', 'legacy-agent']]}
+== postgres D order
+PASS postgres D order: with one tied joined_at, joins alternating between the two connections list in join order on all three connections (join_seq 1..5); the first agent is the active one | observed={'lists': [['human', 'owner'], ['agent', 'a1'], ['agent', 'a2'], ['agent', 'a3'], ['agent', 'a4']], 'join_seq': [1, 2, 3, 4, 5], 'stored': 'a1'}
+PASS postgres D order: a2 leaves and rejoins on the tied clock: listed last with join_seq 6, a1 still active | observed={'order': ['owner', 'a1', 'a3', 'a4', 'a2'], 'join_seq': [1, 2, 4, 5, 6]}
+== postgres F
+PASS postgres F1 normal path: held right after its activation write, the join is still in its transaction and an independent reader sees neither its row nor the activation; after it returns, both | observed={'in_transaction': True, 'during': [[], None], 'after': [['alpha'], 'alpha']}
+PASS postgres F2 exception at the activation read: the join raises it and nothing of it is stored (no alpha row, no active agent) | observed={'join': 'builtins.RuntimeError: probe: injected failure at the activation read', 'raw': [[], None, []]}
+PASS postgres F2: the transaction is closed and its lock released: the connection is not in a transaction, holds no lock on the server, and a join on the other connection completes at once | observed={'in_transaction': False, 'locks': 0, 'beta join seconds': 0.003}
+PASS postgres F2: the same connection then joins normally (beta, joined first, stays active) | observed={'stored': 'beta', 'active': 'beta', 'agents': ['beta', 'alpha']}
+PASS postgres F3 exception after the activation write: the write ran inside the join's transaction, the join raises, and the row and the activation are both rolled back | observed={'join': 'builtins.RuntimeError: probe: injected failure after the activation write', 'write': [{'by': 'first', 'op': 'F3 join alpha (first, fails after its activation write)', 'value': 'alpha', 'session': 'room-40d42eedaa724ff6a5b231098645ed5c', 'rowcount': 1, 'in_transaction': True}], 'raw': [[], None], 'in_transaction': False}
+PASS postgres F3: the next join (beta, on the other connection) is the room's first activation | observed={'stored': 'beta', 'active': 'beta', 'agents': ['beta']}
+PASS postgres F4 exception in a held join while beta's join waits (server: blocked on the held join's lock): alpha's join raises and leaves nothing; beta's join then proceeds and is the first activation | observed={'finished_while_held': False, 'alpha': 'builtins.RuntimeError: probe: injected failure in the held join', 'beta': "ok: 'beta'", 'final': {'stored': 'beta', 'active': 'beta', 'agents': ['beta']}, 'writes': [['second', 'F4 join beta (second)', 'beta']]}
+PASS postgres F5 the waiting join fails with the database's own lock error after waiting (lock_timeout 1 s), and stores nothing | observed={'beta': 'sqlalchemy.exc.OperationalError: (psycopg.errors.LockNotAvailable) canceling statement due to lock timeout', 'seconds': 1.003, 'after': {'stored': 'alpha', 'active': 'alpha', 'agents': ['alpha']}}
+PASS postgres F5: the held join then commits normally (alpha stored and active); the failed connection joins beta afterwards and alpha stays active | observed={'alpha': "ok: 'alpha'", 'final': {'stored': 'alpha', 'active': 'alpha', 'agents': ['alpha', 'beta']}, 'writes': [['first', 'F5 join alpha (first, held)', 'alpha']]}
+== postgres G
+  G two first joins: {'rooms': 200, 'violations': 0, 'errors': 0, 'info: stored is not the first listed': 10, 'outcomes': {'ok | ok': 200}, 'examples': []}
+  G first join vs join and selection: {'rooms': 200, 'violations': 0, 'errors': 0, 'outcomes': {'ok | ok': 200}, 'examples': []}
+  G first join vs leave of the joining agent: {'rooms': 200, 'violations': 0, 'errors': 0, 'outcomes': {'ok | ok': 200}, 'examples': []}
+PASS postgres G two first joins, no pause (200 rooms): never both joins write the active agent, no caller sees an agent that is then replaced, no error | observed={'rooms': 200, 'violations': 0, 'errors': 0, 'info: stored is not the first listed': 10, 'outcomes': {'ok | ok': 200}}
+PASS postgres G first join vs a join plus explicit selection, no pause (200 rooms): the selection is never overwritten (beta stored in every room), no error | observed={'rooms': 200, 'violations': 0, 'errors': 0, 'outcomes': {'ok | ok': 200}}
+PASS postgres G first join vs a leave of the joining agent, no pause (200 rooms): no departed agent is stored as active, no error | observed={'rooms': 200, 'violations': 0, 'errors': 0, 'outcomes': {'ok | ok': 200}}
+== postgres E
+PASS postgres E reopen: a new process opens a new runtime storage on the same database and reads, for every one of the 23 rooms of parts B-F, the stored and active agent and the agents listed that the cases left | observed={'child exit': 0, 'mismatches': [], 'child openminion': ['<VENV>/lib/python3.12/site-packages/openminion/__init__.py', '0.1.15']}
+PASS postgres E reopen: read independently of openminion, the stored active_agent_id and the active agent rows of every room match | observed=[]
+PASS postgres E reopen: across all 623 sessions in the database (stress rooms included), no stored active agent is a departed agent or a non-participant | observed=[]
+== postgres N (#495 note, not a check)
+NOTE #495 (not a check): {'selection': "ok: 'beta'", 'leave': True, 'final': {'stored': 'beta', 'active': 'beta', 'agents': ['alpha']}, 'meaning': '#495 is not in 0.1.15; recorded only to show it is still open, not claimed fixed'}
+SUMMARY passed=49 failed=0 total=49
+exit=0

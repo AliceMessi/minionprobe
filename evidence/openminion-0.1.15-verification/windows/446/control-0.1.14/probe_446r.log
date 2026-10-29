@@ -1,0 +1,95 @@
+{
+  "probe": "probe_446r",
+  "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+  "openminion.__version__": "0.1.14",
+  "python": "3.12.11",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "sqlite3.sqlite_version": "3.50.4",
+  "cwd": "<WORK>\\empty-446",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "backend": "sqlite",
+  "console_script": "<VENV>\\Scripts\\openminion.exe",
+  "console_script_exists": true,
+  "console_script_entry_point": "openminion.cli.main:main"
+}
+PASS sqlite: the probe runs the installed console script `openminion` (entry point openminion.cli.main:main) | observed={'script': '<VENV>\\Scripts\\openminion.exe', 'entry_point': 'openminion.cli.main:main'}
+PASS sqlite: both test databases start with no alembic_version table | observed={'sqlite:db1': [], 'sqlite:db2': []}
+--- db1 new database, text: exit=0
+  ok  secret
+
+--- db1 at head, --json: exit=0
+{
+  "modules": [
+    {
+      "module_id": "secret",
+      "status": "ok",
+      "applied": [],
+      "success": true
+    }
+  ]
+}
+
+--- db2 new database, --json: exit=0
+{
+  "modules": [
+    {
+      "module_id": "secret",
+      "status": "ok",
+      "applied": [],
+      "success": true
+    }
+  ]
+}
+
+--- db2 at head, text: exit=0
+  ok  secret
+
+PASS sqlite success: the migrations really ran: both new databases are at the module's head revision | observed={'db1': ['0001_baseline'], 'db2': ['0001_baseline'], 'head': '0001_baseline'}
+PASS sqlite success (db1 new database, text): exit 0, stdout exactly '  ok  secret', no traceback | observed={'exit': 0, 'stdout': '  ok  secret\n'}
+PASS sqlite success (db2 at head, text): exit 0, stdout exactly '  ok  secret', no traceback | observed={'exit': 0, 'stdout': '  ok  secret\n'}
+FAIL sqlite success (db2 new database, --json): exit 0 and the JSON entries are exactly [{module_id: secret, status: ok, success: true}] | observed={'exit': 0, 'json': {'modules': [{'module_id': 'secret', 'status': 'ok', 'applied': [], 'success': True}]}}
+FAIL sqlite success (db1 at head, --json): exit 0 and the JSON entries are exactly [{module_id: secret, status: ok, success: true}] | observed={'exit': 0, 'json': {'modules': [{'module_id': 'secret', 'status': 'ok', 'applied': [], 'success': True}]}}
+FAIL sqlite success: no entry carries an `applied` list (nor an `error`) | observed=[[{'module_id': 'secret', 'status': 'ok', 'applied': [], 'success': True}], [{'module_id': 'secret', 'status': 'ok', 'applied': [], 'success': True}]]
+--- db1 invalid revision, --json: exit=1
+{
+  "modules": [
+    {
+      "module_id": "secret",
+      "status": "error",
+      "applied": [],
+      "success": false
+    }
+  ]
+}
+
+--- db1 invalid revision, text: exit=1
+  FAIL  secret
+
+--- db1 invalid revision, --verify --json: exit=1
+{
+  "modules": [
+    {
+      "module_id": "secret",
+      "status": "error",
+      "applied": [],
+      "success": false
+    }
+  ]
+}
+
+--- db1 invalid revision, --verify: exit=1
+  FAIL  secret
+
+PASS sqlite failure: the installed MigrationRunner's report for this database fails with the revision error | observed="Alembic upgrade failed for module 'secret': Can't locate revision identified by '9999_not_a_revision'"
+FAIL sqlite failure (db1 invalid revision, --json): the JSON entry carries the actual revision error (identical to MigrationReport.error), status error, success false | observed=[{'module_id': 'secret', 'status': 'error', 'applied': [], 'success': False}]
+FAIL sqlite failure (db1 invalid revision, --json): no `applied` list in the entry | observed=[{'module_id': 'secret', 'status': 'error', 'applied': [], 'success': False}]
+PASS sqlite failure (db1 invalid revision, --json): exit status nonzero (1) | observed=1
+FAIL sqlite failure (db1 invalid revision, --verify --json): the JSON entry carries the actual revision error (identical to MigrationReport.error), status error, success false | observed=[{'module_id': 'secret', 'status': 'error', 'applied': [], 'success': False}]
+FAIL sqlite failure (db1 invalid revision, --verify --json): no `applied` list in the entry | observed=[{'module_id': 'secret', 'status': 'error', 'applied': [], 'success': False}]
+PASS sqlite failure (db1 invalid revision, --verify --json): exit status nonzero (1) | observed=1
+FAIL sqlite failure (db1 invalid revision, text): stdout is '  FAIL  secret: <the actual revision error>', exit 1 | observed={'exit': 1, 'stdout': '  FAIL  secret\n'}
+FAIL sqlite failure (db1 invalid revision, --verify): stdout is '  FAIL  secret: <the actual revision error>', exit 1 | observed={'exit': 1, 'stdout': '  FAIL  secret\n'}
+PASS sqlite failure: the failed runs left the database as it was (revision 9999_not_a_revision, same tables and om_meta) | observed={'before': {'alembic_version': ['9999_not_a_revision'], 'tables': ['alembic_version', 'om_meta', 'secrets'], 'om_meta': {'module_id': 'secret', 'schema_head': '0001_baseline', 'last_migrated_at': '2026-10-29T07:41:57+00:00'}}, 'after': {'alembic_version': ['9999_not_a_revision'], 'tables': ['alembic_version', 'om_meta', 'secrets'], 'om_meta': {'module_id': 'secret', 'schema_head': '0001_baseline', 'last_migrated_at': '2026-10-29T07:41:57+00:00'}}}
+SUMMARY passed=9 failed=9 total=18
+exit=1

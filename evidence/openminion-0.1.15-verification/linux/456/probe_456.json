@@ -1,0 +1,2571 @@
+{
+  "info": {
+    "probe": "probe_456",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.15",
+    "python": "3.12.15",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<WORK>/empty",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "provider": "openai (OpenAI-compatible HTTP) -> scripted ThreadingHTTPServer on 127.0.0.1",
+    "dist_versions": {
+      "openminion": "0.1.15",
+      "sophiagraph": "0.0.12",
+      "pydantic": "2.14.1",
+      "httpx": "0.28.1",
+      "openai": null
+    }
+  },
+  "summary": {
+    "passed": 19,
+    "failed": 0,
+    "total": 19
+  },
+  "all_pass": true,
+  "checks": [
+    {
+      "check": "K. setup: the built-in SQLite store can commit bundles; the earlier SDK turn's own capture write is refused by the database, so its intent stays pending without a result",
+      "pass": true,
+      "observed": {
+        "classes": {
+          "memory_store": "AuditedMemoryStore",
+          "memory_store_inner": "SQLiteMemoryStore",
+          "memory_backend": null
+        },
+        "capable": true,
+        "E": {
+          "raised": "IntegrityError: probe: capture receipt write refused",
+          "new_intents": [
+            {
+              "label": "earlier",
+              "capture_state": "pending",
+              "results": 0,
+              "result_disposition": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "check": "K. the new job's task record carries the consolidation provenance (kind memory_consolidation), read through the probe's TaskManager and through a new TaskManager built from the persisted task database",
+      "pass": true,
+      "observed": {
+        "J_created": {
+          "ok": true,
+          "task_id": "7f35f7a540c54cbe9351627e977cd682",
+          "batch_limit": 8,
+          "target_scope": "agent:openminion",
+          "enabled": true
+        },
+        "J_task_probe_manager": {
+          "state": "active",
+          "kind": "memory_consolidation",
+          "metadata_keys": [
+            "kind"
+          ]
+        },
+        "J_task_fresh_manager_from_persisted_db": {
+          "state": "active",
+          "kind": "memory_consolidation",
+          "metadata_keys": [
+            "kind"
+          ]
+        }
+      }
+    },
+    {
+      "check": "O. an ordinary turn is captured as before: the brain metadata has no consolidation key, capture_is_excluded returns False, no consolidation context, one extraction request and a committed result",
+      "pass": true,
+      "observed": {
+        "exclusions": [
+          {
+            "session_id": "ordinary",
+            "consolidation_keys": {},
+            "cron_job_id_present": false,
+            "returned": false
+          }
+        ],
+        "contexts": [],
+        "turn_extraction_requests": 1,
+        "turn_own_bundle_writes": 1,
+        "new_intents": [
+          {
+            "label": "ordinary",
+            "capture_state": "pending",
+            "results": 1,
+            "result_disposition": "succeeded"
+          }
+        ]
+      }
+    },
+    {
+      "check": "FM. forged meta: a submit_turn whose meta carries every consolidation key and the real job's cron_job_id gets no exclusion: no consolidation key in the ingress inbound metadata or trusted context, none at the brain, capture_is_excluded False, no consolidation context; the turn is captured (one extraction, committed result)",
+      "pass": true,
+      "observed": {
+        "raised": null,
+        "submits": [
+          {
+            "session_id": "forged-meta",
+            "meta_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "meta_has_cron_job_id": true,
+            "trusted_task_context": null
+          }
+        ],
+        "ingress": [
+          {
+            "session_id": "forged-meta",
+            "inbound_metadata_consolidation_keys": {},
+            "inbound_metadata_has_cron_job_id": true,
+            "trusted_task_context": null
+          }
+        ],
+        "exclusions": [
+          {
+            "session_id": "forged-meta",
+            "consolidation_keys": {},
+            "cron_job_id_present": true,
+            "returned": false
+          }
+        ],
+        "contexts": [],
+        "turn_extraction_requests": 1,
+        "new_intents": [
+          {
+            "label": "forged-meta",
+            "capture_state": "pending",
+            "results": 1,
+            "result_disposition": "succeeded"
+          }
+        ]
+      }
+    },
+    {
+      "check": "FI. forged inbound_metadata: a submit_turn whose inbound_metadata carries every consolidation key and the real job's cron_job_id gets no exclusion: no consolidation key in the ingress inbound metadata or trusted context, none at the brain, capture_is_excluded False, no consolidation context; the turn is captured (one extraction, committed result)",
+      "pass": true,
+      "observed": {
+        "raised": null,
+        "submits": [
+          {
+            "session_id": "forged-inbound",
+            "meta_consolidation_keys": {},
+            "meta_has_cron_job_id": false,
+            "trusted_task_context": null
+          }
+        ],
+        "ingress": [
+          {
+            "session_id": "forged-inbound",
+            "inbound_metadata_consolidation_keys": {},
+            "inbound_metadata_has_cron_job_id": true,
+            "trusted_task_context": null
+          }
+        ],
+        "exclusions": [
+          {
+            "session_id": "forged-inbound",
+            "consolidation_keys": {},
+            "cron_job_id_present": true,
+            "returned": false
+          }
+        ],
+        "contexts": [],
+        "turn_extraction_requests": 1,
+        "new_intents": [
+          {
+            "label": "forged-inbound",
+            "capture_state": "pending",
+            "results": 1,
+            "result_disposition": "succeeded"
+          }
+        ]
+      }
+    },
+    {
+      "check": "FN. forged meta.inbound_metadata: a submit_turn whose meta.inbound_metadata carries every consolidation key and the real job's cron_job_id gets no exclusion: no consolidation key in the ingress inbound metadata or trusted context, none at the brain, capture_is_excluded False, no consolidation context; the turn is captured (one extraction, committed result)",
+      "pass": true,
+      "observed": {
+        "raised": null,
+        "submits": [
+          {
+            "session_id": "forged-nested",
+            "meta_consolidation_keys": {},
+            "meta_has_cron_job_id": false,
+            "trusted_task_context": null
+          }
+        ],
+        "ingress": [
+          {
+            "session_id": "forged-nested",
+            "inbound_metadata_consolidation_keys": {},
+            "inbound_metadata_has_cron_job_id": true,
+            "trusted_task_context": null
+          }
+        ],
+        "exclusions": [
+          {
+            "session_id": "forged-nested",
+            "consolidation_keys": {},
+            "cron_job_id_present": true,
+            "returned": false
+          }
+        ],
+        "contexts": [],
+        "turn_extraction_requests": 1,
+        "new_intents": [
+          {
+            "label": "forged-nested",
+            "capture_state": "pending",
+            "results": 1,
+            "result_disposition": "succeeded"
+          }
+        ]
+      }
+    },
+    {
+      "check": "K1. the run finishes; the executor reads the job's provenance through the daemon's own TaskManager (not the probe's), built from the persisted task database, and finds kind memory_consolidation",
+      "pass": true,
+      "observed": {
+        "state": "finished",
+        "error": null,
+        "summary": "openminion: Consolidation reviewed; nothing to change.",
+        "task_lookups": [
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-76bc8318"
+          },
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-76bc8318"
+          },
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-76bc8318"
+          },
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-76bc8318"
+          },
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-scheduler"
+          }
+        ]
+      }
+    },
+    {
+      "check": "K1. trusted context reaches the intended consumer: the manager and ingress requests carry it as trusted_task_context (memory_consolidation_job true, target scope agent:openminion, batch limit 8, 2 iterations, 30 s); the brain's capture_is_excluded and resume hints receive those keys; _attach_memory_consolidation_resume_context runs once and leaves the consolidation state with that scope and those limits",
+      "pass": true,
+      "observed": {
+        "submits": [
+          {
+            "session_id": "consolidate:7f35f7a540c54cbe9351627e977cd682",
+            "meta_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "meta_has_cron_job_id": true,
+            "trusted_task_context": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            }
+          }
+        ],
+        "ingress": [
+          {
+            "session_id": "consolidate:7f35f7a540c54cbe9351627e977cd682",
+            "inbound_metadata_consolidation_keys": {},
+            "inbound_metadata_has_cron_job_id": true,
+            "trusted_task_context": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            }
+          }
+        ],
+        "exclusions": [
+          {
+            "session_id": "consolidate:7f35f7a540c54cbe9351627e977cd682",
+            "consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id_present": true,
+            "returned": true
+          }
+        ],
+        "hints": [
+          {
+            "session_id": "consolidate:7f35f7a540c54cbe9351627e977cd682::conv:consolidate:7f35f7a540c54cbe9351627e977cd682:12cb17ee5f3542a2be7519fa3c9a0f38",
+            "consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id_present": true
+          }
+        ],
+        "contexts": [
+          {
+            "inbound_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "state": {
+              "enabled": true,
+              "target_scope": "agent:openminion",
+              "batch_limit": 8,
+              "max_iterations": 2,
+              "timeout_seconds": 30
+            },
+            "candidate_count": 5,
+            "candidate_fields": [
+              "candidate_id",
+              "confidence",
+              "content_preview",
+              "created_at",
+              "proposed_scope",
+              "record_type",
+              "source",
+              "source_session",
+              "title"
+            ],
+            "candidates": [
+              {
+                "candidate_id": "cand_6e8b1f1dcdffbfdf6a4d91f2",
+                "title": "Prefers tabs for indentation"
+              },
+              {
+                "candidate_id": "cand_40856a2ba4a6efa447688614",
+                "title": "Prefers tabs for indentation"
+              },
+              {
+                "candidate_id": "cand_fe000cd550f223b0f2df16d3",
+                "title": "Prefers tabs for indentation"
+              },
+              {
+                "candidate_id": "cand_fea4a7cb119dbd17a6d4aca7",
+                "title": "Prefers tabs for indentation"
+              },
+              {
+                "candidate_id": "cand_b6eb3b08e25c494f9ea60dac",
+                "title": "Prefers tabs for indentation"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "check": "K1. the consolidation context carries the captured candidates: the candidate ids it collects are candidates in the memory store's memory_candidates table, with the captured title",
+      "pass": true,
+      "observed": {
+        "context_candidate_ids": [
+          "cand_40856a2ba4a6efa447688614",
+          "cand_6e8b1f1dcdffbfdf6a4d91f2",
+          "cand_b6eb3b08e25c494f9ea60dac",
+          "cand_fe000cd550f223b0f2df16d3",
+          "cand_fea4a7cb119dbd17a6d4aca7"
+        ],
+        "store_candidate_ids": [
+          "cand_40856a2ba4a6efa447688614",
+          "cand_6e8b1f1dcdffbfdf6a4d91f2",
+          "cand_b6eb3b08e25c494f9ea60dac",
+          "cand_fe000cd550f223b0f2df16d3",
+          "cand_fea4a7cb119dbd17a6d4aca7"
+        ],
+        "provider_requests_mentioning_candidate_outside_recovery": 0
+      }
+    },
+    {
+      "check": "K1. scheduled self-capture is excluded: capture_is_excluded returns True, the turn's intent is 'excluded' with no result, the turn makes no extraction request and no bundle write of its own",
+      "pass": true,
+      "observed": {
+        "exclusions": [
+          {
+            "session_id": "consolidate:7f35f7a540c54cbe9351627e977cd682",
+            "consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id_present": true,
+            "returned": true
+          }
+        ],
+        "new_intents": [
+          {
+            "label": "scheduled J run 1",
+            "capture_state": "excluded",
+            "results": 0,
+            "result_disposition": null
+          }
+        ],
+        "turn_extraction_requests": 0,
+        "turn_own_bundle_writes": 0,
+        "provider_requests_by_kind": {
+          "decide": 1,
+          "extraction": 1,
+          "freshness": 2
+        }
+      }
+    },
+    {
+      "check": "K1/K2. the earlier pending capture recovers once on the capable store: run 1 recovers it (1, 1, 0) through identity, authorization, capability, source, extraction, bundle and result with one extraction request; run 2 scans 0 and does nothing; the intent has one result and one receipt",
+      "pass": true,
+      "observed": {
+        "K1": {
+          "recovery": [
+            [
+              1,
+              1,
+              0
+            ]
+          ],
+          "recovery_steps_by_intent": {
+            "earlier": [
+              "identity",
+              "authorize=True",
+              "capability=True",
+              "source",
+              "extract",
+              "bundle.store",
+              "bundle",
+              "result"
+            ]
+          },
+          "recovery_extraction_requests": 1
+        },
+        "K2": {
+          "recovery": [
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recovery_steps_by_intent": {}
+        },
+        "E_after": {
+          "capture_state": "pending",
+          "results": 1
+        },
+        "receipts": 1
+      }
+    },
+    {
+      "check": "K2. the second run is excluded again with the same trusted context and makes no extraction request",
+      "pass": true,
+      "observed": {
+        "state": "finished",
+        "exclusions": [
+          {
+            "session_id": "consolidate:7f35f7a540c54cbe9351627e977cd682",
+            "consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id_present": true,
+            "returned": true
+          }
+        ],
+        "new_intents": [
+          {
+            "label": "scheduled J run 2",
+            "capture_state": "excluded",
+            "results": 0,
+            "result_disposition": null
+          }
+        ],
+        "turn_extraction_requests": 0
+      }
+    },
+    {
+      "check": "C. an ordinary cron job (raw cron API) whose payload carries the consolidation keys and the real job's cron_job_id in inbound_metadata: the run finishes without recovery; no trusted context; the brain gets its own cron_job_id but no consolidation key; capture_is_excluded False; the turn is captured",
+      "pass": true,
+      "observed": {
+        "state": "finished",
+        "error": null,
+        "recovery": [],
+        "submits": [
+          {
+            "session_id": "cron-ordinary",
+            "meta_consolidation_keys": {},
+            "meta_has_cron_job_id": true,
+            "trusted_task_context": null
+          }
+        ],
+        "ingress": [
+          {
+            "session_id": "cron-ordinary",
+            "inbound_metadata_consolidation_keys": {},
+            "inbound_metadata_has_cron_job_id": true,
+            "trusted_task_context": null
+          }
+        ],
+        "exclusions": [
+          {
+            "session_id": "cron-ordinary",
+            "consolidation_keys": {},
+            "cron_job_id_present": true,
+            "returned": false
+          }
+        ],
+        "contexts": [],
+        "turn_extraction_requests": 1,
+        "new_intents": [
+          {
+            "label": "cron-ordinary",
+            "capture_state": "pending",
+            "results": 1,
+            "result_disposition": "succeeded"
+          }
+        ]
+      }
+    },
+    {
+      "check": "RAW. the raw cron API operation rejects a new job with the reserved consolidation payload (TaskOwnedCronJobError: create it through task.consolidate_memory); no job is added",
+      "pass": true,
+      "observed": {
+        "RAW": {
+          "rejected": "TaskOwnedCronJobError: memory consolidation jobs must be created through task.consolidate_memory",
+          "code": "task_owned_cron_job"
+        },
+        "jobs_before_after": [
+          [
+            {
+              "job_id": "7f35f7a540c54cbe9351627e977cd682",
+              "enabled": true,
+              "name": "memory consolidation"
+            }
+          ],
+          [
+            {
+              "job_id": "7f35f7a540c54cbe9351627e977cd682",
+              "enabled": true,
+              "name": "memory consolidation"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "check": "ROW. a reserved-payload cron row without a task record (forged, or from before the provenance marker) is not run as a consolidation turn: the run fails with 'missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory', no turn is submitted, no recovery runs, no intent is added, and the job is disabled",
+      "pass": true,
+      "observed": {
+        "state": "failed",
+        "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+        "error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+          "retryable": false
+        },
+        "submits": [],
+        "recovery": [],
+        "new_intents": [],
+        "enabled_after": false,
+        "task": null
+      }
+    },
+    {
+      "check": "I. incapable store (reference-sqlite): the SDK turn's capture stays pending (CAPTURE_RECOVERY_UNSUPPORTED)",
+      "pass": true,
+      "observed": {
+        "classes": {
+          "memory_store": "BackendMemoryStoreAdapter",
+          "memory_store_inner": null,
+          "memory_backend": "SophiaGraphSqliteStore"
+        },
+        "capable": false,
+        "U": {
+          "capture_id": "capture:f13bacdd25cd00eaa03e797e33e9d3837692fed5b7bcdd1980a67126473ad1cd",
+          "disposition": "pending",
+          "error_code": "CAPTURE_RECOVERY_UNSUPPORTED"
+        }
+      }
+    },
+    {
+      "check": "I1/I2. an incapable store preserves pending work: each run reports the intent pending (1, 0, 1) after the capability query, without extracting; the scheduled turns get the trusted context and are excluded, so the pending set stays at 1",
+      "pass": true,
+      "observed": {
+        "I1": {
+          "state": "finished",
+          "recovery": [
+            [
+              1,
+              0,
+              1
+            ]
+          ],
+          "recovery_steps_by_intent": {
+            "capture": [
+              "identity",
+              "authorize=True",
+              "capability=False"
+            ]
+          },
+          "new_intents": [
+            {
+              "label": "scheduled I run 1",
+              "capture_state": "excluded",
+              "results": 0,
+              "result_disposition": null
+            }
+          ]
+        },
+        "I2": {
+          "state": "finished",
+          "recovery": [
+            [
+              1,
+              0,
+              1
+            ]
+          ],
+          "recovery_steps_by_intent": {
+            "capture": [
+              "identity",
+              "authorize=True",
+              "capability=False"
+            ]
+          },
+          "new_intents": [
+            {
+              "label": "scheduled I run 2",
+              "capture_state": "excluded",
+              "results": 0,
+              "result_disposition": null
+            }
+          ]
+        },
+        "pending_after": [
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "check": "I3/I4. reopened with the built-in store, the preserved intent recovers once (one extraction) and the next run does nothing; scheduled turns stay excluded",
+      "pass": true,
+      "observed": {
+        "I3": {
+          "recovery": [
+            [
+              1,
+              1,
+              0
+            ]
+          ],
+          "recovery_steps_by_intent": {
+            "capture": [
+              "identity",
+              "authorize=True",
+              "capability=True",
+              "source",
+              "extract",
+              "bundle.store",
+              "bundle",
+              "result"
+            ]
+          },
+          "recovery_extraction_requests": 1,
+          "new_intents": [
+            {
+              "label": "scheduled I run 3",
+              "capture_state": "excluded",
+              "results": 0,
+              "result_disposition": null
+            }
+          ]
+        },
+        "I4": {
+          "recovery": [
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recovery_steps_by_intent": {},
+          "recovery_extraction_requests": 0,
+          "new_intents": [
+            {
+              "label": "scheduled I run 4",
+              "capture_state": "excluded",
+              "results": 0,
+              "result_disposition": null
+            }
+          ]
+        },
+        "U_after": {
+          "capture_state": "pending",
+          "results": 1
+        }
+      }
+    },
+    {
+      "check": "Offline provider: the openai base URL is the scripted server on 127.0.0.1",
+      "pass": true,
+      "observed": [
+        "127.0.0.1"
+      ]
+    }
+  ],
+  "provider_requests_by_kind": {
+    "K": {
+      "decide": 8,
+      "extraction": 7,
+      "freshness": 16,
+      "other_structured": 1
+    },
+    "I": {
+      "decide": 3,
+      "extraction": 1,
+      "freshness": 6,
+      "other_structured": 1
+    },
+    "I_reopened": {
+      "decide": 2,
+      "extraction": 1,
+      "freshness": 4,
+      "other_structured": 2
+    }
+  },
+  "observed": {
+    "K": {
+      "classes": {
+        "memory_store": "AuditedMemoryStore",
+        "memory_store_inner": "SQLiteMemoryStore",
+        "memory_backend": null
+      },
+      "capable": true,
+      "trigger_on": "triggers now: ['probe_refuse_capture']",
+      "E": {
+        "raised": "IntegrityError: probe: capture receipt write refused",
+        "label": "E earlier turn",
+        "new_intents": [
+          {
+            "label": "earlier",
+            "capture_state": "pending",
+            "results": 0,
+            "result_disposition": null
+          }
+        ],
+        "recovery": [],
+        "recovery_raised": [],
+        "recovery_steps_by_intent": {},
+        "recovery_extraction_requests": 0,
+        "turn_extraction_requests": 1,
+        "turn_own_bundle_writes": 1,
+        "provider_requests_by_kind": {
+          "decide": 1,
+          "extraction": 1,
+          "freshness": 2
+        },
+        "provider_requests_mentioning_candidate_outside_recovery": 0,
+        "provider_requests_forced_function_and_purpose": {
+          "submit_output/-": 2,
+          "submit_output/reflect": 1,
+          "text/decide": 1
+        },
+        "submits": [],
+        "ingress": [],
+        "exclusions": [
+          {
+            "session_id": "earlier",
+            "consolidation_keys": {},
+            "cron_job_id_present": false,
+            "returned": false
+          }
+        ],
+        "hints": [
+          {
+            "session_id": "earlier::conv:earlier:ff540f5372394830a4cb3259c28198c3",
+            "consolidation_keys": {},
+            "cron_job_id_present": false
+          }
+        ],
+        "contexts": [],
+        "task_lookups": []
+      },
+      "trigger_off": "triggers now: []",
+      "O": {
+        "run_state": "completed",
+        "memory_capture_state": "succeeded",
+        "memory_capture_bundle_result": {
+          "capture_id": "capture:92d15a8587a4cff5c16175ea851d6ff4b02c4a84599b431f9995a8784aae2842",
+          "committed_at": "2026-10-29T07:33:36.399549+00:00",
+          "disposition": "succeeded",
+          "output_ids": [
+            "cand_6e8b1f1dcdffbfdf6a4d91f2"
+          ],
+          "report_hash": "59ccc52d2a72949b54ec4ace69866ba2247f41f7ecb100ea8c65c4d96fac2864",
+          "result_hash": "0159cfd5a5d77322f2e9d28dd130e734a3584600e05a9aeee6212092c7362ad9"
+        },
+        "label": "O ordinary turn",
+        "new_intents": [
+          {
+            "label": "ordinary",
+            "capture_state": "pending",
+            "results": 1,
+            "result_disposition": "succeeded"
+          }
+        ],
+        "recovery": [],
+        "recovery_raised": [],
+        "recovery_steps_by_intent": {},
+        "recovery_extraction_requests": 0,
+        "turn_extraction_requests": 1,
+        "turn_own_bundle_writes": 1,
+        "provider_requests_by_kind": {
+          "decide": 1,
+          "extraction": 1,
+          "freshness": 2
+        },
+        "provider_requests_mentioning_candidate_outside_recovery": 0,
+        "provider_requests_forced_function_and_purpose": {
+          "submit_output/-": 2,
+          "submit_output/reflect": 1,
+          "text/decide": 1
+        },
+        "submits": [],
+        "ingress": [],
+        "exclusions": [
+          {
+            "session_id": "ordinary",
+            "consolidation_keys": {},
+            "cron_job_id_present": false,
+            "returned": false
+          }
+        ],
+        "hints": [
+          {
+            "session_id": "ordinary::conv:ordinary:ca2c2b5ca6804efa83c1d667fc360e97",
+            "consolidation_keys": {},
+            "cron_job_id_present": false
+          }
+        ],
+        "contexts": [],
+        "task_lookups": []
+      },
+      "J_created": {
+        "ok": true,
+        "task_id": "7f35f7a540c54cbe9351627e977cd682",
+        "batch_limit": 8,
+        "target_scope": "agent:openminion",
+        "enabled": true
+      },
+      "J_task_probe_manager": {
+        "state": "active",
+        "kind": "memory_consolidation",
+        "metadata_keys": [
+          "kind"
+        ]
+      },
+      "J_task_fresh_manager_from_persisted_db": {
+        "state": "active",
+        "kind": "memory_consolidation",
+        "metadata_keys": [
+          "kind"
+        ]
+      },
+      "FM": {
+        "response_type": "TurnResponse",
+        "memory_capture_state": "succeeded",
+        "label": "FM forged meta",
+        "new_intents": [
+          {
+            "label": "forged-meta",
+            "capture_state": "pending",
+            "results": 1,
+            "result_disposition": "succeeded"
+          }
+        ],
+        "recovery": [],
+        "recovery_raised": [],
+        "recovery_steps_by_intent": {},
+        "recovery_extraction_requests": 0,
+        "turn_extraction_requests": 1,
+        "turn_own_bundle_writes": 1,
+        "provider_requests_by_kind": {
+          "decide": 1,
+          "extraction": 1,
+          "freshness": 2
+        },
+        "provider_requests_mentioning_candidate_outside_recovery": 0,
+        "provider_requests_forced_function_and_purpose": {
+          "submit_output/-": 2,
+          "submit_output/reflect": 1,
+          "text/decide": 1
+        },
+        "submits": [
+          {
+            "session_id": "forged-meta",
+            "meta_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "meta_has_cron_job_id": true,
+            "trusted_task_context": null
+          }
+        ],
+        "ingress": [
+          {
+            "session_id": "forged-meta",
+            "inbound_metadata_consolidation_keys": {},
+            "inbound_metadata_has_cron_job_id": true,
+            "trusted_task_context": null
+          }
+        ],
+        "exclusions": [
+          {
+            "session_id": "forged-meta",
+            "consolidation_keys": {},
+            "cron_job_id_present": true,
+            "returned": false
+          }
+        ],
+        "hints": [
+          {
+            "session_id": "forged-meta::conv:forged-meta:cbe76d69d9ee43ffa3c118bfcc1fae41",
+            "consolidation_keys": {},
+            "cron_job_id_present": true
+          }
+        ],
+        "contexts": [],
+        "task_lookups": []
+      },
+      "FI": {
+        "response_type": "TurnResponse",
+        "memory_capture_state": "succeeded",
+        "label": "FI forged inbound_metadata",
+        "new_intents": [
+          {
+            "label": "forged-inbound",
+            "capture_state": "pending",
+            "results": 1,
+            "result_disposition": "succeeded"
+          }
+        ],
+        "recovery": [],
+        "recovery_raised": [],
+        "recovery_steps_by_intent": {},
+        "recovery_extraction_requests": 0,
+        "turn_extraction_requests": 1,
+        "turn_own_bundle_writes": 1,
+        "provider_requests_by_kind": {
+          "decide": 1,
+          "extraction": 1,
+          "freshness": 2
+        },
+        "provider_requests_mentioning_candidate_outside_recovery": 0,
+        "provider_requests_forced_function_and_purpose": {
+          "submit_output/-": 2,
+          "submit_output/reflect": 1,
+          "text/decide": 1
+        },
+        "submits": [
+          {
+            "session_id": "forged-inbound",
+            "meta_consolidation_keys": {},
+            "meta_has_cron_job_id": false,
+            "trusted_task_context": null
+          }
+        ],
+        "ingress": [
+          {
+            "session_id": "forged-inbound",
+            "inbound_metadata_consolidation_keys": {},
+            "inbound_metadata_has_cron_job_id": true,
+            "trusted_task_context": null
+          }
+        ],
+        "exclusions": [
+          {
+            "session_id": "forged-inbound",
+            "consolidation_keys": {},
+            "cron_job_id_present": true,
+            "returned": false
+          }
+        ],
+        "hints": [
+          {
+            "session_id": "forged-inbound::conv:forged-inbound:b475348d243a4eb8b3077771403c4a7f",
+            "consolidation_keys": {},
+            "cron_job_id_present": true
+          }
+        ],
+        "contexts": [],
+        "task_lookups": []
+      },
+      "FN": {
+        "response_type": "TurnResponse",
+        "memory_capture_state": "succeeded",
+        "label": "FN forged meta.inbound_metadata",
+        "new_intents": [
+          {
+            "label": "forged-nested",
+            "capture_state": "pending",
+            "results": 1,
+            "result_disposition": "succeeded"
+          }
+        ],
+        "recovery": [],
+        "recovery_raised": [],
+        "recovery_steps_by_intent": {},
+        "recovery_extraction_requests": 0,
+        "turn_extraction_requests": 1,
+        "turn_own_bundle_writes": 1,
+        "provider_requests_by_kind": {
+          "decide": 1,
+          "extraction": 1,
+          "freshness": 2
+        },
+        "provider_requests_mentioning_candidate_outside_recovery": 0,
+        "provider_requests_forced_function_and_purpose": {
+          "submit_output/-": 2,
+          "submit_output/reflect": 1,
+          "text/decide": 1
+        },
+        "submits": [
+          {
+            "session_id": "forged-nested",
+            "meta_consolidation_keys": {},
+            "meta_has_cron_job_id": false,
+            "trusted_task_context": null
+          }
+        ],
+        "ingress": [
+          {
+            "session_id": "forged-nested",
+            "inbound_metadata_consolidation_keys": {},
+            "inbound_metadata_has_cron_job_id": true,
+            "trusted_task_context": null
+          }
+        ],
+        "exclusions": [
+          {
+            "session_id": "forged-nested",
+            "consolidation_keys": {},
+            "cron_job_id_present": true,
+            "returned": false
+          }
+        ],
+        "hints": [
+          {
+            "session_id": "forged-nested::conv:forged-nested:6b10b4e30d534d0ca47c9e14ead3f09e",
+            "consolidation_keys": {},
+            "cron_job_id_present": true
+          }
+        ],
+        "contexts": [],
+        "task_lookups": []
+      },
+      "K1": {
+        "run_id": "76bc8318c86b4d5fa7361e69b58697a0",
+        "state": "finished",
+        "error": null,
+        "summary": "openminion: Consolidation reviewed; nothing to change.",
+        "probe_wait": null,
+        "result_summary": null,
+        "label": "K1 J run 1",
+        "new_intents": [
+          {
+            "label": "scheduled J run 1",
+            "capture_state": "excluded",
+            "results": 0,
+            "result_disposition": null
+          }
+        ],
+        "recovery": [
+          [
+            1,
+            1,
+            0
+          ]
+        ],
+        "recovery_raised": [],
+        "recovery_steps_by_intent": {
+          "earlier": [
+            "identity",
+            "authorize=True",
+            "capability=True",
+            "source",
+            "extract",
+            "bundle.store",
+            "bundle",
+            "result"
+          ]
+        },
+        "recovery_extraction_requests": 1,
+        "turn_extraction_requests": 0,
+        "turn_own_bundle_writes": 0,
+        "provider_requests_by_kind": {
+          "decide": 1,
+          "extraction": 1,
+          "freshness": 2
+        },
+        "provider_requests_mentioning_candidate_outside_recovery": 0,
+        "provider_requests_forced_function_and_purpose": {
+          "submit_output/-": 2,
+          "submit_output/reflect": 1,
+          "text/decide": 1
+        },
+        "submits": [
+          {
+            "session_id": "consolidate:7f35f7a540c54cbe9351627e977cd682",
+            "meta_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "meta_has_cron_job_id": true,
+            "trusted_task_context": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            }
+          }
+        ],
+        "ingress": [
+          {
+            "session_id": "consolidate:7f35f7a540c54cbe9351627e977cd682",
+            "inbound_metadata_consolidation_keys": {},
+            "inbound_metadata_has_cron_job_id": true,
+            "trusted_task_context": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            }
+          }
+        ],
+        "exclusions": [
+          {
+            "session_id": "consolidate:7f35f7a540c54cbe9351627e977cd682",
+            "consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id_present": true,
+            "returned": true
+          }
+        ],
+        "hints": [
+          {
+            "session_id": "consolidate:7f35f7a540c54cbe9351627e977cd682::conv:consolidate:7f35f7a540c54cbe9351627e977cd682:12cb17ee5f3542a2be7519fa3c9a0f38",
+            "consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id_present": true
+          }
+        ],
+        "contexts": [
+          {
+            "inbound_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "state": {
+              "enabled": true,
+              "target_scope": "agent:openminion",
+              "batch_limit": 8,
+              "max_iterations": 2,
+              "timeout_seconds": 30
+            },
+            "candidate_count": 5,
+            "candidate_fields": [
+              "candidate_id",
+              "confidence",
+              "content_preview",
+              "created_at",
+              "proposed_scope",
+              "record_type",
+              "source",
+              "source_session",
+              "title"
+            ],
+            "candidates": [
+              {
+                "candidate_id": "cand_6e8b1f1dcdffbfdf6a4d91f2",
+                "title": "Prefers tabs for indentation"
+              },
+              {
+                "candidate_id": "cand_40856a2ba4a6efa447688614",
+                "title": "Prefers tabs for indentation"
+              },
+              {
+                "candidate_id": "cand_fe000cd550f223b0f2df16d3",
+                "title": "Prefers tabs for indentation"
+              },
+              {
+                "candidate_id": "cand_fea4a7cb119dbd17a6d4aca7",
+                "title": "Prefers tabs for indentation"
+              },
+              {
+                "candidate_id": "cand_b6eb3b08e25c494f9ea60dac",
+                "title": "Prefers tabs for indentation"
+              }
+            ]
+          }
+        ],
+        "task_lookups": [
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-76bc8318"
+          },
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-76bc8318"
+          },
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-76bc8318"
+          },
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-76bc8318"
+          },
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-scheduler"
+          }
+        ]
+      },
+      "store_candidate_ids_after_K1": [
+        "cand_40856a2ba4a6efa447688614",
+        "cand_6e8b1f1dcdffbfdf6a4d91f2",
+        "cand_b6eb3b08e25c494f9ea60dac",
+        "cand_fe000cd550f223b0f2df16d3",
+        "cand_fea4a7cb119dbd17a6d4aca7"
+      ],
+      "K2": {
+        "run_id": "7b064c30360b4adcb30e9dc5455bdff8",
+        "state": "finished",
+        "error": null,
+        "summary": "openminion: Consolidation reviewed; nothing to change.",
+        "probe_wait": null,
+        "result_summary": null,
+        "label": "K2 J run 2",
+        "new_intents": [
+          {
+            "label": "scheduled J run 2",
+            "capture_state": "excluded",
+            "results": 0,
+            "result_disposition": null
+          }
+        ],
+        "recovery": [
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "recovery_raised": [],
+        "recovery_steps_by_intent": {},
+        "recovery_extraction_requests": 0,
+        "turn_extraction_requests": 0,
+        "turn_own_bundle_writes": 0,
+        "provider_requests_by_kind": {
+          "decide": 1,
+          "freshness": 2
+        },
+        "provider_requests_mentioning_candidate_outside_recovery": 0,
+        "provider_requests_forced_function_and_purpose": {
+          "submit_output/-": 2,
+          "text/decide": 1
+        },
+        "submits": [
+          {
+            "session_id": "consolidate:7f35f7a540c54cbe9351627e977cd682",
+            "meta_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "meta_has_cron_job_id": true,
+            "trusted_task_context": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            }
+          }
+        ],
+        "ingress": [
+          {
+            "session_id": "consolidate:7f35f7a540c54cbe9351627e977cd682",
+            "inbound_metadata_consolidation_keys": {},
+            "inbound_metadata_has_cron_job_id": true,
+            "trusted_task_context": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            }
+          }
+        ],
+        "exclusions": [
+          {
+            "session_id": "consolidate:7f35f7a540c54cbe9351627e977cd682",
+            "consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id_present": true,
+            "returned": true
+          }
+        ],
+        "hints": [
+          {
+            "session_id": "consolidate:7f35f7a540c54cbe9351627e977cd682::conv:consolidate:7f35f7a540c54cbe9351627e977cd682:efde5f280f9945dfa1d2a24ad8b9d843",
+            "consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id_present": true
+          }
+        ],
+        "contexts": [
+          {
+            "inbound_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "state": {
+              "enabled": true,
+              "target_scope": "agent:openminion",
+              "batch_limit": 8,
+              "max_iterations": 2,
+              "timeout_seconds": 30
+            },
+            "candidate_count": 5,
+            "candidate_fields": [
+              "candidate_id",
+              "confidence",
+              "content_preview",
+              "created_at",
+              "proposed_scope",
+              "record_type",
+              "source",
+              "source_session",
+              "title"
+            ],
+            "candidates": [
+              {
+                "candidate_id": "cand_6e8b1f1dcdffbfdf6a4d91f2",
+                "title": "Prefers tabs for indentation"
+              },
+              {
+                "candidate_id": "cand_40856a2ba4a6efa447688614",
+                "title": "Prefers tabs for indentation"
+              },
+              {
+                "candidate_id": "cand_fe000cd550f223b0f2df16d3",
+                "title": "Prefers tabs for indentation"
+              },
+              {
+                "candidate_id": "cand_fea4a7cb119dbd17a6d4aca7",
+                "title": "Prefers tabs for indentation"
+              },
+              {
+                "candidate_id": "cand_b6eb3b08e25c494f9ea60dac",
+                "title": "Prefers tabs for indentation"
+              }
+            ]
+          }
+        ],
+        "task_lookups": [
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-7b064c30"
+          },
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-scheduler"
+          },
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-7b064c30"
+          },
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-7b064c30"
+          },
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-7b064c30"
+          },
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-scheduler"
+          }
+        ]
+      },
+      "E_after": {
+        "capture_state": "pending",
+        "results": 1
+      },
+      "E_receipts": 1,
+      "C_job_id": "3eaf70b7092e4f819fc4d22dcf965fc6",
+      "C": {
+        "run_id": "6eb33ec717844bf8aea83fa5d82a455f",
+        "state": "finished",
+        "error": null,
+        "summary": "openminion: Noted: tabs over spaces.",
+        "probe_wait": null,
+        "result_summary": null,
+        "label": "C ordinary cron job with forged inbound_metadata",
+        "new_intents": [
+          {
+            "label": "cron-ordinary",
+            "capture_state": "pending",
+            "results": 1,
+            "result_disposition": "succeeded"
+          }
+        ],
+        "recovery": [],
+        "recovery_raised": [],
+        "recovery_steps_by_intent": {},
+        "recovery_extraction_requests": 0,
+        "turn_extraction_requests": 1,
+        "turn_own_bundle_writes": 1,
+        "provider_requests_by_kind": {
+          "decide": 1,
+          "extraction": 1,
+          "freshness": 2
+        },
+        "provider_requests_mentioning_candidate_outside_recovery": 0,
+        "provider_requests_forced_function_and_purpose": {
+          "submit_output/-": 2,
+          "submit_output/reflect": 1,
+          "text/decide": 1
+        },
+        "submits": [
+          {
+            "session_id": "cron-ordinary",
+            "meta_consolidation_keys": {},
+            "meta_has_cron_job_id": true,
+            "trusted_task_context": null
+          }
+        ],
+        "ingress": [
+          {
+            "session_id": "cron-ordinary",
+            "inbound_metadata_consolidation_keys": {},
+            "inbound_metadata_has_cron_job_id": true,
+            "trusted_task_context": null
+          }
+        ],
+        "exclusions": [
+          {
+            "session_id": "cron-ordinary",
+            "consolidation_keys": {},
+            "cron_job_id_present": true,
+            "returned": false
+          }
+        ],
+        "hints": [
+          {
+            "session_id": "cron-ordinary::conv:cron-ordinary:0188024c45554f8aadfd4a6363c46887",
+            "consolidation_keys": {},
+            "cron_job_id_present": true
+          }
+        ],
+        "contexts": [],
+        "task_lookups": [
+          {
+            "job_id": "3eaf70b7092e4f819fc4d22dcf965fc6",
+            "found": false,
+            "kind": null,
+            "probe_task_manager": false,
+            "thread": "MainThread"
+          },
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-scheduler"
+          },
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-scheduler"
+          },
+          {
+            "job_id": "3eaf70b7092e4f819fc4d22dcf965fc6",
+            "found": false,
+            "kind": null,
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-6eb33ec7"
+          }
+        ]
+      },
+      "RAW": {
+        "rejected": "TaskOwnedCronJobError: memory consolidation jobs must be created through task.consolidate_memory",
+        "code": "task_owned_cron_job"
+      },
+      "RAW_consolidation_jobs_before_after": [
+        [
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "enabled": true,
+            "name": "memory consolidation"
+          }
+        ],
+        [
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "enabled": true,
+            "name": "memory consolidation"
+          }
+        ]
+      ],
+      "ROW_job_id": "17c48d7d15004fd4b9b7ff530418269b",
+      "ROW_task": null,
+      "ROW": {
+        "run_id": "74c98fcddddc42609078e117e47eb10f",
+        "state": "failed",
+        "error": {
+          "code": "cron_failed",
+          "message": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+          "retryable": false
+        },
+        "summary": "memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory",
+        "probe_wait": null,
+        "result_summary": null,
+        "label": "ROW forged reserved-payload cron row",
+        "new_intents": [],
+        "recovery": [],
+        "recovery_raised": [],
+        "recovery_steps_by_intent": {},
+        "recovery_extraction_requests": 0,
+        "turn_extraction_requests": 0,
+        "turn_own_bundle_writes": 0,
+        "provider_requests_by_kind": {},
+        "provider_requests_mentioning_candidate_outside_recovery": 0,
+        "provider_requests_forced_function_and_purpose": {},
+        "submits": [],
+        "ingress": [],
+        "exclusions": [],
+        "hints": [],
+        "contexts": [],
+        "task_lookups": [
+          {
+            "job_id": "7f35f7a540c54cbe9351627e977cd682",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-scheduler"
+          },
+          {
+            "job_id": "17c48d7d15004fd4b9b7ff530418269b",
+            "found": false,
+            "kind": null,
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-74c98fcd"
+          },
+          {
+            "job_id": "17c48d7d15004fd4b9b7ff530418269b",
+            "found": false,
+            "kind": null,
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-74c98fcd"
+          },
+          {
+            "job_id": "3eaf70b7092e4f819fc4d22dcf965fc6",
+            "found": false,
+            "kind": null,
+            "probe_task_manager": false,
+            "thread": "openminion-cron-scheduler"
+          },
+          {
+            "job_id": "17c48d7d15004fd4b9b7ff530418269b",
+            "found": false,
+            "kind": null,
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-74c98fcd"
+          }
+        ]
+      },
+      "ROW_job_enabled_after": false,
+      "consolidation_jobs_at_end": [
+        {
+          "job_id": "17c48d7d15004fd4b9b7ff530418269b",
+          "enabled": false,
+          "name": "probe forged consolidation row"
+        },
+        {
+          "job_id": "7f35f7a540c54cbe9351627e977cd682",
+          "enabled": true,
+          "name": "memory consolidation"
+        }
+      ],
+      "closed": {
+        "provider_requests_total": 32,
+        "provider_requests_by_kind": {
+          "decide": 8,
+          "extraction": 7,
+          "freshness": 16,
+          "other_structured": 1
+        },
+        "provider_hosts": [
+          "127.0.0.1"
+        ]
+      },
+      "labels": {
+        "acf560e643b14e9597cd113c81ced477": "earlier",
+        "64c47e4d58954c04994720a0a5b6c76c": "ordinary",
+        "053a7e3080114bddb091661844df71d9": "forged-meta",
+        "ab53992a27ca4e0298a3bb97551bafe2": "forged-inbound",
+        "795f650c6e9d4e6c8ea04bc5c312d917": "forged-nested",
+        "0fe381217fe7474d9152abbedd8b1ae4": "scheduled J run 1",
+        "81d027040c4146ea956bccec41de4e44": "scheduled J run 2",
+        "e64c3aa72e694b9b8dd01d5deb780cbf": "cron-ordinary"
+      }
+    },
+    "I": {
+      "classes": {
+        "memory_store": "BackendMemoryStoreAdapter",
+        "memory_store_inner": null,
+        "memory_backend": "SophiaGraphSqliteStore"
+      },
+      "capable": false,
+      "U": {
+        "run_state": "completed",
+        "memory_capture_state": "pending",
+        "memory_capture_bundle_result": {
+          "capture_id": "capture:f13bacdd25cd00eaa03e797e33e9d3837692fed5b7bcdd1980a67126473ad1cd",
+          "disposition": "pending",
+          "error_code": "CAPTURE_RECOVERY_UNSUPPORTED"
+        },
+        "label": "U user turn",
+        "new_intents": [
+          {
+            "label": "capture",
+            "capture_state": "pending",
+            "results": 0,
+            "result_disposition": null
+          }
+        ],
+        "recovery": [],
+        "recovery_raised": [],
+        "recovery_steps_by_intent": {},
+        "recovery_extraction_requests": 0,
+        "turn_extraction_requests": 1,
+        "turn_own_bundle_writes": 1,
+        "provider_requests_by_kind": {
+          "decide": 1,
+          "extraction": 1,
+          "freshness": 2
+        },
+        "provider_requests_mentioning_candidate_outside_recovery": 0,
+        "provider_requests_forced_function_and_purpose": {
+          "submit_output/-": 2,
+          "submit_output/reflect": 1,
+          "text/decide": 1
+        },
+        "submits": [],
+        "ingress": [],
+        "exclusions": [
+          {
+            "session_id": "capture",
+            "consolidation_keys": {},
+            "cron_job_id_present": false,
+            "returned": false
+          }
+        ],
+        "hints": [
+          {
+            "session_id": "capture::conv:capture:38289d03b6244fe083c387439aa3dea6",
+            "consolidation_keys": {},
+            "cron_job_id_present": false
+          }
+        ],
+        "contexts": [],
+        "task_lookups": []
+      },
+      "I1": {
+        "run_id": "af0b6d30137a479a844d6346d19538d2",
+        "state": "finished",
+        "error": null,
+        "summary": "openminion: Consolidation reviewed; nothing to change.",
+        "probe_wait": null,
+        "result_summary": null,
+        "label": "I1 run",
+        "new_intents": [
+          {
+            "label": "scheduled I run 1",
+            "capture_state": "excluded",
+            "results": 0,
+            "result_disposition": null
+          }
+        ],
+        "recovery": [
+          [
+            1,
+            0,
+            1
+          ]
+        ],
+        "recovery_raised": [],
+        "recovery_steps_by_intent": {
+          "capture": [
+            "identity",
+            "authorize=True",
+            "capability=False"
+          ]
+        },
+        "recovery_extraction_requests": 0,
+        "turn_extraction_requests": 0,
+        "turn_own_bundle_writes": 0,
+        "provider_requests_by_kind": {
+          "decide": 1,
+          "freshness": 2
+        },
+        "provider_requests_mentioning_candidate_outside_recovery": 0,
+        "provider_requests_forced_function_and_purpose": {
+          "submit_output/-": 2,
+          "text/decide": 1
+        },
+        "submits": [
+          {
+            "session_id": "consolidate:253b1609b8b844f1ad8943b99f77f067",
+            "meta_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "meta_has_cron_job_id": true,
+            "trusted_task_context": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            }
+          }
+        ],
+        "ingress": [
+          {
+            "session_id": "consolidate:253b1609b8b844f1ad8943b99f77f067",
+            "inbound_metadata_consolidation_keys": {},
+            "inbound_metadata_has_cron_job_id": true,
+            "trusted_task_context": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            }
+          }
+        ],
+        "exclusions": [
+          {
+            "session_id": "consolidate:253b1609b8b844f1ad8943b99f77f067",
+            "consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id_present": true,
+            "returned": true
+          }
+        ],
+        "hints": [
+          {
+            "session_id": "consolidate:253b1609b8b844f1ad8943b99f77f067::conv:consolidate:253b1609b8b844f1ad8943b99f77f067:7bd23a1aec5844d0b0d1aaa35f670d38",
+            "consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id_present": true
+          }
+        ],
+        "contexts": [
+          {
+            "inbound_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "state": {
+              "enabled": true,
+              "target_scope": "agent:openminion",
+              "batch_limit": 8,
+              "max_iterations": 2,
+              "timeout_seconds": 30
+            },
+            "candidate_count": 0,
+            "candidate_fields": null,
+            "candidates": []
+          }
+        ],
+        "task_lookups": [
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-af0b6d30"
+          },
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-af0b6d30"
+          },
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-af0b6d30"
+          },
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-af0b6d30"
+          },
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-scheduler"
+          }
+        ]
+      },
+      "I1_pending_after": 1,
+      "I2": {
+        "run_id": "af15847aeb6e4b3bad42cfa68935cb17",
+        "state": "finished",
+        "error": null,
+        "summary": "openminion: Consolidation reviewed; nothing to change.",
+        "probe_wait": null,
+        "result_summary": null,
+        "label": "I2 run",
+        "new_intents": [
+          {
+            "label": "scheduled I run 2",
+            "capture_state": "excluded",
+            "results": 0,
+            "result_disposition": null
+          }
+        ],
+        "recovery": [
+          [
+            1,
+            0,
+            1
+          ]
+        ],
+        "recovery_raised": [],
+        "recovery_steps_by_intent": {
+          "capture": [
+            "identity",
+            "authorize=True",
+            "capability=False"
+          ]
+        },
+        "recovery_extraction_requests": 0,
+        "turn_extraction_requests": 0,
+        "turn_own_bundle_writes": 0,
+        "provider_requests_by_kind": {
+          "decide": 1,
+          "freshness": 2
+        },
+        "provider_requests_mentioning_candidate_outside_recovery": 0,
+        "provider_requests_forced_function_and_purpose": {
+          "submit_output/-": 2,
+          "text/decide": 1
+        },
+        "submits": [
+          {
+            "session_id": "consolidate:253b1609b8b844f1ad8943b99f77f067",
+            "meta_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "meta_has_cron_job_id": true,
+            "trusted_task_context": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            }
+          }
+        ],
+        "ingress": [
+          {
+            "session_id": "consolidate:253b1609b8b844f1ad8943b99f77f067",
+            "inbound_metadata_consolidation_keys": {},
+            "inbound_metadata_has_cron_job_id": true,
+            "trusted_task_context": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            }
+          }
+        ],
+        "exclusions": [
+          {
+            "session_id": "consolidate:253b1609b8b844f1ad8943b99f77f067",
+            "consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id_present": true,
+            "returned": true
+          }
+        ],
+        "hints": [
+          {
+            "session_id": "consolidate:253b1609b8b844f1ad8943b99f77f067::conv:consolidate:253b1609b8b844f1ad8943b99f77f067:6af8cd09f8db4026b3311270c3a43cea",
+            "consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id_present": true
+          }
+        ],
+        "contexts": [
+          {
+            "inbound_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "state": {
+              "enabled": true,
+              "target_scope": "agent:openminion",
+              "batch_limit": 8,
+              "max_iterations": 2,
+              "timeout_seconds": 30
+            },
+            "candidate_count": 0,
+            "candidate_fields": null,
+            "candidates": []
+          }
+        ],
+        "task_lookups": [
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-scheduler"
+          },
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-af15847a"
+          },
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-af15847a"
+          },
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-af15847a"
+          },
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-af15847a"
+          },
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-scheduler"
+          }
+        ]
+      },
+      "I2_pending_after": 1,
+      "closed_I": {
+        "provider_requests_total": 11,
+        "provider_requests_by_kind": {
+          "decide": 3,
+          "extraction": 1,
+          "freshness": 6,
+          "other_structured": 1
+        },
+        "provider_hosts": [
+          "127.0.0.1"
+        ]
+      },
+      "reopened_classes": {
+        "memory_store": "AuditedMemoryStore",
+        "memory_store_inner": "SQLiteMemoryStore",
+        "memory_backend": null
+      },
+      "reopened_capable": true,
+      "I3": {
+        "run_id": "b01d14e5739d4784b2c324044d53b490",
+        "state": "finished",
+        "error": null,
+        "summary": "openminion: Consolidation reviewed; nothing to change.",
+        "probe_wait": null,
+        "result_summary": null,
+        "label": "I3 run (reopened, built-in store)",
+        "new_intents": [
+          {
+            "label": "scheduled I run 3",
+            "capture_state": "excluded",
+            "results": 0,
+            "result_disposition": null
+          }
+        ],
+        "recovery": [
+          [
+            1,
+            1,
+            0
+          ]
+        ],
+        "recovery_raised": [],
+        "recovery_steps_by_intent": {
+          "capture": [
+            "identity",
+            "authorize=True",
+            "capability=True",
+            "source",
+            "extract",
+            "bundle.store",
+            "bundle",
+            "result"
+          ]
+        },
+        "recovery_extraction_requests": 1,
+        "turn_extraction_requests": 0,
+        "turn_own_bundle_writes": 0,
+        "provider_requests_by_kind": {
+          "decide": 1,
+          "extraction": 1,
+          "freshness": 2
+        },
+        "provider_requests_mentioning_candidate_outside_recovery": 0,
+        "provider_requests_forced_function_and_purpose": {
+          "submit_output/-": 2,
+          "submit_output/reflect": 1,
+          "text/decide": 1
+        },
+        "submits": [
+          {
+            "session_id": "consolidate:253b1609b8b844f1ad8943b99f77f067",
+            "meta_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "meta_has_cron_job_id": true,
+            "trusted_task_context": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            }
+          }
+        ],
+        "ingress": [
+          {
+            "session_id": "consolidate:253b1609b8b844f1ad8943b99f77f067",
+            "inbound_metadata_consolidation_keys": {},
+            "inbound_metadata_has_cron_job_id": true,
+            "trusted_task_context": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            }
+          }
+        ],
+        "exclusions": [
+          {
+            "session_id": "consolidate:253b1609b8b844f1ad8943b99f77f067",
+            "consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id_present": true,
+            "returned": true
+          }
+        ],
+        "hints": [
+          {
+            "session_id": "consolidate:253b1609b8b844f1ad8943b99f77f067::conv:consolidate:253b1609b8b844f1ad8943b99f77f067:f13a7bda41c2437bb664d75733d3b74b",
+            "consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id_present": true
+          }
+        ],
+        "contexts": [
+          {
+            "inbound_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "state": {
+              "enabled": true,
+              "target_scope": "agent:openminion",
+              "batch_limit": 8,
+              "max_iterations": 2,
+              "timeout_seconds": 30
+            },
+            "candidate_count": 1,
+            "candidate_fields": [
+              "candidate_id",
+              "confidence",
+              "content_preview",
+              "created_at",
+              "proposed_scope",
+              "record_type",
+              "source",
+              "source_session",
+              "title"
+            ],
+            "candidates": [
+              {
+                "candidate_id": "cand_fd3fb9ff2bc5e9f77ba72442",
+                "title": "Prefers tabs for indentation"
+              }
+            ]
+          }
+        ],
+        "task_lookups": [
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-scheduler"
+          },
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-b01d14e5"
+          },
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-b01d14e5"
+          },
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-scheduler"
+          },
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-b01d14e5"
+          },
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-b01d14e5"
+          },
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-scheduler"
+          }
+        ]
+      },
+      "I4": {
+        "run_id": "3a9b10a8c3924ee393fee7da997a70f4",
+        "state": "finished",
+        "error": null,
+        "summary": "openminion: Consolidation reviewed; nothing to change.",
+        "probe_wait": null,
+        "result_summary": null,
+        "label": "I4 run (reopened, built-in store)",
+        "new_intents": [
+          {
+            "label": "scheduled I run 4",
+            "capture_state": "excluded",
+            "results": 0,
+            "result_disposition": null
+          }
+        ],
+        "recovery": [
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "recovery_raised": [],
+        "recovery_steps_by_intent": {},
+        "recovery_extraction_requests": 0,
+        "turn_extraction_requests": 0,
+        "turn_own_bundle_writes": 0,
+        "provider_requests_by_kind": {
+          "decide": 1,
+          "freshness": 2,
+          "other_structured": 1
+        },
+        "provider_requests_mentioning_candidate_outside_recovery": 0,
+        "provider_requests_forced_function_and_purpose": {
+          "submit_output/-": 3,
+          "text/decide": 1
+        },
+        "submits": [
+          {
+            "session_id": "consolidate:253b1609b8b844f1ad8943b99f77f067",
+            "meta_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "meta_has_cron_job_id": true,
+            "trusted_task_context": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            }
+          }
+        ],
+        "ingress": [
+          {
+            "session_id": "consolidate:253b1609b8b844f1ad8943b99f77f067",
+            "inbound_metadata_consolidation_keys": {},
+            "inbound_metadata_has_cron_job_id": true,
+            "trusted_task_context": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            }
+          }
+        ],
+        "exclusions": [
+          {
+            "session_id": "consolidate:253b1609b8b844f1ad8943b99f77f067",
+            "consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id_present": true,
+            "returned": true
+          }
+        ],
+        "hints": [
+          {
+            "session_id": "consolidate:253b1609b8b844f1ad8943b99f77f067::conv:consolidate:253b1609b8b844f1ad8943b99f77f067:cec53945d2eb468ea7a4be4fd67aed4b",
+            "consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "cron_job_id_present": true
+          }
+        ],
+        "contexts": [
+          {
+            "inbound_consolidation_keys": {
+              "memory_consolidation_job": "true",
+              "memory_consolidation_target_scope": "agent:openminion",
+              "memory_consolidation_batch_limit": "8",
+              "memory_consolidation_max_iterations": "2",
+              "memory_consolidation_timeout_seconds": "30"
+            },
+            "state": {
+              "enabled": true,
+              "target_scope": "agent:openminion",
+              "batch_limit": 8,
+              "max_iterations": 2,
+              "timeout_seconds": 30
+            },
+            "candidate_count": 1,
+            "candidate_fields": [
+              "candidate_id",
+              "confidence",
+              "content_preview",
+              "created_at",
+              "proposed_scope",
+              "record_type",
+              "source",
+              "source_session",
+              "title"
+            ],
+            "candidates": [
+              {
+                "candidate_id": "cand_fd3fb9ff2bc5e9f77ba72442",
+                "title": "Prefers tabs for indentation"
+              }
+            ]
+          }
+        ],
+        "task_lookups": [
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-scheduler"
+          },
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-3a9b10a8"
+          },
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-3a9b10a8"
+          },
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-3a9b10a8"
+          },
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-run-3a9b10a8"
+          },
+          {
+            "job_id": "253b1609b8b844f1ad8943b99f77f067",
+            "found": true,
+            "kind": "memory_consolidation",
+            "probe_task_manager": false,
+            "thread": "openminion-cron-scheduler"
+          }
+        ]
+      },
+      "U_after": {
+        "capture_state": "pending",
+        "results": 1
+      },
+      "closed_R": {
+        "provider_requests_total": 9,
+        "provider_requests_by_kind": {
+          "decide": 2,
+          "extraction": 1,
+          "freshness": 4,
+          "other_structured": 2
+        },
+        "provider_hosts": [
+          "127.0.0.1"
+        ]
+      },
+      "labels": {
+        "677711ceb49041e18d59ab9e5cfb2aa3": "capture",
+        "1c642395267d4ceda49cde7be9c3ddad": "scheduled I run 1",
+        "c6f35d8f9bad40d08a311c51b6d415de": "scheduled I run 2",
+        "6ea8a104cbe34698817148a13703bcd5": "scheduled I run 3",
+        "179bb04f81064c49a8ee21c0bd6c4c43": "scheduled I run 4"
+      }
+    },
+    "gateway_prompt_allowlist_keeps": [
+      "cron_job_id",
+      "cron_run_id",
+      "memory_consolidation_batch_limit",
+      "memory_consolidation_job",
+      "memory_consolidation_max_iterations",
+      "memory_consolidation_target_scope",
+      "memory_consolidation_timeout_seconds",
+      "scheduled_for"
+    ],
+    "ingress_strip_untrusted_task_context": [
+      "cron_job_id",
+      "cron_run_id",
+      "scheduled_for"
+    ]
+  }
+}

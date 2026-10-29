@@ -1,0 +1,1689 @@
+{
+  "banner": {
+    "probe": "probe_364",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.15",
+    "python": "3.12.15",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<WORK>/empty",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "backend": "postgres",
+    "postgres": {
+      "sqlalchemy": "2.1.6",
+      "psycopg": "3.3.6",
+      "select version()": "PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+      "server_version": "16.15 (Debian 16.15-1.pgdg13+2)",
+      "url_scheme": "postgresql+psycopg"
+    }
+  },
+  "checks": [
+    {
+      "check": "postgres A: `openminion room create --agent first --agent second --agent third --routing-mode broadcast` (console script) exits 0 with participants=3, active_agent=first; `room invite <room> --agent fourth` exits 0 with participants=4",
+      "pass": true,
+      "observed": {
+        "create": {
+          "exit_code": 0,
+          "stderr_tail": [
+            "Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill",
+            "Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a",
+            "Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane",
+            "Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy",
+            "Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry",
+            "Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact"
+          ],
+          "seconds": 8.66,
+          "connections_max_while_running": 1,
+          "connections_samples": 137,
+          "connections_after_exit": {
+            "count": 0,
+            "waited_s": 0.01
+          },
+          "stdout": [
+            "room=room-8581549773744aee95d4dc8df33a5ff2",
+            "participants=3",
+            "active_agent=first"
+          ]
+        },
+        "invite": {
+          "exit_code": 0,
+          "stderr_tail": [
+            "Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry",
+            "Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill",
+            "Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry",
+            "Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve",
+            "Postgres module 'session' has pending migrations. Run: openminion storage migrate --module session",
+            "Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane"
+          ],
+          "seconds": 4.65,
+          "connections_max_while_running": 1,
+          "connections_samples": 74,
+          "connections_after_exit": {
+            "count": 0,
+            "waited_s": 0.01
+          },
+          "stdout": [
+            "invited agent=fourth",
+            "participants=4"
+          ]
+        }
+      }
+    },
+    {
+      "check": "postgres A: the participant rows (independent read) are first, second, third, fourth with join_seq 1..4",
+      "pass": true,
+      "observed": [
+        [
+          "first",
+          1,
+          "owner"
+        ],
+        [
+          "second",
+          2,
+          "participant"
+        ],
+        [
+          "third",
+          3,
+          "participant"
+        ],
+        [
+          "fourth",
+          4,
+          "participant"
+        ]
+      ]
+    },
+    {
+      "check": "postgres B: `room create --routing-mode broadcast --agent first --agent second --agent third` on one tick, row ids sorting in reverse join order: exit 0, participants=3, active_agent=first",
+      "pass": true,
+      "observed": {
+        "exit_code": 0,
+        "stderr_tail": [
+          "Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill",
+          "Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a",
+          "Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve",
+          "Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry",
+          "Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress",
+          "Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact"
+        ],
+        "seconds": 4.71,
+        "connections_max_while_running": 1,
+        "connections_samples": 75,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        },
+        "stdout": [
+          "room=room-22d2152ec50847158530d4ce8f0123af",
+          "participants=3",
+          "active_agent=first"
+        ]
+      }
+    },
+    {
+      "check": "postgres B: `room create --routing-mode sequential --agent first --agent second --agent third` on one tick, row ids sorting in reverse join order: exit 0, participants=3, active_agent=first",
+      "pass": true,
+      "observed": {
+        "exit_code": 0,
+        "stderr_tail": [
+          "Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry",
+          "Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory",
+          "Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a",
+          "Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry",
+          "Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity",
+          "Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact"
+        ],
+        "seconds": 4.64,
+        "connections_max_while_running": 1,
+        "connections_samples": 74,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        },
+        "stdout": [
+          "room=room-0a0351b724c94b99823e2e3ee1ebb6dc",
+          "participants=3",
+          "active_agent=first"
+        ]
+      }
+    },
+    {
+      "check": "postgres B: `room create --routing-mode addressed --agent first --agent second --agent third` on one tick, row ids sorting in reverse join order: exit 0, participants=3, active_agent=first",
+      "pass": true,
+      "observed": {
+        "exit_code": 0,
+        "stderr_tail": [
+          "Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity",
+          "Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry",
+          "Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve",
+          "Postgres module 'session' has pending migrations. Run: openminion storage migrate --module session",
+          "Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact",
+          "Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill"
+        ],
+        "seconds": 4.69,
+        "connections_max_while_running": 1,
+        "connections_samples": 75,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        },
+        "stdout": [
+          "room=room-1163d71630944ea9ae306e0871356f47",
+          "participants=3",
+          "active_agent=first"
+        ]
+      }
+    },
+    {
+      "check": "postgres B: `room invite <broadcast room> --agent fourth` on the same tick (row id sorts before two earlier joins): exit 0, participants=4",
+      "pass": true,
+      "observed": {
+        "exit_code": 0,
+        "stderr_tail": [
+          "Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry",
+          "Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry",
+          "Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane",
+          "Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve",
+          "Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact",
+          "Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a"
+        ],
+        "seconds": 4.71,
+        "connections_max_while_running": 1,
+        "connections_samples": 75,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        },
+        "stdout": [
+          "invited agent=fourth",
+          "participants=4"
+        ]
+      }
+    },
+    {
+      "check": "postgres B: the stored rows share one joined_at and their ids sort in reverse join order (first 'f..', second 'c..', third '0..', fourth '1..')",
+      "pass": true,
+      "observed": [
+        [
+          "first",
+          "fe8",
+          "2026-10-29T01:00:00+00:00",
+          1
+        ],
+        [
+          "second",
+          "ce8",
+          "2026-10-29T01:00:00+00:00",
+          2
+        ],
+        [
+          "third",
+          "0e8",
+          "2026-10-29T01:00:00+00:00",
+          3
+        ],
+        [
+          "fourth",
+          "1e8",
+          "2026-10-29T01:00:00+00:00",
+          4
+        ]
+      ]
+    },
+    {
+      "check": "postgres B: join_seq is 1, 2, 3, 4 in join order (independent read)",
+      "pass": true,
+      "observed": [
+        [
+          "first",
+          1
+        ],
+        [
+          "second",
+          2
+        ],
+        [
+          "third",
+          3
+        ],
+        [
+          "fourth",
+          4
+        ]
+      ]
+    },
+    {
+      "check": "postgres B: a new APIRuntime (RecordStorePostgres) lists first, second, third, fourth with first active; the sequential and addressed rooms list first, second, third",
+      "pass": true,
+      "observed": {
+        "broadcast": [
+          "first",
+          "second",
+          "third",
+          "fourth"
+        ],
+        "active": "first",
+        "sequential": [
+          "first",
+          "second",
+          "third"
+        ],
+        "addressed": [
+          "first",
+          "second",
+          "third"
+        ],
+        "record_store": "RecordStorePostgres"
+      }
+    },
+    {
+      "check": "postgres C: `openminion run --agent fourth --session <broadcast room>`: exit 0; the turn goes to first, second, third, fourth in join order (outbound rows in the messages table)",
+      "pass": true,
+      "observed": {
+        "replies": [
+          "first",
+          "second",
+          "third",
+          "fourth"
+        ],
+        "meta": {
+          "ok": true,
+          "runtime_source": "inproc",
+          "room_routing_mode": "broadcast",
+          "room_routed_agents": "first,second,third,fourth",
+          "agent_id": "fourth",
+          "body": "[first]\nfirst: hello room (thinking=minimal)\n\n[second]\nsecond: hello room (thinking=minimal)\n\n[third]\nthird: hello room (thinking=minimal)\n\n[fourth]\nfourth: hello room (thinking=minimal)",
+          "run_id": "fce3b950497242beb311899f12a1ef7f",
+          "thread_decision_action": null,
+          "thread_decision_reason": null,
+          "replayed_response": null
+        }
+      }
+    },
+    {
+      "check": "postgres C: `run --agent third` on the sequential room (no explicit order): first, second, third",
+      "pass": true,
+      "observed": {
+        "replies": [
+          "first",
+          "second",
+          "third"
+        ],
+        "meta": {
+          "ok": true,
+          "runtime_source": "inproc",
+          "room_routing_mode": "sequential",
+          "room_routed_agents": "first,second,third",
+          "agent_id": "third",
+          "body": "[first]\nfirst: hello room (thinking=minimal)\n\n[second]\nsecond: hello room (thinking=minimal)\n\n[third]\nthird: hello room (thinking=minimal)",
+          "run_id": "7f442f86bd3243ff92062137bd72f953",
+          "thread_decision_action": null,
+          "thread_decision_reason": null,
+          "replayed_response": null
+        }
+      }
+    },
+    {
+      "check": "postgres C: `run --agent third` on the addressed room: the active agent first answers",
+      "pass": true,
+      "observed": {
+        "replies": [
+          "first"
+        ],
+        "meta": {
+          "ok": true,
+          "runtime_source": "inproc",
+          "room_routing_mode": null,
+          "room_routed_agents": null,
+          "agent_id": "first",
+          "body": "first: hello room (thinking=minimal)",
+          "run_id": "658d1e73c9d5433f94142215691a1b59",
+          "thread_decision_action": "fork_thread",
+          "thread_decision_reason": "settled_without_resume",
+          "replayed_response": null
+        }
+      }
+    },
+    {
+      "check": "postgres C: on a new APIRuntime the active first agent leaves both rooms on the same tick: second becomes active; the broadcast room lists second, third, fourth",
+      "pass": true,
+      "observed": {
+        "left": [
+          true,
+          true
+        ],
+        "active": [
+          "second",
+          "second"
+        ],
+        "listed": [
+          "second",
+          "third",
+          "fourth"
+        ],
+        "routed": {
+          "broadcast": [
+            [
+              "second",
+              "third",
+              "fourth"
+            ],
+            "broadcast"
+          ],
+          "addressed": [
+            [
+              "second"
+            ],
+            "addressed"
+          ],
+          "addressed @third": [
+            [
+              "third"
+            ],
+            "addressed"
+          ]
+        }
+      }
+    },
+    {
+      "check": "postgres C: `_routed_agents` with that real runtime: broadcast second, third, fourth; addressed second; `@third` selects third",
+      "pass": true,
+      "observed": {
+        "broadcast": [
+          [
+            "second",
+            "third",
+            "fourth"
+          ],
+          "broadcast"
+        ],
+        "addressed": [
+          [
+            "second"
+          ],
+          "addressed"
+        ],
+        "addressed @third": [
+          [
+            "third"
+          ],
+          "addressed"
+        ]
+      }
+    },
+    {
+      "check": "postgres C: `run --agent fourth` on the broadcast room after the leave: second, third, fourth",
+      "pass": true,
+      "observed": {
+        "replies": [
+          "second",
+          "third",
+          "fourth"
+        ],
+        "meta": {
+          "ok": true,
+          "runtime_source": "inproc",
+          "room_routing_mode": "broadcast",
+          "room_routed_agents": "second,third,fourth",
+          "agent_id": "fourth",
+          "body": "[second]\nsecond: hello again (thinking=minimal)\n\n[third]\nthird: hello again (thinking=minimal)\n\n[fourth]\nfourth: hello again (thinking=minimal)",
+          "run_id": "e35daaf500374b95a154fde8b4849183",
+          "thread_decision_action": null,
+          "thread_decision_reason": null,
+          "replayed_response": null
+        }
+      }
+    },
+    {
+      "check": "postgres C: `run --agent third --reset-session` on the addressed room after the leave: the fallback second answers; `run --agent second --reset-session \"@third please\"` is answered by third",
+      "pass": true,
+      "observed": {
+        "plain": [
+          "second"
+        ],
+        "@third": [
+          "third"
+        ]
+      }
+    },
+    {
+      "check": "postgres: every CLI process connected to PostgreSQL under the database's application_name while running and left no connection after it exited",
+      "pass": true,
+      "observed": [
+        [
+          [
+            "room",
+            "create",
+            "--name"
+          ],
+          1,
+          {
+            "count": 0,
+            "waited_s": 0.01
+          }
+        ],
+        [
+          [
+            "room",
+            "invite",
+            "room-8581549773744aee95d4dc8df33a5ff2"
+          ],
+          1,
+          {
+            "count": 0,
+            "waited_s": 0.01
+          }
+        ],
+        [
+          [
+            "(tied)",
+            "room",
+            "create"
+          ],
+          1,
+          {
+            "count": 0,
+            "waited_s": 0.01
+          }
+        ],
+        [
+          [
+            "(tied)",
+            "room",
+            "create"
+          ],
+          1,
+          {
+            "count": 0,
+            "waited_s": 0.01
+          }
+        ],
+        [
+          [
+            "(tied)",
+            "room",
+            "create"
+          ],
+          1,
+          {
+            "count": 0,
+            "waited_s": 0.01
+          }
+        ],
+        [
+          [
+            "(tied)",
+            "room",
+            "invite"
+          ],
+          1,
+          {
+            "count": 0,
+            "waited_s": 0.01
+          }
+        ],
+        [
+          [
+            "run",
+            "--agent",
+            "fourth"
+          ],
+          1,
+          {
+            "count": 0,
+            "waited_s": 0.01
+          }
+        ],
+        [
+          [
+            "run",
+            "--agent",
+            "third"
+          ],
+          1,
+          {
+            "count": 0,
+            "waited_s": 0.01
+          }
+        ],
+        [
+          [
+            "run",
+            "--agent",
+            "third"
+          ],
+          1,
+          {
+            "count": 0,
+            "waited_s": 0.01
+          }
+        ],
+        [
+          [
+            "run",
+            "--agent",
+            "third"
+          ],
+          1,
+          {
+            "count": 0,
+            "waited_s": 0.01
+          }
+        ],
+        [
+          [
+            "run",
+            "--agent",
+            "fourth"
+          ],
+          1,
+          {
+            "count": 0,
+            "waited_s": 0.01
+          }
+        ],
+        [
+          [
+            "run",
+            "--agent",
+            "third"
+          ],
+          1,
+          {
+            "count": 0,
+            "waited_s": 0.01
+          }
+        ],
+        [
+          [
+            "run",
+            "--agent",
+            "second"
+          ],
+          1,
+          {
+            "count": 0,
+            "waited_s": 0.01
+          }
+        ]
+      ]
+    },
+    {
+      "check": "postgres: no runtime SQLite database created at storage.path",
+      "pass": true,
+      "observed": {
+        "storage.path exists": false,
+        "sqlite files": [
+          ".openminion/artifact/index.db",
+          ".openminion/authored_tools/store.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071454755530Z-0-none.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071459547072Z-0-0001_baseline.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071504233143Z-0-0001_baseline.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071508880661Z-0-0001_baseline.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071513582741Z-0-0001_baseline.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071518295207Z-0-0001_baseline.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071522388750Z-0-0001_baseline.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071526506795Z-0-0001_baseline.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071532610158Z-0-0001_baseline.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071538423601Z-0-0001_baseline.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071543531830Z-0-0001_baseline.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071544478522Z-0-0001_baseline.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071548499195Z-0-0001_baseline.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071554219517Z-0-0001_baseline.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071559233647Z-0-0001_baseline.sqlite",
+          ".openminion/brain/brain.db",
+          ".openminion/brain/memory.db",
+          ".openminion/brain/sessions.db",
+          ".openminion/identity/identity.db",
+          ".openminion/memory/memory.audit.db",
+          ".openminion/memory/memory.db",
+          ".openminion/ops/evidence.db",
+          ".openminion/ops/jobs.db",
+          ".openminion/ops/plans.db",
+          ".openminion/policy/policy.db",
+          ".openminion/policy/policy.db.bak/20261029T071454253234Z-0-none.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071459432628Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071504102360Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071508754382Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071513456729Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071518127356Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071522278519Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071526395962Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071532500444Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071538313175Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071543420280Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071544453752Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071548388197Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071554106602Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071559120745Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/retrieve/retrieve.db",
+          ".openminion/skill/skills.db",
+          ".openminion/task/task.db",
+          ".openminion/telemetry/telemetry.db"
+        ]
+      }
+    }
+  ],
+  "cases": {
+    "database": {
+      "name": "om364_1206c963",
+      "application_name": "om364_1206c963"
+    },
+    "A": {
+      "create": {
+        "exit_code": 0,
+        "stderr_tail": [
+          "Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill",
+          "Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a",
+          "Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane",
+          "Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy",
+          "Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry",
+          "Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact"
+        ],
+        "seconds": 8.66,
+        "connections_max_while_running": 1,
+        "connections_samples": 137,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        },
+        "stdout": [
+          "room=room-8581549773744aee95d4dc8df33a5ff2",
+          "participants=3",
+          "active_agent=first"
+        ]
+      },
+      "invite": {
+        "exit_code": 0,
+        "stderr_tail": [
+          "Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry",
+          "Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill",
+          "Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry",
+          "Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve",
+          "Postgres module 'session' has pending migrations. Run: openminion storage migrate --module session",
+          "Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane"
+        ],
+        "seconds": 4.65,
+        "connections_max_while_running": 1,
+        "connections_samples": 74,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        },
+        "stdout": [
+          "invited agent=fourth",
+          "participants=4"
+        ]
+      },
+      "rows": [
+        {
+          "id": "b11f6a68fd3b4f96b350bc97321afef3",
+          "participant_type": "agent",
+          "participant_id": "first",
+          "role": "owner",
+          "joined_at": "2026-10-29T07:14:54.844802+00:00",
+          "left_at": null,
+          "join_seq": 1
+        },
+        {
+          "id": "2957bd70d4ce4c0b96c0757d5707fb8d",
+          "participant_type": "agent",
+          "participant_id": "second",
+          "role": "participant",
+          "joined_at": "2026-10-29T07:14:54.852821+00:00",
+          "left_at": null,
+          "join_seq": 2
+        },
+        {
+          "id": "a226543ca5784351bd252f59ad21169f",
+          "participant_type": "agent",
+          "participant_id": "third",
+          "role": "participant",
+          "joined_at": "2026-10-29T07:14:54.859091+00:00",
+          "left_at": null,
+          "join_seq": 3
+        },
+        {
+          "id": "08ef2efbf2114390a986c711c00ef73d",
+          "participant_type": "agent",
+          "participant_id": "fourth",
+          "role": "participant",
+          "joined_at": "2026-10-29T07:14:59.582542+00:00",
+          "left_at": null,
+          "join_seq": 4
+        }
+      ]
+    },
+    "B create broadcast": {
+      "exit_code": 0,
+      "stderr_tail": [
+        "Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill",
+        "Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a",
+        "Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve",
+        "Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry",
+        "Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress",
+        "Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact"
+      ],
+      "seconds": 4.71,
+      "connections_max_while_running": 1,
+      "connections_samples": 75,
+      "connections_after_exit": {
+        "count": 0,
+        "waited_s": 0.01
+      },
+      "stdout": [
+        "room=room-22d2152ec50847158530d4ce8f0123af",
+        "participants=3",
+        "active_agent=first"
+      ]
+    },
+    "B create sequential": {
+      "exit_code": 0,
+      "stderr_tail": [
+        "Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry",
+        "Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory",
+        "Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a",
+        "Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry",
+        "Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity",
+        "Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact"
+      ],
+      "seconds": 4.64,
+      "connections_max_while_running": 1,
+      "connections_samples": 74,
+      "connections_after_exit": {
+        "count": 0,
+        "waited_s": 0.01
+      },
+      "stdout": [
+        "room=room-0a0351b724c94b99823e2e3ee1ebb6dc",
+        "participants=3",
+        "active_agent=first"
+      ]
+    },
+    "B create addressed": {
+      "exit_code": 0,
+      "stderr_tail": [
+        "Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity",
+        "Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry",
+        "Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve",
+        "Postgres module 'session' has pending migrations. Run: openminion storage migrate --module session",
+        "Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact",
+        "Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill"
+      ],
+      "seconds": 4.69,
+      "connections_max_while_running": 1,
+      "connections_samples": 75,
+      "connections_after_exit": {
+        "count": 0,
+        "waited_s": 0.01
+      },
+      "stdout": [
+        "room=room-1163d71630944ea9ae306e0871356f47",
+        "participants=3",
+        "active_agent=first"
+      ]
+    },
+    "B invite": {
+      "exit_code": 0,
+      "stderr_tail": [
+        "Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry",
+        "Postgres module 'telemetry' has pending migrations. Run: openminion storage migrate --module telemetry",
+        "Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane",
+        "Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve",
+        "Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact",
+        "Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a"
+      ],
+      "seconds": 4.71,
+      "connections_max_while_running": 1,
+      "connections_samples": 75,
+      "connections_after_exit": {
+        "count": 0,
+        "waited_s": 0.01
+      },
+      "stdout": [
+        "invited agent=fourth",
+        "participants=4"
+      ]
+    },
+    "B rows": [
+      {
+        "id": "fe88199c423228a456677d367059b4f9",
+        "participant_type": "agent",
+        "participant_id": "first",
+        "role": "owner",
+        "joined_at": "2026-10-29T01:00:00+00:00",
+        "left_at": null,
+        "join_seq": 1
+      },
+      {
+        "id": "ce88199c423228a456677d367059b4f9",
+        "participant_type": "agent",
+        "participant_id": "second",
+        "role": "participant",
+        "joined_at": "2026-10-29T01:00:00+00:00",
+        "left_at": null,
+        "join_seq": 2
+      },
+      {
+        "id": "0e88199c423228a456677d367059b4f9",
+        "participant_type": "agent",
+        "participant_id": "third",
+        "role": "participant",
+        "joined_at": "2026-10-29T01:00:00+00:00",
+        "left_at": null,
+        "join_seq": 3
+      },
+      {
+        "id": "1e88199c423228a456677d367059b4f9",
+        "participant_type": "agent",
+        "participant_id": "fourth",
+        "role": "participant",
+        "joined_at": "2026-10-29T01:00:00+00:00",
+        "left_at": null,
+        "join_seq": 4
+      }
+    ],
+    "B read back": {
+      "broadcast": [
+        "first",
+        "second",
+        "third",
+        "fourth"
+      ],
+      "active": "first",
+      "sequential": [
+        "first",
+        "second",
+        "third"
+      ],
+      "addressed": [
+        "first",
+        "second",
+        "third"
+      ],
+      "record_store": "RecordStorePostgres"
+    },
+    "C broadcast": {
+      "cli": {
+        "exit_code": 0,
+        "stderr_tail": [
+          "2026-10-29 07:15:27,158 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=second purpose=reflect sentinel=brain-bridge:fallback:v1",
+          "2026-10-29 07:15:27,208 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=second purpose=decide sentinel=brain-bridge:fallback:v1",
+          "2026-10-29 07:15:27,490 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=third purpose=reflect sentinel=brain-bridge:fallback:v1",
+          "2026-10-29 07:15:27,546 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=third purpose=decide sentinel=brain-bridge:fallback:v1",
+          "2026-10-29 07:15:27,818 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=fourth purpose=reflect sentinel=brain-bridge:fallback:v1",
+          "2026-10-29 07:15:27,872 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=fourth purpose=decide sentinel=brain-bridge:fallback:v1"
+        ],
+        "seconds": 6.15,
+        "connections_max_while_running": 1,
+        "connections_samples": 97,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        },
+        "stdout": [
+          "{",
+          "  \"ok\": true,",
+          "  \"runtime_source\": \"inproc\",",
+          "  \"trace_id\": \"fce3b950497242beb311899f12a1ef7f\",",
+          "  \"turn\": {",
+          "    \"agent_id\": \"fourth\",",
+          "    \"body\": \"[first]\\nfirst: hello room (thinking=minimal)\\n\\n[second]\\nsecond: hello room (thinking=minimal)\\n\\n[third]\\nthird: hello room (thinking=minimal)\\n\\n[fourth]\\nfourth: hello room (thinking=minimal)\",",
+          "    \"channel\": \"console\",",
+          "    \"id\": \"ee74ec8466484dbf9232f034e53e55f6\",",
+          "    \"metadata\": {",
+          "      \"room_aggregated\": \"true\",",
+          "      \"room_responses\": ["
+        ]
+      },
+      "meta": {
+        "ok": true,
+        "runtime_source": "inproc",
+        "room_routing_mode": "broadcast",
+        "room_routed_agents": "first,second,third,fourth",
+        "agent_id": "fourth",
+        "body": "[first]\nfirst: hello room (thinking=minimal)\n\n[second]\nsecond: hello room (thinking=minimal)\n\n[third]\nthird: hello room (thinking=minimal)\n\n[fourth]\nfourth: hello room (thinking=minimal)",
+        "run_id": "fce3b950497242beb311899f12a1ef7f",
+        "thread_decision_action": null,
+        "thread_decision_reason": null,
+        "replayed_response": null
+      },
+      "replies": [
+        "first",
+        "second",
+        "third",
+        "fourth"
+      ]
+    },
+    "C sequential": {
+      "cli": {
+        "exit_code": 0,
+        "stderr_tail": [
+          "2026-10-29 07:15:32,841 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=first purpose=reflect sentinel=brain-bridge:fallback:v1",
+          "2026-10-29 07:15:32,900 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=first purpose=decide sentinel=brain-bridge:fallback:v1",
+          "2026-10-29 07:15:33,171 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=second purpose=reflect sentinel=brain-bridge:fallback:v1",
+          "2026-10-29 07:15:33,230 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=second purpose=decide sentinel=brain-bridge:fallback:v1",
+          "2026-10-29 07:15:33,500 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=third purpose=reflect sentinel=brain-bridge:fallback:v1",
+          "2026-10-29 07:15:33,553 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=third purpose=decide sentinel=brain-bridge:fallback:v1"
+        ],
+        "seconds": 5.76,
+        "connections_max_while_running": 1,
+        "connections_samples": 91,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        },
+        "stdout": [
+          "{",
+          "  \"ok\": true,",
+          "  \"runtime_source\": \"inproc\",",
+          "  \"trace_id\": \"7f442f86bd3243ff92062137bd72f953\",",
+          "  \"turn\": {",
+          "    \"agent_id\": \"third\",",
+          "    \"body\": \"[first]\\nfirst: hello room (thinking=minimal)\\n\\n[second]\\nsecond: hello room (thinking=minimal)\\n\\n[third]\\nthird: hello room (thinking=minimal)\",",
+          "    \"channel\": \"console\",",
+          "    \"id\": \"37e9e21d85e44199a737d2517195d3a5\",",
+          "    \"metadata\": {",
+          "      \"room_aggregated\": \"true\",",
+          "      \"room_responses\": ["
+        ]
+      },
+      "meta": {
+        "ok": true,
+        "runtime_source": "inproc",
+        "room_routing_mode": "sequential",
+        "room_routed_agents": "first,second,third",
+        "agent_id": "third",
+        "body": "[first]\nfirst: hello room (thinking=minimal)\n\n[second]\nsecond: hello room (thinking=minimal)\n\n[third]\nthird: hello room (thinking=minimal)",
+        "run_id": "7f442f86bd3243ff92062137bd72f953",
+        "thread_decision_action": null,
+        "thread_decision_reason": null,
+        "replayed_response": null
+      },
+      "replies": [
+        "first",
+        "second",
+        "third"
+      ]
+    },
+    "C addressed": {
+      "cli": {
+        "exit_code": 0,
+        "stderr_tail": [
+          "Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity",
+          "Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry",
+          "Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy",
+          "Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory",
+          "2026-10-29 07:15:38,643 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=first purpose=reflect sentinel=brain-bridge:fallback:v1",
+          "2026-10-29 07:15:38,701 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=first purpose=decide sentinel=brain-bridge:fallback:v1"
+        ],
+        "seconds": 5.02,
+        "connections_max_while_running": 1,
+        "connections_samples": 80,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        },
+        "stdout": [
+          "{",
+          "  \"ok\": true,",
+          "  \"runtime_source\": \"inproc\",",
+          "  \"trace_id\": \"658d1e73c9d5433f94142215691a1b59\",",
+          "  \"turn\": {",
+          "    \"agent_id\": \"first\",",
+          "    \"body\": \"first: hello room (thinking=minimal)\",",
+          "    \"channel\": \"console\",",
+          "    \"id\": \"bfd0c803424443aba392572ede457a5d\",",
+          "    \"metadata\": {",
+          "      \"agent\": \"first\",",
+          "      \"authenticity_mode\": \"warn\","
+        ]
+      },
+      "meta": {
+        "ok": true,
+        "runtime_source": "inproc",
+        "room_routing_mode": null,
+        "room_routed_agents": null,
+        "agent_id": "first",
+        "body": "first: hello room (thinking=minimal)",
+        "run_id": "658d1e73c9d5433f94142215691a1b59",
+        "thread_decision_action": "fork_thread",
+        "thread_decision_reason": "settled_without_resume",
+        "replayed_response": null
+      },
+      "replies": [
+        "first"
+      ]
+    },
+    "note: second run on the same thread": {
+      "exit_code": 0,
+      "meta": {
+        "ok": true,
+        "runtime_source": "inproc",
+        "room_routing_mode": null,
+        "room_routed_agents": null,
+        "agent_id": "first",
+        "body": "first: hello room (thinking=minimal)",
+        "run_id": "658d1e73c9d5433f94142215691a1b59",
+        "thread_decision_action": "replay",
+        "thread_decision_reason": "undelivered_response_pending",
+        "replayed_response": "true"
+      },
+      "new outbound rows": [],
+      "first run": {
+        "ok": true,
+        "runtime_source": "inproc",
+        "room_routing_mode": null,
+        "room_routed_agents": null,
+        "agent_id": "first",
+        "body": "first: hello room (thinking=minimal)",
+        "run_id": "658d1e73c9d5433f94142215691a1b59",
+        "thread_decision_action": "fork_thread",
+        "thread_decision_reason": "settled_without_resume",
+        "replayed_response": null
+      }
+    },
+    "C leave": {
+      "left": [
+        true,
+        true
+      ],
+      "active": [
+        "second",
+        "second"
+      ],
+      "listed": [
+        "second",
+        "third",
+        "fourth"
+      ],
+      "routed": {
+        "broadcast": [
+          [
+            "second",
+            "third",
+            "fourth"
+          ],
+          "broadcast"
+        ],
+        "addressed": [
+          [
+            "second"
+          ],
+          "addressed"
+        ],
+        "addressed @third": [
+          [
+            "third"
+          ],
+          "addressed"
+        ]
+      }
+    },
+    "C broadcast after leave": {
+      "cli": {
+        "exit_code": 0,
+        "stderr_tail": [
+          "2026-10-29 07:15:48,730 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=second purpose=reflect sentinel=brain-bridge:fallback:v1",
+          "2026-10-29 07:15:48,787 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=second purpose=decide sentinel=brain-bridge:fallback:v1",
+          "2026-10-29 07:15:49,065 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=third purpose=reflect sentinel=brain-bridge:fallback:v1",
+          "2026-10-29 07:15:49,119 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=third purpose=decide sentinel=brain-bridge:fallback:v1",
+          "2026-10-29 07:15:49,395 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=fourth purpose=reflect sentinel=brain-bridge:fallback:v1",
+          "2026-10-29 07:15:49,448 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=fourth purpose=decide sentinel=brain-bridge:fallback:v1"
+        ],
+        "seconds": 5.62,
+        "connections_max_while_running": 1,
+        "connections_samples": 87,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        },
+        "stdout": [
+          "{",
+          "  \"ok\": true,",
+          "  \"runtime_source\": \"inproc\",",
+          "  \"trace_id\": \"e35daaf500374b95a154fde8b4849183\",",
+          "  \"turn\": {",
+          "    \"agent_id\": \"fourth\",",
+          "    \"body\": \"[second]\\nsecond: hello again (thinking=minimal)\\n\\n[third]\\nthird: hello again (thinking=minimal)\\n\\n[fourth]\\nfourth: hello again (thinking=minimal)\",",
+          "    \"channel\": \"console\",",
+          "    \"id\": \"bb8a0d8064894cdebeeb322f1d60b2ba\",",
+          "    \"metadata\": {",
+          "      \"room_aggregated\": \"true\",",
+          "      \"room_responses\": ["
+        ]
+      },
+      "meta": {
+        "ok": true,
+        "runtime_source": "inproc",
+        "room_routing_mode": "broadcast",
+        "room_routed_agents": "second,third,fourth",
+        "agent_id": "fourth",
+        "body": "[second]\nsecond: hello again (thinking=minimal)\n\n[third]\nthird: hello again (thinking=minimal)\n\n[fourth]\nfourth: hello again (thinking=minimal)",
+        "run_id": "e35daaf500374b95a154fde8b4849183",
+        "thread_decision_action": null,
+        "thread_decision_reason": null,
+        "replayed_response": null
+      },
+      "replies": [
+        "second",
+        "third",
+        "fourth"
+      ]
+    },
+    "C addressed after leave": {
+      "cli": [
+        {
+          "exit_code": 0,
+          "stderr_tail": [
+            "Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry",
+            "Postgres module 'compress' has pending migrations. Run: openminion storage migrate --module compress",
+            "Postgres module 'identity' has pending migrations. Run: openminion storage migrate --module identity",
+            "Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy",
+            "2026-10-29 07:15:54,453 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=second purpose=reflect sentinel=brain-bridge:fallback:v1",
+            "2026-10-29 07:15:54,512 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=second purpose=decide sentinel=brain-bridge:fallback:v1"
+          ],
+          "seconds": 5.01,
+          "connections_max_while_running": 1,
+          "connections_samples": 80,
+          "connections_after_exit": {
+            "count": 0,
+            "waited_s": 0.01
+          },
+          "stdout": [
+            "{",
+            "  \"ok\": true,",
+            "  \"runtime_source\": \"inproc\",",
+            "  \"trace_id\": \"e09bd45d8ec74bda858b8b60d0422589\",",
+            "  \"turn\": {",
+            "    \"agent_id\": \"second\",",
+            "    \"body\": \"second: hello again (thinking=minimal)\",",
+            "    \"channel\": \"console\",",
+            "    \"id\": \"7a689f120dfc4f65baf15dfa36130c6c\",",
+            "    \"metadata\": {",
+            "      \"agent\": \"second\",",
+            "      \"authenticity_mode\": \"warn\","
+          ]
+        },
+        {
+          "exit_code": 0,
+          "stderr_tail": [
+            "Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact",
+            "Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a",
+            "Postgres module 'session' has pending migrations. Run: openminion storage migrate --module session",
+            "Postgres module 'retrieve' has pending migrations. Run: openminion storage migrate --module retrieve",
+            "2026-10-29 07:15:59,467 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=third purpose=reflect sentinel=brain-bridge:fallback:v1",
+            "2026-10-29 07:15:59,525 WARNING openminion.modules.brain.adapters.context.bridges: identity.bridge_fallback reason=profile_absent agent_id=third purpose=decide sentinel=brain-bridge:fallback:v1"
+          ],
+          "seconds": 5.0,
+          "connections_max_while_running": 1,
+          "connections_samples": 80,
+          "connections_after_exit": {
+            "count": 0,
+            "waited_s": 0.01
+          },
+          "stdout": [
+            "{",
+            "  \"ok\": true,",
+            "  \"runtime_source\": \"inproc\",",
+            "  \"trace_id\": \"9481df6a953249beba81fd59545c462e\",",
+            "  \"turn\": {",
+            "    \"agent_id\": \"third\",",
+            "    \"body\": \"third: @third please (thinking=minimal)\",",
+            "    \"channel\": \"console\",",
+            "    \"id\": \"d9d7bf4ce4b74cb691176114f7761c79\",",
+            "    \"metadata\": {",
+            "      \"agent\": \"third\",",
+            "      \"authenticity_mode\": \"warn\","
+          ]
+        }
+      ],
+      "replies": [
+        [
+          "second"
+        ],
+        [
+          "third"
+        ]
+      ]
+    },
+    "processes": [
+      {
+        "argv": [
+          "room",
+          "create",
+          "--name",
+          "order",
+          "--agent",
+          "first",
+          "--agent",
+          "second",
+          "--agent",
+          "third",
+          "--routing-mode",
+          "broadcast"
+        ],
+        "exit_code": 0,
+        "connections_max_while_running": 1,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        }
+      },
+      {
+        "argv": [
+          "room",
+          "invite",
+          "room-8581549773744aee95d4dc8df33a5ff2",
+          "--agent",
+          "fourth"
+        ],
+        "exit_code": 0,
+        "connections_max_while_running": 1,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        }
+      },
+      {
+        "argv": [
+          "(tied)",
+          "room",
+          "create",
+          "--name",
+          "tie-broadcast",
+          "--agent",
+          "first",
+          "--agent",
+          "second",
+          "--agent",
+          "third",
+          "--routing-mode",
+          "broadcast",
+          "--channel",
+          "console",
+          "--target",
+          "cli-user"
+        ],
+        "exit_code": 0,
+        "connections_max_while_running": 1,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        }
+      },
+      {
+        "argv": [
+          "(tied)",
+          "room",
+          "create",
+          "--name",
+          "tie-sequential",
+          "--agent",
+          "first",
+          "--agent",
+          "second",
+          "--agent",
+          "third",
+          "--routing-mode",
+          "sequential",
+          "--channel",
+          "console",
+          "--target",
+          "cli-user"
+        ],
+        "exit_code": 0,
+        "connections_max_while_running": 1,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        }
+      },
+      {
+        "argv": [
+          "(tied)",
+          "room",
+          "create",
+          "--name",
+          "tie-addressed",
+          "--agent",
+          "first",
+          "--agent",
+          "second",
+          "--agent",
+          "third",
+          "--routing-mode",
+          "addressed",
+          "--channel",
+          "console",
+          "--target",
+          "cli-user"
+        ],
+        "exit_code": 0,
+        "connections_max_while_running": 1,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        }
+      },
+      {
+        "argv": [
+          "(tied)",
+          "room",
+          "invite",
+          "room-22d2152ec50847158530d4ce8f0123af",
+          "--agent",
+          "fourth"
+        ],
+        "exit_code": 0,
+        "connections_max_while_running": 1,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        }
+      },
+      {
+        "argv": [
+          "run",
+          "--agent",
+          "fourth",
+          "--session",
+          "room-22d2152ec50847158530d4ce8f0123af",
+          "--json",
+          "hello room"
+        ],
+        "exit_code": 0,
+        "connections_max_while_running": 1,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        }
+      },
+      {
+        "argv": [
+          "run",
+          "--agent",
+          "third",
+          "--session",
+          "room-0a0351b724c94b99823e2e3ee1ebb6dc",
+          "--json",
+          "hello room"
+        ],
+        "exit_code": 0,
+        "connections_max_while_running": 1,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        }
+      },
+      {
+        "argv": [
+          "run",
+          "--agent",
+          "third",
+          "--session",
+          "room-1163d71630944ea9ae306e0871356f47",
+          "--json",
+          "hello room"
+        ],
+        "exit_code": 0,
+        "connections_max_while_running": 1,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        }
+      },
+      {
+        "argv": [
+          "run",
+          "--agent",
+          "third",
+          "--session",
+          "room-1163d71630944ea9ae306e0871356f47",
+          "--json",
+          "a different prompt on the same thread"
+        ],
+        "exit_code": 0,
+        "connections_max_while_running": 1,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        }
+      },
+      {
+        "argv": [
+          "run",
+          "--agent",
+          "fourth",
+          "--session",
+          "room-22d2152ec50847158530d4ce8f0123af",
+          "--json",
+          "hello again"
+        ],
+        "exit_code": 0,
+        "connections_max_while_running": 1,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        }
+      },
+      {
+        "argv": [
+          "run",
+          "--agent",
+          "third",
+          "--session",
+          "room-1163d71630944ea9ae306e0871356f47",
+          "--json",
+          "--reset-session",
+          "hello again"
+        ],
+        "exit_code": 0,
+        "connections_max_while_running": 1,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        }
+      },
+      {
+        "argv": [
+          "run",
+          "--agent",
+          "second",
+          "--session",
+          "room-1163d71630944ea9ae306e0871356f47",
+          "--json",
+          "--reset-session",
+          "@third please"
+        ],
+        "exit_code": 0,
+        "connections_max_while_running": 1,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        }
+      }
+    ],
+    "sqlite_files_under_root": {
+      ".openminion/artifact/index.db": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071454755530Z-0-none.sqlite": {
+        "tables": 0
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071459547072Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071504233143Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071508880661Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071513582741Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071518295207Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071522388750Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071526506795Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071532610158Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071538423601Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071543531830Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071544478522Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071548499195Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071554219517Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071559233647Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/brain/brain.db": {
+        "tables": 6
+      },
+      ".openminion/brain/memory.db": {
+        "tables": 14
+      },
+      ".openminion/brain/sessions.db": {
+        "tables": 26,
+        "sessions_rows": 13
+      },
+      ".openminion/identity/identity.db": {
+        "tables": 3
+      },
+      ".openminion/memory/memory.audit.db": {
+        "tables": 1
+      },
+      ".openminion/memory/memory.db": {
+        "tables": 14
+      },
+      ".openminion/ops/evidence.db": {
+        "tables": 1
+      },
+      ".openminion/ops/jobs.db": {
+        "tables": 1
+      },
+      ".openminion/ops/plans.db": {
+        "tables": 1
+      },
+      ".openminion/policy/policy.db": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071454253234Z-0-none.sqlite": {
+        "tables": 0
+      },
+      ".openminion/policy/policy.db.bak/20261029T071459432628Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071504102360Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071508754382Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071513456729Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071518127356Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071522278519Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071526395962Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071532500444Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071538313175Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071543420280Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071544453752Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071548388197Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071554106602Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071559120745Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/retrieve/retrieve.db": {
+        "tables": 11
+      },
+      ".openminion/skill/skills.db": {
+        "tables": 13
+      },
+      ".openminion/task/task.db": {
+        "tables": 3
+      },
+      ".openminion/telemetry/telemetry.db": {
+        "tables": 3
+      }
+    },
+    "postgres_ledger": [
+      {
+        "version": 14,
+        "name": "add_room_participant_join_seq"
+      },
+      {
+        "version": 15,
+        "name": "add_session_metadata_strings"
+      }
+    ],
+    "postgres_join_seq_index": [
+      {
+        "indexname": "idx_room_participants_lookup",
+        "indexdef": "CREATE INDEX idx_room_participants_lookup ON public.room_participants USING btree (session_id, participant_type, participant_id, left_at)"
+      },
+      {
+        "indexname": "idx_room_participants_session_join_seq",
+        "indexdef": "CREATE UNIQUE INDEX idx_room_participants_session_join_seq ON public.room_participants USING btree (session_id, join_seq)"
+      },
+      {
+        "indexname": "idx_room_participants_session_joined",
+        "indexdef": "CREATE INDEX idx_room_participants_session_joined ON public.room_participants USING btree (session_id, joined_at, id)"
+      },
+      {
+        "indexname": "room_participants_pkey",
+        "indexdef": "CREATE UNIQUE INDEX room_participants_pkey ON public.room_participants USING btree (id)"
+      },
+      {
+        "indexname": "room_participants_session_id_participant_type_participant_i_key",
+        "indexdef": "CREATE UNIQUE INDEX room_participants_session_id_participant_type_participant_i_key ON public.room_participants USING btree (session_id, participant_type, participant_id)"
+      }
+    ]
+  },
+  "summary": {
+    "passed": 18,
+    "failed": 0,
+    "total": 18
+  }
+}

@@ -1,0 +1,197 @@
+{
+  "banner": {
+    "probe": "probe_369",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.14",
+    "python": "3.12.15",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<WORK>/empty",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "backend": "postgres",
+    "postgres": {
+      "sqlalchemy": "2.1.6",
+      "psycopg": "3.3.6",
+      "select version()": "PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+      "server_version": "16.15 (Debian 16.15-1.pgdg13+2)",
+      "url_scheme": "postgresql+psycopg"
+    },
+    "agent-client-protocol": "0.12.1"
+  },
+  "checks": [
+    {
+      "check": "postgres acp: `openminion acp` starts and answers initialize",
+      "pass": false,
+      "observed": {
+        "error": "RuntimeError: acp process closed stdout before replying to initialize; exit=2",
+        "exit_code": 2,
+        "stderr_tail": [
+          "2026-10-29 07:15:49,804 INFO openminion.modules.tool.selection: selection.mode_resolved",
+          "2026-10-29 07:15:49,805 INFO openminion.agent: BrainBridgeService initialized with home_root=<WORK>/work/probe_369_postgres_0114/acp-postgres path_mode=integrated_runtime path_source=explicit_workspace",
+          "openminion: runtime record_store does not expose sqlite connection"
+        ]
+      }
+    },
+    {
+      "check": "postgres focus: APIRuntime.from_config_path starts",
+      "pass": false,
+      "observed": "RuntimeError: runtime record_store does not expose sqlite connection"
+    },
+    {
+      "check": "postgres focus-cli: the bare `openminion --dir <project>` Focus launch in a pseudo-terminal starts, and `/exit` ends it with exit 0",
+      "pass": false,
+      "observed": {
+        "exit_code": 1,
+        "steps": [
+          {
+            "after": "startup",
+            "running": false,
+            "bytes": 95
+          }
+        ],
+        "output_tail": [
+          "openminion: interactive startup error: runtime record_store does not expose sqlite connection"
+        ]
+      }
+    },
+    {
+      "check": "postgres focus-cli: the launch created its Focus directory session (target focus, working_dir = the project) in the runtime database",
+      "pass": false,
+      "observed": []
+    },
+    {
+      "check": "postgres focus-cli: the Focus process connected to PostgreSQL under its application_name while running and left no connection after it exited",
+      "pass": true,
+      "observed": {
+        "max while running": 1,
+        "after exit": {
+          "count": 0,
+          "waited_s": 0.01
+        }
+      }
+    },
+    {
+      "check": "postgres focus: no runtime SQLite database created at storage.path",
+      "pass": true,
+      "observed": {
+        "storage.path exists": false,
+        "sqlite files": [
+          ".openminion/artifact/index.db",
+          ".openminion/authored_tools/store.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071552999517Z-0-none.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071555752433Z-0-0001_baseline.sqlite",
+          ".openminion/memory/memory.db",
+          ".openminion/ops/evidence.db",
+          ".openminion/ops/jobs.db",
+          ".openminion/ops/plans.db",
+          ".openminion/policy/policy.db",
+          ".openminion/policy/policy.db.bak/20261029T071552902113Z-0-none.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071555668969Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/retrieve/retrieve.db",
+          ".openminion/telemetry/telemetry.db"
+        ]
+      }
+    }
+  ],
+  "cases": {
+    "postgres acp": {
+      "database": "om369_acp_8014608b",
+      "server application_name": "om369_acp_8014608b",
+      "start": {
+        "error": "RuntimeError: acp process closed stdout before replying to initialize; exit=2",
+        "exit_code": 2,
+        "stderr_tail": [
+          "2026-10-29 07:15:49,804 INFO openminion.modules.tool.selection: selection.mode_resolved",
+          "2026-10-29 07:15:49,805 INFO openminion.agent: BrainBridgeService initialized with home_root=<WORK>/work/probe_369_postgres_0114/acp-postgres path_mode=integrated_runtime path_source=explicit_workspace",
+          "openminion: runtime record_store does not expose sqlite connection"
+        ]
+      }
+    },
+    "postgres focus": {
+      "database": "om369_focus_f01593bc",
+      "start": "RuntimeError: runtime record_store does not expose sqlite connection"
+    },
+    "postgres focus-cli": {
+      "argv": [
+        "openminion",
+        "--home-root",
+        "<WORK>/work/probe_369_postgres_0114/focus-postgres",
+        "--data-root",
+        "<WORK>/work/probe_369_postgres_0114/focus-postgres/.openminion",
+        "--config",
+        "<WORK>/work/probe_369_postgres_0114/focus-postgres/agents-focus-cli.json",
+        "--dir",
+        "<WORK>/work/probe_369_postgres_0114/focus-postgres/project-cli",
+        "--no-update-check",
+        "--no-context"
+      ],
+      "steps": [
+        {
+          "after": "startup",
+          "running": false,
+          "bytes": 95
+        }
+      ],
+      "exit_code": 1,
+      "output_tail": [
+        "openminion: interactive startup error: runtime record_store does not expose sqlite connection"
+      ],
+      "new sessions": [],
+      "server connections": {
+        "max while running": 1,
+        "after exit": {
+          "count": 0,
+          "waited_s": 0.01
+        }
+      }
+    },
+    "postgres focus sqlite files": {
+      ".openminion/artifact/index.db": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071552999517Z-0-none.sqlite": {
+        "tables": 0
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071555752433Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/memory/memory.db": {
+        "tables": 14
+      },
+      ".openminion/ops/evidence.db": {
+        "tables": 1
+      },
+      ".openminion/ops/jobs.db": {
+        "tables": 1
+      },
+      ".openminion/ops/plans.db": {
+        "tables": 1
+      },
+      ".openminion/policy/policy.db": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071552902113Z-0-none.sqlite": {
+        "tables": 0
+      },
+      ".openminion/policy/policy.db.bak/20261029T071555668969Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/retrieve/retrieve.db": {
+        "tables": 11
+      },
+      ".openminion/telemetry/telemetry.db": {
+        "tables": 3
+      }
+    }
+  },
+  "not_run": [],
+  "summary": {
+    "passed": 2,
+    "failed": 4,
+    "total": 6
+  }
+}

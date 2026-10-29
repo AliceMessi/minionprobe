@@ -1,0 +1,373 @@
+{
+  "banner": {
+    "probe": "probe_369",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.15",
+    "python": "3.12.15",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<RUNNER_TEMP>/empty",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "backend": "sqlite",
+    "agent-client-protocol": "0.12.1"
+  },
+  "checks": [
+    {
+      "check": "sqlite acp: `openminion acp` (stdio JSON-RPC) answers initialize with the installed version and the session/list capability",
+      "pass": true,
+      "observed": {
+        "version": "0.1.15",
+        "list": {}
+      }
+    },
+    {
+      "check": "sqlite acp: session/list cwd=a lists only the ACP sessions of workspace a, newest first (including one with NaN, NUL and a lone surrogate in other members)",
+      "pass": true,
+      "observed": [
+        "odd-acp-in-a",
+        "0aa8cf31e5b44dd98b6b23d9b2db6a83"
+      ]
+    },
+    {
+      "check": "sqlite acp: session/list without cwd lists every ACP session newest first; surfaces cli, [\"acp\"], true, \"ACP\" and missing are excluded",
+      "pass": true,
+      "observed": [
+        "odd-acp-in-a",
+        "1d5a9d49c26d4a3a8f0bbc4a44fbd486",
+        "0aa8cf31e5b44dd98b6b23d9b2db6a83"
+      ]
+    },
+    {
+      "check": "sqlite acp: session/list cwd=b lists only the workspace-b session",
+      "pass": true,
+      "observed": [
+        "1d5a9d49c26d4a3a8f0bbc4a44fbd486"
+      ]
+    },
+    {
+      "check": "sqlite acp: with 108 ACP sessions, session/list returns the newest 100 (the store limit), in order",
+      "pass": true,
+      "observed": 100
+    },
+    {
+      "check": "sqlite acp: the acp server exits 0 on stdin EOF",
+      "pass": true,
+      "observed": 0
+    },
+    {
+      "check": "sqlite acp: through a real runtime, list_sessions with two filters (surface=acp, workspace_root=a) selects exactly workspace a's ACP sessions; a non-matching second filter selects none",
+      "pass": true,
+      "observed": {
+        "matched": 2,
+        "expected": 2,
+        "nonmatching": []
+      }
+    },
+    {
+      "check": "sqlite focus (RecordStoreSQLite): a new Focus session stores working_dir (resolved) and focus_mode",
+      "pass": true,
+      "observed": {
+        "working_dir": "<RUNNER_TEMP>/work/probe_369_sqlite/focus-sqlite/project-a",
+        "focus_mode": true
+      }
+    },
+    {
+      "check": "sqlite focus: list_directory_sessions = alpha's sessions of project-a, newest first (beta's and project-b's excluded; one with NaN/NUL in other members included)",
+      "pass": true,
+      "observed": [
+        "focus-odd",
+        "focus-e42161a9e5064ec7833932f1ac5fc6e5",
+        "focus-94e77df55f4a4227a2783657abff5ec8",
+        "focus-ac305248d804421e9b123302ca182082"
+      ]
+    },
+    {
+      "check": "sqlite focus: limit=2 returns the newest two",
+      "pass": true,
+      "observed": [
+        "focus-odd",
+        "focus-e42161a9e5064ec7833932f1ac5fc6e5"
+      ]
+    },
+    {
+      "check": "sqlite focus: find_candidate_session is the newest",
+      "pass": true,
+      "observed": "focus-odd"
+    },
+    {
+      "check": "sqlite focus: beta lists only its own project-a session",
+      "pass": true,
+      "observed": [
+        "focus-a0ce740da4cd49788b293c00a22532df"
+      ]
+    },
+    {
+      "check": "sqlite focus: project-b lists its one session",
+      "pass": true,
+      "observed": [
+        "focus-dd260941cfd44142b68ccdac069f3732"
+      ]
+    },
+    {
+      "check": "sqlite focus-cli: the bare `openminion --dir <project>` Focus launch in a pseudo-terminal starts, and `/exit` ends it with exit 0",
+      "pass": true,
+      "observed": {
+        "exit_code": 0,
+        "steps": [
+          {
+            "after": "startup",
+            "running": true,
+            "bytes": 1567
+          },
+          {
+            "sent": "/exit\r"
+          }
+        ],
+        "output_tail": [
+          "\u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256f",
+          "Tip: / for commands \u00b7 @ to mention a file \u00b7 keep typing while a turn runs",
+          "\u276f Ask anything \u00b7 @ to mention a file \u00b7 / for commands",
+          "\u25c6 alpha  \u00b7  model: \u2014  \u00b7  cwd: <RUNNER_TEMP>/work/probe_369_sqlite/focus-sqlite/project-cli                    /exit"
+        ]
+      }
+    },
+    {
+      "check": "sqlite focus-cli: the launch created its Focus directory session (target focus, working_dir = the project) in the runtime database",
+      "pass": true,
+      "observed": [
+        {
+          "id": "focus-5c9728b0edc54a55b75c11c4d44acdfc",
+          "target": "focus",
+          "metadata": {
+            "cwd": "<RUNNER_TEMP>/work/probe_369_sqlite/focus-sqlite/project-cli",
+            "focus_mode": true,
+            "permission_mode": "default",
+            "permission_overrides": {},
+            "session_action_policy_mode_override": "",
+            "working_dir": "<RUNNER_TEMP>/work/probe_369_sqlite/focus-sqlite/project-cli",
+            "workspace_root": "<RUNNER_TEMP>/work/probe_369_sqlite/focus-sqlite/project-cli"
+          }
+        }
+      ]
+    },
+    {
+      "check": "sqlite focus-cli: the Focus runtime lists that session for the project directory",
+      "pass": true,
+      "observed": [
+        "focus-5c9728b0edc54a55b75c11c4d44acdfc"
+      ]
+    }
+  ],
+  "cases": {
+    "sqlite acp": {
+      "database": null,
+      "server application_name": null,
+      "writer record store": "RecordStoreSQLite",
+      "session/list cwd=a": [
+        "odd-acp-in-a",
+        "0aa8cf31e5b44dd98b6b23d9b2db6a83"
+      ],
+      "session/list": [
+        "odd-acp-in-a",
+        "1d5a9d49c26d4a3a8f0bbc4a44fbd486",
+        "0aa8cf31e5b44dd98b6b23d9b2db6a83"
+      ],
+      "session/list cwd=b": [
+        "1d5a9d49c26d4a3a8f0bbc4a44fbd486"
+      ],
+      "session/list with 108 ACP sessions": 100,
+      "acp exit code": 0
+    },
+    "sqlite acp sqlite files": {
+      ".openminion/artifact/index.db": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071524611318Z-0-none.sqlite": {
+        "tables": 0
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071527238264Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071528807945Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/memory/memory.db": {
+        "tables": 14
+      },
+      ".openminion/ops/evidence.db": {
+        "tables": 1
+      },
+      ".openminion/ops/jobs.db": {
+        "tables": 1
+      },
+      ".openminion/ops/plans.db": {
+        "tables": 1
+      },
+      ".openminion/policy/policy.db": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071524333727Z-0-none.sqlite": {
+        "tables": 0
+      },
+      ".openminion/policy/policy.db.bak/20261029T071527124352Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071528776406Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/retrieve/retrieve.db": {
+        "tables": 11
+      },
+      ".openminion/state.db": {
+        "tables": 20,
+        "sessions_rows": 113,
+        "room_participants_rows": 113
+      },
+      ".openminion/telemetry/telemetry.db": {
+        "tables": 3
+      }
+    },
+    "sqlite focus": {
+      "database": null,
+      "record store": "RecordStoreSQLite",
+      "created": [
+        "focus-ac305248d804421e9b123302ca182082",
+        "focus-94e77df55f4a4227a2783657abff5ec8",
+        "focus-e42161a9e5064ec7833932f1ac5fc6e5"
+      ],
+      "beta": "focus-a0ce740da4cd49788b293c00a22532df",
+      "project-b": "focus-dd260941cfd44142b68ccdac069f3732",
+      "listed": [
+        "focus-odd",
+        "focus-e42161a9e5064ec7833932f1ac5fc6e5",
+        "focus-94e77df55f4a4227a2783657abff5ec8",
+        "focus-ac305248d804421e9b123302ca182082"
+      ],
+      "expected": [
+        "focus-odd",
+        "focus-e42161a9e5064ec7833932f1ac5fc6e5",
+        "focus-94e77df55f4a4227a2783657abff5ec8",
+        "focus-ac305248d804421e9b123302ca182082"
+      ]
+    },
+    "sqlite focus-cli": {
+      "argv": [
+        "openminion",
+        "--home-root",
+        "<RUNNER_TEMP>/work/probe_369_sqlite/focus-sqlite",
+        "--data-root",
+        "<RUNNER_TEMP>/work/probe_369_sqlite/focus-sqlite/.openminion",
+        "--config",
+        "<RUNNER_TEMP>/work/probe_369_sqlite/focus-sqlite/agents-focus-cli.json",
+        "--dir",
+        "<RUNNER_TEMP>/work/probe_369_sqlite/focus-sqlite/project-cli",
+        "--no-update-check",
+        "--no-context"
+      ],
+      "steps": [
+        {
+          "after": "startup",
+          "running": true,
+          "bytes": 1567
+        },
+        {
+          "sent": "/exit\r"
+        }
+      ],
+      "exit_code": 0,
+      "output_tail": [
+        "\u256d\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256e",
+        "\u2502 OpenMinion CLI  (v0.1.15)                         \u2502",
+        "\u2502 interactive terminal  \u00b7  type-ahead queue enabled \u2502",
+        "\u2502                                                   \u2502",
+        "\u2502 model:       \u2014                                    \u2502",
+        "\u2502 directory:   ~/\u2026/focus-sqlite/project-cli         \u2502",
+        "\u2502 permissions: default                              \u2502",
+        "\u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256f",
+        "Tip: / for commands \u00b7 @ to mention a file \u00b7 keep typing while a turn runs",
+        "\u276f Ask anything \u00b7 @ to mention a file \u00b7 / for commands",
+        "\u25c6 alpha  \u00b7  model: \u2014  \u00b7  cwd: <RUNNER_TEMP>/work/probe_369_sqlite/focus-sqlite/project-cli                    /exit"
+      ],
+      "new sessions": [
+        {
+          "id": "focus-5c9728b0edc54a55b75c11c4d44acdfc",
+          "target": "focus",
+          "metadata": {
+            "cwd": "<RUNNER_TEMP>/work/probe_369_sqlite/focus-sqlite/project-cli",
+            "focus_mode": true,
+            "permission_mode": "default",
+            "permission_overrides": {},
+            "session_action_policy_mode_override": "",
+            "working_dir": "<RUNNER_TEMP>/work/probe_369_sqlite/focus-sqlite/project-cli",
+            "workspace_root": "<RUNNER_TEMP>/work/probe_369_sqlite/focus-sqlite/project-cli"
+          }
+        }
+      ],
+      "listed by the Focus runtime": [
+        "focus-5c9728b0edc54a55b75c11c4d44acdfc"
+      ]
+    },
+    "sqlite focus sqlite files": {
+      ".openminion/artifact/index.db": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071528984981Z-0-none.sqlite": {
+        "tables": 0
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071531455168Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/authored_tools/store.sqlite.bak/20261029T071542585692Z-0-0001_baseline.sqlite": {
+        "tables": 5
+      },
+      ".openminion/memory/memory.db": {
+        "tables": 14
+      },
+      ".openminion/ops/evidence.db": {
+        "tables": 1
+      },
+      ".openminion/ops/jobs.db": {
+        "tables": 1
+      },
+      ".openminion/ops/plans.db": {
+        "tables": 1
+      },
+      ".openminion/policy/policy.db": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071528928661Z-0-none.sqlite": {
+        "tables": 0
+      },
+      ".openminion/policy/policy.db.bak/20261029T071531205580Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/policy/policy.db.bak/20261029T071542569421Z-0-0002_blockchain_confirmations.sqlite": {
+        "tables": 6
+      },
+      ".openminion/retrieve/retrieve.db": {
+        "tables": 11
+      },
+      ".openminion/state.db": {
+        "tables": 20,
+        "sessions_rows": 7,
+        "room_participants_rows": 7
+      },
+      ".openminion/telemetry/telemetry.db": {
+        "tables": 3
+      }
+    }
+  },
+  "not_run": [],
+  "summary": {
+    "passed": 16,
+    "failed": 0,
+    "total": 16
+  }
+}

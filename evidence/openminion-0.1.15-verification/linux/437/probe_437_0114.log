@@ -1,0 +1,40 @@
+{
+  "probe": "probe_437",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.14",
+  "python": "3.12.15",
+  "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "gc": "disabled before importing openminion; gc.collect calls counted",
+  "postgres": {
+    "sqlalchemy": "2.1.6",
+    "psycopg": "3.3.6",
+    "select version()": "PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+    "server_version": "16.15 (Debian 16.15-1.pgdg13+2)",
+    "url_scheme": "postgresql+psycopg"
+  }
+}
+PASS S1 sqlite: storage_connection is a sqlite3.Connection, the same object as runtime_storage.connection and the record store's connection | observed={'type': 'Connection', 'record_store': 'RecordStoreSQLite', 'is_runtime_storage_connection': True, 'is_record_store_connection': True}
+PASS S1 sqlite: that connection's main database is storage.path, and the file exists | observed={'main': '<RUNNER_TEMP>/work/probe_437_0114/s1_sqlite_api/.openminion/state.db', 'storage.path': '<RUNNER_TEMP>/work/probe_437_0114/s1_sqlite_api/.openminion/state.db'}
+PASS S1 sqlite: one SDK turn (Agent(runtime=...).run) completes | observed={'run_state': 'completed', 'text': 'first: hello from probe_437 (thinking=minimal)'}
+PASS S1 sqlite: the turn's session row and its 2 messages (the prompt and the reply) are in the runtime database | observed={'sessions': 1, 'messages': [['inbound', 'hello from probe_437'], ['outbound', 'first: hello from probe_437 (thinking=minimal)']]}
+PASS S1 sqlite: the turn's session has its owner participant row (agent first, owner) | observed=[['agent', 'first', 'owner']]
+PASS S1 sqlite: close() closes that connection | observed=True
+PASS S2 sqlite (`storage.backend: sqlite` in the file): record backend record.sqlite; storage_connection is the record store's own sqlite3.Connection | observed={'record_backend': 'record.sqlite', 'type': 'Connection'}
+PASS S2 sqlite: close() closes it | observed=True
+PASS S3 sqlite wrapper: OpenMinionRuntime.storage is the runtime's storage_connection, the record store's own sqlite3.Connection; sess is the runtime's SessionStore | observed={'type': 'Connection', 'sess': 'SessionStore'}
+PASS S3 sqlite wrapper: close() closes it | observed=True
+PASS S4 sqlite: `openminion room create --agent first --agent second` and `room invite <room> --human alice` exit 0 (participants=2, active_agent=first, then participants=3); the rows are in state.db | observed={'create': {'exit_code': 0, 'stderr_tail': [], 'seconds': 4.23, 'stdout': ['room=room-0cb727b0c5a24875b63231b49a357e1b', 'participants=2', 'active_agent=first']}, 'invite': {'exit_code': 0, 'stderr_tail': [], 'seconds': 4.09, 'stdout': ['invited human=alice', 'participants=3']}, 'rows': [{'participant_type': 'agent', 'participant_id': 'first', 'role': 'owner', 'join_seq': 1}, {'participant_type': 'agent', 'participant_id': 'second', 'role': 'participant', 'join_seq': 2}, {'participant_type': 'human', 'participant_id': 'alice', 'role': 'participant', 'join_seq': 3}]}
+PASS S5a sqlite (default storage config): finalize_runtime_instance with a record store that has no connection raises the existing `RuntimeError: runtime record_store does not expose sqlite connection` and builds no runtime | observed={'outcome': 'RuntimeError: runtime record_store does not expose sqlite connection', 'runtime_built': False}
+PASS S5b sqlite (`storage.backend: sqlite`): APIRuntime.from_config_path whose built SQLite record store reports no connection fails with the existing `RuntimeError: runtime record_store does not expose sqlite connection` | observed={'outcome': 'RuntimeError: runtime record_store does not expose sqlite connection', 'storages_built': 1}
+FAIL P1 postgres, storage section, postgresql+psycopg:// URL: APIRuntime.from_config_path starts | observed='RuntimeError: runtime record_store does not expose sqlite connection'
+FAIL P2 postgres, storage section, postgresql:// URL: APIRuntime.from_config_path starts | observed='RuntimeError: runtime record_store does not expose sqlite connection'
+FAIL P3 postgres, OPENMINION_STORAGE_BACKEND/OPENMINION_STORAGE_POSTGRES_URL: APIRuntime.from_config_path starts | observed='RuntimeError: runtime record_store does not expose sqlite connection'
+FAIL P4 postgres wrapper: OpenMinionRuntime.from_config_path starts | observed='RuntimeError: runtime record_store does not expose sqlite connection'
+FAIL P5 postgres room CLI: `openminion ... room create --name probe-437 --agent first --agent second` exits 0 with participants=2, active_agent=first | observed={'exit_code': 1, 'stderr_tail': ["Postgres module 'session' has pending migrations. Run: openminion storage migrate --module session", "Postgres module 'task' has pending migrations. Run: openminion storage migrate --module task", "Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory", "Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact", "Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy", 'openminion room: startup error — runtime record_store does not expose sqlite connection'], 'seconds': 4.58, 'connections_max_while_running': 1, 'connections_samples': 73, 'connections_after_exit': {'count': 0, 'waited_s': 0.01}, 'stdout': []}
+gc.collect calls during the probe: 0
+SUMMARY passed=13 failed=5 total=18
+exit=1

@@ -1,0 +1,518 @@
+{
+  "banner": {
+    "probe": "probe_446r",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.14",
+    "python": "3.12.15",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<WORK>/empty",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "backend": "sqlite",
+    "console_script": "<VENV>/bin/openminion",
+    "console_script_exists": true,
+    "console_script_entry_point": "openminion.cli.main:main"
+  },
+  "summary": {
+    "passed": 9,
+    "failed": 9,
+    "total": 18
+  },
+  "checks": [
+    {
+      "check": "sqlite: the probe runs the installed console script `openminion` (entry point openminion.cli.main:main)",
+      "pass": true,
+      "observed": {
+        "script": "<VENV>/bin/openminion",
+        "entry_point": "openminion.cli.main:main"
+      }
+    },
+    {
+      "check": "sqlite: both test databases start with no alembic_version table",
+      "pass": true,
+      "observed": {
+        "sqlite:db1": [],
+        "sqlite:db2": []
+      }
+    },
+    {
+      "check": "sqlite success: the migrations really ran: both new databases are at the module's head revision",
+      "pass": true,
+      "observed": {
+        "db1": [
+          "0001_baseline"
+        ],
+        "db2": [
+          "0001_baseline"
+        ],
+        "head": "0001_baseline"
+      }
+    },
+    {
+      "check": "sqlite success (db1 new database, text): exit 0, stdout exactly '  ok  secret', no traceback",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "stdout": "  ok  secret\n"
+      }
+    },
+    {
+      "check": "sqlite success (db2 at head, text): exit 0, stdout exactly '  ok  secret', no traceback",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "stdout": "  ok  secret\n"
+      }
+    },
+    {
+      "check": "sqlite success (db2 new database, --json): exit 0 and the JSON entries are exactly [{module_id: secret, status: ok, success: true}]",
+      "pass": false,
+      "observed": {
+        "exit": 0,
+        "json": {
+          "modules": [
+            {
+              "module_id": "secret",
+              "status": "ok",
+              "applied": [],
+              "success": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "check": "sqlite success (db1 at head, --json): exit 0 and the JSON entries are exactly [{module_id: secret, status: ok, success: true}]",
+      "pass": false,
+      "observed": {
+        "exit": 0,
+        "json": {
+          "modules": [
+            {
+              "module_id": "secret",
+              "status": "ok",
+              "applied": [],
+              "success": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "check": "sqlite success: no entry carries an `applied` list (nor an `error`)",
+      "pass": false,
+      "observed": [
+        [
+          {
+            "module_id": "secret",
+            "status": "ok",
+            "applied": [],
+            "success": true
+          }
+        ],
+        [
+          {
+            "module_id": "secret",
+            "status": "ok",
+            "applied": [],
+            "success": true
+          }
+        ]
+      ]
+    },
+    {
+      "check": "sqlite failure: the installed MigrationRunner's report for this database fails with the revision error",
+      "pass": true,
+      "observed": "Alembic upgrade failed for module 'secret': Can't locate revision identified by '9999_not_a_revision'"
+    },
+    {
+      "check": "sqlite failure (db1 invalid revision, --json): the JSON entry carries the actual revision error (identical to MigrationReport.error), status error, success false",
+      "pass": false,
+      "observed": [
+        {
+          "module_id": "secret",
+          "status": "error",
+          "applied": [],
+          "success": false
+        }
+      ]
+    },
+    {
+      "check": "sqlite failure (db1 invalid revision, --json): no `applied` list in the entry",
+      "pass": false,
+      "observed": [
+        {
+          "module_id": "secret",
+          "status": "error",
+          "applied": [],
+          "success": false
+        }
+      ]
+    },
+    {
+      "check": "sqlite failure (db1 invalid revision, --json): exit status nonzero (1)",
+      "pass": true,
+      "observed": 1
+    },
+    {
+      "check": "sqlite failure (db1 invalid revision, --verify --json): the JSON entry carries the actual revision error (identical to MigrationReport.error), status error, success false",
+      "pass": false,
+      "observed": [
+        {
+          "module_id": "secret",
+          "status": "error",
+          "applied": [],
+          "success": false
+        }
+      ]
+    },
+    {
+      "check": "sqlite failure (db1 invalid revision, --verify --json): no `applied` list in the entry",
+      "pass": false,
+      "observed": [
+        {
+          "module_id": "secret",
+          "status": "error",
+          "applied": [],
+          "success": false
+        }
+      ]
+    },
+    {
+      "check": "sqlite failure (db1 invalid revision, --verify --json): exit status nonzero (1)",
+      "pass": true,
+      "observed": 1
+    },
+    {
+      "check": "sqlite failure (db1 invalid revision, text): stdout is '  FAIL  secret: <the actual revision error>', exit 1",
+      "pass": false,
+      "observed": {
+        "exit": 1,
+        "stdout": "  FAIL  secret\n"
+      }
+    },
+    {
+      "check": "sqlite failure (db1 invalid revision, --verify): stdout is '  FAIL  secret: <the actual revision error>', exit 1",
+      "pass": false,
+      "observed": {
+        "exit": 1,
+        "stdout": "  FAIL  secret\n"
+      }
+    },
+    {
+      "check": "sqlite failure: the failed runs left the database as it was (revision 9999_not_a_revision, same tables and om_meta)",
+      "pass": true,
+      "observed": {
+        "before": {
+          "alembic_version": [
+            "9999_not_a_revision"
+          ],
+          "tables": [
+            "alembic_version",
+            "om_meta",
+            "secrets"
+          ],
+          "om_meta": {
+            "module_id": "secret",
+            "schema_head": "0001_baseline",
+            "last_migrated_at": "2026-10-29T07:42:51+00:00"
+          }
+        },
+        "after": {
+          "alembic_version": [
+            "9999_not_a_revision"
+          ],
+          "tables": [
+            "alembic_version",
+            "om_meta",
+            "secrets"
+          ],
+          "om_meta": {
+            "module_id": "secret",
+            "schema_head": "0001_baseline",
+            "last_migrated_at": "2026-10-29T07:42:51+00:00"
+          }
+        }
+      }
+    }
+  ],
+  "cases": {
+    "secret_head_revision": "0001_baseline",
+    "databases": [
+      "sqlite:db1",
+      "sqlite:db2"
+    ],
+    "after_success": {
+      "db1": {
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "om_meta": {
+          "module_id": "secret",
+          "schema_head": "0001_baseline",
+          "last_migrated_at": "2026-10-29T07:42:51+00:00"
+        },
+        "tables": [
+          "alembic_version",
+          "om_meta",
+          "secrets"
+        ]
+      },
+      "db2": {
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "om_meta": {
+          "module_id": "secret",
+          "schema_head": "0001_baseline",
+          "last_migrated_at": "2026-10-29T07:42:51+00:00"
+        },
+        "tables": [
+          "alembic_version",
+          "om_meta",
+          "secrets"
+        ]
+      }
+    },
+    "db1_invalid_revision_before": {
+      "alembic_version": [
+        "9999_not_a_revision"
+      ],
+      "tables": [
+        "alembic_version",
+        "om_meta",
+        "secrets"
+      ],
+      "om_meta": {
+        "module_id": "secret",
+        "schema_head": "0001_baseline",
+        "last_migrated_at": "2026-10-29T07:42:51+00:00"
+      }
+    },
+    "db1_invalid_revision_after": {
+      "alembic_version": [
+        "9999_not_a_revision"
+      ],
+      "tables": [
+        "alembic_version",
+        "om_meta",
+        "secrets"
+      ],
+      "om_meta": {
+        "module_id": "secret",
+        "schema_head": "0001_baseline",
+        "last_migrated_at": "2026-10-29T07:42:51+00:00"
+      }
+    },
+    "migration_report_in_process": {
+      "success": false,
+      "error": "Alembic upgrade failed for module 'secret': Can't locate revision identified by '9999_not_a_revision'",
+      "has_applied_versions": false
+    },
+    "cli_runs": [
+      {
+        "label": "db1 new database, text",
+        "argv": [
+          "openminion",
+          "storage",
+          "migrate",
+          "--sqlite",
+          "<WORK>/work/probe_446r_sqlite_0114/sqlite/db1.db",
+          "--module",
+          "secret"
+        ],
+        "exit_code": 0,
+        "stdout": "  ok  secret\n",
+        "stdout_line_endings": "lf",
+        "stderr_tail": "",
+        "stderr_has_traceback": false,
+        "seconds": 0.5,
+        "files_left_in_cwd": [],
+        "json": null
+      },
+      {
+        "label": "db1 at head, --json",
+        "argv": [
+          "openminion",
+          "storage",
+          "migrate",
+          "--sqlite",
+          "<WORK>/work/probe_446r_sqlite_0114/sqlite/db1.db",
+          "--module",
+          "secret",
+          "--json"
+        ],
+        "exit_code": 0,
+        "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"secret\",\n      \"status\": \"ok\",\n      \"applied\": [],\n      \"success\": true\n    }\n  ]\n}\n",
+        "stdout_line_endings": "lf",
+        "stderr_tail": "",
+        "stderr_has_traceback": false,
+        "seconds": 0.36,
+        "files_left_in_cwd": [],
+        "json": {
+          "modules": [
+            {
+              "module_id": "secret",
+              "status": "ok",
+              "applied": [],
+              "success": true
+            }
+          ]
+        }
+      },
+      {
+        "label": "db2 new database, --json",
+        "argv": [
+          "openminion",
+          "storage",
+          "migrate",
+          "--sqlite",
+          "<WORK>/work/probe_446r_sqlite_0114/sqlite/db2.db",
+          "--module",
+          "secret",
+          "--json"
+        ],
+        "exit_code": 0,
+        "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"secret\",\n      \"status\": \"ok\",\n      \"applied\": [],\n      \"success\": true\n    }\n  ]\n}\n",
+        "stdout_line_endings": "lf",
+        "stderr_tail": "",
+        "stderr_has_traceback": false,
+        "seconds": 0.41,
+        "files_left_in_cwd": [],
+        "json": {
+          "modules": [
+            {
+              "module_id": "secret",
+              "status": "ok",
+              "applied": [],
+              "success": true
+            }
+          ]
+        }
+      },
+      {
+        "label": "db2 at head, text",
+        "argv": [
+          "openminion",
+          "storage",
+          "migrate",
+          "--sqlite",
+          "<WORK>/work/probe_446r_sqlite_0114/sqlite/db2.db",
+          "--module",
+          "secret"
+        ],
+        "exit_code": 0,
+        "stdout": "  ok  secret\n",
+        "stdout_line_endings": "lf",
+        "stderr_tail": "",
+        "stderr_has_traceback": false,
+        "seconds": 0.37,
+        "files_left_in_cwd": [],
+        "json": null
+      },
+      {
+        "label": "db1 invalid revision, --json",
+        "argv": [
+          "openminion",
+          "storage",
+          "migrate",
+          "--sqlite",
+          "<WORK>/work/probe_446r_sqlite_0114/sqlite/db1.db",
+          "--module",
+          "secret",
+          "--json"
+        ],
+        "exit_code": 1,
+        "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"secret\",\n      \"status\": \"error\",\n      \"applied\": [],\n      \"success\": false\n    }\n  ]\n}\n",
+        "stdout_line_endings": "lf",
+        "stderr_tail": "",
+        "stderr_has_traceback": false,
+        "seconds": 0.36,
+        "files_left_in_cwd": [],
+        "json": {
+          "modules": [
+            {
+              "module_id": "secret",
+              "status": "error",
+              "applied": [],
+              "success": false
+            }
+          ]
+        }
+      },
+      {
+        "label": "db1 invalid revision, text",
+        "argv": [
+          "openminion",
+          "storage",
+          "migrate",
+          "--sqlite",
+          "<WORK>/work/probe_446r_sqlite_0114/sqlite/db1.db",
+          "--module",
+          "secret"
+        ],
+        "exit_code": 1,
+        "stdout": "  FAIL  secret\n",
+        "stdout_line_endings": "lf",
+        "stderr_tail": "",
+        "stderr_has_traceback": false,
+        "seconds": 0.35,
+        "files_left_in_cwd": [],
+        "json": null
+      },
+      {
+        "label": "db1 invalid revision, --verify --json",
+        "argv": [
+          "openminion",
+          "storage",
+          "migrate",
+          "--sqlite",
+          "<WORK>/work/probe_446r_sqlite_0114/sqlite/db1.db",
+          "--module",
+          "secret",
+          "--verify",
+          "--json"
+        ],
+        "exit_code": 1,
+        "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"secret\",\n      \"status\": \"error\",\n      \"applied\": [],\n      \"success\": false\n    }\n  ]\n}\n",
+        "stdout_line_endings": "lf",
+        "stderr_tail": "",
+        "stderr_has_traceback": false,
+        "seconds": 0.35,
+        "files_left_in_cwd": [],
+        "json": {
+          "modules": [
+            {
+              "module_id": "secret",
+              "status": "error",
+              "applied": [],
+              "success": false
+            }
+          ]
+        }
+      },
+      {
+        "label": "db1 invalid revision, --verify",
+        "argv": [
+          "openminion",
+          "storage",
+          "migrate",
+          "--sqlite",
+          "<WORK>/work/probe_446r_sqlite_0114/sqlite/db1.db",
+          "--module",
+          "secret",
+          "--verify"
+        ],
+        "exit_code": 1,
+        "stdout": "  FAIL  secret\n",
+        "stdout_line_endings": "lf",
+        "stderr_tail": "",
+        "stderr_has_traceback": false,
+        "seconds": 0.37,
+        "files_left_in_cwd": [],
+        "json": null
+      }
+    ]
+  }
+}

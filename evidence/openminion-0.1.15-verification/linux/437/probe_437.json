@@ -1,0 +1,1019 @@
+{
+  "banner": {
+    "probe": "probe_437",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.15",
+    "python": "3.12.15",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<RUNNER_TEMP>/empty",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "gc": "disabled before importing openminion; gc.collect calls counted",
+    "postgres": {
+      "sqlalchemy": "2.1.6",
+      "psycopg": "3.3.6",
+      "select version()": "PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+      "server_version": "16.15 (Debian 16.15-1.pgdg13+2)",
+      "url_scheme": "postgresql+psycopg"
+    }
+  },
+  "checks": [
+    {
+      "check": "S1 sqlite: storage_connection is a sqlite3.Connection, the same object as runtime_storage.connection and the record store's connection",
+      "pass": true,
+      "observed": {
+        "type": "Connection",
+        "record_store": "RecordStoreSQLite",
+        "is_runtime_storage_connection": true,
+        "is_record_store_connection": true
+      }
+    },
+    {
+      "check": "S1 sqlite: that connection's main database is storage.path, and the file exists",
+      "pass": true,
+      "observed": {
+        "main": "<RUNNER_TEMP>/work/probe_437/s1_sqlite_api/.openminion/state.db",
+        "storage.path": "<RUNNER_TEMP>/work/probe_437/s1_sqlite_api/.openminion/state.db"
+      }
+    },
+    {
+      "check": "S1 sqlite: one SDK turn (Agent(runtime=...).run) completes",
+      "pass": true,
+      "observed": {
+        "run_state": "completed",
+        "text": "first: hello from probe_437 (thinking=minimal)"
+      }
+    },
+    {
+      "check": "S1 sqlite: the turn's session row and its 2 messages (the prompt and the reply) are in the runtime database",
+      "pass": true,
+      "observed": {
+        "sessions": 1,
+        "messages": [
+          [
+            "inbound",
+            "hello from probe_437"
+          ],
+          [
+            "outbound",
+            "first: hello from probe_437 (thinking=minimal)"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "S1 sqlite: the turn's session has its owner participant row (agent first, owner)",
+      "pass": true,
+      "observed": [
+        [
+          "agent",
+          "first",
+          "owner"
+        ]
+      ]
+    },
+    {
+      "check": "S1 sqlite: close() closes that connection",
+      "pass": true,
+      "observed": true
+    },
+    {
+      "check": "S2 sqlite (`storage.backend: sqlite` in the file): record backend record.sqlite; storage_connection is the record store's own sqlite3.Connection",
+      "pass": true,
+      "observed": {
+        "record_backend": "record.sqlite",
+        "type": "Connection"
+      }
+    },
+    {
+      "check": "S2 sqlite: close() closes it",
+      "pass": true,
+      "observed": true
+    },
+    {
+      "check": "S3 sqlite wrapper: OpenMinionRuntime.storage is the runtime's storage_connection, the record store's own sqlite3.Connection; sess is the runtime's SessionStore",
+      "pass": true,
+      "observed": {
+        "type": "Connection",
+        "sess": "SessionStore"
+      }
+    },
+    {
+      "check": "S3 sqlite wrapper: close() closes it",
+      "pass": true,
+      "observed": true
+    },
+    {
+      "check": "S4 sqlite: `openminion room create --agent first --agent second` and `room invite <room> --human alice` exit 0 (participants=2, active_agent=first, then participants=3); the rows are in state.db",
+      "pass": true,
+      "observed": {
+        "create": {
+          "exit_code": 0,
+          "stderr_tail": [],
+          "seconds": 4.29,
+          "stdout": [
+            "room=room-2d206cccff7e45b1abc9e8866655182f",
+            "participants=2",
+            "active_agent=first"
+          ]
+        },
+        "invite": {
+          "exit_code": 0,
+          "stderr_tail": [],
+          "seconds": 4.24,
+          "stdout": [
+            "invited human=alice",
+            "participants=3"
+          ]
+        },
+        "rows": [
+          {
+            "participant_type": "agent",
+            "participant_id": "first",
+            "role": "owner",
+            "join_seq": 1
+          },
+          {
+            "participant_type": "agent",
+            "participant_id": "second",
+            "role": "participant",
+            "join_seq": 2
+          },
+          {
+            "participant_type": "human",
+            "participant_id": "alice",
+            "role": "participant",
+            "join_seq": 3
+          }
+        ]
+      }
+    },
+    {
+      "check": "S5a sqlite (default storage config): finalize_runtime_instance with a record store that has no connection raises the existing `RuntimeError: runtime record_store does not expose sqlite connection` and builds no runtime",
+      "pass": true,
+      "observed": {
+        "outcome": "RuntimeError: runtime record_store does not expose sqlite connection",
+        "runtime_built": false
+      }
+    },
+    {
+      "check": "S5b sqlite (`storage.backend: sqlite`): APIRuntime.from_config_path whose built SQLite record store reports no connection fails with the existing `RuntimeError: runtime record_store does not expose sqlite connection`",
+      "pass": true,
+      "observed": {
+        "outcome": "RuntimeError: runtime record_store does not expose sqlite connection",
+        "storages_built": 1
+      }
+    },
+    {
+      "check": "P1 postgres, storage section, postgresql+psycopg:// URL: starts; storage.backend postgres, record store RecordStorePostgres, storage_connection is None",
+      "pass": true,
+      "observed": {
+        "backend": "postgres",
+        "record_backend": "record.postgres",
+        "record_store": "RecordStorePostgres",
+        "storage_connection": "None"
+      }
+    },
+    {
+      "check": "P1 postgres, storage section, postgresql+psycopg:// URL: sessions use PostgreSQL: a session and a message written through runtime.sessions are read back from an independent PostgreSQL connection",
+      "pass": true,
+      "observed": [
+        {
+          "target": "om437-config",
+          "body": "written through runtime.sessions (config)"
+        }
+      ]
+    },
+    {
+      "check": "P1 postgres, storage section, postgresql+psycopg:// URL: one SDK turn (Agent(runtime=...).run) completes",
+      "pass": true,
+      "observed": {
+        "run_state": "completed",
+        "text": "first: hello from probe_437 (thinking=minimal)"
+      }
+    },
+    {
+      "check": "P1 postgres, storage section, postgresql+psycopg:// URL: the turn's session row and its 2 messages (the prompt and the reply) are in the runtime database",
+      "pass": true,
+      "observed": {
+        "sessions": 1,
+        "messages": [
+          [
+            "inbound",
+            "hello from probe_437"
+          ],
+          [
+            "outbound",
+            "first: hello from probe_437 (thinking=minimal)"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "P1 postgres, storage section, postgresql+psycopg:// URL: the turn's session has its owner participant row (agent first, owner)",
+      "pass": true,
+      "observed": [
+        [
+          "agent",
+          "first",
+          "owner"
+        ]
+      ]
+    },
+    {
+      "check": "P1 postgres, storage section, postgresql+psycopg:// URL: while open, the runtime holds PostgreSQL connections under its application_name",
+      "pass": true,
+      "observed": 1
+    },
+    {
+      "check": "P1 postgres, storage section, postgresql+psycopg:// URL: after close() no connection with its application_name remains (no gc.collect)",
+      "pass": true,
+      "observed": {
+        "count": 0,
+        "waited_s": 0.01
+      }
+    },
+    {
+      "check": "P1 postgres, storage section, postgresql+psycopg:// URL: no runtime SQLite database created at storage.path",
+      "pass": true,
+      "observed": {
+        "storage.path exists": false,
+        "sqlite files": [
+          ".openminion/artifact/index.db",
+          ".openminion/authored_tools/store.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071459503020Z-0-none.sqlite",
+          ".openminion/brain/brain.db",
+          ".openminion/brain/memory.db",
+          ".openminion/brain/sessions.db",
+          ".openminion/identity/identity.db",
+          ".openminion/memory/memory.audit.db",
+          ".openminion/memory/memory.db",
+          ".openminion/ops/evidence.db",
+          ".openminion/ops/jobs.db",
+          ".openminion/ops/plans.db",
+          ".openminion/policy/policy.db",
+          ".openminion/policy/policy.db.bak/20261029T071459448145Z-0-none.sqlite",
+          ".openminion/retrieve/retrieve.db",
+          ".openminion/skill/skills.db",
+          ".openminion/task/task.db",
+          ".openminion/telemetry/telemetry.db"
+        ]
+      }
+    },
+    {
+      "check": "P2 postgres, storage section, postgresql:// URL: starts; storage.backend postgres, record store RecordStorePostgres, storage_connection is None",
+      "pass": true,
+      "observed": {
+        "backend": "postgres",
+        "record_backend": "record.postgres",
+        "record_store": "RecordStorePostgres",
+        "storage_connection": "None"
+      }
+    },
+    {
+      "check": "P2 postgres, storage section, postgresql:// URL: sessions use PostgreSQL: a session and a message written through runtime.sessions are read back from an independent PostgreSQL connection",
+      "pass": true,
+      "observed": [
+        {
+          "target": "om437-plain",
+          "body": "written through runtime.sessions (plain)"
+        }
+      ]
+    },
+    {
+      "check": "P2 postgres, storage section, postgresql:// URL: while open, the runtime holds PostgreSQL connections under its application_name",
+      "pass": true,
+      "observed": 1
+    },
+    {
+      "check": "P2 postgres, storage section, postgresql:// URL: after close() no connection with its application_name remains (no gc.collect)",
+      "pass": true,
+      "observed": {
+        "count": 0,
+        "waited_s": 0.01
+      }
+    },
+    {
+      "check": "P2 postgres, storage section, postgresql:// URL: no runtime SQLite database created at storage.path",
+      "pass": true,
+      "observed": {
+        "storage.path exists": false,
+        "sqlite files": [
+          ".openminion/artifact/index.db",
+          ".openminion/authored_tools/store.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071500490010Z-0-none.sqlite",
+          ".openminion/memory/memory.db",
+          ".openminion/ops/evidence.db",
+          ".openminion/ops/jobs.db",
+          ".openminion/ops/plans.db",
+          ".openminion/policy/policy.db",
+          ".openminion/policy/policy.db.bak/20261029T071500409454Z-0-none.sqlite",
+          ".openminion/retrieve/retrieve.db",
+          ".openminion/telemetry/telemetry.db"
+        ]
+      }
+    },
+    {
+      "check": "P3 postgres, OPENMINION_STORAGE_BACKEND/OPENMINION_STORAGE_POSTGRES_URL: starts; storage.backend postgres, record store RecordStorePostgres, storage_connection is None",
+      "pass": true,
+      "observed": {
+        "backend": "postgres",
+        "record_backend": "record.postgres",
+        "record_store": "RecordStorePostgres",
+        "storage_connection": "None"
+      }
+    },
+    {
+      "check": "P3 postgres, OPENMINION_STORAGE_BACKEND/OPENMINION_STORAGE_POSTGRES_URL: sessions use PostgreSQL: a session and a message written through runtime.sessions are read back from an independent PostgreSQL connection",
+      "pass": true,
+      "observed": [
+        {
+          "target": "om437-env",
+          "body": "written through runtime.sessions (env)"
+        }
+      ]
+    },
+    {
+      "check": "P3 postgres, OPENMINION_STORAGE_BACKEND/OPENMINION_STORAGE_POSTGRES_URL: while open, the runtime holds PostgreSQL connections under its application_name",
+      "pass": true,
+      "observed": 1
+    },
+    {
+      "check": "P3 postgres, OPENMINION_STORAGE_BACKEND/OPENMINION_STORAGE_POSTGRES_URL: after close() no connection with its application_name remains (no gc.collect)",
+      "pass": true,
+      "observed": {
+        "count": 0,
+        "waited_s": 0.01
+      }
+    },
+    {
+      "check": "P3 postgres, OPENMINION_STORAGE_BACKEND/OPENMINION_STORAGE_POSTGRES_URL: no runtime SQLite database created at storage.path",
+      "pass": true,
+      "observed": {
+        "storage.path exists": false,
+        "sqlite files": [
+          ".openminion/artifact/index.db",
+          ".openminion/authored_tools/store.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071501056160Z-0-none.sqlite",
+          ".openminion/memory/memory.db",
+          ".openminion/ops/evidence.db",
+          ".openminion/ops/jobs.db",
+          ".openminion/ops/plans.db",
+          ".openminion/policy/policy.db",
+          ".openminion/policy/policy.db.bak/20261029T071501004724Z-0-none.sqlite",
+          ".openminion/retrieve/retrieve.db",
+          ".openminion/telemetry/telemetry.db"
+        ]
+      }
+    },
+    {
+      "check": "P4 postgres wrapper: OpenMinionRuntime.storage is None; sess is the runtime's SessionStore over RecordStorePostgres; the runtime's storage_connection is None",
+      "pass": true,
+      "observed": {
+        "storage": "None",
+        "sess": "SessionStore",
+        "record_store": "RecordStorePostgres"
+      }
+    },
+    {
+      "check": "P4 postgres wrapper: a session written through wrapper.sess is in PostgreSQL (independent read)",
+      "pass": true,
+      "observed": [
+        {
+          "target": "om437-wrapper"
+        }
+      ]
+    },
+    {
+      "check": "P4 postgres wrapper: while open, PostgreSQL connections under its application_name",
+      "pass": true,
+      "observed": 1
+    },
+    {
+      "check": "P4 postgres wrapper: after wrapper.close() no connection with its application_name remains (no gc.collect)",
+      "pass": true,
+      "observed": {
+        "count": 0,
+        "waited_s": 0.01
+      }
+    },
+    {
+      "check": "P4 postgres wrapper: no runtime SQLite database created at storage.path",
+      "pass": true,
+      "observed": [
+        ".openminion/artifact/index.db",
+        ".openminion/authored_tools/store.sqlite",
+        ".openminion/authored_tools/store.sqlite.bak/20261029T071501615989Z-0-none.sqlite",
+        ".openminion/memory/memory.db",
+        ".openminion/ops/evidence.db",
+        ".openminion/ops/jobs.db",
+        ".openminion/ops/plans.db",
+        ".openminion/policy/policy.db",
+        ".openminion/policy/policy.db.bak/20261029T071501566646Z-0-none.sqlite",
+        ".openminion/retrieve/retrieve.db",
+        ".openminion/telemetry/telemetry.db"
+      ]
+    },
+    {
+      "check": "P5 postgres room CLI: `openminion ... room create --name probe-437 --agent first --agent second` exits 0 with participants=2, active_agent=first",
+      "pass": true,
+      "observed": {
+        "exit_code": 0,
+        "stderr_tail": [
+          "Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane",
+          "Postgres module 'session' has pending migrations. Run: openminion storage migrate --module session",
+          "Postgres module 'task' has pending migrations. Run: openminion storage migrate --module task",
+          "Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory",
+          "Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a",
+          "Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy"
+        ],
+        "seconds": 4.82,
+        "connections_max_while_running": 1,
+        "connections_samples": 77,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        },
+        "stdout": [
+          "room=room-0183412886cd4e66a66a6a1494219349",
+          "participants=2",
+          "active_agent=first"
+        ]
+      }
+    },
+    {
+      "check": "P5 postgres room CLI: `openminion ... room invite <room> --human alice` exits 0 with participants=3",
+      "pass": true,
+      "observed": {
+        "exit_code": 0,
+        "stderr_tail": [
+          "Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact",
+          "Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory",
+          "Postgres module 'secret' has pending migrations. Run: openminion storage migrate --module secret",
+          "Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a",
+          "Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill",
+          "Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry"
+        ],
+        "seconds": 4.55,
+        "connections_max_while_running": 1,
+        "connections_samples": 73,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        },
+        "stdout": [
+          "invited human=alice",
+          "participants=3"
+        ]
+      }
+    },
+    {
+      "check": "P5 postgres room CLI: the room's session row is in PostgreSQL (room session key, name probe-437, active agent first)",
+      "pass": true,
+      "observed": {
+        "session_key": "room:room-0183412886cd4e66a66a6a1494219349",
+        "metadata": {
+          "name": "probe-437",
+          "room_routing_mode": "addressed"
+        },
+        "active_agent_id": "first"
+      }
+    },
+    {
+      "check": "P5 postgres room CLI: its participant rows are in PostgreSQL: agent first (owner, join_seq 1), agent second (participant, 2), human alice (participant, 3)",
+      "pass": true,
+      "observed": [
+        {
+          "participant_type": "agent",
+          "participant_id": "first",
+          "role": "owner",
+          "join_seq": 1,
+          "left_at": null
+        },
+        {
+          "participant_type": "agent",
+          "participant_id": "second",
+          "role": "participant",
+          "join_seq": 2,
+          "left_at": null
+        },
+        {
+          "participant_type": "human",
+          "participant_id": "alice",
+          "role": "participant",
+          "join_seq": 3,
+          "left_at": null
+        }
+      ]
+    },
+    {
+      "check": "P5 postgres room CLI: each CLI process connected to PostgreSQL under its application_name while running, and none remains after it exits",
+      "pass": true,
+      "observed": {
+        "create": [
+          1,
+          {
+            "count": 0,
+            "waited_s": 0.01
+          }
+        ],
+        "invite": [
+          1,
+          {
+            "count": 0,
+            "waited_s": 0.01
+          }
+        ]
+      }
+    },
+    {
+      "check": "P5 postgres room CLI: no runtime SQLite database created at storage.path",
+      "pass": true,
+      "observed": {
+        "storage.path exists": false,
+        "sqlite files": [
+          ".openminion/artifact/index.db",
+          ".openminion/authored_tools/store.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071505884666Z-0-none.sqlite",
+          ".openminion/authored_tools/store.sqlite.bak/20261029T071510549500Z-0-0001_baseline.sqlite",
+          ".openminion/memory/memory.db",
+          ".openminion/ops/evidence.db",
+          ".openminion/ops/jobs.db",
+          ".openminion/ops/plans.db",
+          ".openminion/policy/policy.db",
+          ".openminion/policy/policy.db.bak/20261029T071505742395Z-0-none.sqlite",
+          ".openminion/policy/policy.db.bak/20261029T071510433847Z-0-0002_blockchain_confirmations.sqlite",
+          ".openminion/retrieve/retrieve.db",
+          ".openminion/telemetry/telemetry.db"
+        ]
+      }
+    }
+  ],
+  "cases": {
+    "S1": {
+      "run_state": "completed",
+      "text": "first: hello from probe_437 (thinking=minimal)",
+      "session_id": "9eb45477808246e7911811fa7b09ecc6",
+      "rows": {
+        "sessions": [
+          {
+            "id": "9eb45477808246e7911811fa7b09ecc6",
+            "session_key": "agent:first|channel:console|target:api-user|session:9eb45477808246e7911811fa7b09ecc6",
+            "channel": "console",
+            "target": "api-user"
+          }
+        ],
+        "messages": [
+          {
+            "role": "inbound",
+            "body": "hello from probe_437"
+          },
+          {
+            "role": "outbound",
+            "body": "first: hello from probe_437 (thinking=minimal)"
+          }
+        ],
+        "room_participants": [
+          {
+            "participant_type": "agent",
+            "participant_id": "first",
+            "role": "owner"
+          }
+        ]
+      }
+    },
+    "S4": {
+      "create": {
+        "exit_code": 0,
+        "stderr_tail": [],
+        "seconds": 4.29,
+        "stdout": [
+          "room=room-2d206cccff7e45b1abc9e8866655182f",
+          "participants=2",
+          "active_agent=first"
+        ]
+      },
+      "invite": {
+        "exit_code": 0,
+        "stderr_tail": [],
+        "seconds": 4.24,
+        "stdout": [
+          "invited human=alice",
+          "participants=3"
+        ]
+      },
+      "participants": [
+        {
+          "participant_type": "agent",
+          "participant_id": "first",
+          "role": "owner",
+          "join_seq": 1
+        },
+        {
+          "participant_type": "agent",
+          "participant_id": "second",
+          "role": "participant",
+          "join_seq": 2
+        },
+        {
+          "participant_type": "human",
+          "participant_id": "alice",
+          "role": "participant",
+          "join_seq": 3
+        }
+      ]
+    },
+    "S5a": "RuntimeError: runtime record_store does not expose sqlite connection",
+    "S5b": "RuntimeError: runtime record_store does not expose sqlite connection",
+    "P1": {
+      "database": "om437_config_bb3ce995",
+      "application_name": "om437_config_bb3ce995",
+      "config_storage": {
+        "path": "<RUNNER_TEMP>/work/probe_437/pg_config/.openminion/state.db",
+        "backend": "postgres",
+        "postgres_url": "postgresql+psycopg://postgres:***@localhost:5432/om437_config_bb3ce995?application_name=om437_config_bb3ce995"
+      },
+      "env": [],
+      "start": "started",
+      "runtime_storage.connection": "RuntimeError: runtime record_store does not expose sqlite connection",
+      "postgres_runtime_ledger": [
+        {
+          "n": 15,
+          "head": 15
+        }
+      ],
+      "turn": {
+        "run_state": "completed",
+        "text": "first: hello from probe_437 (thinking=minimal)",
+        "session_id": "ee836132a452425daa4ddd97eba84d8e",
+        "rows": {
+          "sessions": [
+            {
+              "id": "ee836132a452425daa4ddd97eba84d8e",
+              "session_key": "agent:first|channel:console|target:api-user|session:ee836132a452425daa4ddd97eba84d8e",
+              "channel": "console",
+              "target": "api-user"
+            }
+          ],
+          "messages": [
+            {
+              "role": "inbound",
+              "body": "hello from probe_437"
+            },
+            {
+              "role": "outbound",
+              "body": "first: hello from probe_437 (thinking=minimal)"
+            }
+          ],
+          "room_participants": [
+            {
+              "participant_type": "agent",
+              "participant_id": "first",
+              "role": "owner"
+            }
+          ]
+        }
+      },
+      "connections_while_open": 1,
+      "connections_after_close": {
+        "count": 0,
+        "waited_s": 0.01
+      },
+      "sqlite_files_under_root": {
+        ".openminion/artifact/index.db": {
+          "tables": 5
+        },
+        ".openminion/authored_tools/store.sqlite": {
+          "tables": 5
+        },
+        ".openminion/authored_tools/store.sqlite.bak/20261029T071459503020Z-0-none.sqlite": {
+          "tables": 0
+        },
+        ".openminion/brain/brain.db": {
+          "tables": 6
+        },
+        ".openminion/brain/memory.db": {
+          "tables": 14
+        },
+        ".openminion/brain/sessions.db": {
+          "tables": 26,
+          "sessions_rows": 1
+        },
+        ".openminion/identity/identity.db": {
+          "tables": 3
+        },
+        ".openminion/memory/memory.audit.db": {
+          "tables": 1
+        },
+        ".openminion/memory/memory.db": {
+          "tables": 14
+        },
+        ".openminion/ops/evidence.db": {
+          "tables": 1
+        },
+        ".openminion/ops/jobs.db": {
+          "tables": 1
+        },
+        ".openminion/ops/plans.db": {
+          "tables": 1
+        },
+        ".openminion/policy/policy.db": {
+          "tables": 6
+        },
+        ".openminion/policy/policy.db.bak/20261029T071459448145Z-0-none.sqlite": {
+          "tables": 0
+        },
+        ".openminion/retrieve/retrieve.db": {
+          "tables": 11
+        },
+        ".openminion/skill/skills.db": {
+          "tables": 13
+        },
+        ".openminion/task/task.db": {
+          "tables": 3
+        },
+        ".openminion/telemetry/telemetry.db": {
+          "tables": 3
+        }
+      },
+      "postgres_totals": [
+        {
+          "sessions": 2,
+          "messages": 3,
+          "room_participants": 1
+        }
+      ]
+    },
+    "P2": {
+      "database": "om437_plain_40974e9e",
+      "application_name": "om437_plain_40974e9e",
+      "config_storage": {
+        "path": "<RUNNER_TEMP>/work/probe_437/pg_plain/.openminion/state.db",
+        "backend": "postgres",
+        "postgres_url": "postgresql://postgres:***@localhost:5432/om437_plain_40974e9e?application_name=om437_plain_40974e9e"
+      },
+      "env": [],
+      "start": "started",
+      "runtime_storage.connection": "RuntimeError: runtime record_store does not expose sqlite connection",
+      "postgres_runtime_ledger": [
+        {
+          "n": 15,
+          "head": 15
+        }
+      ],
+      "connections_while_open": 1,
+      "connections_after_close": {
+        "count": 0,
+        "waited_s": 0.01
+      },
+      "sqlite_files_under_root": {
+        ".openminion/artifact/index.db": {
+          "tables": 5
+        },
+        ".openminion/authored_tools/store.sqlite": {
+          "tables": 5
+        },
+        ".openminion/authored_tools/store.sqlite.bak/20261029T071500490010Z-0-none.sqlite": {
+          "tables": 0
+        },
+        ".openminion/memory/memory.db": {
+          "tables": 14
+        },
+        ".openminion/ops/evidence.db": {
+          "tables": 1
+        },
+        ".openminion/ops/jobs.db": {
+          "tables": 1
+        },
+        ".openminion/ops/plans.db": {
+          "tables": 1
+        },
+        ".openminion/policy/policy.db": {
+          "tables": 6
+        },
+        ".openminion/policy/policy.db.bak/20261029T071500409454Z-0-none.sqlite": {
+          "tables": 0
+        },
+        ".openminion/retrieve/retrieve.db": {
+          "tables": 11
+        },
+        ".openminion/telemetry/telemetry.db": {
+          "tables": 3
+        }
+      },
+      "postgres_totals": [
+        {
+          "sessions": 1,
+          "messages": 1,
+          "room_participants": 0
+        }
+      ]
+    },
+    "P3": {
+      "database": "om437_env_2fd60a83",
+      "application_name": "om437_env_2fd60a83",
+      "config_storage": {
+        "path": "<RUNNER_TEMP>/work/probe_437/pg_env/.openminion/state.db"
+      },
+      "env": [
+        "OPENMINION_STORAGE_BACKEND",
+        "OPENMINION_STORAGE_POSTGRES_URL"
+      ],
+      "start": "started",
+      "runtime_storage.connection": "RuntimeError: runtime record_store does not expose sqlite connection",
+      "postgres_runtime_ledger": [
+        {
+          "n": 15,
+          "head": 15
+        }
+      ],
+      "connections_while_open": 1,
+      "connections_after_close": {
+        "count": 0,
+        "waited_s": 0.01
+      },
+      "sqlite_files_under_root": {
+        ".openminion/artifact/index.db": {
+          "tables": 5
+        },
+        ".openminion/authored_tools/store.sqlite": {
+          "tables": 5
+        },
+        ".openminion/authored_tools/store.sqlite.bak/20261029T071501056160Z-0-none.sqlite": {
+          "tables": 0
+        },
+        ".openminion/memory/memory.db": {
+          "tables": 14
+        },
+        ".openminion/ops/evidence.db": {
+          "tables": 1
+        },
+        ".openminion/ops/jobs.db": {
+          "tables": 1
+        },
+        ".openminion/ops/plans.db": {
+          "tables": 1
+        },
+        ".openminion/policy/policy.db": {
+          "tables": 6
+        },
+        ".openminion/policy/policy.db.bak/20261029T071501004724Z-0-none.sqlite": {
+          "tables": 0
+        },
+        ".openminion/retrieve/retrieve.db": {
+          "tables": 11
+        },
+        ".openminion/telemetry/telemetry.db": {
+          "tables": 3
+        }
+      },
+      "postgres_totals": [
+        {
+          "sessions": 1,
+          "messages": 1,
+          "room_participants": 0
+        }
+      ]
+    },
+    "P4": {
+      "database": "om437_wrapper_79594d0d",
+      "application_name": "om437_wrapper_79594d0d",
+      "start": "started",
+      "connections_while_open": 1,
+      "connections_after_close": {
+        "count": 0,
+        "waited_s": 0.01
+      }
+    },
+    "P5": {
+      "database": "om437_room_9de4e42f",
+      "application_name": "om437_room_9de4e42f",
+      "create": {
+        "exit_code": 0,
+        "stderr_tail": [
+          "Postgres module 'controlplane' has pending migrations. Run: openminion storage migrate --module controlplane",
+          "Postgres module 'session' has pending migrations. Run: openminion storage migrate --module session",
+          "Postgres module 'task' has pending migrations. Run: openminion storage migrate --module task",
+          "Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory",
+          "Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a",
+          "Postgres module 'policy' has pending migrations. Run: openminion storage migrate --module policy"
+        ],
+        "seconds": 4.82,
+        "connections_max_while_running": 1,
+        "connections_samples": 77,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        },
+        "stdout": [
+          "room=room-0183412886cd4e66a66a6a1494219349",
+          "participants=2",
+          "active_agent=first"
+        ]
+      },
+      "invite": {
+        "exit_code": 0,
+        "stderr_tail": [
+          "Postgres module 'artifact' has pending migrations. Run: openminion storage migrate --module artifact",
+          "Postgres module 'memory' has pending migrations. Run: openminion storage migrate --module memory",
+          "Postgres module 'secret' has pending migrations. Run: openminion storage migrate --module secret",
+          "Postgres module 'a2a' has pending migrations. Run: openminion storage migrate --module a2a",
+          "Postgres module 'skill' has pending migrations. Run: openminion storage migrate --module skill",
+          "Postgres module 'registry' has pending migrations. Run: openminion storage migrate --module registry"
+        ],
+        "seconds": 4.55,
+        "connections_max_while_running": 1,
+        "connections_samples": 73,
+        "connections_after_exit": {
+          "count": 0,
+          "waited_s": 0.01
+        },
+        "stdout": [
+          "invited human=alice",
+          "participants=3"
+        ]
+      },
+      "postgres_session": [
+        {
+          "id": "room-0183412886cd4e66a66a6a1494219349",
+          "session_key": "room:room-0183412886cd4e66a66a6a1494219349",
+          "channel": "cli",
+          "target": "room",
+          "metadata_json": "{\"name\": \"probe-437\", \"room_routing_mode\": \"addressed\"}",
+          "active_agent_id": "first"
+        }
+      ],
+      "postgres_participants": [
+        {
+          "participant_type": "agent",
+          "participant_id": "first",
+          "role": "owner",
+          "join_seq": 1,
+          "left_at": null
+        },
+        {
+          "participant_type": "agent",
+          "participant_id": "second",
+          "role": "participant",
+          "join_seq": 2,
+          "left_at": null
+        },
+        {
+          "participant_type": "human",
+          "participant_id": "alice",
+          "role": "participant",
+          "join_seq": 3,
+          "left_at": null
+        }
+      ],
+      "sqlite_files_under_root": {
+        ".openminion/artifact/index.db": {
+          "tables": 5
+        },
+        ".openminion/authored_tools/store.sqlite": {
+          "tables": 5
+        },
+        ".openminion/authored_tools/store.sqlite.bak/20261029T071505884666Z-0-none.sqlite": {
+          "tables": 0
+        },
+        ".openminion/authored_tools/store.sqlite.bak/20261029T071510549500Z-0-0001_baseline.sqlite": {
+          "tables": 5
+        },
+        ".openminion/memory/memory.db": {
+          "tables": 14
+        },
+        ".openminion/ops/evidence.db": {
+          "tables": 1
+        },
+        ".openminion/ops/jobs.db": {
+          "tables": 1
+        },
+        ".openminion/ops/plans.db": {
+          "tables": 1
+        },
+        ".openminion/policy/policy.db": {
+          "tables": 6
+        },
+        ".openminion/policy/policy.db.bak/20261029T071505742395Z-0-none.sqlite": {
+          "tables": 0
+        },
+        ".openminion/policy/policy.db.bak/20261029T071510433847Z-0-0002_blockchain_confirmations.sqlite": {
+          "tables": 6
+        },
+        ".openminion/retrieve/retrieve.db": {
+          "tables": 11
+        },
+        ".openminion/telemetry/telemetry.db": {
+          "tables": 3
+        }
+      }
+    }
+  },
+  "gc_collect_calls": [],
+  "summary": {
+    "passed": 42,
+    "failed": 0,
+    "total": 42
+  }
+}

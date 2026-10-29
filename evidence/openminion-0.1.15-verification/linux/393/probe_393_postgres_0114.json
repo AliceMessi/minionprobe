@@ -1,0 +1,3134 @@
+{
+  "banner": {
+    "probe": "probe_393",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.14",
+    "python": "3.12.15",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<RUNNER_TEMP>/empty",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "backend": "postgres",
+    "rooms_per_stress_case": 200,
+    "hold_seconds": 1.5
+  },
+  "summary": {
+    "passed": 22,
+    "failed": 27,
+    "total": 49
+  },
+  "checks": [
+    {
+      "check": "postgres A: main, first and second are independent PostgreSQL connections (own engine and application_name) on one schema",
+      "pass": true,
+      "observed": {
+        "main": {
+          "record_store": "RecordStorePostgres",
+          "engine_id": 140614857163600,
+          "schema": "p393_0eb593052580",
+          "app": "p393-main",
+          "search_path": "p393_0eb593052580"
+        },
+        "first": {
+          "record_store": "RecordStorePostgres",
+          "engine_id": 140614853278320,
+          "schema": "p393_0eb593052580",
+          "app": "p393-first",
+          "search_path": "p393_0eb593052580"
+        },
+        "second": {
+          "record_store": "RecordStorePostgres",
+          "engine_id": 140614853012432,
+          "schema": "p393_0eb593052580",
+          "app": "p393-second",
+          "search_path": "p393_0eb593052580"
+        }
+      }
+    },
+    {
+      "check": "postgres B1: the held join's activation read found no active agent",
+      "pass": true
+    },
+    {
+      "check": "postgres B1: at that read the held join is inside its participant transaction (session-row lock held)",
+      "pass": false,
+      "observed": false
+    },
+    {
+      "check": "postgres B1: while the join is held, another connection sees neither its participant row nor an active agent",
+      "pass": false,
+      "observed": {
+        "exists": true,
+        "stored": null,
+        "agents": [
+          "alpha"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            2
+          ]
+        ],
+        "left": []
+      }
+    },
+    {
+      "check": "postgres B1: beta's join on the other connection waits for the held join (not finished during the 1.5 s hold; ends after the release; the server shows its backend blocked on a lock held by the held join's backend)",
+      "pass": false,
+      "observed": {
+        "finished_while_held": true,
+        "beta_seconds": 0.006,
+        "pg_lock_wait": null
+      }
+    },
+    {
+      "check": "postgres B1: no stale overwrite: each caller saw alpha, alpha is stored, agents listed [alpha, beta]",
+      "pass": false,
+      "observed": {
+        "alpha caller": "ok: 'alpha'",
+        "beta caller": "ok: 'beta'",
+        "final": {
+          "stored": "alpha",
+          "active": "alpha",
+          "agents": [
+            "alpha",
+            "beta"
+          ]
+        }
+      }
+    },
+    {
+      "check": "postgres B1: exactly one active-agent write, by alpha's join",
+      "pass": false,
+      "observed": [
+        [
+          "second",
+          "B1 join beta (second)",
+          "beta"
+        ],
+        [
+          "first",
+          "B1 join alpha (first, held)",
+          "alpha"
+        ]
+      ]
+    },
+    {
+      "check": "postgres B2: the join plus selection on the other connection waits for the held join (server: blocked on the held join's lock)",
+      "pass": false,
+      "observed": {
+        "finished_while_held": true,
+        "seconds": 0.006,
+        "pg_lock_wait": null
+      }
+    },
+    {
+      "check": "postgres B2: the selection then applies: it returns beta, beta is stored and active, agents [alpha, beta]",
+      "pass": false,
+      "observed": {
+        "alpha join": "ok: 'alpha'",
+        "selection": "ok: 'beta'",
+        "final": {
+          "stored": "alpha",
+          "active": "alpha",
+          "agents": [
+            "alpha",
+            "beta"
+          ]
+        }
+      }
+    },
+    {
+      "check": "postgres B2: the writes are alpha's activation, then the selection's beta (the join wrote nothing over the selection)",
+      "pass": false,
+      "observed": [
+        [
+          "second",
+          "B2 join beta + select beta (second)",
+          "beta"
+        ],
+        [
+          "second",
+          "B2 join beta + select beta (second)",
+          "beta"
+        ],
+        [
+          "first",
+          "B2 join alpha (first, held)",
+          "alpha"
+        ]
+      ]
+    },
+    {
+      "check": "postgres B2b: setup: a legacy session whose owner record is listed, with no stored active agent",
+      "pass": true,
+      "observed": {
+        "stored": null,
+        "active": "legacy-agent",
+        "agents": [
+          "legacy-agent"
+        ]
+      }
+    },
+    {
+      "check": "postgres B2b: a selection alone on the other connection waits for the held join (server: blocked on the held join's lock)",
+      "pass": false,
+      "observed": {
+        "finished_while_held": true,
+        "seconds": 0.003,
+        "pg_lock_wait": null
+      }
+    },
+    {
+      "check": "postgres B2b: the selection then applies over the join's activation: legacy-agent stored and active",
+      "pass": false,
+      "observed": {
+        "guest join": "ok: 'guest-agent'",
+        "selection": "ok: 'legacy-agent'",
+        "final": {
+          "stored": "guest-agent",
+          "active": "guest-agent",
+          "agents": [
+            "legacy-agent",
+            "guest-agent"
+          ]
+        }
+      }
+    },
+    {
+      "check": "postgres B2b: the writes are the guest join's activation, then the selection",
+      "pass": false,
+      "observed": [
+        [
+          "second",
+          "B2b select legacy-agent (second)",
+          "legacy-agent"
+        ],
+        [
+          "first",
+          "B2b join guest-agent (first, held)",
+          "guest-agent"
+        ]
+      ]
+    },
+    {
+      "check": "postgres B3: the leave on the other connection waits for the held join (server: blocked on the held join's lock)",
+      "pass": false,
+      "observed": {
+        "finished_while_held": true,
+        "seconds": 0.003,
+        "pg_lock_wait": null
+      }
+    },
+    {
+      "check": "postgres B3: the leave then applies: it returns True, no agent listed, no active agent stored (no departed active agent)",
+      "pass": false,
+      "observed": {
+        "leave": "ok: True",
+        "final": {
+          "stored": "alpha",
+          "active": "alpha",
+          "agents": []
+        }
+      }
+    },
+    {
+      "check": "postgres B3: the held join reads its participant back after the leave and raises, as before #393",
+      "pass": true,
+      "observed": "builtins.RuntimeError: Failed to upsert participant agent:alpha"
+    },
+    {
+      "check": "postgres B3: selecting the departed alpha is refused",
+      "pass": true,
+      "observed": "builtins.ValueError: Agent 'alpha' is not an active participant"
+    },
+    {
+      "check": "postgres C: the first committed activation (alpha) stays through joins, a re-join and a leave of another agent; it changes only on the explicit selection and on leaves of the active agent; both connections read the stored agent after every step",
+      "pass": true,
+      "observed": [
+        [
+          "first: join alpha (first activation)",
+          "alpha",
+          true
+        ],
+        [
+          "second: join beta",
+          "alpha",
+          true
+        ],
+        [
+          "first: join gamma",
+          "alpha",
+          true
+        ],
+        [
+          "second: join alpha again (already a participant)",
+          "alpha",
+          true
+        ],
+        [
+          "first: gamma leaves (not the active agent)",
+          "alpha",
+          true
+        ],
+        [
+          "second: select beta (intentional selection)",
+          "beta",
+          true
+        ],
+        [
+          "first: join delta",
+          "beta",
+          true
+        ],
+        [
+          "first: beta leaves (the active agent: intentional leave)",
+          "alpha",
+          true
+        ],
+        [
+          "second: alpha leaves (the active agent)",
+          "delta",
+          true
+        ],
+        [
+          "first: delta leaves (the last agent)",
+          null,
+          true
+        ],
+        [
+          "second: gamma joins again (rejoin into a room with no agent)",
+          "gamma",
+          true
+        ]
+      ]
+    },
+    {
+      "check": "postgres C: only the two joins into a room with no active agent wrote it (alpha first, gamma last)",
+      "pass": true,
+      "observed": [
+        [
+          "first",
+          "C first: join alpha (first activation)",
+          "alpha"
+        ],
+        [
+          "second",
+          "C second: gamma joins again (rejoin into a room with no agent)",
+          "gamma"
+        ]
+      ]
+    },
+    {
+      "check": "postgres D existing selection: a selection stored by connections closed before the joins (beta) stays through a join, two concurrent joins, a held join with another join waiting, and a re-join of the first agent; every caller saw beta",
+      "pass": true,
+      "observed": {
+        "final": {
+          "stored": "beta",
+          "active": "beta",
+          "agents": [
+            "alpha",
+            "beta",
+            "gamma",
+            "epsilon",
+            "delta",
+            "zeta",
+            "eta"
+          ]
+        },
+        "concurrent": [
+          "ok: 'beta'",
+          "ok: 'beta'"
+        ],
+        "held": [
+          "ok: 'beta'",
+          "ok: 'beta'"
+        ],
+        "held read saw": "beta"
+      }
+    },
+    {
+      "check": "postgres D existing selection: none of those joins wrote the active agent",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "postgres D existing selection: every agent that joined is listed once (delta and epsilon in either order)",
+      "pass": true,
+      "observed": [
+        "alpha",
+        "beta",
+        "gamma",
+        "epsilon",
+        "delta",
+        "zeta",
+        "eta"
+      ]
+    },
+    {
+      "check": "postgres D initial activation: a room created with active_agent_id beta keeps beta when alpha, then beta, join (no join wrote it)",
+      "pass": true,
+      "observed": {
+        "raw before": "beta",
+        "after alpha": {
+          "stored": "beta",
+          "active": "beta",
+          "agents": [
+            "alpha"
+          ]
+        },
+        "final": {
+          "stored": "beta",
+          "active": "beta",
+          "agents": [
+            "alpha",
+            "beta"
+          ]
+        },
+        "writes": []
+      }
+    },
+    {
+      "check": "postgres D blank: rooms created with no, empty or spaces-only initial activation (create_room stores each as NULL), and rows whose active_agent_id is '' or '   ' (written directly): the first joining agent (alpha) is stored and active, one write each",
+      "pass": true,
+      "observed": [
+        [
+          null,
+          {
+            "stored": "alpha",
+            "active": "alpha",
+            "agents": [
+              "alpha"
+            ]
+          },
+          [
+            [
+              "second",
+              "MainThread",
+              "alpha"
+            ]
+          ]
+        ],
+        [
+          null,
+          {
+            "stored": "alpha",
+            "active": "alpha",
+            "agents": [
+              "alpha"
+            ]
+          },
+          [
+            [
+              "second",
+              "MainThread",
+              "alpha"
+            ]
+          ]
+        ],
+        [
+          null,
+          {
+            "stored": "alpha",
+            "active": "alpha",
+            "agents": [
+              "alpha"
+            ]
+          },
+          [
+            [
+              "second",
+              "MainThread",
+              "alpha"
+            ]
+          ]
+        ],
+        [
+          "",
+          {
+            "stored": "alpha",
+            "active": "alpha",
+            "agents": [
+              "alpha"
+            ]
+          },
+          [
+            [
+              "second",
+              "MainThread",
+              "alpha"
+            ]
+          ]
+        ],
+        [
+          "   ",
+          {
+            "stored": "alpha",
+            "active": "alpha",
+            "agents": [
+              "alpha"
+            ]
+          },
+          [
+            [
+              "second",
+              "MainThread",
+              "alpha"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "check": "postgres D blank: on a row whose active_agent_id is '   ', a held first join (its session read gives no active agent) activates its agent, and the second join waiting for it keeps it",
+      "pass": false,
+      "observed": {
+        "held read saw": null,
+        "results": [
+          "ok: 'alpha'",
+          "ok: 'beta'"
+        ],
+        "final": {
+          "stored": "alpha",
+          "active": "alpha",
+          "agents": [
+            "alpha",
+            "beta"
+          ]
+        },
+        "writes": [
+          [
+            "second",
+            "D blank join beta (second)",
+            "beta"
+          ],
+          [
+            "first",
+            "D blank join alpha (first, held)",
+            "alpha"
+          ]
+        ],
+        "waiter finished while held": true
+      }
+    },
+    {
+      "check": "postgres D rejoin: alpha leaves (beta becomes active), rejoins: beta stays active and alpha is listed after beta with a new join_seq; joining again while present keeps its place",
+      "pass": true,
+      "observed": {
+        "after leave": {
+          "stored": "beta",
+          "active": "beta",
+          "agents": [
+            "beta"
+          ]
+        },
+        "after rejoin": {
+          "stored": "beta",
+          "active": "beta",
+          "agents": [
+            "beta",
+            "alpha"
+          ]
+        },
+        "join_seq before": {
+          "owner": 1,
+          "alpha": 2,
+          "beta": 3
+        },
+        "join_seq after": {
+          "owner": 1,
+          "beta": 3,
+          "alpha": 4
+        }
+      }
+    },
+    {
+      "check": "postgres D rejoin: with no agent left, the rejoining alpha is activated",
+      "pass": true,
+      "observed": {
+        "after beta leaves": {
+          "stored": "alpha",
+          "active": "alpha",
+          "agents": [
+            "alpha"
+          ]
+        },
+        "after alpha leaves": {
+          "stored": null,
+          "active": null,
+          "agents": []
+        },
+        "after rejoin": {
+          "stored": "alpha",
+          "active": "alpha",
+          "agents": [
+            "alpha"
+          ]
+        }
+      }
+    },
+    {
+      "check": "postgres D rejoin: the active agent was written only by the two joins into a room without one (alpha) and by the leaves of the active agent (beta, alpha, None)",
+      "pass": true,
+      "observed": [
+        [
+          "first",
+          "MainThread",
+          "alpha"
+        ],
+        [
+          "second",
+          "MainThread",
+          "beta"
+        ],
+        [
+          "first",
+          "MainThread",
+          "alpha"
+        ],
+        [
+          "second",
+          "MainThread",
+          null
+        ],
+        [
+          "first",
+          "MainThread",
+          "alpha"
+        ]
+      ]
+    },
+    {
+      "check": "postgres D legacy: reading a legacy session's participants writes its owner record and activates nobody (stored None, get_active_agent answers the session's agent, no write)",
+      "pass": true,
+      "observed": {
+        "listed": [
+          [
+            "legacy-agent",
+            "owner"
+          ]
+        ],
+        "view": {
+          "stored": null,
+          "active": "legacy-agent",
+          "agents": [
+            "legacy-agent"
+          ]
+        },
+        "writes": []
+      }
+    },
+    {
+      "check": "postgres D legacy: another agent joining writes the owner record without activation, then activates the joining agent (one write)",
+      "pass": true,
+      "observed": {
+        "listed": [
+          [
+            "legacy-agent",
+            "owner"
+          ],
+          [
+            "guest-agent",
+            "participant"
+          ]
+        ],
+        "view": {
+          "stored": "guest-agent",
+          "active": "guest-agent",
+          "agents": [
+            "legacy-agent",
+            "guest-agent"
+          ]
+        },
+        "writes": [
+          [
+            "first",
+            "D legacy join guest-agent (first)",
+            "guest-agent"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "postgres D legacy: the session's own agent joining is activated",
+      "pass": true,
+      "observed": {
+        "view": {
+          "stored": "legacy-agent",
+          "active": "legacy-agent",
+          "agents": [
+            "legacy-agent"
+          ]
+        },
+        "writes": [
+          [
+            "second",
+            "D legacy join legacy-agent (second)",
+            "legacy-agent"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "postgres D order: with one tied joined_at, joins alternating between the two connections list in join order on all three connections (join_seq 1..5); the first agent is the active one",
+      "pass": true,
+      "observed": {
+        "lists": [
+          [
+            "human",
+            "owner"
+          ],
+          [
+            "agent",
+            "a1"
+          ],
+          [
+            "agent",
+            "a2"
+          ],
+          [
+            "agent",
+            "a3"
+          ],
+          [
+            "agent",
+            "a4"
+          ]
+        ],
+        "join_seq": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "stored": "a1"
+      }
+    },
+    {
+      "check": "postgres D order: a2 leaves and rejoins on the tied clock: listed last with join_seq 6, a1 still active",
+      "pass": true,
+      "observed": {
+        "order": [
+          "owner",
+          "a1",
+          "a3",
+          "a4",
+          "a2"
+        ],
+        "join_seq": [
+          1,
+          2,
+          4,
+          5,
+          6
+        ]
+      }
+    },
+    {
+      "check": "postgres F1 normal path: held right after its activation write, the join is still in its transaction and an independent reader sees neither its row nor the activation; after it returns, both",
+      "pass": false,
+      "observed": {
+        "in_transaction": false,
+        "during": [
+          [
+            "alpha"
+          ],
+          "alpha"
+        ],
+        "after": [
+          [
+            "alpha"
+          ],
+          "alpha"
+        ]
+      }
+    },
+    {
+      "check": "postgres F2 exception at the activation read: the join raises it and nothing of it is stored (no alpha row, no active agent)",
+      "pass": false,
+      "observed": {
+        "join": "builtins.RuntimeError: probe: injected failure at the activation read",
+        "raw": [
+          [
+            "alpha"
+          ],
+          null,
+          []
+        ]
+      }
+    },
+    {
+      "check": "postgres F2: the transaction is closed and its lock released: the connection is not in a transaction, holds no lock on the server, and a join on the other connection completes at once",
+      "pass": true,
+      "observed": {
+        "in_transaction": false,
+        "locks": 0,
+        "beta join seconds": 0.006
+      }
+    },
+    {
+      "check": "postgres F2: the same connection then joins normally (beta, joined first, stays active)",
+      "pass": false,
+      "observed": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      }
+    },
+    {
+      "check": "postgres F3 exception after the activation write: the write ran inside the join's transaction, the join raises, and the row and the activation are both rolled back",
+      "pass": false,
+      "observed": {
+        "join": "builtins.RuntimeError: probe: injected failure after the activation write",
+        "write": [
+          {
+            "by": "first",
+            "op": "F3 join alpha (first, fails after its activation write)",
+            "value": "alpha",
+            "session": "room-f0daec7664364c14a3c5f44a0099cbe3",
+            "rowcount": 1,
+            "in_transaction": false
+          }
+        ],
+        "raw": [
+          [
+            "alpha"
+          ],
+          "alpha"
+        ],
+        "in_transaction": false
+      }
+    },
+    {
+      "check": "postgres F3: the next join (beta, on the other connection) is the room's first activation",
+      "pass": false,
+      "observed": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      }
+    },
+    {
+      "check": "postgres F4 exception in a held join while beta's join waits (server: blocked on the held join's lock): alpha's join raises and leaves nothing; beta's join then proceeds and is the first activation",
+      "pass": false,
+      "observed": {
+        "finished_while_held": true,
+        "alpha": "builtins.RuntimeError: probe: injected failure in the held join",
+        "beta": "ok: 'beta'",
+        "final": {
+          "stored": "beta",
+          "active": "beta",
+          "agents": [
+            "alpha",
+            "beta"
+          ]
+        },
+        "writes": [
+          [
+            "second",
+            "F4 join beta (second)",
+            "beta"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "postgres F5 the waiting join fails with the database's own lock error after waiting (lock_timeout 1 s), and stores nothing",
+      "pass": false,
+      "observed": {
+        "beta": "ok: 'beta'",
+        "seconds": 0.005,
+        "after": {
+          "stored": "alpha",
+          "active": "alpha",
+          "agents": [
+            "alpha",
+            "beta"
+          ]
+        }
+      }
+    },
+    {
+      "check": "postgres F5: the held join then commits normally (alpha stored and active); the failed connection joins beta afterwards and alpha stays active",
+      "pass": false,
+      "observed": {
+        "alpha": "ok: 'alpha'",
+        "final": {
+          "stored": "alpha",
+          "active": "alpha",
+          "agents": [
+            "alpha",
+            "beta"
+          ]
+        },
+        "writes": [
+          [
+            "second-lt",
+            "F5 join beta (second-lt)",
+            "beta"
+          ],
+          [
+            "first",
+            "F5 join alpha (first, held)",
+            "alpha"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "postgres G two first joins, no pause (200 rooms): never both joins write the active agent, no caller sees an agent that is then replaced, no error",
+      "pass": false,
+      "observed": {
+        "rooms": 200,
+        "violations": 192,
+        "errors": 0,
+        "both joins wrote": 192,
+        "info: stored is not the first listed": 185,
+        "outcomes": {
+          "ok | ok": 200
+        }
+      }
+    },
+    {
+      "check": "postgres G first join vs a join plus explicit selection, no pause (200 rooms): the selection is never overwritten (beta stored in every room), no error",
+      "pass": true,
+      "observed": {
+        "rooms": 200,
+        "violations": 0,
+        "errors": 0,
+        "outcomes": {
+          "ok | ok": 200
+        }
+      }
+    },
+    {
+      "check": "postgres G first join vs a leave of the joining agent, no pause (200 rooms): no departed agent is stored as active, no error",
+      "pass": false,
+      "observed": {
+        "rooms": 200,
+        "violations": 22,
+        "errors": 0,
+        "departed active agent": 22,
+        "outcomes": {
+          "ok | ok": 178,
+          "builtins.RuntimeError | ok": 22
+        }
+      }
+    },
+    {
+      "check": "postgres E reopen: a new process opens a new runtime storage on the same database and reads, for every one of the 23 rooms of parts B-F, the stored and active agent and the agents listed that the cases left",
+      "pass": false,
+      "observed": {
+        "child exit": 0,
+        "mismatches": [
+          [
+            "B2b",
+            "35417b194f124daeb06c10014e4786d2",
+            {
+              "stored": "guest-agent",
+              "active": "guest-agent",
+              "agents": [
+                "legacy-agent",
+                "guest-agent"
+              ]
+            },
+            {
+              "stored": "legacy-agent",
+              "active": "legacy-agent",
+              "agents": [
+                "legacy-agent",
+                "guest-agent"
+              ]
+            }
+          ],
+          [
+            "F2",
+            "room-5626689532da4d0dad7582000d8e378d",
+            {
+              "stored": "beta",
+              "active": "beta",
+              "agents": [
+                "alpha",
+                "beta"
+              ]
+            },
+            {
+              "stored": "beta",
+              "active": "beta",
+              "agents": [
+                "beta",
+                "alpha"
+              ]
+            }
+          ],
+          [
+            "F4",
+            "room-9e903b55785e415eb119db9dd092d4ce",
+            {
+              "stored": "beta",
+              "active": "beta",
+              "agents": [
+                "alpha",
+                "beta"
+              ]
+            },
+            {
+              "stored": "beta",
+              "active": "beta",
+              "agents": [
+                "beta"
+              ]
+            }
+          ],
+          [
+            "B2",
+            "room-ae52f92d2ddc4902ac9fe68f32590efd",
+            {
+              "stored": "alpha",
+              "active": "alpha",
+              "agents": [
+                "alpha",
+                "beta"
+              ]
+            },
+            {
+              "stored": "beta",
+              "active": "beta",
+              "agents": [
+                "alpha",
+                "beta"
+              ]
+            }
+          ],
+          [
+            "B3",
+            "room-b5de867bdd3d40efa87f21e3e2287c07",
+            {
+              "stored": "alpha",
+              "active": "alpha",
+              "agents": []
+            },
+            {
+              "stored": null,
+              "active": null,
+              "agents": []
+            }
+          ],
+          [
+            "F3",
+            "room-f0daec7664364c14a3c5f44a0099cbe3",
+            {
+              "stored": "alpha",
+              "active": "alpha",
+              "agents": [
+                "alpha",
+                "beta"
+              ]
+            },
+            {
+              "stored": "beta",
+              "active": "beta",
+              "agents": [
+                "beta"
+              ]
+            }
+          ]
+        ],
+        "child openminion": [
+          "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+          "0.1.14"
+        ]
+      }
+    },
+    {
+      "check": "postgres E reopen: read independently of openminion, the stored active_agent_id and the active agent rows of every room match",
+      "pass": false,
+      "observed": [
+        [
+          "B2b",
+          "35417b194f124daeb06c10014e4786d2",
+          [
+            [
+              "legacy-agent",
+              "guest-agent"
+            ],
+            "guest-agent"
+          ],
+          [
+            [
+              "legacy-agent",
+              "guest-agent"
+            ],
+            "legacy-agent"
+          ]
+        ],
+        [
+          "F2",
+          "room-5626689532da4d0dad7582000d8e378d",
+          [
+            [
+              "alpha",
+              "beta"
+            ],
+            "beta"
+          ],
+          [
+            [
+              "beta",
+              "alpha"
+            ],
+            "beta"
+          ]
+        ],
+        [
+          "F4",
+          "room-9e903b55785e415eb119db9dd092d4ce",
+          [
+            [
+              "alpha",
+              "beta"
+            ],
+            "beta"
+          ],
+          [
+            [
+              "beta"
+            ],
+            "beta"
+          ]
+        ],
+        [
+          "B2",
+          "room-ae52f92d2ddc4902ac9fe68f32590efd",
+          [
+            [
+              "alpha",
+              "beta"
+            ],
+            "alpha"
+          ],
+          [
+            [
+              "alpha",
+              "beta"
+            ],
+            "beta"
+          ]
+        ],
+        [
+          "B3",
+          "room-b5de867bdd3d40efa87f21e3e2287c07",
+          [
+            [],
+            "alpha"
+          ],
+          [
+            [],
+            null
+          ]
+        ],
+        [
+          "F3",
+          "room-f0daec7664364c14a3c5f44a0099cbe3",
+          [
+            [
+              "alpha",
+              "beta"
+            ],
+            "alpha"
+          ],
+          [
+            [
+              "beta"
+            ],
+            "beta"
+          ]
+        ]
+      ]
+    },
+    {
+      "check": "postgres E reopen: across all 623 sessions in the database (stress rooms included), no stored active agent is a departed agent or a non-participant",
+      "pass": false,
+      "observed": [
+        [
+          "room-23784474307e4ceaa0d03161dcf588dd",
+          "alpha"
+        ],
+        [
+          "room-3b71c989d536470699abd793bf084a82",
+          "alpha"
+        ],
+        [
+          "room-3f6f4645a1b94920a6a6df8e7fdb14a4",
+          "alpha"
+        ],
+        [
+          "room-40054ef9f01e41fe805b23bd4ecb42d4",
+          "alpha"
+        ],
+        [
+          "room-474583e89add47339b3e0fd89a4ae399",
+          "alpha"
+        ],
+        [
+          "room-4899760f77364f4da437844690a35a74",
+          "alpha"
+        ],
+        [
+          "room-53e36e68966748d992127529a781a516",
+          "alpha"
+        ],
+        [
+          "room-5c57702eeeed4a459262f50ae3931265",
+          "alpha"
+        ],
+        [
+          "room-6397547ab6eb48b595b6aff7d2611cd1",
+          "alpha"
+        ],
+        [
+          "room-63aa48cb5f0f419db0c93907eca05f0f",
+          "alpha"
+        ]
+      ]
+    }
+  ],
+  "expect": {
+    "room-f477454fa19e43589b91925a9b2dd757": {
+      "case": "B1",
+      "stored": "alpha",
+      "agents": [
+        "alpha",
+        "beta"
+      ],
+      "active": "alpha"
+    },
+    "room-ae52f92d2ddc4902ac9fe68f32590efd": {
+      "case": "B2",
+      "stored": "beta",
+      "agents": [
+        "alpha",
+        "beta"
+      ],
+      "active": "beta"
+    },
+    "35417b194f124daeb06c10014e4786d2": {
+      "case": "B2b",
+      "stored": "legacy-agent",
+      "agents": [
+        "legacy-agent",
+        "guest-agent"
+      ],
+      "active": "legacy-agent"
+    },
+    "room-b5de867bdd3d40efa87f21e3e2287c07": {
+      "case": "B3",
+      "stored": null,
+      "agents": [],
+      "active": null
+    },
+    "room-8c6f3ab216124698b04a4e5f84cc4766": {
+      "case": "C",
+      "stored": "gamma",
+      "agents": [
+        "gamma"
+      ],
+      "active": "gamma"
+    },
+    "room-81905e61c2ac494b8687f38b73772670": {
+      "case": "D existing selection",
+      "stored": "beta",
+      "agents": [
+        "alpha",
+        "beta",
+        "gamma",
+        "epsilon",
+        "delta",
+        "zeta",
+        "eta"
+      ],
+      "active": "beta"
+    },
+    "room-4bfaf8a09921485ca77f9431ffd0d3db": {
+      "case": "D initial activation",
+      "stored": "beta",
+      "agents": [
+        "alpha",
+        "beta"
+      ],
+      "active": "beta"
+    },
+    "room-51b152098dcb45bab2d2cf3e80168421": {
+      "case": "D blank none",
+      "stored": "alpha",
+      "agents": [
+        "alpha"
+      ],
+      "active": "alpha"
+    },
+    "room-87b6bf23c4cb40458fd89a4debab5f0c": {
+      "case": "D blank empty",
+      "stored": "alpha",
+      "agents": [
+        "alpha"
+      ],
+      "active": "alpha"
+    },
+    "room-9ed458afc40f4de494c69cecee6e5360": {
+      "case": "D blank spaces",
+      "stored": "alpha",
+      "agents": [
+        "alpha"
+      ],
+      "active": "alpha"
+    },
+    "room-a2d8d61ecaae4e5aa0537e9ef8c2810c": {
+      "case": "D blank empty-row",
+      "stored": "alpha",
+      "agents": [
+        "alpha"
+      ],
+      "active": "alpha"
+    },
+    "room-7e0fbca53a6f461c9470fe1e2c1dd9f0": {
+      "case": "D blank spaces-row",
+      "stored": "alpha",
+      "agents": [
+        "alpha"
+      ],
+      "active": "alpha"
+    },
+    "room-4bfe717f389441f98a7e83fd61f981d8": {
+      "case": "D blank held",
+      "stored": "alpha",
+      "agents": [
+        "alpha",
+        "beta"
+      ],
+      "active": "alpha"
+    },
+    "room-5a2779b953bc4ce6ba7c76222006e705": {
+      "case": "D rejoin",
+      "stored": "alpha",
+      "agents": [
+        "alpha"
+      ],
+      "active": "alpha"
+    },
+    "939ef13181344e51a0259ad86b938e98": {
+      "case": "D legacy read",
+      "stored": null,
+      "agents": [
+        "legacy-agent"
+      ],
+      "active": "legacy-agent"
+    },
+    "695c52f924764cf0a26e797ce9a4b715": {
+      "case": "D legacy invite",
+      "stored": "guest-agent",
+      "agents": [
+        "legacy-agent",
+        "guest-agent"
+      ],
+      "active": "guest-agent"
+    },
+    "482875e6e0394d66a9107d5cd60c68fb": {
+      "case": "D legacy own",
+      "stored": "legacy-agent",
+      "agents": [
+        "legacy-agent"
+      ],
+      "active": "legacy-agent"
+    },
+    "room-1b56613cea7c46d8a20d85368ae455fb": {
+      "case": "D order",
+      "stored": "a1",
+      "agents": [
+        "a1",
+        "a3",
+        "a4",
+        "a2"
+      ],
+      "active": "a1"
+    },
+    "room-8f6f229f7f7b4a349cf5e2a07c838d0a": {
+      "case": "F1",
+      "stored": "alpha",
+      "agents": [
+        "alpha"
+      ],
+      "active": "alpha"
+    },
+    "room-5626689532da4d0dad7582000d8e378d": {
+      "case": "F2",
+      "stored": "beta",
+      "agents": [
+        "beta",
+        "alpha"
+      ],
+      "active": "beta"
+    },
+    "room-f0daec7664364c14a3c5f44a0099cbe3": {
+      "case": "F3",
+      "stored": "beta",
+      "agents": [
+        "beta"
+      ],
+      "active": "beta"
+    },
+    "room-9e903b55785e415eb119db9dd092d4ce": {
+      "case": "F4",
+      "stored": "beta",
+      "agents": [
+        "beta"
+      ],
+      "active": "beta"
+    },
+    "room-45c850e602884cdfb87d9e2dc3b2ad05": {
+      "case": "F5",
+      "stored": "alpha",
+      "agents": [
+        "alpha",
+        "beta"
+      ],
+      "active": "alpha"
+    }
+  },
+  "cases": {
+    "postgres": {
+      "version": "PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+      "database": "postgres",
+      "server_version": "16.15 (Debian 16.15-1.pgdg13+2)",
+      "schema": "p393_0eb593052580"
+    },
+    "postgres A connections": {
+      "main": {
+        "record_store": "RecordStorePostgres",
+        "engine_id": 140614857163600,
+        "schema": "p393_0eb593052580",
+        "app": "p393-main",
+        "search_path": "p393_0eb593052580"
+      },
+      "first": {
+        "record_store": "RecordStorePostgres",
+        "engine_id": 140614853278320,
+        "schema": "p393_0eb593052580",
+        "app": "p393-first",
+        "search_path": "p393_0eb593052580"
+      },
+      "second": {
+        "record_store": "RecordStorePostgres",
+        "engine_id": 140614853012432,
+        "schema": "p393_0eb593052580",
+        "app": "p393-second",
+        "search_path": "p393_0eb593052580"
+      }
+    },
+    "postgres A server": {
+      "version": "PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+      "database": "postgres",
+      "server_version": "16.15 (Debian 16.15-1.pgdg13+2)",
+      "schema": "p393_0eb593052580"
+    },
+    "postgres B1": {
+      "room": "room-f477454fa19e43589b91925a9b2dd757",
+      "held_read_saw": null,
+      "held_in_transaction": false,
+      "independent_read_while_held": {
+        "exists": true,
+        "stored": null,
+        "agents": [
+          "alpha"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            2
+          ]
+        ],
+        "left": []
+      },
+      "watch": {
+        "finished_while_held": true,
+        "seconds_watched": 1.5,
+        "pg_lock_wait": null
+      },
+      "alpha": "ok: 'alpha'",
+      "beta": "ok: 'beta'",
+      "beta_seconds": 0.006,
+      "beta_ended_after_release": false,
+      "final": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      },
+      "raw": {
+        "exists": true,
+        "stored": "alpha",
+        "agents": [
+          "alpha",
+          "beta"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            2
+          ],
+          [
+            "agent",
+            "beta",
+            "participant",
+            3
+          ]
+        ],
+        "left": []
+      },
+      "active_agent_writes": [
+        [
+          "second",
+          "B1 join beta (second)",
+          "beta"
+        ],
+        [
+          "first",
+          "B1 join alpha (first, held)",
+          "alpha"
+        ]
+      ]
+    },
+    "postgres B2": {
+      "room": "room-ae52f92d2ddc4902ac9fe68f32590efd",
+      "held_read_saw": null,
+      "watch": {
+        "finished_while_held": true,
+        "seconds_watched": 1.5,
+        "pg_lock_wait": null
+      },
+      "alpha": "ok: 'alpha'",
+      "selection": "ok: 'beta'",
+      "final": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      },
+      "raw": {
+        "exists": true,
+        "stored": "alpha",
+        "agents": [
+          "alpha",
+          "beta"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            2
+          ],
+          [
+            "agent",
+            "beta",
+            "participant",
+            3
+          ]
+        ],
+        "left": []
+      },
+      "active_agent_writes": [
+        [
+          "second",
+          "B2 join beta + select beta (second)",
+          "beta"
+        ],
+        [
+          "second",
+          "B2 join beta + select beta (second)",
+          "beta"
+        ],
+        [
+          "first",
+          "B2 join alpha (first, held)",
+          "alpha"
+        ]
+      ]
+    },
+    "postgres B2b": {
+      "room": "35417b194f124daeb06c10014e4786d2",
+      "before": {
+        "stored": null,
+        "active": "legacy-agent",
+        "agents": [
+          "legacy-agent"
+        ]
+      },
+      "held_read_saw": null,
+      "watch": {
+        "finished_while_held": true,
+        "seconds_watched": 1.5,
+        "pg_lock_wait": null
+      },
+      "guest": "ok: 'guest-agent'",
+      "selection": "ok: 'legacy-agent'",
+      "final": {
+        "stored": "guest-agent",
+        "active": "guest-agent",
+        "agents": [
+          "legacy-agent",
+          "guest-agent"
+        ]
+      },
+      "raw": {
+        "exists": true,
+        "stored": "guest-agent",
+        "agents": [
+          "legacy-agent",
+          "guest-agent"
+        ],
+        "participants": [
+          [
+            "agent",
+            "legacy-agent",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "guest-agent",
+            "participant",
+            2
+          ]
+        ],
+        "left": []
+      },
+      "active_agent_writes": [
+        [
+          "second",
+          "B2b select legacy-agent (second)",
+          "legacy-agent"
+        ],
+        [
+          "first",
+          "B2b join guest-agent (first, held)",
+          "guest-agent"
+        ]
+      ]
+    },
+    "postgres B3": {
+      "room": "room-b5de867bdd3d40efa87f21e3e2287c07",
+      "held_read_saw": null,
+      "watch": {
+        "finished_while_held": true,
+        "seconds_watched": 1.5,
+        "pg_lock_wait": null
+      },
+      "leave": "ok: True",
+      "alpha": "builtins.RuntimeError: Failed to upsert participant agent:alpha",
+      "final": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": []
+      },
+      "raw": {
+        "exists": true,
+        "stored": "alpha",
+        "agents": [],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ]
+        ],
+        "left": [
+          [
+            "agent",
+            "alpha",
+            2
+          ]
+        ]
+      },
+      "select alpha afterwards": "builtins.ValueError: Agent 'alpha' is not an active participant",
+      "active_agent_writes": [
+        [
+          "first",
+          "B3 join alpha (first, held)",
+          "alpha"
+        ]
+      ]
+    },
+    "postgres C": {
+      "room": "room-8c6f3ab216124698b04a4e5f84cc4766",
+      "timeline": [
+        [
+          "first: join alpha (first activation)",
+          "'alpha'",
+          {
+            "stored": "alpha",
+            "first": "alpha",
+            "second": "alpha"
+          },
+          "alpha",
+          true
+        ],
+        [
+          "second: join beta",
+          "'beta'",
+          {
+            "stored": "alpha",
+            "first": "alpha",
+            "second": "alpha"
+          },
+          "alpha",
+          true
+        ],
+        [
+          "first: join gamma",
+          "'gamma'",
+          {
+            "stored": "alpha",
+            "first": "alpha",
+            "second": "alpha"
+          },
+          "alpha",
+          true
+        ],
+        [
+          "second: join alpha again (already a participant)",
+          "'alpha'",
+          {
+            "stored": "alpha",
+            "first": "alpha",
+            "second": "alpha"
+          },
+          "alpha",
+          true
+        ],
+        [
+          "first: gamma leaves (not the active agent)",
+          "True",
+          {
+            "stored": "alpha",
+            "first": "alpha",
+            "second": "alpha"
+          },
+          "alpha",
+          true
+        ],
+        [
+          "second: select beta (intentional selection)",
+          "'beta'",
+          {
+            "stored": "beta",
+            "first": "beta",
+            "second": "beta"
+          },
+          "beta",
+          true
+        ],
+        [
+          "first: join delta",
+          "'delta'",
+          {
+            "stored": "beta",
+            "first": "beta",
+            "second": "beta"
+          },
+          "beta",
+          true
+        ],
+        [
+          "first: beta leaves (the active agent: intentional leave)",
+          "True",
+          {
+            "stored": "alpha",
+            "first": "alpha",
+            "second": "alpha"
+          },
+          "alpha",
+          true
+        ],
+        [
+          "second: alpha leaves (the active agent)",
+          "True",
+          {
+            "stored": "delta",
+            "first": "delta",
+            "second": "delta"
+          },
+          "delta",
+          true
+        ],
+        [
+          "first: delta leaves (the last agent)",
+          "True",
+          {
+            "stored": null,
+            "first": null,
+            "second": null
+          },
+          null,
+          true
+        ],
+        [
+          "second: gamma joins again (rejoin into a room with no agent)",
+          "'gamma'",
+          {
+            "stored": "gamma",
+            "first": "gamma",
+            "second": "gamma"
+          },
+          "gamma",
+          true
+        ]
+      ],
+      "active_agent_writes": [
+        [
+          "first",
+          "C first: join alpha (first activation)",
+          "alpha"
+        ],
+        [
+          "second",
+          "C second: select beta (intentional selection)",
+          "beta"
+        ],
+        [
+          "first",
+          "C first: beta leaves (the active agent: intentional leave)",
+          "alpha"
+        ],
+        [
+          "second",
+          "C second: alpha leaves (the active agent)",
+          "delta"
+        ],
+        [
+          "first",
+          "C first: delta leaves (the last agent)",
+          null
+        ],
+        [
+          "second",
+          "C second: gamma joins again (rejoin into a room with no agent)",
+          "gamma"
+        ]
+      ],
+      "final": {
+        "stored": "gamma",
+        "active": "gamma",
+        "agents": [
+          "gamma"
+        ]
+      }
+    },
+    "postgres D existing selection": {
+      "room": "room-81905e61c2ac494b8687f38b73772670",
+      "concurrent": [
+        "ok: 'beta'",
+        "ok: 'beta'"
+      ],
+      "held_read_saw": "beta",
+      "held": [
+        "ok: 'beta'",
+        "ok: 'beta'"
+      ],
+      "watch": {
+        "finished_while_held": true,
+        "seconds_watched": 1.5,
+        "pg_lock_wait": null
+      },
+      "final": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta",
+          "gamma",
+          "epsilon",
+          "delta",
+          "zeta",
+          "eta"
+        ]
+      },
+      "writes": []
+    },
+    "postgres D initial activation": {
+      "room": "room-4bfaf8a09921485ca77f9431ffd0d3db",
+      "raw_before": {
+        "exists": true,
+        "stored": "beta",
+        "agents": [],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ]
+        ],
+        "left": []
+      },
+      "after_alpha": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "final": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      },
+      "writes": []
+    },
+    "postgres D blank": {
+      "rooms": [
+        {
+          "case": "none",
+          "initial": null,
+          "written directly": false,
+          "raw stored before": null,
+          "get_active_agent before": null,
+          "final": {
+            "stored": "alpha",
+            "active": "alpha",
+            "agents": [
+              "alpha"
+            ]
+          },
+          "writes": [
+            [
+              "second",
+              "MainThread",
+              "alpha"
+            ]
+          ]
+        },
+        {
+          "case": "empty",
+          "initial": "",
+          "written directly": false,
+          "raw stored before": null,
+          "get_active_agent before": null,
+          "final": {
+            "stored": "alpha",
+            "active": "alpha",
+            "agents": [
+              "alpha"
+            ]
+          },
+          "writes": [
+            [
+              "second",
+              "MainThread",
+              "alpha"
+            ]
+          ]
+        },
+        {
+          "case": "spaces",
+          "initial": "   ",
+          "written directly": false,
+          "raw stored before": null,
+          "get_active_agent before": null,
+          "final": {
+            "stored": "alpha",
+            "active": "alpha",
+            "agents": [
+              "alpha"
+            ]
+          },
+          "writes": [
+            [
+              "second",
+              "MainThread",
+              "alpha"
+            ]
+          ]
+        },
+        {
+          "case": "empty-row",
+          "initial": "",
+          "written directly": true,
+          "raw stored before": "",
+          "get_active_agent before": null,
+          "final": {
+            "stored": "alpha",
+            "active": "alpha",
+            "agents": [
+              "alpha"
+            ]
+          },
+          "writes": [
+            [
+              "second",
+              "MainThread",
+              "alpha"
+            ]
+          ]
+        },
+        {
+          "case": "spaces-row",
+          "initial": "   ",
+          "written directly": true,
+          "raw stored before": "   ",
+          "get_active_agent before": null,
+          "final": {
+            "stored": "alpha",
+            "active": "alpha",
+            "agents": [
+              "alpha"
+            ]
+          },
+          "writes": [
+            [
+              "second",
+              "MainThread",
+              "alpha"
+            ]
+          ]
+        }
+      ],
+      "held": {
+        "room": "room-4bfe717f389441f98a7e83fd61f981d8",
+        "raw stored before": "   ",
+        "held_read_saw": null,
+        "results": [
+          "ok: 'alpha'",
+          "ok: 'beta'"
+        ],
+        "watch": {
+          "finished_while_held": true,
+          "seconds_watched": 1.5,
+          "pg_lock_wait": null
+        },
+        "final": {
+          "stored": "alpha",
+          "active": "alpha",
+          "agents": [
+            "alpha",
+            "beta"
+          ]
+        },
+        "writes": [
+          [
+            "second",
+            "D blank join beta (second)",
+            "beta"
+          ],
+          [
+            "first",
+            "D blank join alpha (first, held)",
+            "alpha"
+          ]
+        ]
+      }
+    },
+    "postgres D rejoin": {
+      "room": "room-5a2779b953bc4ce6ba7c76222006e705",
+      "seq": {
+        "owner": 1,
+        "alpha": 2,
+        "beta": 3
+      },
+      "after alpha leaves": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "beta"
+        ]
+      },
+      "after alpha rejoins": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "beta",
+          "alpha"
+        ]
+      },
+      "raw after rejoin": {
+        "exists": true,
+        "stored": "beta",
+        "agents": [
+          "beta",
+          "alpha"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "beta",
+            "participant",
+            3
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            4
+          ]
+        ],
+        "left": []
+      },
+      "raw after joining again": {
+        "exists": true,
+        "stored": "beta",
+        "agents": [
+          "beta",
+          "alpha"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "beta",
+            "participant",
+            3
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            4
+          ]
+        ],
+        "left": []
+      },
+      "after beta leaves": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "after alpha leaves again": {
+        "stored": null,
+        "active": null,
+        "agents": []
+      },
+      "after alpha rejoins an empty room": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "writes": [
+        [
+          "first",
+          "MainThread",
+          "alpha"
+        ],
+        [
+          "second",
+          "MainThread",
+          "beta"
+        ],
+        [
+          "first",
+          "MainThread",
+          "alpha"
+        ],
+        [
+          "second",
+          "MainThread",
+          null
+        ],
+        [
+          "first",
+          "MainThread",
+          "alpha"
+        ]
+      ]
+    },
+    "postgres D legacy": {
+      "read": {
+        "listed": [
+          [
+            "legacy-agent",
+            "owner"
+          ]
+        ],
+        "view": {
+          "stored": null,
+          "active": "legacy-agent",
+          "agents": [
+            "legacy-agent"
+          ]
+        },
+        "writes": []
+      },
+      "invite": {
+        "listed": [
+          [
+            "legacy-agent",
+            "owner"
+          ],
+          [
+            "guest-agent",
+            "participant"
+          ]
+        ],
+        "view": {
+          "stored": "guest-agent",
+          "active": "guest-agent",
+          "agents": [
+            "legacy-agent",
+            "guest-agent"
+          ]
+        },
+        "writes": [
+          [
+            "first",
+            "D legacy join guest-agent (first)",
+            "guest-agent"
+          ]
+        ]
+      },
+      "own": {
+        "view": {
+          "stored": "legacy-agent",
+          "active": "legacy-agent",
+          "agents": [
+            "legacy-agent"
+          ]
+        },
+        "writes": [
+          [
+            "second",
+            "D legacy join legacy-agent (second)",
+            "legacy-agent"
+          ]
+        ]
+      }
+    },
+    "postgres D order": {
+      "room": "room-1b56613cea7c46d8a20d85368ae455fb",
+      "lists": {
+        "main": [
+          [
+            "human",
+            "owner"
+          ],
+          [
+            "agent",
+            "a1"
+          ],
+          [
+            "agent",
+            "a2"
+          ],
+          [
+            "agent",
+            "a3"
+          ],
+          [
+            "agent",
+            "a4"
+          ]
+        ],
+        "first": [
+          [
+            "human",
+            "owner"
+          ],
+          [
+            "agent",
+            "a1"
+          ],
+          [
+            "agent",
+            "a2"
+          ],
+          [
+            "agent",
+            "a3"
+          ],
+          [
+            "agent",
+            "a4"
+          ]
+        ],
+        "second": [
+          [
+            "human",
+            "owner"
+          ],
+          [
+            "agent",
+            "a1"
+          ],
+          [
+            "agent",
+            "a2"
+          ],
+          [
+            "agent",
+            "a3"
+          ],
+          [
+            "agent",
+            "a4"
+          ]
+        ]
+      },
+      "raw": {
+        "exists": true,
+        "stored": "a1",
+        "agents": [
+          "a1",
+          "a2",
+          "a3",
+          "a4"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "a1",
+            "participant",
+            2
+          ],
+          [
+            "agent",
+            "a2",
+            "participant",
+            3
+          ],
+          [
+            "agent",
+            "a3",
+            "participant",
+            4
+          ],
+          [
+            "agent",
+            "a4",
+            "participant",
+            5
+          ]
+        ],
+        "left": []
+      },
+      "after a2 rejoins": {
+        "exists": true,
+        "stored": "a1",
+        "agents": [
+          "a1",
+          "a3",
+          "a4",
+          "a2"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "a1",
+            "participant",
+            2
+          ],
+          [
+            "agent",
+            "a3",
+            "participant",
+            4
+          ],
+          [
+            "agent",
+            "a4",
+            "participant",
+            5
+          ],
+          [
+            "agent",
+            "a2",
+            "participant",
+            6
+          ]
+        ],
+        "left": []
+      },
+      "final": {
+        "stored": "a1",
+        "active": "a1",
+        "agents": [
+          "a1",
+          "a3",
+          "a4",
+          "a2"
+        ]
+      }
+    },
+    "postgres F1": {
+      "room": "room-8f6f229f7f7b4a349cf5e2a07c838d0a",
+      "in_transaction": false,
+      "during": {
+        "exists": true,
+        "stored": "alpha",
+        "agents": [
+          "alpha"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            2
+          ]
+        ],
+        "left": []
+      },
+      "after": {
+        "exists": true,
+        "stored": "alpha",
+        "agents": [
+          "alpha"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            2
+          ]
+        ],
+        "left": []
+      },
+      "join": "ok: 'alpha'"
+    },
+    "postgres F2": {
+      "room": "room-5626689532da4d0dad7582000d8e378d",
+      "join": "builtins.RuntimeError: probe: injected failure at the activation read",
+      "raw after failure": {
+        "exists": true,
+        "stored": null,
+        "agents": [
+          "alpha"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            2
+          ]
+        ],
+        "left": []
+      },
+      "first in_transaction": false,
+      "pg locks held by first": 0,
+      "beta join seconds": 0.006,
+      "final": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      },
+      "writes": [
+        [
+          "second",
+          "F2 join beta (second)",
+          "beta"
+        ]
+      ]
+    },
+    "postgres F3": {
+      "room": "room-f0daec7664364c14a3c5f44a0099cbe3",
+      "join": "builtins.RuntimeError: probe: injected failure after the activation write",
+      "activation write ran": [
+        {
+          "by": "first",
+          "op": "F3 join alpha (first, fails after its activation write)",
+          "value": "alpha",
+          "session": "room-f0daec7664364c14a3c5f44a0099cbe3",
+          "rowcount": 1,
+          "in_transaction": false
+        }
+      ],
+      "raw after failure": {
+        "exists": true,
+        "stored": "alpha",
+        "agents": [
+          "alpha"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            2
+          ]
+        ],
+        "left": []
+      },
+      "first in_transaction": false,
+      "final": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      }
+    },
+    "postgres F4": {
+      "room": "room-9e903b55785e415eb119db9dd092d4ce",
+      "watch": {
+        "finished_while_held": true,
+        "seconds_watched": 1.5,
+        "pg_lock_wait": null
+      },
+      "alpha": "builtins.RuntimeError: probe: injected failure in the held join",
+      "beta": "ok: 'beta'",
+      "final": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      },
+      "writes": [
+        [
+          "second",
+          "F4 join beta (second)",
+          "beta"
+        ]
+      ]
+    },
+    "postgres F5": {
+      "room": "room-45c850e602884cdfb87d9e2dc3b2ad05",
+      "waiter": "second-lt",
+      "hold seconds": 2.5,
+      "watch": {
+        "finished_while_held": true,
+        "seconds_watched": 2.5,
+        "pg_lock_wait": null
+      },
+      "alpha": "ok: 'alpha'",
+      "beta": "ok: 'beta'",
+      "beta seconds": 0.005,
+      "after": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      },
+      "final": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      },
+      "writes": [
+        [
+          "second-lt",
+          "F5 join beta (second-lt)",
+          "beta"
+        ],
+        [
+          "first",
+          "F5 join alpha (first, held)",
+          "alpha"
+        ]
+      ]
+    },
+    "postgres G": {
+      "two first joins": {
+        "rooms": 200,
+        "violations": 192,
+        "errors": 0,
+        "both joins wrote": 192,
+        "info: stored is not the first listed": 185,
+        "outcomes": {
+          "ok | ok": 200
+        },
+        "examples": [
+          {
+            "room": "room-34ecb03191f34d78befe2349a9d186bf",
+            "first": "ok: 'alpha'",
+            "second": "ok: 'alpha'",
+            "raw": [
+              [
+                "beta",
+                "alpha"
+              ],
+              "alpha"
+            ],
+            "writes": [
+              [
+                "second",
+                "G two first joins second",
+                "beta"
+              ],
+              [
+                "first",
+                "G two first joins first",
+                "alpha"
+              ]
+            ]
+          },
+          {
+            "room": "room-cf32cab64277470eada92387cc0b40c1",
+            "first": "ok: 'alpha'",
+            "second": "ok: 'alpha'",
+            "raw": [
+              [
+                "beta",
+                "alpha"
+              ],
+              "alpha"
+            ],
+            "writes": [
+              [
+                "second",
+                "G two first joins second",
+                "beta"
+              ],
+              [
+                "first",
+                "G two first joins first",
+                "alpha"
+              ]
+            ]
+          },
+          {
+            "room": "room-610e66ccecd142d4abef4fb2b36577c1",
+            "first": "ok: 'alpha'",
+            "second": "ok: 'alpha'",
+            "raw": [
+              [
+                "beta",
+                "alpha"
+              ],
+              "alpha"
+            ],
+            "writes": [
+              [
+                "second",
+                "G two first joins second",
+                "beta"
+              ],
+              [
+                "first",
+                "G two first joins first",
+                "alpha"
+              ]
+            ]
+          }
+        ]
+      },
+      "first join vs join and selection": {
+        "rooms": 200,
+        "violations": 0,
+        "errors": 0,
+        "outcomes": {
+          "ok | ok": 200
+        },
+        "examples": []
+      },
+      "first join vs leave of the joining agent": {
+        "rooms": 200,
+        "violations": 22,
+        "errors": 0,
+        "departed active agent": 22,
+        "outcomes": {
+          "ok | ok": 178,
+          "builtins.RuntimeError | ok": 22
+        },
+        "examples": [
+          {
+            "room": "room-a18c2ab5b70445828db3742453c0da24",
+            "first": "builtins.RuntimeError: Failed to upsert participant agent:alpha",
+            "second": "ok: True",
+            "raw": [
+              [],
+              "alpha"
+            ],
+            "writes": [
+              [
+                "first",
+                "G first join vs leave of the joining agent first",
+                "alpha"
+              ]
+            ]
+          },
+          {
+            "room": "room-4899760f77364f4da437844690a35a74",
+            "first": "builtins.RuntimeError: Failed to upsert participant agent:alpha",
+            "second": "ok: True",
+            "raw": [
+              [],
+              "alpha"
+            ],
+            "writes": [
+              [
+                "first",
+                "G first join vs leave of the joining agent first",
+                "alpha"
+              ]
+            ]
+          },
+          {
+            "room": "room-5c57702eeeed4a459262f50ae3931265",
+            "first": "builtins.RuntimeError: Failed to upsert participant agent:alpha",
+            "second": "ok: True",
+            "raw": [
+              [],
+              "alpha"
+            ],
+            "writes": [
+              [
+                "first",
+                "G first join vs leave of the joining agent first",
+                "alpha"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    "postgres active-agent writes (all)": 1210,
+    "postgres E reopen": {
+      "child_exit": 0,
+      "child_stderr_tail": "",
+      "child_openminion": [
+        "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+        "0.1.14"
+      ],
+      "child_pid": 5148,
+      "parent_pid": 3906,
+      "sessions_counted_by_child": 623,
+      "rooms_checked": 23,
+      "api_mismatches": [
+        [
+          "B2b",
+          "35417b194f124daeb06c10014e4786d2",
+          {
+            "stored": "guest-agent",
+            "active": "guest-agent",
+            "agents": [
+              "legacy-agent",
+              "guest-agent"
+            ]
+          },
+          {
+            "stored": "legacy-agent",
+            "active": "legacy-agent",
+            "agents": [
+              "legacy-agent",
+              "guest-agent"
+            ]
+          }
+        ],
+        [
+          "F2",
+          "room-5626689532da4d0dad7582000d8e378d",
+          {
+            "stored": "beta",
+            "active": "beta",
+            "agents": [
+              "alpha",
+              "beta"
+            ]
+          },
+          {
+            "stored": "beta",
+            "active": "beta",
+            "agents": [
+              "beta",
+              "alpha"
+            ]
+          }
+        ],
+        [
+          "F4",
+          "room-9e903b55785e415eb119db9dd092d4ce",
+          {
+            "stored": "beta",
+            "active": "beta",
+            "agents": [
+              "alpha",
+              "beta"
+            ]
+          },
+          {
+            "stored": "beta",
+            "active": "beta",
+            "agents": [
+              "beta"
+            ]
+          }
+        ],
+        [
+          "B2",
+          "room-ae52f92d2ddc4902ac9fe68f32590efd",
+          {
+            "stored": "alpha",
+            "active": "alpha",
+            "agents": [
+              "alpha",
+              "beta"
+            ]
+          },
+          {
+            "stored": "beta",
+            "active": "beta",
+            "agents": [
+              "alpha",
+              "beta"
+            ]
+          }
+        ],
+        [
+          "B3",
+          "room-b5de867bdd3d40efa87f21e3e2287c07",
+          {
+            "stored": "alpha",
+            "active": "alpha",
+            "agents": []
+          },
+          {
+            "stored": null,
+            "active": null,
+            "agents": []
+          }
+        ],
+        [
+          "F3",
+          "room-f0daec7664364c14a3c5f44a0099cbe3",
+          {
+            "stored": "alpha",
+            "active": "alpha",
+            "agents": [
+              "alpha",
+              "beta"
+            ]
+          },
+          {
+            "stored": "beta",
+            "active": "beta",
+            "agents": [
+              "beta"
+            ]
+          }
+        ]
+      ],
+      "raw_mismatches": [
+        [
+          "B2b",
+          "35417b194f124daeb06c10014e4786d2",
+          [
+            [
+              "legacy-agent",
+              "guest-agent"
+            ],
+            "guest-agent"
+          ],
+          [
+            [
+              "legacy-agent",
+              "guest-agent"
+            ],
+            "legacy-agent"
+          ]
+        ],
+        [
+          "F2",
+          "room-5626689532da4d0dad7582000d8e378d",
+          [
+            [
+              "alpha",
+              "beta"
+            ],
+            "beta"
+          ],
+          [
+            [
+              "beta",
+              "alpha"
+            ],
+            "beta"
+          ]
+        ],
+        [
+          "F4",
+          "room-9e903b55785e415eb119db9dd092d4ce",
+          [
+            [
+              "alpha",
+              "beta"
+            ],
+            "beta"
+          ],
+          [
+            [
+              "beta"
+            ],
+            "beta"
+          ]
+        ],
+        [
+          "B2",
+          "room-ae52f92d2ddc4902ac9fe68f32590efd",
+          [
+            [
+              "alpha",
+              "beta"
+            ],
+            "alpha"
+          ],
+          [
+            [
+              "alpha",
+              "beta"
+            ],
+            "beta"
+          ]
+        ],
+        [
+          "B3",
+          "room-b5de867bdd3d40efa87f21e3e2287c07",
+          [
+            [],
+            "alpha"
+          ],
+          [
+            [],
+            null
+          ]
+        ],
+        [
+          "F3",
+          "room-f0daec7664364c14a3c5f44a0099cbe3",
+          [
+            [
+              "alpha",
+              "beta"
+            ],
+            "alpha"
+          ],
+          [
+            [
+              "beta"
+            ],
+            "beta"
+          ]
+        ]
+      ],
+      "raw_sessions": 623,
+      "raw_participant_rows": 1665,
+      "stored_active_not_a_participant": [
+        [
+          "room-23784474307e4ceaa0d03161dcf588dd",
+          "alpha"
+        ],
+        [
+          "room-3b71c989d536470699abd793bf084a82",
+          "alpha"
+        ],
+        [
+          "room-3f6f4645a1b94920a6a6df8e7fdb14a4",
+          "alpha"
+        ],
+        [
+          "room-40054ef9f01e41fe805b23bd4ecb42d4",
+          "alpha"
+        ],
+        [
+          "room-474583e89add47339b3e0fd89a4ae399",
+          "alpha"
+        ],
+        [
+          "room-4899760f77364f4da437844690a35a74",
+          "alpha"
+        ],
+        [
+          "room-53e36e68966748d992127529a781a516",
+          "alpha"
+        ],
+        [
+          "room-5c57702eeeed4a459262f50ae3931265",
+          "alpha"
+        ],
+        [
+          "room-6397547ab6eb48b595b6aff7d2611cd1",
+          "alpha"
+        ],
+        [
+          "room-63aa48cb5f0f419db0c93907eca05f0f",
+          "alpha"
+        ],
+        [
+          "room-7822383103b842b09a344d0c26a8c279",
+          "alpha"
+        ],
+        [
+          "room-7a122a1fd39740999c25575ddd99f0bd",
+          "alpha"
+        ],
+        [
+          "room-8146abd0a24c4233b97f34b8a0456b77",
+          "alpha"
+        ],
+        [
+          "room-944a9e108bdb4653a356a7c6368d69fa",
+          "alpha"
+        ],
+        [
+          "room-9dc0203c232f4f438093f630619a6159",
+          "alpha"
+        ],
+        [
+          "room-a18c2ab5b70445828db3742453c0da24",
+          "alpha"
+        ],
+        [
+          "room-b0f03a4d76db47d6a29cf52c0bb20793",
+          "alpha"
+        ],
+        [
+          "room-b5de867bdd3d40efa87f21e3e2287c07",
+          "alpha"
+        ],
+        [
+          "room-b683a84db0714bad83b997c54271177d",
+          "alpha"
+        ],
+        [
+          "room-d508edc8da724e4fb20f1ca80f311ee5",
+          "alpha"
+        ],
+        [
+          "room-e3e0de8a62c541d3b0caea5ddef465be",
+          "alpha"
+        ],
+        [
+          "room-f105f4142274497e9e97e70a3f8d7af9",
+          "alpha"
+        ],
+        [
+          "room-ff39d944b7344e8991f5eeb770cea1c2",
+          "alpha"
+        ]
+      ],
+      "server_counts": {
+        "sessions": 623,
+        "room_participants": 1665,
+        "migrations": 15
+      },
+      "server_connections_after_close": []
+    },
+    "postgres N #495 note (not a check)": {
+      "selection": "ok: 'beta'",
+      "leave": true,
+      "final": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "meaning": "#495 is not in 0.1.15; recorded only to show it is still open, not claimed fixed"
+    }
+  }
+}

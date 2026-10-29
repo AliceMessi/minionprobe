@@ -1,0 +1,43 @@
+{
+  "probe": "probe_369",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.15",
+  "python": "3.12.15",
+  "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "backend": "postgres",
+  "postgres": {
+    "sqlalchemy": "2.1.6",
+    "psycopg": "3.3.6",
+    "select version()": "PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+    "server_version": "16.15 (Debian 16.15-1.pgdg13+2)",
+    "url_scheme": "postgresql+psycopg"
+  },
+  "agent-client-protocol": "0.12.1"
+}
+PASS postgres acp: `openminion acp` (stdio JSON-RPC) answers initialize with the installed version and the session/list capability | observed={'version': '0.1.15', 'list': {}}
+PASS postgres acp: session/list cwd=a lists only the ACP sessions of workspace a, newest first (including one with NaN, NUL and a lone surrogate in other members) | observed=['odd-acp-in-a', '37519c770c094461aef7ad0cdf165bed']
+PASS postgres acp: session/list without cwd lists every ACP session newest first; surfaces cli, ["acp"], true, "ACP" and missing are excluded | observed=['odd-acp-in-a', 'c0046dff56eb47a38874d93fa9e0b5ab', '37519c770c094461aef7ad0cdf165bed']
+PASS postgres acp: session/list cwd=b lists only the workspace-b session | observed=['c0046dff56eb47a38874d93fa9e0b5ab']
+PASS postgres acp: with 108 ACP sessions, session/list returns the newest 100 (the store limit), in order | observed=100
+PASS postgres acp: the acp server exits 0 on stdin EOF | observed=0
+PASS postgres acp: the acp server connected to PostgreSQL under its application_name while running and left no connection after it exited | observed={'max while running': 1, 'after exit': {'count': 0, 'waited_s': 0.01}}
+PASS postgres acp: through a real runtime, list_sessions with two filters (surface=acp, workspace_root=a) selects exactly workspace a's ACP sessions; a non-matching second filter selects none | observed={'matched': 2, 'expected': 2, 'nonmatching': []}
+PASS postgres acp: no runtime SQLite database created at storage.path | observed={'storage.path exists': False, 'sqlite files': ['.openminion/artifact/index.db', '.openminion/authored_tools/store.sqlite', '.openminion/authored_tools/store.sqlite.bak/20261029T071501341114Z-0-none.sqlite', '.openminion/authored_tools/store.sqlite.bak/20261029T071504140947Z-0-0001_baseline.sqlite', '.openminion/authored_tools/store.sqlite.bak/20261029T071506156655Z-0-0001_baseline.sqlite', '.openminion/memory/memory.db', '.openminion/ops/evidence.db', '.openminion/ops/jobs.db', '.openminion/ops/plans.db', '.openminion/policy/policy.db', '.openminion/policy/policy.db.bak/20261029T071501008882Z-0-none.sqlite', '.openminion/policy/policy.db.bak/20261029T071504066269Z-0-0002_blockchain_confirmations.sqlite', '.openminion/policy/policy.db.bak/20261029T071506140454Z-0-0002_blockchain_confirmations.sqlite', '.openminion/retrieve/retrieve.db', '.openminion/telemetry/telemetry.db']}
+PASS postgres focus (RecordStorePostgres): a new Focus session stores working_dir (resolved) and focus_mode | observed={'working_dir': '<RUNNER_TEMP>/work/probe_369_postgres/focus-postgres/project-a', 'focus_mode': True}
+PASS postgres focus: list_directory_sessions = alpha's sessions of project-a, newest first (beta's and project-b's excluded; one with NaN/NUL in other members included) | observed=['focus-odd', 'focus-3ee9df737855450babacab24c1d55703', 'focus-6be25c4bdcdc4ce9980920cd8c6f639d', 'focus-cca45d2c77434294af3dfaef36fad57c']
+PASS postgres focus: limit=2 returns the newest two | observed=['focus-odd', 'focus-3ee9df737855450babacab24c1d55703']
+PASS postgres focus: find_candidate_session is the newest | observed='focus-odd'
+PASS postgres focus: beta lists only its own project-a session | observed=['focus-57cbca31cf26498b864b9ed241c0cb4e']
+PASS postgres focus: project-b lists its one session | observed=['focus-0474ce64666b4be1a46f66fb6eff570e']
+PASS postgres focus: the Focus sessions are rows of the PostgreSQL sessions table (independent read) | observed=[{'n': 6}]
+PASS postgres focus-cli: the bare `openminion --dir <project>` Focus launch in a pseudo-terminal starts, and `/exit` ends it with exit 0 | observed={'exit_code': 0, 'steps': [{'after': 'startup', 'running': True, 'bytes': 1567}, {'sent': '/exit\r'}], 'output_tail': ['╰───────────────────────────────────────────────────╯', 'Tip: / for commands · @ to mention a file · keep typing while a turn runs', '❯ Ask anything · @ to mention a file · / for commands', '◆ alpha  ·  model: —  ·  cwd: <RUNNER_TEMP>/work/probe_369_postgres/focus-postgres/project-cli                /exit']}
+PASS postgres focus-cli: the launch created its Focus directory session (target focus, working_dir = the project) in the runtime database | observed=[{'id': 'focus-c33024525a6044509cfd0e30ff4d78ab', 'target': 'focus', 'metadata': {'cwd': '<RUNNER_TEMP>/work/probe_369_postgres/focus-postgres/project-cli', 'focus_mode': True, 'permission_mode': 'default', 'permission_overrides': {}, 'session_action_policy_mode_override': '', 'working_dir': '<RUNNER_TEMP>/work/probe_369_postgres/focus-postgres/project-cli', 'workspace_root': '<RUNNER_TEMP>/work/probe_369_postgres/focus-postgres/project-cli'}}]
+PASS postgres focus-cli: the Focus process connected to PostgreSQL under its application_name while running and left no connection after it exited | observed={'max while running': 1, 'after exit': {'count': 0, 'waited_s': 0.01}}
+PASS postgres focus-cli: the Focus runtime lists that session for the project directory | observed=['focus-c33024525a6044509cfd0e30ff4d78ab']
+PASS postgres focus: no runtime SQLite database created at storage.path | observed={'storage.path exists': False, 'sqlite files': ['.openminion/artifact/index.db', '.openminion/authored_tools/store.sqlite', '.openminion/authored_tools/store.sqlite.bak/20261029T071506553200Z-0-none.sqlite', '.openminion/authored_tools/store.sqlite.bak/20261029T071509399307Z-0-0001_baseline.sqlite', '.openminion/authored_tools/store.sqlite.bak/20261029T071521081788Z-0-0001_baseline.sqlite', '.openminion/memory/memory.db', '.openminion/ops/evidence.db', '.openminion/ops/jobs.db', '.openminion/ops/plans.db', '.openminion/policy/policy.db', '.openminion/policy/policy.db.bak/20261029T071506512381Z-0-none.sqlite', '.openminion/policy/policy.db.bak/20261029T071509318470Z-0-0002_blockchain_confirmations.sqlite', '.openminion/policy/policy.db.bak/20261029T071521065364Z-0-0002_blockchain_confirmations.sqlite', '.openminion/retrieve/retrieve.db', '.openminion/telemetry/telemetry.db']}
+SUMMARY passed=21 failed=0 total=21 not_run=0
+exit=0
