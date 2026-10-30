@@ -1,0 +1,164 @@
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+.F..                                                                     [100%]
+=================================== FAILURES ===================================
+___ test_focus_pty_keeps_top_down_transcript_with_inline_input_across_resize ___
+
+focus_probe = <tests.e2e.cli.focus.harness.probe.FocusProbe object at 0x10db84510>
+
+    def test_focus_pty_keeps_top_down_transcript_with_inline_input_across_resize(
+        focus_probe: FocusProbe,
+    ) -> None:
+        def assert_blank_row_after(
+            screen_rows: tuple[str, ...],
+            expected_line: str,
+        ) -> None:
+            row = max(
+                index for index, line in enumerate(screen_rows) if line == expected_line
+            )
+            assert screen_rows[row + 1] == ""
+    
+        def assert_flow_layout(session: PtySession, *, rows: int) -> None:
+            deadline = time.monotonic() + 5
+            while time.monotonic() < deadline:
+                screen_rows = session.screen_lines
+                occupied_rows = _occupied_rows(session)
+                if (
+                    len(screen_rows) == rows
+                    and len(occupied_rows) >= 2
+                    and occupied_rows[-1].startswith("◆ ")
+                    and occupied_rows[-2].startswith("❯ ")
+                    and session.cursor_position[0] == len(occupied_rows) - 1
+                ):
+                    break
+                time.sleep(0.05)
+            assert len(session.screen_lines) == rows
+            _assert_inline_composer(session)
+            assert "cursor position requests" not in session.visible_transcript
+    
+        with focus_probe.session(rows=24, cols=100) as session:
+            focus_probe.wait_ready(session)
+            assert_flow_layout(session, rows=24)
+            assert_blank_row_after(
+                session.screen_lines,
+                "Tip: / for commands · @ to mention a file · keep typing while a turn runs",
+            )
+    
+            focus_probe.run_turn(
+                session,
+                FocusScenario(
+                    scenario_id="local_inline_layout",
+                    prompt="Reply with exactly: footer layout check",
+                    expected_markers=("footer layout check",),
+                    timeout=60,
+                ),
+            )
+            assert_flow_layout(session, rows=24)
+            screen_rows = session.screen_lines
+            tip_row = screen_rows.index(
+                "Tip: / for commands · @ to mention a file · keep typing while a turn runs"
+            )
+            startup_row = next(
+                index for index, line in enumerate(screen_rows) if "OpenMinion CLI" in line
+            )
+            matching_rows = [
+                index
+                for index, line in enumerate(screen_rows)
+                if "footer layout check" in line
+            ]
+            assert startup_row < tip_row < matching_rows[0]
+            assert matching_rows[0] == tip_row + 2, "\n".join(
+                f"{index}: {line!r}" for index, line in enumerate(screen_rows)
+            )
+            assert len(matching_rows) >= 2
+            assert matching_rows[1] == matching_rows[0] + 2
+            assert matching_rows[0] < matching_rows[1] < len(_occupied_rows(session)) - 2
+            assert_blank_row_after(
+                screen_rows,
+                "❯ Reply with exactly: footer layout check",
+            )
+    
+            focus_probe.run_slash(session, "/cost", marker="Cost")
+            screen_rows = session.screen_lines
+            first_response_row = next(
+                index
+                for index, line in enumerate(screen_rows)
+                if index > matching_rows[0] and "footer layout check" in line
+            )
+            command_row = screen_rows.index("❯ /cost")
+            cost_row = next(
+                index
+                for index, line in enumerate(screen_rows)
+                if index > command_row and line.startswith("Cost")
+            )
+            assert (
+                first_response_row
+                < command_row
+                < cost_row
+                < len(_occupied_rows(session)) - 2
+            )
+            focus_probe.run_slash(session, "/queue", marker="No queued messages.")
+            screen_rows = session.screen_lines
+            assert any(line.startswith("Cost") for line in screen_rows)
+            assert screen_rows.index("❯ /cost") < screen_rows.index("❯ /queue")
+    
+            session.send("typed-check")
+            deadline = time.monotonic() + 5
+            while time.monotonic() < deadline:
+                if _occupied_rows(session)[-2] == "❯ typed-check":
+                    break
+                time.sleep(0.05)
+            else:
+                raise AssertionError("typed input did not remain above the footer")
+            assert_flow_layout(session, rows=24)
+    
+            session.send("\x7f" * len("typed-check"))
+            session.send("/")
+            deadline = time.monotonic() + 5
+            while time.monotonic() < deadline:
+                if "/agents" in session.screen_text:
+                    break
+                time.sleep(0.05)
+            else:
+                raise AssertionError("slash completion menu did not open")
+            assert "❯ /" in _occupied_rows(session)
+            assert _occupied_rows(session)[-1].startswith("◆ ")
+    
+            session.send("\x7f")
+            deadline = time.monotonic() + 5
+            while time.monotonic() < deadline:
+                if "/agents" not in session.screen_text:
+                    break
+                time.sleep(0.05)
+            else:
+                raise AssertionError("slash completion menu did not close cleanly")
+            session.resize(rows=18, cols=72)
+            assert_flow_layout(session, rows=18)
+    
+            session.resize(rows=42, cols=120)
+>           assert_flow_layout(session, rows=42)
+
+tests/e2e/cli/focus/test_local.py:717: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/e2e/cli/focus/test_local.py:614: in assert_flow_layout
+    _assert_inline_composer(session)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+session = PtySession(argv=('/Users/runner/work/linux-runner/linux-runner/.venv/bin/python3.11', '-m', 'openminion', '--config', ...to mention a file · / for commands\n◆ minimax-m2-7  ·  model: —  ·  cwd: /Users/runner/work/linux-runner/linux-runner')
+
+    def _assert_inline_composer(session: PtySession) -> tuple[str, ...]:
+        rows = _occupied_rows(session)
+        assert rows[-1].startswith("◆ "), "\n".join(rows)
+        assert rows[-2].startswith("❯ "), "\n".join(rows)
+>       assert session.cursor_position[0] == len(rows) - 1
+E       AssertionError: assert 13 == (8 - 1)
+E        +  where 8 = len(('Cost', 'Session: focus-e2e-test-f…534e29b35f25', 'Amount: unavailable', 'Usage: 0 tokens · 2 observed · 0 unmetered · 0 failed', '❯ /queue', 'No queued messages.', ...))
+
+tests/e2e/cli/focus/test_local.py:28: AssertionError
+=========================== short test summary info ============================
+FAILED tests/e2e/cli/focus/test_local.py::test_focus_pty_keeps_top_down_transcript_with_inline_input_across_resize - AssertionError: assert 13 == (8 - 1)
+ +  where 8 = len(('Cost', 'Session: focus-e2e-test-f…534e29b35f25', 'Amount: unavailable', 'Usage: 0 tokens · 2 observed · 0 unmetered · 0 failed', '❯ /queue', 'No queued messages.', ...))
+1 failed, 3 passed in 37.15s

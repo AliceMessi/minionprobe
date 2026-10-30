@@ -1,6 +1,6 @@
 # OpenMinion #524: a tool call that did not run stages no `tool_outcome` candidate
 
-Evidence for the #524 fix PR (branch `fix/524-denied-call-outcome-candidate` on `AliceMessi/openminion`, head `8d688f7a`): option A, as approved on [openminion#524](https://github.com/openminion/openminion/issues/524#issuecomment-6494224192). The branch is three commits on `dev` @ `aec2df9e` (after #519, #525 and #520): the tests, the fix and the docs. The report itself is in [`openminion-user-denied-tool-args-candidate`](../openminion-user-denied-tool-args-candidate).
+Evidence for the #524 fix PR (branch `fix/524-denied-call-outcome-candidate` on `AliceMessi/openminion`, head `8d688f7a` in round 1; the final head after the 30 Oct review is `2f8bb282`, see Round 2): option A, as approved on [openminion#524](https://github.com/openminion/openminion/issues/524#issuecomment-6494224192). The branch is three commits on `dev` @ `aec2df9e` (after #519, #525 and #520): the tests, the fix and the docs. The report itself is in [`openminion-user-denied-tool-args-candidate`](../openminion-user-denied-tool-args-candidate).
 
 ## Files
 
@@ -61,6 +61,31 @@ Its three "later yes" scenarios sent the reply with a second `Agent.run`, which 
 The same run's draft SDK file gave 2 failed, 12 passed on the fix. The log keeps only the last 30 lines of that output; they show `test_executed_call_keeps_its_tool_outcome[failed-without-memory-write]` failing on the draft's comparison of the handler's arguments, which include their defaults, with the model's four. The tested file records only those four keys.
 
 **check** ([run 40861340925](https://github.com/AliceMessi/linux-runner/actions/runs/40861340925), `wip/524-check1` @ `953dd9dc`): the three new and changed test files twice, `ruff format --check` and `ruff check` on them, then the files on `dev`'s sources. One case failed on the fix, twice: the later-approval test compared the failure candidate's signature with the model's arguments, while the replayed call carries its validated arguments with their defaults. The tested head compares the four keys and checks that `source_args_signature` equals `args_signature`. On `dev`'s sources: the same 11 failures as on the head.
+
+## Round 2: head `2f8bb282` (after the #534 review of 30 Oct)
+
+The review asked to reconcile with `dev` after the 0.1.16 release with this entry under `## Unreleased`, to state the `policy_denied` category contract in the README and changelog, and to add a takeover/category control. Head `2f8bb282` on `fix/524-denied-call-outcome-candidate`, on top of `376b1315`:
+- `c729a028`: "Merge branch 'dev' into fix/524-denied-call-outcome-candidate", `dev` @ `f7b6100a`. Git merged `CHANGELOG.md` cleanly but put the entry under `Current package line - 2026-10-29`; the merge commit moves it to `## Unreleased`. `git diff f7b6100a -- CHANGELOG.md` only adds the entry.
+- `19123e29`, `test(brain)`: `test_executed_takeover_result_is_policy_denied_and_stages_no_tool_outcome` in `tests/brain/test_runner_tools.py`.
+- `2f8bb282`, `docs(memory)`: the contract in the memory module README and the changelog entry.
+
+Files in `linux/round2-2f8bb282/`:
+- `runner-gates-r2.sh`: the gates script (base64 on the runner; its sha256 is the first line of the log). `DEV` is `f7b6100a`; it adds the CLI-docs validator, the takeover control alone, and `tests/brain/test_commerce_handoff_result.py` to `<focused>`.
+- `gates-run-41026703068.txt`, `head.txt`, `result.txt`, `run-id.txt`: [run 41026703068](https://github.com/AliceMessi/linux-runner/actions/runs/41026703068) on `2f8bb282`. Runner paths are shortened to `<checkout>`.
+- `earlier-02f25bfe/`: [run 41024929495](https://github.com/AliceMessi/linux-runner/actions/runs/41024929495) on the earlier local head `02f25bfe`, with the same script. Everything passed except `make format-check` ("1 file would be reformatted", the new test's signature line). `19123e29` is that commit formatted with `ruff format`; nothing else differs.
+
+| Gate on `2f8bb282` | Result |
+|---|---|
+| `make lint` | passed, mypy ratchet 4306 / 4306 |
+| `scripts/validate/max_file_loc.py`, `python -m scripts.validate.cli_layout` | ok, ok |
+| upstream `postgres-memory-retrieval`, 9 commands from `ci.yml` | 19, 1, 7, 6, 54, 8, 2, 13, 13 passed |
+| the takeover control alone | passed |
+| `pytest <focused>` | 117 passed; on `dev`'s sources 12 failed, 105 passed |
+| new and changed test files, 3 runs | 57 passed each time; on `dev`'s sources 12 failed, 45 passed |
+| `pytest -m "<test-ci markers>" <related>` | 8191 passed, 6 skipped, 1 xfailed |
+| `ruff check .`, `make format-check` | passed, 5163 files already formatted |
+
+The 12 failures on `dev`'s sources are the 11 listed above plus the takeover control, which finds the `policy_denied` candidate that `dev` stages for the takeover result.
 
 ## Not run
 
