@@ -1,0 +1,152 @@
+0848d68872a858dda91adf73b33c3e7f224ceb02b4799d55bd4076dd7c69132d  /tmp/runner-gates.sh
+head: 7d7a2ec4 docs(api): document thread_id replies to a waiting confirmation
+  7d7a2ec4 docs(api): document thread_id replies to a waiting confirmation
+  0332e143 feat(api): accept an explicit thread_id in Agent.run and run_stream
+  fcded075 test(api): pin Agent replies sent to an explicit thread
+  1169bd22 fix(storage): isolate PostgreSQL module schemas (#536)
+  bfa677d8 Merge branch 'dev' into fix/446-module-migration-ownership
+dev:  1169bd22 fix(storage): isolate PostgreSQL module schemas (#536)
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+OPENMINION_TEST_POSTGRES_URL set: yes
+
+== git diff --stat 1169bd226b428f9187e2b5652a01ab7f29757271..HEAD
+ API_COMPATIBILITY.md                             |   8 +
+ CHANGELOG.md                                     |   7 +
+ docs/runtime-surfaces.md                         |  15 +
+ scripts/baselines/api_complexity.tsv             |   2 +-
+ src/openminion/api/agent.py                      |  16 +-
+ tests/api/test_agent.py                          | 109 ++++++
+ tests/runtime/test_agent_explicit_thread.py      | 443 +++++++++++++++++++++++
+ tests/runtime/test_turn_capture_authorization.py |  13 +-
+ tests/typing/fixtures/sdk_consumer_valid.py      |   5 +
+ 9 files changed, 615 insertions(+), 3 deletions(-)
+
+== CHANGELOG: sections around the #541 entry
+8:## Unreleased
+54:  blank, it changes nothing (Refs #541).
+56:## Current package line - 2026-10-29
+134:## Current package line - 2026-10-28
+
+== make lint
+make lint exit: 0
+cd "<checkout>" && <checkout>/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4306; baseline total: 4306
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 287
+[tcr] api: 76 / 76 | monthly quota -50 | next target <= 26 | headroom 0
+[tcr] cli: 308 / 308 | monthly quota -50 | next target <= 258 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 221 / 221 | monthly quota -50 | next target <= 171 | headroom 0
+make[1]: Leaving directory '<checkout>'
+-- lint lines with FAIL or Error:
+
+== python scripts/validate/max_file_loc.py
+[OK] Result
+  - max-file-LOC baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 1, "ceiling": 1000, "checked": 2750, "over_ceiling": 1}, "ok": true, "validator": "validate_max_file_loc"}
+max_file_loc exit: 0
+
+== python -m scripts.validate.api_layout
+
+[OK] Result
+  - api layout, route-owner imports, and complexity match exact ratchets.
+{"allowed_root_files": ["README.md", "__init__.py", "agent.py", "config.py", "constants.py", "handoff.py", "metrics.py", "metrics_registry.py", "runtime.py", "turns.py"], "complexity": {"max_callable_loc": 96, "max_route_loc": 280, "queries/runtime_reports.py": 466, "runtime.py": 185, "server/app.py": 231}, "complexity_baseline": {"max_callable_loc": 96, "max_route_loc": 280, "queries/runtime_reports.py": 492, "runtime.py": 185, "server/app.py": 234}, "disallowed_root_files": [], "missing_subpackages": [], "new_route_owner_imports": [], "ok": true, "required_subpackages": ["core", "operations", "queries", "responses", "routes", "server"], "root_files": ["README.md", "__init__.py", "agent.py", "config.py", "constants.py", "handoff.py", "metrics.py", "metrics_registry.py", "runtime.py", "turns.py"], "route_owner_imports": [["routes/debug.py", "openminion.services.diagnostics.debug"], ["routes/health.py", "openminion.services.health.service"], ["routes/skill.py", "openminion.modules.skill.constants"]], "stale_route_owner_imports": []}
+api_layout exit: 0
+
+== python -m scripts.validate.cli_layout
+[OK] Result
+  - cli root layout and legacy token scan are clean.
+{"allowed_root_files": ["README.md", "__init__.py", "config.py", "constants.py", "main.py"], "current_doc_count": 86, "grouped_dirs": ["bootstrap", "identity", "parser", "presentation", "transport"], "legacy_token_count": 8, "ok": true, "retired_doc_pattern_count": 13, "retired_focus_source_pattern_count": 3}
+cli_layout exit: 0
+
+== [head] the new file, verbose
+============================= 14 passed in 21.42s ==============================
+
+== [head] new file, 3 runs
+14 passed in 20.36s
+14 passed in 20.56s
+14 passed in 20.20s
+
+== [head] pytest <focused>
+164 passed, 1 xfailed in 115.93s (0:01:55)
+
+== [head] pytest -m "<test-ci markers>" <related>
+7124 passed, 3 skipped, 11 deselected, 1 xfailed, 13 warnings in 404.39s (0:06:44)
+
+== [head] installed wheel SDK typing (the ci.yml step)
+wheel: openminion-0.1.16-py3-none-any.whl
+Success: no issues found in 1 source file
+invalid fixture: exit 1, 1 error(s)
+invalid fixture: expected arg-type error found
+sdk typing exit: 0
+
+== dev sources: git checkout 1169bd226b428f9187e2b5652a01ab7f29757271 -- src (1 paths differ)
+
+== [dev] pytest <new and changed>, verbose
+FAILED tests/runtime/test_agent_explicit_thread.py::test_reply_without_thread_id_keeps_the_default_routing[empty] - TypeError: Agent.run() got an unexpected keyword argument 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_reply_without_thread_id_keeps_the_default_routing[blank] - TypeError: Agent.run() got an unexpected keyword argument 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_reply_on_its_thread_answers_the_confirmation_once - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_denied_confirmation_does_not_run_on_a_later_reply - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_pre_cancelled_reply_does_not_run_the_waiting_call - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_each_reply_runs_only_its_own_threads_call - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_thread_of_another_session_runs_no_waiting_call - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_thread_of_another_agent_runs_no_waiting_call - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_approval_callback_still_decides_on_an_explicit_thread[waiting-approved] - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_approval_callback_still_decides_on_an_explicit_thread[waiting-denied] - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_approval_callback_still_decides_on_an_explicit_thread[new-approved] - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_approval_callback_still_decides_on_an_explicit_thread[new-denied] - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_run_stream_answers_on_its_thread_with_progress - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_result_keeps_its_positional_field_order - AssertionError: assert ('output', 't...sion_id', ...) == ('output', 't...sion_id', ...)
+FAILED tests/api/test_agent.py::test_agent_run_without_a_thread_id_sends_the_same_payload[none-run] - TypeError: Agent.run() got an unexpected keyword argument 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_without_a_thread_id_sends_the_same_payload[none-run_stream] - TypeError: Agent.run_stream() got an unexpected keyword argument 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_without_a_thread_id_sends_the_same_payload[empty-run] - TypeError: Agent.run() got an unexpected keyword argument 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_without_a_thread_id_sends_the_same_payload[empty-run_stream] - TypeError: Agent.run_stream() got an unexpected keyword argument 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_without_a_thread_id_sends_the_same_payload[blank-run] - TypeError: Agent.run() got an unexpected keyword argument 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_without_a_thread_id_sends_the_same_payload[blank-run_stream] - TypeError: Agent.run_stream() got an unexpected keyword argument 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_sends_an_explicit_thread_id[run] - TypeError: Agent.run() got an unexpected keyword argument 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_sends_an_explicit_thread_id[run_stream] - TypeError: Agent.run_stream() got an unexpected keyword argument 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_result_thread_id_comes_from_the_returned_metadata[thread] - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_result_thread_id_comes_from_the_returned_metadata[blank] - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_result_thread_id_comes_from_the_returned_metadata[missing] - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+======================== 25 failed, 38 passed in 16.58s ========================
+
+== [dev] pytest <focused>
+FAILED tests/runtime/test_agent_explicit_thread.py::test_reply_without_thread_id_keeps_the_default_routing[empty] - TypeError: Agent.run() got an unexpected keyword argument 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_reply_without_thread_id_keeps_the_default_routing[blank] - TypeError: Agent.run() got an unexpected keyword argument 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_reply_on_its_thread_answers_the_confirmation_once - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_denied_confirmation_does_not_run_on_a_later_reply - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_pre_cancelled_reply_does_not_run_the_waiting_call - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_each_reply_runs_only_its_own_threads_call - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_thread_of_another_session_runs_no_waiting_call - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_thread_of_another_agent_runs_no_waiting_call - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_approval_callback_still_decides_on_an_explicit_thread[waiting-approved] - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_approval_callback_still_decides_on_an_explicit_thread[waiting-denied] - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_approval_callback_still_decides_on_an_explicit_thread[new-approved] - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_approval_callback_still_decides_on_an_explicit_thread[new-denied] - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/runtime/test_agent_explicit_thread.py::test_run_stream_answers_on_its_thread_with_progress - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_result_keeps_its_positional_field_order - AssertionError: assert ('output', 't...sion_id', ...) == ('output', 't...sion_id', ...)
+FAILED tests/api/test_agent.py::test_agent_run_without_a_thread_id_sends_the_same_payload[none-run] - TypeError: Agent.run() got an unexpected keyword argument 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_without_a_thread_id_sends_the_same_payload[none-run_stream] - TypeError: Agent.run_stream() got an unexpected keyword argument 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_without_a_thread_id_sends_the_same_payload[empty-run] - TypeError: Agent.run() got an unexpected keyword argument 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_without_a_thread_id_sends_the_same_payload[empty-run_stream] - TypeError: Agent.run_stream() got an unexpected keyword argument 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_without_a_thread_id_sends_the_same_payload[blank-run] - TypeError: Agent.run() got an unexpected keyword argument 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_without_a_thread_id_sends_the_same_payload[blank-run_stream] - TypeError: Agent.run_stream() got an unexpected keyword argument 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_sends_an_explicit_thread_id[run] - TypeError: Agent.run() got an unexpected keyword argument 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_sends_an_explicit_thread_id[run_stream] - TypeError: Agent.run_stream() got an unexpected keyword argument 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_result_thread_id_comes_from_the_returned_metadata[thread] - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_result_thread_id_comes_from_the_returned_metadata[blank] - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAILED tests/api/test_agent.py::test_agent_run_result_thread_id_comes_from_the_returned_metadata[missing] - AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+25 failed, 139 passed, 1 xfailed in 111.90s (0:01:51)
+
+== back to the branch head: 0 paths differ
+
+== ruff check .
+All checks passed!
+
+== make format-check
+<checkout>/.venv/bin/python3.11 -m ruff format --check "<checkout>"
+5167 files already formatted
+format-check exit: 0
