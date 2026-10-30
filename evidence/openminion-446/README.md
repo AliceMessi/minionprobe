@@ -1,8 +1,50 @@
 # #446: PostgreSQL schema per owner, the PR's evidence
 
-Evidence for the PR that implements the bounded rule approved on [openminion#446](https://github.com/openminion/openminion/issues/446) ([comment 6494431887](https://github.com/openminion/openminion/issues/446#issuecomment-6494431887)). Branch `fix/446-module-migration-ownership` on [AliceMessi/openminion](https://github.com/AliceMessi/openminion), head `f04b4eae` on `dev` `48332187` (#521 merged): `test(storage): ...` `012b6ae8`, `fix(storage): ...` `ede74ca3`, `docs(storage): ...` `f04b4eae`. This head answers two independent reviews (of `5fc5f9e5`, then of `0c1b8ebd`); those heads' runs are kept in `superseded-5fc5f9e5/` and `superseded-0c1b8ebd/` and no longer describe the PR.
+Evidence for the PR ([openminion#536](https://github.com/openminion/openminion/pull/536)) that implements the bounded rule approved on [openminion#446](https://github.com/openminion/openminion/issues/446) ([comment 6494431887](https://github.com/openminion/openminion/issues/446#issuecomment-6494431887)). Branch `fix/446-module-migration-ownership` on [AliceMessi/openminion](https://github.com/AliceMessi/openminion). The current head is `370be163` on `dev` `f7b6100a` ([Round 2](#round-2-head-370be163)), which answers the maintainer's review of the round-1 head `f04b4eae`.
+
+The round-1 head `f04b4eae` is on `dev` `48332187` (#521 merged): `test(storage): ...` `012b6ae8`, `fix(storage): ...` `ede74ca3`, `docs(storage): ...` `f04b4eae`. Sections 1 to 5 describe it, and still hold where Round 2 says so. That head answered two independent reviews (of `5fc5f9e5`, then of `0c1b8ebd`); those heads' runs are kept in `superseded-5fc5f9e5/` and `superseded-0c1b8ebd/` and no longer describe the PR.
 
 Everything ran on GitHub-hosted runners ([AliceMessi/linux-runner](https://github.com/AliceMessi/linux-runner)): Ubuntu 24.04.5, CPython 3.11.17, PostgreSQL 16.15 (`postgres:16`), SQLAlchemy 2.1.6, psycopg 3.3.6, Alembic 1.18.4. Every probe step runs with `python -I -X utf8` from an empty directory. Published packages are installed from PyPI into their own `uv` venvs (`openminion[postgres]==X`; dependencies resolved on the day of the run). The branch build is the checkout installed non-editable into its own venv.
+
+## Round 2 (head 370be163)
+
+The maintainer's review of `f04b4eae` asked to remove the two ledger-less adoption paths in `<base>__<module id>`, to add real-PostgreSQL refusal tests with snapshots and controls, and to reconcile with `dev`. The new head is `370be163`, on `dev` `f7b6100a`, with no history rewritten:
+- `f3d1d14f` test(storage): refuse a postgres module schema without its ledger;
+- `265ddd53` fix(storage): use a module schema only when it is empty or proven;
+- `5fb19f9d` docs(storage): document the refusal of a module schema without its ledger;
+- `370be163` Merge branch 'dev' into fix/446-module-migration-ownership. The #446 changelog entry stays under `## Unreleased`; without it, the file equals `dev`'s.
+
+Its runs are in [`linux/round2-370be163/`](linux/round2-370be163/).
+
+**The refusal rule.** An existing `<base>__<module id>` is used only in two cases:
+- it is empty;
+- it records the module's ledger and holds one of the module's listed histories, proven.
+
+One with tables but no ledger of the module is refused whatever the tables are, with nothing written. That covers some of a store's tables, a foreign table with a storage engine name, and every table of a first start that stopped before `om_meta`.
+
+The storage engine's tables (`core_events`, `core_sidecar_rows`, `sidecar_ingest_log`) are no longer skipped by name. Next to a proven history they must have the exact columns this code creates, now listed under `engine_tables` in `postgres_histories.json`. The listed-histories test checks them against what every store builds.
+
+**The Alembic base ledger.** A module's Alembic chain downgraded to base leaves `om_meta` naming the module and an `alembic_version` without a row. #521's `test_downgrade_removes_the_baseline_and_upgrade_restores_it` does this in the module's own schema.
+- That is now read as the ledger `alembic base`, and listed with no table for the 11 modules whose downgrade the listing test runs.
+- Memory, session and skill are not listed. Their downgrade fails on PostgreSQL (InternalError, InternalError and TypeError; `base-measure-41029618649/`, on the measuring commit `1bd578f6`), so that layout stays refused for them.
+- Without this ledger, the intermediate commit `dc935e4d` (round 2's code minus the ledger) refused that layout ("holds tables (alembic_version, om_meta) but records no controlplane ledger"), and the two #521 cases failed (`intermediate-gates-41026757100/out/postgres_all.log`).
+- Side effect: when one of the 11 modules was downgraded to base in the base schema itself, it is now selected there in place, where `f04b4eae` refused it. This holds only if no other base table has one of its names and no `<base>__<module id>` exists. Its store still waits for `storage migrate` (the behind-head guard).
+
+**The first-start race.** A second process can open a module store while the first start in a new `<base>__<module id>` is still creating its tables, before `om_meta`. It then sees tables without a ledger and is refused. A later start succeeds. The upgrade docs and the PR state this.
+
+**Data.** [`data/postgres_histories.json`](data/postgres_histories.json) is now the head's file: 98 histories (section 2's 87 plus the 11 `alembic base` entries) and the engine tables' signatures. `data/histories-measured.json` and `data/filter-output.txt` are unchanged.
+
+| Run (`linux/round2-370be163/`) | Ref | Result |
+| --- | --- | --- |
+| [41030023881](https://github.com/AliceMessi/linux-runner/actions/runs/41030023881) `gates-41030023881/`: section 4's script, dev control on `f7b6100a` | head `370be163` | the `postgres-memory-retrieval` job's ten commands: 19, 1, 7, 6, 55, 8, 2, 13, 13 and 32 passed; focused 258 passed, 1 failed (the timeout); `pytest -m postgres tests/` 295 passed, 2 skipped, 1 failed (`test_truth_maintenance`); non-slow slice 8684 passed, 10 skipped, 1 xfailed, 1 failed (the timeout); `ruff`, `make format-check` (5165 files) and `make lint` (mypy 4306 / 4306) pass; dev control 47 failed, 71 passed, 1 collection error (section 4's 42 plus the five new PostgreSQL cases) |
+| [41032504137](https://github.com/AliceMessi/linux-runner/actions/runs/41032504137) `dev-known-41032504137/`: the two failures alone | clean `dev` `f7b6100a` | both fail there too: `test_unreachable_db_raises_with_redacted_url` (60 s timeout), `test_session_lifecycle_runs_capacity_and_purge_on_postgres` |
+| [41030025591](https://github.com/AliceMessi/linux-runner/actions/runs/41030025591) `testfirst-41030025591/`: the two new test files | `f3d1d14f` (the new tests on `f04b4eae`'s code) | 12 failed, 47 passed: the review's two layouts and the stopped first start are accepted; the store adds a `namespace` column to the foreign `core_events` before it fails, and `storage migrate --module registry` then succeeds |
+| [41030023625](https://github.com/AliceMessi/linux-runner/actions/runs/41030023625), [41030023824](https://github.com/AliceMessi/linux-runner/actions/runs/41030023824), [41030024361](https://github.com/AliceMessi/linux-runner/actions/runs/41030024361) `upgrade-{a,b,c}-*/`: section 3's installed upgrade and restore, plus 0.1.16 in c | probe commit `c4c983dc` = `370be163` plus `probe_tmp/446/` | 1793 PASS, 39 REFUSED, 0 FAIL ([`upgrade-summary.txt`](linux/round2-370be163/upgrade-summary.txt), identical row for row to [`data/upgrade-summary.txt`](data/upgrade-summary.txt)); 0.1.16: 51 PASS, 0 REFUSED, 0 FAIL ([`upgrade-summary-0.1.16.txt`](linux/round2-370be163/upgrade-summary-0.1.16.txt)) |
+| [41034334815](https://github.com/AliceMessi/linux-runner/actions/runs/41034334815) `pgbouncer-41034334815/`: section 5's PgBouncer probe | `3be4bfcf` = `370be163` plus the probe | the same as on `f04b4eae` in all three configurations: rejected by default, refused with the landing message with `ignore_startup_parameters = options` or `track_extra_parameters = search_path`, the database unchanged, and `storage migrate --module secret` through PgBouncer migrates into `public__secret` |
+| [41029618649](https://github.com/AliceMessi/linux-runner/actions/runs/41029618649) `base-measure-41029618649/`: the listed-histories test with the downgrade step and no base entries | `1bd578f6` (measuring commit) | the 11 modules' bases are reported as unlisted with no table (the lines added to the file); memory, session and skill fail to downgrade |
+| [41026757100](https://github.com/AliceMessi/linux-runner/actions/runs/41026757100) `intermediate-gates-41026757100/`: section 4's script | `dc935e4d` (before the base ledger) | the two #521 downgrade cases fail with the refusal above (in focused, in `pytest -m postgres tests/`, and in the job's eighth command: 2 failed, 11 passed); the other failures are the two known ones |
+
+Log paths are shortened: `<checkout>` is the runner's checkout, `<runner-temp>` its temporary directory, `<runner-home>` its home. The wip refs are on the fork: `wip/446-r2-probes` (`c4c983dc`), `wip/446-r2-pgb` (`3be4bfcf`), `wip/446-r2-testfirst` (`f3d1d14f`), `wip/446-r2-measure` (`1bd578f6`), `wip/446-r2-intermediate` (`dc935e4d`).
 
 ## 1. What every published package creates (the listed histories)
 
@@ -12,11 +54,11 @@ Run [40875868078](https://github.com/AliceMessi/linux-runner/actions/runs/408758
 
 ## 2. Which historical layouts are listed
 
-Runs [40881330002](https://github.com/AliceMessi/linux-runner/actions/runs/40881330002), [40881330356](https://github.com/AliceMessi/linux-runner/actions/runs/40881330356), [40881330724](https://github.com/AliceMessi/linux-runner/actions/runs/40881330724) (`linux/upgrade-verify-*`): the installed upgrade of section 3, run on the pre-review code (`731a0513`, probe commit `641fd41c`) with the unfiltered 96 histories. The listed histories have not changed since; the head's own upgrade runs in section 3 re-confirm every listed and refused layout. [`probes/filter_histories.py`](probes/filter_histories.py) keeps a history when this code builds it, or when it is the layout a release leaves and its installed upgrade passed for every release that left it ([`data/filter-output.txt`](data/filter-output.txt)): 87 histories, 18 of them historical with `upgraded_from`; 9 dropped. The result is exactly the PR's `postgres_histories.json` ([`data/postgres_histories.json`](data/postgres_histories.json)), unchanged by the review.
+Runs [40881330002](https://github.com/AliceMessi/linux-runner/actions/runs/40881330002), [40881330356](https://github.com/AliceMessi/linux-runner/actions/runs/40881330356), [40881330724](https://github.com/AliceMessi/linux-runner/actions/runs/40881330724) (`linux/upgrade-verify-*`): the installed upgrade of section 3, run on the pre-review code (`731a0513`, probe commit `641fd41c`) with the unfiltered 96 histories. The listed histories have not changed since; the head's own upgrade runs in section 3 re-confirm every listed and refused layout. [`probes/filter_histories.py`](probes/filter_histories.py) keeps a history when this code builds it, or when it is the layout a release leaves and its installed upgrade passed for every release that left it ([`data/filter-output.txt`](data/filter-output.txt)): 87 histories, 18 of them historical with `upgraded_from`; 9 dropped. The result was exactly the round-1 PR's `postgres_histories.json`. Round 2 kept these 87 and added the 11 `alembic base` entries and the engine tables' signatures; [`data/postgres_histories.json`](data/postgres_histories.json) is now the round-2 head's file.
 
-## 3. Installed upgrade and restore on the PR head
+## 3. Installed upgrade and restore on the round-1 head
 
-Runs [40914601043](https://github.com/AliceMessi/linux-runner/actions/runs/40914601043) (0.0.1..0.0.15), [40914607068](https://github.com/AliceMessi/linux-runner/actions/runs/40914607068) (0.0.16..0.0.30), [40914613614](https://github.com/AliceMessi/linux-runner/actions/runs/40914613614) (0.1.0..0.1.15) (`linux/upgrade-final-*`). The probe commit is `4fed8bab` = the PR head `f04b4eae` plus `probe_tmp/446/` only; the branch build is the PR head installed from the checkout.
+Runs [40914601043](https://github.com/AliceMessi/linux-runner/actions/runs/40914601043) (0.0.1..0.0.15), [40914607068](https://github.com/AliceMessi/linux-runner/actions/runs/40914607068) (0.0.16..0.0.30), [40914613614](https://github.com/AliceMessi/linux-runner/actions/runs/40914613614) (0.1.0..0.1.15) (`linux/upgrade-final-*`). The probe commit is `4fed8bab` = the round-1 head `f04b4eae` plus `probe_tmp/446/` only; the branch build is that head installed from the checkout.
 
 [`probes/probe_446_upgrade.py`](probes/probe_446_upgrade.py) `drive` runs, for every release and every owner it can build, on a new database:
 1. **build** with the release, in `public`, the way an installation of that release does: a runtime storage start; `MigrationRunner.migrate("head")` as `storage migrate` runs it; each module store; `storage migrate` then the store (`after:`), and the store then `storage migrate` (`before:`); and one mixed case, `runtime+session_store`: runtime storage, then the session store on the same URL as the API's session trace query builds it. It then adds one row to every table it can (generic values for `NOT NULL` columns without a default);
@@ -44,9 +86,9 @@ Total: 1793 PASS, 39 REFUSED, 0 FAIL.
 
 Covered: runtime storage from every version a release left (v9, v10, v11, v13, v15); every module whose Alembic chain runs on PostgreSQL in that release (memory, a2a, session, registry, artifact, identity, policy, retrieve, secret, skill, task; no published release can migrate `compress`, `controlplane` or `telemetry` with Alembic); the memory, A2A audit and A2A state stores and the session, controlplane, telemetry, compress, registry, artifact, identity, policy, retrieve, skill and task stores; `storage migrate` with each store, in both orders.
 
-## 4. PR gates on the PR head
+## 4. PR gates on the round-1 head
 
-Run [40914594792](https://github.com/AliceMessi/linux-runner/actions/runs/40914594792) (`linux/gates-40914594792/`). The checkout is the PR head `f04b4eae`; the runner's `make dev-install` installed it with the `postgres` extra. The script is [`probes/gates_446.sh`](probes/gates_446.sh), fetched from `wip/446-review-probes4`; each step's log is in `out/`.
+Run [40914594792](https://github.com/AliceMessi/linux-runner/actions/runs/40914594792) (`linux/gates-40914594792/`). The checkout is the round-1 head `f04b4eae`; the runner's `make dev-install` installed it with the `postgres` extra. The script is [`probes/gates_446.sh`](probes/gates_446.sh), fetched from `wip/446-review-probes4`; each step's log is in `out/`.
 
 | Step | Result |
 | --- | --- |
@@ -70,7 +112,7 @@ The dedicated memory database control passes on `dev`, as do the unchanged cases
 ## 5. Review probes
 
 - Run [40900525510](https://github.com/AliceMessi/linux-runner/actions/runs/40900525510) (`linux/review-dev-40900525510/`), on `dev` `48332187` plus [`probes/leftover.py`](probes/leftover.py) only: runtime storage starts on a new database, then the session store is built on the same URL as `api/queries/sessions.py` builds it. It fails with `UndefinedColumn` (`column "session_id" referenced in foreign key constraint does not exist`) and leaves one index, `idx_sessions_status_updated`, on runtime storage's `sessions`; no table or column. The PR's `test_runtime_storage_after_the_session_store_tried_its_url` builds that layout and checks that it upgrades. The same run reproduces the two known failures on `dev` itself: `test_truth_maintenance.py::test_session_lifecycle_runs_capacity_and_purge_on_postgres` (`get('purge-me')` is not None) and `test_unreachable_db_raises_with_redacted_url` (60 s timeout).
-- Run [40914749310](https://github.com/AliceMessi/linux-runner/actions/runs/40914749310) (`linux/pgbouncer-40914749310/`), [`probes/pgbouncer_probe.py`](probes/pgbouncer_probe.py) with Ubuntu's PgBouncer 1.22.0 in transaction pooling in front of the runner's server, on the PR head `f04b4eae` plus the probe (`wip/446-review-pgb2`). With PgBouncer's defaults, a connection with `options=-c search_path=...` is rejected (`unsupported startup parameter in options: search_path`), so the memory store cannot connect. With `ignore_startup_parameters = options`, and with `track_extra_parameters = search_path`, the connection is accepted but keeps `"$user", public`, and the memory store is refused with the PR's landing message. In every configuration the database is unchanged after the memory store attempt, and `storage migrate --module secret` through PgBouncer migrates into `public__secret`.
+- Run [40914749310](https://github.com/AliceMessi/linux-runner/actions/runs/40914749310) (`linux/pgbouncer-40914749310/`), [`probes/pgbouncer_probe.py`](probes/pgbouncer_probe.py) with Ubuntu's PgBouncer 1.22.0 in transaction pooling in front of the runner's server, on the round-1 head `f04b4eae` plus the probe (`wip/446-review-pgb2`). With PgBouncer's defaults, a connection with `options=-c search_path=...` is rejected (`unsupported startup parameter in options: search_path`), so the memory store cannot connect. With `ignore_startup_parameters = options`, and with `track_extra_parameters = search_path`, the connection is accepted but keeps `"$user", public`, and the memory store is refused with the PR's landing message. In every configuration the database is unchanged after the memory store attempt, and `storage migrate --module secret` through PgBouncer migrates into `public__secret`.
 
 ## Rerun
 
@@ -81,7 +123,8 @@ bash probe_tmp/446_histories/run_histories.sh "0.0.1 ... 0.1.15"   # measurement
 bash probe_tmp/446/run_upgrade.sh "0.1.0 0.1.1 ..."                 # installed upgrade and restore
 python -I probes/filter_histories.py histories-measured.json out.json upgrade-*.json
 python -I probes/summarize_upgrade.py upgrade-*.json
-bash gates_446.sh 4833218729abb9bbab4774a4f6141cfaacfa33a3        # on the PR head
+bash gates_446.sh 4833218729abb9bbab4774a4f6141cfaacfa33a3        # on the round-1 head
+bash gates_446.sh f7b6100ae06f326399942fed04e5f5f95e5f70b3        # on the round-2 head
 ```
 
 ## Not covered
@@ -94,7 +137,8 @@ bash gates_446.sh 4833218729abb9bbab4774a4f6141cfaacfa33a3        # on the PR he
 ## Files
 
 - `probes/`: `probe_446_histories.py`, `run_histories.sh`, `make_histories.py`, `probe_446_upgrade.py`, `run_upgrade.sh`, `filter_histories.py`, `summarize_upgrade.py`, `gates_446.sh`, `leftover.py`, `pgbouncer_probe.py`.
-- `data/`: `histories-measured.json` (all 96), `postgres_histories.json` (the PR's 87), `filter-output.txt`, `upgrade-summary.txt`.
+- `data/`: `histories-measured.json` (all 96), `postgres_histories.json` (the round-2 head's 98, with the engine tables), `filter-output.txt`, `upgrade-summary.txt` (round 1).
 - `linux/<step>-<run id>/`: each run's `run.log`, `head.txt`, `result.txt`, `setup.log.gz` where kept, and `out/` (per release: probe logs, `*.json.gz`, `pip-freeze-*.txt`, install logs; for the gates, each step's log and the dev control's failures).
+- `linux/round2-370be163/`: the round-2 runs in the same layout, with `upgrade-summary.txt` and `upgrade-summary-0.1.16.txt`.
 - `superseded-5fc5f9e5/`, `superseded-0c1b8ebd/`: the gates, installed-upgrade and PgBouncer runs of the heads before each review.
 - `.gitattributes` (`* -text`); `SHA256SUMS.txt` last.

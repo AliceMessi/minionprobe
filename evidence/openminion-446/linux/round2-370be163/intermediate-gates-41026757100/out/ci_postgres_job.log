@@ -1,0 +1,326 @@
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+...................                                                      [100%]
+19 passed in 1.94s
+CIJOB_STEP_OK
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+.                                                                        [100%]
+1 passed in 0.23s
+CIJOB_STEP_OK
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+.......                                                                  [100%]
+7 passed in 0.88s
+CIJOB_STEP_OK
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+......                                                                   [100%]
+6 passed, 6 deselected in 0.67s
+CIJOB_STEP_OK
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+.......................................................                  [100%]
+55 passed in 29.68s
+CIJOB_STEP_OK
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+........                                                                 [100%]
+8 passed in 3.05s
+CIJOB_STEP_OK
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+..                                                                       [100%]
+2 passed in 0.30s
+CIJOB_STEP_OK
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+......FF.....                                                            [100%]
+=================================== FAILURES ===================================
+__ test_downgrade_removes_the_baseline_and_upgrade_restores_it[controlplane] ___
+
+schema = 'postgresql+psycopg://postgres:test@localhost:5432/postgres?options=-csearch_path%3Dbaseline_59e3187a19534bf8a69307131a44d2bf'
+module_id = 'controlplane'
+tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-8/test_downgrade_removes_the_bas0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f57d4dd9250>
+
+    @pytest.mark.parametrize("module_id", MODULES)
+    def test_downgrade_removes_the_baseline_and_upgrade_restores_it(
+        schema: str, module_id: str, tmp_path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        assert _migrate(schema, module_id, tmp_path, capsys)["status"] == "ok"
+        module = _module_url(schema, module_id)
+        created = _tables(module)
+    
+        _downgrade_to_base(module, module_id)
+    
+        assert _revision(module) == []
+        # The module's Alembic environment writes om_meta again after every run.
+        assert _tables(module) == ["alembic_version", "om_meta"]
+        assert (
+            _scalars(
+                module,
+                "SELECT sequence_name FROM information_schema.sequences "
+                "WHERE sequence_schema = current_schema()",
+            )
+            == []
+        )
+    
+        entry = _migrate(schema, module_id, tmp_path, capsys)
+    
+>       assert entry == {"exit": 0, "module_id": module_id, "status": "ok", "success": True}
+E       assert {'error': "Mo... 'error', ...} == {'exit': 0, '...uccess': True}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'status': 'error'} != {'status': 'ok'}
+E         {'exit': 1} != {'exit': 0}
+E         {'success': False} != {'success': True}
+E         Left contains 1 more item:
+E         {'error': "Module 'controlplane': PostgreSQL schema "
+E                   '"baseline_59e3187a19534bf8a69307131a44d2bf__controlplane" holds '
+E                   'tables (alembic_version, om_meta) but records no controlplane '
+E                   "ledger: tables without their owner's ledger are not evidence, also "
+E                   "when they have the columns this code's controlplane store creates "
+E                   '(a first start that stopped before it wrote om_meta leaves such a '
+E                   'schema). Nothing was written. OpenMinion does not move, repair or '
+E                   'restamp existing tables. Stop every OpenMinion process, take a full '
+E                   'pg_dump, and follow "PostgreSQL schemas per owner" in '
+E                   'docs/runtime-database-upgrades.md.'}
+E         
+E         Full diff:
+E           {
+E         +     'error': "Module 'controlplane': PostgreSQL schema "
+E         +     '"baseline_59e3187a19534bf8a69307131a44d2bf__controlplane" holds tables '
+E         +     '(alembic_version, om_meta) but records no controlplane ledger: tables '
+E         +     "without their owner's ledger are not evidence, also when they have the "
+E         +     "columns this code's controlplane store creates (a first start that "
+E         +     'stopped before it wrote om_meta leaves such a schema). Nothing was '
+E         +     'written. OpenMinion does not move, repair or restamp existing tables. '
+E         +     'Stop every OpenMinion process, take a full pg_dump, and follow '
+E         +     '"PostgreSQL schemas per owner" in docs/runtime-database-upgrades.md.',
+E         -     'exit': 0,
+E         ?             ^
+E         +     'exit': 1,
+E         ?             ^
+E               'module_id': 'controlplane',
+E         -     'status': 'ok',
+E         ?                 ^
+E         +     'status': 'error',
+E         ?                +++ ^
+E         -     'success': True,
+E         ?                ^^^
+E         +     'success': False,
+E         ?                ^^^^
+E           }
+
+tests/integration/test_module_baselines_postgres.py:353: AssertionError
+____ test_downgrade_removes_the_baseline_and_upgrade_restores_it[telemetry] ____
+
+schema = 'postgresql+psycopg://postgres:test@localhost:5432/postgres?options=-csearch_path%3Dbaseline_a6b26b89c655492b9df6c04c1be24110'
+module_id = 'telemetry'
+tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-8/test_downgrade_removes_the_bas1')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f57d4de1d90>
+
+    @pytest.mark.parametrize("module_id", MODULES)
+    def test_downgrade_removes_the_baseline_and_upgrade_restores_it(
+        schema: str, module_id: str, tmp_path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        assert _migrate(schema, module_id, tmp_path, capsys)["status"] == "ok"
+        module = _module_url(schema, module_id)
+        created = _tables(module)
+    
+        _downgrade_to_base(module, module_id)
+    
+        assert _revision(module) == []
+        # The module's Alembic environment writes om_meta again after every run.
+        assert _tables(module) == ["alembic_version", "om_meta"]
+        assert (
+            _scalars(
+                module,
+                "SELECT sequence_name FROM information_schema.sequences "
+                "WHERE sequence_schema = current_schema()",
+            )
+            == []
+        )
+    
+        entry = _migrate(schema, module_id, tmp_path, capsys)
+    
+>       assert entry == {"exit": 0, "module_id": module_id, "status": "ok", "success": True}
+E       assert {'error': "Mo... 'error', ...} == {'exit': 0, '...uccess': True}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'status': 'error'} != {'status': 'ok'}
+E         {'exit': 1} != {'exit': 0}
+E         {'success': False} != {'success': True}
+E         Left contains 1 more item:
+E         {'error': "Module 'telemetry': PostgreSQL schema "
+E                   '"baseline_a6b26b89c655492b9df6c04c1be24110__telemetry" holds tables '
+E                   '(alembic_version, om_meta) but records no telemetry ledger: tables '
+E                   "without their owner's ledger are not evidence, also when they have "
+E                   "the columns this code's telemetry store creates (a first start that "
+E                   'stopped before it wrote om_meta leaves such a schema). Nothing was '
+E                   'written. OpenMinion does not move, repair or restamp existing '
+E                   'tables. Stop every OpenMinion process, take a full pg_dump, and '
+E                   'follow "PostgreSQL schemas per owner" in '
+E                   'docs/runtime-database-upgrades.md.'}
+E         
+E         Full diff:
+E           {
+E         +     'error': "Module 'telemetry': PostgreSQL schema "
+E         +     '"baseline_a6b26b89c655492b9df6c04c1be24110__telemetry" holds tables '
+E         +     '(alembic_version, om_meta) but records no telemetry ledger: tables '
+E         +     "without their owner's ledger are not evidence, also when they have the "
+E         +     "columns this code's telemetry store creates (a first start that stopped "
+E         +     'before it wrote om_meta leaves such a schema). Nothing was written. '
+E         +     'OpenMinion does not move, repair or restamp existing tables. Stop every '
+E         +     'OpenMinion process, take a full pg_dump, and follow "PostgreSQL schemas '
+E         +     'per owner" in docs/runtime-database-upgrades.md.',
+E         -     'exit': 0,
+E         ?             ^
+E         +     'exit': 1,
+E         ?             ^
+E               'module_id': 'telemetry',
+E         -     'status': 'ok',
+E         ?                 ^
+E         +     'status': 'error',
+E         ?                +++ ^
+E         -     'success': True,
+E         ?                ^^^
+E         +     'success': False,
+E         ?                ^^^^
+E           }
+
+tests/integration/test_module_baselines_postgres.py:353: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_module_baselines_postgres.py::test_downgrade_removes_the_baseline_and_upgrade_restores_it[controlplane] - assert {'error': "Mo... 'error', ...} == {'exit': 0, '...uccess': True}
+  
+  Omitting 1 identical items, use -vv to show
+  Differing items:
+  {'status': 'error'} != {'status': 'ok'}
+  {'exit': 1} != {'exit': 0}
+  {'success': False} != {'success': True}
+  Left contains 1 more item:
+  {'error': "Module 'controlplane': PostgreSQL schema "
+            '"baseline_59e3187a19534bf8a69307131a44d2bf__controlplane" holds '
+            'tables (alembic_version, om_meta) but records no controlplane '
+            "ledger: tables without their owner's ledger are not evidence, also "
+            "when they have the columns this code's controlplane store creates "
+            '(a first start that stopped before it wrote om_meta leaves such a '
+            'schema). Nothing was written. OpenMinion does not move, repair or '
+            'restamp existing tables. Stop every OpenMinion process, take a full '
+            'pg_dump, and follow "PostgreSQL schemas per owner" in '
+            'docs/runtime-database-upgrades.md.'}
+  
+  Full diff:
+    {
+  +     'error': "Module 'controlplane': PostgreSQL schema "
+  +     '"baseline_59e3187a19534bf8a69307131a44d2bf__controlplane" holds tables '
+  +     '(alembic_version, om_meta) but records no controlplane ledger: tables '
+  +     "without their owner's ledger are not evidence, also when they have the "
+  +     "columns this code's controlplane store creates (a first start that "
+  +     'stopped before it wrote om_meta leaves such a schema). Nothing was '
+  +     'written. OpenMinion does not move, repair or restamp existing tables. '
+  +     'Stop every OpenMinion process, take a full pg_dump, and follow '
+  +     '"PostgreSQL schemas per owner" in docs/runtime-database-upgrades.md.',
+  -     'exit': 0,
+  ?             ^
+  +     'exit': 1,
+  ?             ^
+        'module_id': 'controlplane',
+  -     'status': 'ok',
+  ?                 ^
+  +     'status': 'error',
+  ?                +++ ^
+  -     'success': True,
+  ?                ^^^
+  +     'success': False,
+  ?                ^^^^
+    }
+FAILED tests/integration/test_module_baselines_postgres.py::test_downgrade_removes_the_baseline_and_upgrade_restores_it[telemetry] - assert {'error': "Mo... 'error', ...} == {'exit': 0, '...uccess': True}
+  
+  Omitting 1 identical items, use -vv to show
+  Differing items:
+  {'status': 'error'} != {'status': 'ok'}
+  {'exit': 1} != {'exit': 0}
+  {'success': False} != {'success': True}
+  Left contains 1 more item:
+  {'error': "Module 'telemetry': PostgreSQL schema "
+            '"baseline_a6b26b89c655492b9df6c04c1be24110__telemetry" holds tables '
+            '(alembic_version, om_meta) but records no telemetry ledger: tables '
+            "without their owner's ledger are not evidence, also when they have "
+            "the columns this code's telemetry store creates (a first start that "
+            'stopped before it wrote om_meta leaves such a schema). Nothing was '
+            'written. OpenMinion does not move, repair or restamp existing '
+            'tables. Stop every OpenMinion process, take a full pg_dump, and '
+            'follow "PostgreSQL schemas per owner" in '
+            'docs/runtime-database-upgrades.md.'}
+  
+  Full diff:
+    {
+  +     'error': "Module 'telemetry': PostgreSQL schema "
+  +     '"baseline_a6b26b89c655492b9df6c04c1be24110__telemetry" holds tables '
+  +     '(alembic_version, om_meta) but records no telemetry ledger: tables '
+  +     "without their owner's ledger are not evidence, also when they have the "
+  +     "columns this code's telemetry store creates (a first start that stopped "
+  +     'before it wrote om_meta leaves such a schema). Nothing was written. '
+  +     'OpenMinion does not move, repair or restamp existing tables. Stop every '
+  +     'OpenMinion process, take a full pg_dump, and follow "PostgreSQL schemas '
+  +     'per owner" in docs/runtime-database-upgrades.md.',
+  -     'exit': 0,
+  ?             ^
+  +     'exit': 1,
+  ?             ^
+        'module_id': 'telemetry',
+  -     'status': 'ok',
+  ?                 ^
+  +     'status': 'error',
+  ?                +++ ^
+  -     'success': True,
+  ?                ^^^
+  +     'success': False,
+  ?                ^^^^
+    }
+2 failed, 11 passed in 3.46s
+CIJOB_STEP_FAILED
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+.............                                                            [100%]
+13 passed in 1.67s
+CIJOB_STEP_OK
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+................................                                         [100%]
+32 passed in 22.86s
+CIJOB_STEP_OK

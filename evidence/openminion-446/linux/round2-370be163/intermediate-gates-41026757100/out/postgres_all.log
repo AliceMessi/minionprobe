@@ -1,0 +1,350 @@
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+.................................FF..................................... [ 24%]
+........................................................................ [ 48%]
+........................................................................ [ 72%]
+.....F.................................................................. [ 97%]
+........                                                                 [100%]
+=================================== FAILURES ===================================
+__ test_downgrade_removes_the_baseline_and_upgrade_restores_it[controlplane] ___
+
+schema = 'postgresql+psycopg://postgres:test@localhost:5432/postgres?options=-csearch_path%3Dbaseline_67dbc5d92c7640f1817d17bd497cf5ce'
+module_id = 'controlplane'
+tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-11/test_downgrade_removes_the_bas0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7ff3f3c4ee50>
+
+    @pytest.mark.parametrize("module_id", MODULES)
+    def test_downgrade_removes_the_baseline_and_upgrade_restores_it(
+        schema: str, module_id: str, tmp_path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        assert _migrate(schema, module_id, tmp_path, capsys)["status"] == "ok"
+        module = _module_url(schema, module_id)
+        created = _tables(module)
+    
+        _downgrade_to_base(module, module_id)
+    
+        assert _revision(module) == []
+        # The module's Alembic environment writes om_meta again after every run.
+        assert _tables(module) == ["alembic_version", "om_meta"]
+        assert (
+            _scalars(
+                module,
+                "SELECT sequence_name FROM information_schema.sequences "
+                "WHERE sequence_schema = current_schema()",
+            )
+            == []
+        )
+    
+        entry = _migrate(schema, module_id, tmp_path, capsys)
+    
+>       assert entry == {"exit": 0, "module_id": module_id, "status": "ok", "success": True}
+E       assert {'error': "Mo... 'error', ...} == {'exit': 0, '...uccess': True}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'status': 'error'} != {'status': 'ok'}
+E         {'exit': 1} != {'exit': 0}
+E         {'success': False} != {'success': True}
+E         Left contains 1 more item:
+E         {'error': "Module 'controlplane': PostgreSQL schema "
+E                   '"baseline_67dbc5d92c7640f1817d17bd497cf5ce__controlplane" holds '
+E                   'tables (alembic_version, om_meta) but records no controlplane '
+E                   "ledger: tables without their owner's ledger are not evidence, also "
+E                   "when they have the columns this code's controlplane store creates "
+E                   '(a first start that stopped before it wrote om_meta leaves such a '
+E                   'schema). Nothing was written. OpenMinion does not move, repair or '
+E                   'restamp existing tables. Stop every OpenMinion process, take a full '
+E                   'pg_dump, and follow "PostgreSQL schemas per owner" in '
+E                   'docs/runtime-database-upgrades.md.'}
+E         
+E         Full diff:
+E           {
+E         +     'error': "Module 'controlplane': PostgreSQL schema "
+E         +     '"baseline_67dbc5d92c7640f1817d17bd497cf5ce__controlplane" holds tables '
+E         +     '(alembic_version, om_meta) but records no controlplane ledger: tables '
+E         +     "without their owner's ledger are not evidence, also when they have the "
+E         +     "columns this code's controlplane store creates (a first start that "
+E         +     'stopped before it wrote om_meta leaves such a schema). Nothing was '
+E         +     'written. OpenMinion does not move, repair or restamp existing tables. '
+E         +     'Stop every OpenMinion process, take a full pg_dump, and follow '
+E         +     '"PostgreSQL schemas per owner" in docs/runtime-database-upgrades.md.',
+E         -     'exit': 0,
+E         ?             ^
+E         +     'exit': 1,
+E         ?             ^
+E               'module_id': 'controlplane',
+E         -     'status': 'ok',
+E         ?                 ^
+E         +     'status': 'error',
+E         ?                +++ ^
+E         -     'success': True,
+E         ?                ^^^
+E         +     'success': False,
+E         ?                ^^^^
+E           }
+
+tests/integration/test_module_baselines_postgres.py:353: AssertionError
+____ test_downgrade_removes_the_baseline_and_upgrade_restores_it[telemetry] ____
+
+schema = 'postgresql+psycopg://postgres:test@localhost:5432/postgres?options=-csearch_path%3Dbaseline_014295f8085045509f0de6a34986ea59'
+module_id = 'telemetry'
+tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-11/test_downgrade_removes_the_bas1')
+capsys = <_pytest.capture.CaptureFixture object at 0x7ff3f3d11050>
+
+    @pytest.mark.parametrize("module_id", MODULES)
+    def test_downgrade_removes_the_baseline_and_upgrade_restores_it(
+        schema: str, module_id: str, tmp_path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        assert _migrate(schema, module_id, tmp_path, capsys)["status"] == "ok"
+        module = _module_url(schema, module_id)
+        created = _tables(module)
+    
+        _downgrade_to_base(module, module_id)
+    
+        assert _revision(module) == []
+        # The module's Alembic environment writes om_meta again after every run.
+        assert _tables(module) == ["alembic_version", "om_meta"]
+        assert (
+            _scalars(
+                module,
+                "SELECT sequence_name FROM information_schema.sequences "
+                "WHERE sequence_schema = current_schema()",
+            )
+            == []
+        )
+    
+        entry = _migrate(schema, module_id, tmp_path, capsys)
+    
+>       assert entry == {"exit": 0, "module_id": module_id, "status": "ok", "success": True}
+E       assert {'error': "Mo... 'error', ...} == {'exit': 0, '...uccess': True}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'status': 'error'} != {'status': 'ok'}
+E         {'exit': 1} != {'exit': 0}
+E         {'success': False} != {'success': True}
+E         Left contains 1 more item:
+E         {'error': "Module 'telemetry': PostgreSQL schema "
+E                   '"baseline_014295f8085045509f0de6a34986ea59__telemetry" holds tables '
+E                   '(alembic_version, om_meta) but records no telemetry ledger: tables '
+E                   "without their owner's ledger are not evidence, also when they have "
+E                   "the columns this code's telemetry store creates (a first start that "
+E                   'stopped before it wrote om_meta leaves such a schema). Nothing was '
+E                   'written. OpenMinion does not move, repair or restamp existing '
+E                   'tables. Stop every OpenMinion process, take a full pg_dump, and '
+E                   'follow "PostgreSQL schemas per owner" in '
+E                   'docs/runtime-database-upgrades.md.'}
+E         
+E         Full diff:
+E           {
+E         +     'error': "Module 'telemetry': PostgreSQL schema "
+E         +     '"baseline_014295f8085045509f0de6a34986ea59__telemetry" holds tables '
+E         +     '(alembic_version, om_meta) but records no telemetry ledger: tables '
+E         +     "without their owner's ledger are not evidence, also when they have the "
+E         +     "columns this code's telemetry store creates (a first start that stopped "
+E         +     'before it wrote om_meta leaves such a schema). Nothing was written. '
+E         +     'OpenMinion does not move, repair or restamp existing tables. Stop every '
+E         +     'OpenMinion process, take a full pg_dump, and follow "PostgreSQL schemas '
+E         +     'per owner" in docs/runtime-database-upgrades.md.',
+E         -     'exit': 0,
+E         ?             ^
+E         +     'exit': 1,
+E         ?             ^
+E               'module_id': 'telemetry',
+E         -     'status': 'ok',
+E         ?                 ^
+E         +     'status': 'error',
+E         ?                +++ ^
+E         -     'success': True,
+E         ?                ^^^
+E         +     'success': False,
+E         ?                ^^^^
+E           }
+
+tests/integration/test_module_baselines_postgres.py:353: AssertionError
+__________ test_session_lifecycle_runs_capacity_and_purge_on_postgres __________
+
+tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-11/test_session_lifecycle_runs_ca1')
+
+    @pytest.mark.postgres
+    def test_session_lifecycle_runs_capacity_and_purge_on_postgres(
+        tmp_path: Path,
+    ) -> None:
+        postgres_url = str(os.environ.get("OPENMINION_TEST_POSTGRES_URL", "")).strip()
+        if not postgres_url:
+            pytest.skip("OPENMINION_TEST_POSTGRES_URL is not set")
+        schema_name = f"sfc_truth_{uuid.uuid4().hex}"
+        admin_engine = sa.create_engine(postgres_url, future=True)
+        with admin_engine.begin() as conn:
+            conn.execute(sa.text(f'CREATE SCHEMA IF NOT EXISTS "{schema_name}"'))
+        engine = sa.create_engine(schema_url(postgres_url, schema_name), future=True)
+        try:
+            store = PostgresMemoryStore(
+                engine,
+                database_path=tmp_path / ".openminion" / "memory" / "postgres-truth.db",
+            )
+            service = MemoryService(store=store)
+            adapter = MemoryServiceGatewayAdapter(
+                service,
+                agent_id="truth-agent",
+                memory_config=_memory_config(),
+            )
+            now = datetime.now(timezone.utc)
+    
+            for index in range(501):
+                store.put(
+                    MemoryRecord(
+                        id=f"fact-{index}",
+                        scope="agent:truth-agent",
+                        type="fact",
+                        key=f"fact:{index}",
+                        title=f"fact {index}",
+                        content=f"active fact {index}",
+                        confidence=0.8,
+                        created_at=now.isoformat(),
+                        updated_at=now.isoformat(),
+                    )
+                )
+            store.put(
+                MemoryRecord(
+                    id="pin-1",
+                    scope="agent:truth-agent",
+                    type="pin",
+                    key="pin:1",
+                    title="Pinned runbook",
+                    content="Never drop the pinned runbook.",
+                    confidence=1.0,
+                    created_at=now.isoformat(),
+                    updated_at=now.isoformat(),
+                )
+            )
+            store.put(
+                MemoryRecord(
+                    id="purge-me",
+                    scope="agent:truth-agent",
+                    type="fact",
+                    key="purge:me",
+                    title="Obsolete fact",
+                    content="obsolete fact",
+                    confidence=0.1,
+                    created_at=now.isoformat(),
+                    updated_at=now.isoformat(),
+                )
+            )
+            store.delete("purge-me")
+    
+            adapter._maybe_run_session_lifecycle(session_id="session-1")  # noqa: SLF001
+    
+            remaining = service.list(
+                ListQueryOptions(scopes=["agent:truth-agent"], limit=600)
+            )
+            assert len(remaining) <= 500
+            assert any(record.id == "pin-1" for record in remaining)
+>           assert store.get("purge-me") is None
+E           AssertionError: assert MemoryRecord(id='purge-me', scope='agent:truth-agent', type='fact', content='obsolete fact', created_at='2026-10-30T08...amespace=None, deleted_at=None, deleted_reason=None, tier='working', access_count=0, integrity_hash=None, goal_id=None) is None
+E            +  where MemoryRecord(id='purge-me', scope='agent:truth-agent', type='fact', content='obsolete fact', created_at='2026-10-30T08...amespace=None, deleted_at=None, deleted_reason=None, tier='working', access_count=0, integrity_hash=None, goal_id=None) = get('purge-me')
+E            +    where get = <openminion.modules.memory.storage.postgres.store.PostgresMemoryStore object at 0x7ff3f052d290>.get
+
+tests/services/agent/test_truth_maintenance.py:189: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/websockets/legacy/__init__.py:6
+  <checkout>/.venv/lib/python3.11/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_module_baselines_postgres.py::test_downgrade_removes_the_baseline_and_upgrade_restores_it[controlplane] - assert {'error': "Mo... 'error', ...} == {'exit': 0, '...uccess': True}
+  
+  Omitting 1 identical items, use -vv to show
+  Differing items:
+  {'status': 'error'} != {'status': 'ok'}
+  {'exit': 1} != {'exit': 0}
+  {'success': False} != {'success': True}
+  Left contains 1 more item:
+  {'error': "Module 'controlplane': PostgreSQL schema "
+            '"baseline_67dbc5d92c7640f1817d17bd497cf5ce__controlplane" holds '
+            'tables (alembic_version, om_meta) but records no controlplane '
+            "ledger: tables without their owner's ledger are not evidence, also "
+            "when they have the columns this code's controlplane store creates "
+            '(a first start that stopped before it wrote om_meta leaves such a '
+            'schema). Nothing was written. OpenMinion does not move, repair or '
+            'restamp existing tables. Stop every OpenMinion process, take a full '
+            'pg_dump, and follow "PostgreSQL schemas per owner" in '
+            'docs/runtime-database-upgrades.md.'}
+  
+  Full diff:
+    {
+  +     'error': "Module 'controlplane': PostgreSQL schema "
+  +     '"baseline_67dbc5d92c7640f1817d17bd497cf5ce__controlplane" holds tables '
+  +     '(alembic_version, om_meta) but records no controlplane ledger: tables '
+  +     "without their owner's ledger are not evidence, also when they have the "
+  +     "columns this code's controlplane store creates (a first start that "
+  +     'stopped before it wrote om_meta leaves such a schema). Nothing was '
+  +     'written. OpenMinion does not move, repair or restamp existing tables. '
+  +     'Stop every OpenMinion process, take a full pg_dump, and follow '
+  +     '"PostgreSQL schemas per owner" in docs/runtime-database-upgrades.md.',
+  -     'exit': 0,
+  ?             ^
+  +     'exit': 1,
+  ?             ^
+        'module_id': 'controlplane',
+  -     'status': 'ok',
+  ?                 ^
+  +     'status': 'error',
+  ?                +++ ^
+  -     'success': True,
+  ?                ^^^
+  +     'success': False,
+  ?                ^^^^
+    }
+FAILED tests/integration/test_module_baselines_postgres.py::test_downgrade_removes_the_baseline_and_upgrade_restores_it[telemetry] - assert {'error': "Mo... 'error', ...} == {'exit': 0, '...uccess': True}
+  
+  Omitting 1 identical items, use -vv to show
+  Differing items:
+  {'status': 'error'} != {'status': 'ok'}
+  {'exit': 1} != {'exit': 0}
+  {'success': False} != {'success': True}
+  Left contains 1 more item:
+  {'error': "Module 'telemetry': PostgreSQL schema "
+            '"baseline_014295f8085045509f0de6a34986ea59__telemetry" holds tables '
+            '(alembic_version, om_meta) but records no telemetry ledger: tables '
+            "without their owner's ledger are not evidence, also when they have "
+            "the columns this code's telemetry store creates (a first start that "
+            'stopped before it wrote om_meta leaves such a schema). Nothing was '
+            'written. OpenMinion does not move, repair or restamp existing '
+            'tables. Stop every OpenMinion process, take a full pg_dump, and '
+            'follow "PostgreSQL schemas per owner" in '
+            'docs/runtime-database-upgrades.md.'}
+  
+  Full diff:
+    {
+  +     'error': "Module 'telemetry': PostgreSQL schema "
+  +     '"baseline_014295f8085045509f0de6a34986ea59__telemetry" holds tables '
+  +     '(alembic_version, om_meta) but records no telemetry ledger: tables '
+  +     "without their owner's ledger are not evidence, also when they have the "
+  +     "columns this code's telemetry store creates (a first start that stopped "
+  +     'before it wrote om_meta leaves such a schema). Nothing was written. '
+  +     'OpenMinion does not move, repair or restamp existing tables. Stop every '
+  +     'OpenMinion process, take a full pg_dump, and follow "PostgreSQL schemas '
+  +     'per owner" in docs/runtime-database-upgrades.md.',
+  -     'exit': 0,
+  ?             ^
+  +     'exit': 1,
+  ?             ^
+        'module_id': 'telemetry',
+  -     'status': 'ok',
+  ?                 ^
+  +     'status': 'error',
+  ?                +++ ^
+  -     'success': True,
+  ?                ^^^
+  +     'success': False,
+  ?                ^^^^
+    }
+FAILED tests/services/agent/test_truth_maintenance.py::test_session_lifecycle_runs_capacity_and_purge_on_postgres - AssertionError: assert MemoryRecord(id='purge-me', scope='agent:truth-agent', type='fact', content='obsolete fact', created_at='2026-10-30T08...amespace=None, deleted_at=None, deleted_reason=None, tier='working', access_count=0, integrity_hash=None, goal_id=None) is None
+ +  where MemoryRecord(id='purge-me', scope='agent:truth-agent', type='fact', content='obsolete fact', created_at='2026-10-30T08...amespace=None, deleted_at=None, deleted_reason=None, tier='working', access_count=0, integrity_hash=None, goal_id=None) = get('purge-me')
+ +    where get = <openminion.modules.memory.storage.postgres.store.PostgresMemoryStore object at 0x7ff3f052d290>.get
+3 failed, 293 passed, 2 skipped, 21872 deselected, 1 warning in 118.17s (0:01:58)

@@ -1,0 +1,390 @@
+<checkout>/.venv/bin/python3.11 -m ruff check "<checkout>"
+All checks passed!
+make -j 4 validate-patterns
+make[1]: Entering directory '<checkout>'
+No config files to validate (and no test-configs directory found).
+OK: env/config centralization regression guard is clean.
+OK: logging control-plane regression guard is clean.
+agent_execution_complexity
+
+[INFO] Summary
+  files: 38
+  package_loc: 6362
+  methods: 267
+  dispatch_owners: 1
+  passthroughs: 48
+  duplicate_helpers: 0
+
+[OK] Result
+  - agent execution complexity ratchets are clean.
+{"findings": [], "metrics": {"dispatch_owners": 1, "duplicate_helpers": 0, "files": 38, "methods": 267, "package_loc": 6362, "passthroughs": 48}, "ok": true, "validator": "agent_execution_complexity"}
+OK: no direct base load_config usage outside ConfigManager.
+validate_init_file_loc
+
+[INFO] Summary
+  checked: 376
+  ceiling: 50
+  at/over ceiling: 48
+  baseline entries: 48
+
+[OK] Result
+  - init-file LOC baseline is clean.
+{"findings": [], "metrics": {"at_or_over_ceiling": 48, "baseline_entries": 48, "ceiling": 50, "checked": 376}, "ok": true, "validator": "validate_init_file_loc"}
+validate_max_file_loc
+
+[INFO] Summary
+  checked: 2750
+  ceiling: 1000
+  over ceiling: 1
+  baseline entries: 1
+
+[OK] Result
+  - max-file-LOC baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 1, "ceiling": 1000, "checked": 2750, "over_ceiling": 1}, "ok": true, "validator": "validate_max_file_loc"}
+validate_module_typed_raises
+
+[OK] Result
+  - typed bare-raise guard is clean.
+  - Exemption (pragma) counts: memory=7, llm=2, tool=30
+validate_tool_selection_scoring_contract
+
+[OK] Result
+  - clean across 101 files in 3 scan roots.
+validate_recovery_pipeline_contract
+
+[INFO] Summary
+  recovery root: <checkout>/src/openminion/modules/brain/runtime/recovery
+  findings: 0
+
+[OK] Result
+  - typed recovery-pipeline contract is clean.
+{"findings": [], "ok": true, "validator": "validate_recovery_pipeline_contract"}
+validate_schema_class_count
+
+[INFO] Summary
+  checked: 2750
+  ceiling: 20
+  at/over ceiling: 2
+  baseline entries: 2
+
+[OK] Result
+  - schema class-count baseline is clean.
+{"findings": [], "metrics": {"at_or_over_ceiling": 2, "baseline_entries": 2, "ceiling": 20, "checked": 2750}, "ok": true, "validator": "validate_schema_class_count"}
+validate_telemetry_event_catalog
+
+[INFO] Summary
+  scan root: <checkout>/src/openminion
+  registered: 106
+  catalog size: 215
+  unregistered: 0
+
+[OK] Result
+  - all emitted telemetry event types are registered.
+{"catalog_size": 215, "ok": true, "registered": 106, "scan_root": "<checkout>/src/openminion", "total_literals_seen": 106, "unregistered": []}
+validate_pydantic_extra_allow_audit
+
+[INFO] Summary
+  checked declarations: 26
+  allowlist rows: 26
+  findings: 0
+
+[OK] Result
+  - all extra="allow" declarations match the checked-in allowlist.
+{"allowlisted": 26, "checked": 26, "findings": [], "ok": true}
+validate_termination_reason_vocabulary
+
+[INFO] Summary
+  vocabulary size: 26
+  emit sites scanned: 17
+  findings: 0
+
+[OK] Result
+  - termination-reason vocabulary is clean.
+{"emit_sites_scanned": 17, "findings": [], "ok": true, "vocabulary_size": 26}
+validate_runtime_step_ownership
+
+[OK] Result
+  - clean across 2 rail file(s).
+validate_no_source_e2e_artifact_refs
+
+[INFO] Summary
+  source root: <checkout>/src/openminion
+  forbidden path patterns: 3
+  findings: 0
+
+[OK] Result
+  - source tree is free of forbidden E2E/generated artifact paths.
+{"findings": [], "forbidden_source_artifact_paths": ["artifacts/cli-chat-e2e", ".openminion/runtime/cli-chat-e2e", ".openminion/runtime/skill-complex"], "ok": true}
+validate/memory_boundary.py
+
+[INFO] Summary
+  services agent memory root: <checkout>/src/openminion/services/agent/memory
+  checked: 3
+  findings: 0
+
+[OK] Result
+  - services.agent.memory boundary is clean.
+{"checked": 3, "findings": [], "ok": true, "residual_files": ["__init__.py", "capsule.py", "gateway_adapter.py"]}
+validate/base_charter.py
+
+[INFO] Summary
+  base root: <checkout>/src/openminion/base
+  allowed root files: 12
+  admitted subpackages: 4
+  allowed upward imports: 0
+  reviewed Python owners: 71
+  base LOC: 9520/9524
+
+[OK] Result
+  - base layout, dependency direction, and monotonic budgets match the charter.
+{"admitted_subpackages": ["channel", "config", "errors", "runtime"], "allowed_root_files": ["README.md", "__init__.py", "constants.py", "debug.py", "generated_paths.py", "logging.py", "protocol.py", "redaction.py", "time.py", "types.py", "user_io.py", "version.py"], "base_loc": 9520, "base_loc_limit": 9524, "base_python_files": 71, "max_callable_loc": 97, "metric_errors": [], "ok": true, "upward_imports": 0}
+validate/openminion_root_layout.py
+
+[INFO] Summary
+  package root: <checkout>/src/openminion
+  allowed root files: 5
+  allowed top-level dirs: 6
+
+[OK] Result
+  - package root layout matches the canonical owner families.
+{"allowed_root_files": ["__init__.py", "__main__.py", "daemon.py", "daemon_main.py", "py.typed"], "allowed_top_level_dirs": ["api", "base", "cli", "modules", "services", "tools"], "ok": true}
+validate/modules_shape.py
+
+[INFO] Summary
+  modules root: <checkout>/src/openminion/modules
+  subsystems checked: 20
+  test owners checked: 20
+  required markers: 11
+
+[OK] Result
+  - module root files and subsystem shape markers are clean.
+{"allowed_root_files": ["README.md", "__init__.py", "base.py", "cli_common.py", "config.py", "constants.py", "paths.py", "providers.py"], "ok": true, "subsystems": ["a2a", "artifact", "brain", "context", "controlplane", "identity", "llm", "memory", "policy", "prompting", "registry", "retrieve", "runtime", "secret", "session", "skill", "storage", "task", "telemetry", "tool"]}
+validate/services_layout.py
+
+[INFO] Summary
+  services root: <checkout>/src/openminion/services
+  scan roots: 3
+  retired paths: 21
+  owner stacks: 4
+
+[OK] Result
+  - services layout, retired paths, owner stacks, and budgets are clean.
+{"allowed_root_files": ["__init__.py", "config.py", "constants.py"], "moved_modules": ["config_bootstrap", "debug", "migration", "onboarding", "owner_status", "paths", "request_orchestrator", "self_improvement", "sidecars", "skill_harness", "vector_sync"], "ok": true, "owner_stack_scopes": ["runtime/plugins", "security", "stats", "tool"], "retired_import_paths": ["openminion.services.agent.identity", "openminion.services.agent.lifecycle", "openminion.services.brain.cli", "openminion.services.channel.policy", "openminion.services.context.budget", "openminion.services.context.cleanup", "openminion.services.context.slices", "openminion.services.cron.constants", "openminion.services.cron.delivery", "openminion.services.cron.interfaces", "openminion.services.cron.scheduling", "openminion.services.integration", "openminion.services.lifecycle.prompts", "openminion.services.runtime.config", "openminion.services.runtime.daytona", "openminion.services.security.blast_radius.adapter", "openminion.services.security.untrusted_content", "openminion.services.stats.formatting", "openminion.services.stats.service", "openminion.services.stats.token_usage", "openminion.services.stats.types"]}
+validate/module_cycles.py
+
+[INFO] Summary
+  modules root: <checkout>/src/openminion/modules
+  max cycle length: 5
+  advisory mode: False
+  baseline cycles: 0
+  detected cycles: 0
+
+[OK] Result
+[OK] detected cycle set matches baseline allowlist.
+  - detected cycle set matches baseline allowlist.
+validate/api_layout.py
+
+[INFO] Summary
+  api root: <checkout>/src/openminion/api
+  allowed root files: 10
+  required subpackages: 6
+  route owner imports: 3
+  max callable LOC: 93
+
+[OK] Result
+  - api layout, route-owner imports, and complexity match exact ratchets.
+{"allowed_root_files": ["README.md", "__init__.py", "agent.py", "config.py", "constants.py", "handoff.py", "metrics.py", "metrics_registry.py", "runtime.py", "turns.py"], "complexity": {"max_callable_loc": 93, "max_route_loc": 280, "queries/runtime_reports.py": 466, "runtime.py": 185, "server/app.py": 231}, "complexity_baseline": {"max_callable_loc": 93, "max_route_loc": 280, "queries/runtime_reports.py": 492, "runtime.py": 185, "server/app.py": 234}, "disallowed_root_files": [], "missing_subpackages": [], "new_route_owner_imports": [], "ok": true, "required_subpackages": ["core", "operations", "queries", "responses", "routes", "server"], "root_files": ["README.md", "__init__.py", "agent.py", "config.py", "constants.py", "handoff.py", "metrics.py", "metrics_registry.py", "runtime.py", "turns.py"], "route_owner_imports": [["routes/debug.py", "openminion.services.diagnostics.debug"], ["routes/health.py", "openminion.services.health.service"], ["routes/skill.py", "openminion.modules.skill.constants"]], "stale_route_owner_imports": []}
+validate/tools_layout.py
+
+[INFO] Summary
+  tools root: <checkout>/src/openminion/tools
+  scan roots: 3
+  multi-provider categories: 4
+  legacy path tokens: 20
+
+[OK] Result
+  - tools root layout and retired provider tokens are clean.
+{"allowed_root_files": ["README.md", "__init__.py", "__main__.py", "config.py", "constants.py", "decorator.py", "env.py"], "legacy_token_count": 20, "multi_provider_categories": ["browser", "fetch", "search", "weather"], "ok": true}
+validate_self_improvement_contract
+
+[INFO] Summary
+  scan root: <checkout>/src/openminion
+  findings: 0
+
+[OK] Result
+  - self-improvement metadata contract is clean.
+{"findings": [], "ok": true, "validator": "validate_self_improvement_contract"}
+validate_openminion_eval_layout
+
+[INFO] Summary
+  package root: <checkout>/.deps/openminion-eval/src/openminion_eval
+  allowed root files: 23
+  admitted subpackages: 12
+  required subpackages: 11
+
+[OK] Result
+  - openminion-eval layout is clean.
+{"admitted_subpackages": ["cases", "closure", "freshness", "goal_trajectory", "memory_context_scorecard", "memory_effectiveness", "policy", "reporting", "routing", "runtime_reliability", "skills", "tools"], "allowed_root_files": ["README.md", "__init__.py", "__main__.py", "boundary_artifacts.py", "cli.py", "config.py", "constants.py", "datasets.py", "family_registry.py", "family_support.py", "integration_quarantine.py", "interfaces.py", "manual.py", "paths.py", "py.typed", "reports.py", "runner.py", "schemas.py", "scorer.py", "subject_adapters.py", "suite.py", "suite_artifacts.py", "suite_selection.py"], "ok": true, "required_subpackages": ["cases", "closure", "freshness", "goal_trajectory", "memory_context_scorecard", "policy", "reporting", "routing", "runtime_reliability", "skills", "tools"]}
+validate/cli_layout.py
+
+[INFO] Summary
+  cli root: <checkout>/src/openminion/cli
+  scan roots: 3
+  grouped dirs: 5
+  legacy path tokens: 8
+  current docs: 86
+
+[OK] Result
+  - cli root layout and legacy token scan are clean.
+{"allowed_root_files": ["README.md", "__init__.py", "config.py", "constants.py", "main.py"], "current_doc_count": 86, "grouped_dirs": ["bootstrap", "identity", "parser", "presentation", "transport"], "legacy_token_count": 8, "ok": true, "retired_doc_pattern_count": 13, "retired_focus_source_pattern_count": 3}
+validate/public_surface.py
+
+[INFO] Summary
+  source root: <checkout>/src/openminion
+  internal subpackages: ['providers', 'runtime', 'storage']
+  advisory mode: True
+  fail categories: ['providers', 'runtime']
+  baseline reaches: 200
+  detected reaches: 200
+  detected by category: providers=41, runtime=150, storage=9
+
+[OK] Result
+[OK] detected internal-reach set matches baseline allowlist.
+  - detected internal-reach set matches baseline allowlist.
+validate/path_structure_hygiene.py
+
+[INFO] Summary
+  source root: <checkout>/src/openminion
+  deprecated dir names: 3
+  redundant suffixes: 4
+
+[OK] Result
+  - source path structure hygiene is clean.
+{"deprecated_dir_names": {"focus_terminal": "terminal", "knowledge_graphs": "knowledge", "parsing": "parser"}, "ok": true, "redundant_suffixes": ["_events", "_helpers", "_runtime", "_support"], "scan_root": "<checkout>/src/openminion"}
+validate_runner_delegates
+
+[INFO] Summary
+  delegate keys: 59
+  used delegate keys: 59
+  callsite count: 580
+
+[OK] Result
+  - runner delegate map matches static consumers.
+{"dynamic_calls": [], "metrics": {"callsite_count": 580, "delegate_keys": 59, "used_delegate_keys": 59}, "ok": true, "undefined": [], "unused": [], "validator": "validate_runner_delegates"}
+[asyncio-run-boundary] clean — 17 allowlisted file(s), 0 violations
+[prompt-literals] warn-only — 6 stable prompt literal candidate(s) outside modules/prompting
+  src/openminion/modules/brain/loop/strategies/research/findings.py:13: RESEARCH_ITERATION_EVIDENCE_GUIDANCE = 'Use search to discover sources, then inspect the relevant readable source with fetch or browser '
+  src/openminion/modules/brain/loop/tools/plan_control.py:326: guidance = 'The active task plan is now complete and the full user-facing answer is already preserved. Retur'
+  src/openminion/modules/brain/loop/tools/plan_control.py:332: guidance = 'The active task plan is now complete. Return the final user-facing answer now. Preserve every us'
+  src/openminion/modules/controlplane/wizard/terminal.py:118: prompt_text = "(comma-separated numbers, e.g., '' or enter individual values)"
+  src/openminion/modules/storage/migrations/postgres_schema.py:54: _GUIDANCE = 'Stop every OpenMinion process, take a full pg_dump, and follow "PostgreSQL schemas per owner" in'
+  src/openminion/tools/ops/guidance.py:5: OPS_TOOL_FAMILY_GUIDANCE = 'Use ops tools evidence-first. Prefer read-only observations before any change, do not claim reme'
+validate/filename_underscore_hygiene.py
+
+[INFO] Summary
+  scan roots: ['src', 'tests', 'scripts', 'examples']
+  scanned python files: 5014
+  underscore threshold: >1
+  baseline entries: 1315
+  detected entries: 1809
+  enforced baseline entries: 33
+  enforced detected entries: 54
+  src baseline entries: 0
+  src detected entries: 18
+  tests baseline entries: 1282
+  tests detected entries: 1755
+  advisory mode: True
+  strict mode: False
+  baseline path: <checkout>/scripts/baselines/filename_underscore_hygiene.tsv
+
+[DRIFT] filename underscore hygiene baseline drift detected.
+
+[WARN] New multi-underscore filenames
+  - 21 new enforced filename(s) exceed the underscore practice threshold:
+  + scripts/ci/publish_runtime_manifest.py (2 underscores)
+  + scripts/ci/runtime_release_status.py (2 underscores)
+  + scripts/inventory_controlplane_schema.py (2 underscores)
+  + src/openminion/modules/a2a/storage/migrations/versions/0004_job_owner.py (2 underscores)
+  + src/openminion/modules/a2a/storage/migrations/versions/0005_job_idempotency_scope.py (3 underscores)
+  + src/openminion/modules/controlplane/channels/telegram/storage/migrations/versions/0002_polling_lease_schema.py (3 underscores)
+  + src/openminion/modules/controlplane/storage/migrations/versions/0002_index_audit.py (2 underscores)
+  + src/openminion/modules/policy/storage/migrations/versions/0002_blockchain_confirmations.py (2 underscores)
+  + src/openminion/modules/session/storage/migrations/versions/0002_run_invocation.py (2 underscores)
+  + src/openminion/modules/session/storage/migrations/versions/0003_cron_coordination.py (2 underscores)
+  + src/openminion/modules/session/storage/migrations/versions/0004_task_plan_step_start.py (4 underscores)
+  + src/openminion/modules/session/storage/migrations/versions/0005_cron_scheduler_control.py (3 underscores)
+  + src/openminion/modules/skill/storage/migrations/versions/0004_active_version_admission.py (3 underscores)
+  + src/openminion/modules/skill/storage/migrations/versions/0005_verification_evidence.py (2 underscores)
+  + src/openminion/modules/skill/storage/migrations/versions/0006_proposal_replay_proof.py (3 underscores)
+  + src/openminion/modules/skill/storage/migrations/versions/0007_workflow_observations.py (2 underscores)
+  + src/openminion/modules/telemetry/storage/migrations/versions/0002_event_v2.py (2 underscores)
+  + src/openminion/modules/telemetry/storage/migrations/versions/0003_debug_query_indexes.py (3 underscores)
+  + src/openminion/tools/commerce/storage/migrations/versions/0002_preparation_invalidation.py (2 underscores)
+  + src/openminion/tools/commerce/storage/migrations/versions/0003_placement_attempt_authorization.py (3 underscores)
+  + src/openminion/tools/commerce/storage/migrations/versions/0004_action_preparations.py (2 underscores)
+
+[WARN] Source advisory inventory
+  - 18 src filename(s) still exceed the underscore practice threshold.
+  These stay visible as context-dependent readability/refactor candidates, even when they already exist in the frozen baseline.
+  Use --show-src-detail to print the full src-path advisory list.
+
+[INFO] Tests inventory
+  - 1755 test filename(s) exceed the underscore practice threshold; informational only.
+  Use --show-tests-detail to print the full test-path inventory.
+
+[ADVISORY] Result
+[ADVISORY] _ADVISORY_MODE=True
+  - New drift is reported as a naming/readability practice warning for enforced roots; test-path inventory stays informational. Use --strict to fail on enforced drift.
+{"advisory_mode": true, "findings": ["new:scripts/ci/publish_runtime_manifest.py:2", "new:scripts/ci/runtime_release_status.py:2", "new:scripts/inventory_controlplane_schema.py:2", "new:src/openminion/modules/a2a/storage/migrations/versions/0004_job_owner.py:2", "new:src/openminion/modules/a2a/storage/migrations/versions/0005_job_idempotency_scope.py:3", "new:src/openminion/modules/controlplane/channels/telegram/storage/migrations/versions/0002_polling_lease_schema.py:3", "new:src/openminion/modules/controlplane/storage/migrations/versions/0002_index_audit.py:2", "new:src/openminion/modules/policy/storage/migrations/versions/0002_blockchain_confirmations.py:2", "new:src/openminion/modules/session/storage/migrations/versions/0002_run_invocation.py:2", "new:src/openminion/modules/session/storage/migrations/versions/0003_cron_coordination.py:2", "new:src/openminion/modules/session/storage/migrations/versions/0004_task_plan_step_start.py:4", "new:src/openminion/modules/session/storage/migrations/versions/0005_cron_scheduler_control.py:3", "new:src/openminion/modules/skill/storage/migrations/versions/0004_active_version_admission.py:3", "new:src/openminion/modules/skill/storage/migrations/versions/0005_verification_evidence.py:2", "new:src/openminion/modules/skill/storage/migrations/versions/0006_proposal_replay_proof.py:3", "new:src/openminion/modules/skill/storage/migrations/versions/0007_workflow_observations.py:2", "new:src/openminion/modules/telemetry/storage/migrations/versions/0002_event_v2.py:2", "new:src/openminion/modules/telemetry/storage/migrations/versions/0003_debug_query_indexes.py:3", "new:src/openminion/tools/commerce/storage/migrations/versions/0002_preparation_invalidation.py:2", "new:src/openminion/tools/commerce/storage/migrations/versions/0003_placement_attempt_authorization.py:3", "new:src/openminion/tools/commerce/storage/migrations/versions/0004_action_preparations.py:2"], "metrics": {"baseline_entries": 1315, "detected_entries": 1809, "enforced_baseline_entries": 33, "enforced_detected_entries": 54, "new_entries": 21, "removed_entries": 0, "scanned_files": 5014, "src_baseline_entries": 0, "src_detected_entries": 18, "tests_baseline_entries": 1282, "tests_detected_entries": 1755, "threshold": 1}, "ok": true, "strict": false, "validator": "validate_filename_underscore_hygiene"}
+[type-ignore-hygiene] clean — 0 bare ignores; 93 qualified ignores across 14 codes
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=0
+method_loc
+
+[INFO] Summary
+  checked: 20964
+  ceiling: 100
+  over ceiling: 111
+  baseline entries: 111
+
+[OK] Result
+  - method-LOC baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 111, "ceiling": 100, "checked": 20964, "over_ceiling": 111}, "ok": true, "validator": "method_loc"}
+{
+  "checked": 2661,
+  "ok": true,
+  "violations": []
+}
+broad_exception
+
+[INFO] Summary
+  files: 410
+  handlers: 1102
+  silent pass: 106
+  baseline entries: 410
+
+[OK] Result
+  - broad-exception baseline is clean.
+{"findings": [], "metrics": {"baseline_entries": 410, "files_with_handlers": 410, "handler_count": 1102, "silent_pass_count": 106}, "ok": true, "validator": "broad_exception"}
+make[1]: Leaving directory '<checkout>'
+<checkout>/.venv/bin/python3.11 scripts/validate/controlplane_delivery.py
+[coo-09] clean — no synchronous runner deliver regressions
+<checkout>/.venv/bin/python3.11 scripts/validate/webhook_secret.py
+[coo-10] clean — webhook secret-required contract preserved
+Skipping workspace browser tool-family contract validator (not present in standalone checkout).
+make typecheck
+make[1]: Entering directory '<checkout>'
+cd "<checkout>" && <checkout>/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4306; baseline total: 4306
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 287
+[tcr] api: 76 / 76 | monthly quota -50 | next target <= 26 | headroom 0
+[tcr] cli: 308 / 308 | monthly quota -50 | next target <= 258 | headroom 0
+[tcr] modules: 3344 / 3344 | monthly quota -50 | next target <= 3294 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 356 / 356 | monthly quota -50 | next target <= 306 | headroom 0
+[tcr] tools: 221 / 221 | monthly quota -50 | next target <= 171 | headroom 0
+make[1]: Leaving directory '<checkout>'

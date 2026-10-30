@@ -1,0 +1,179 @@
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+MEASURE no downgrade session InternalError
+MEASURE no downgrade skill InternalError
+MEASURE no downgrade memory TypeError
+F
+=================================== FAILURES ===================================
+_________________ test_this_code_builds_only_listed_histories __________________
+
+database = 'postgresql+psycopg://postgres:test@localhost:5432/om446_d14efd10f180'
+tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_this_code_builds_only_lis0')
+
+    def test_this_code_builds_only_listed_histories(database: str, tmp_path: Path) -> None:
+        """Every layout this code builds, one revision at a time, is listed as current.
+    
+        On a failure the message holds the postgres_histories.json lines to add (see
+        "PostgreSQL schemas per owner" in docs/runtime-database-upgrades.md).
+        """
+        from alembic.config import Config
+        from alembic.script import ScriptDirectory
+    
+        from openminion.modules.storage.backends.postgres import RecordStorePostgres
+        from openminion.modules.storage.migrations.alembic import (
+            discover_module_alembic_paths,
+        )
+        from openminion.modules.storage.migrations import postgres_schema
+        from openminion.modules.storage.migrations.postgres_schema import ModuleSchema
+        from openminion.modules.storage.runtime.migrations import (
+            DEFAULT_MIGRATIONS,
+            migrate_record_store,
+        )
+    
+        built: set[tuple[str, str]] = set()
+        unlisted: list[tuple[str, str, dict[str, str]]] = []
+        catalog = postgres_schema._catalog()  # noqa: SLF001
+        skip = set(catalog.engine_tables) | {"alembic_version", "om_meta"}
+        engine_built: dict[str, set[str]] = {}
+    
+        def check(owner: str, schema: str) -> None:
+            layout = _read(database, schema)
+            for table in catalog.engine_tables:
+                if layout.tables.get(table) is not None:
+                    engine_built.setdefault(table, set()).add(str(layout.tables[table]))
+            history = postgres_schema.complete_history(owner, layout)
+            owned = {t for t in layout.tables if t in catalog.names[owner]}
+            if (
+                history is not None
+                and "current" in history.measured
+                and owned == set(history.tables)
+            ):
+                built.add((owner, history.ledger))
+                return
+            if owner == postgres_schema.RUNTIME:
+                ledger = f"v{len(layout.migrations or ())}"
+            elif layout.alembic is not None:
+                ledger = f"alembic {layout.alembic[0] if layout.alembic else 'base'}"
+            else:
+                ledger = f"store {(layout.om_meta or {}).get('schema_head')}"
+            tables = _all_signatures(database, schema)
+            unlisted.append(
+                (owner, ledger, {t: v for t, v in tables.items() if t not in skip})
+            )
+    
+        _execute(database, "CREATE SCHEMA rt")
+        store = RecordStorePostgres(schema_url(database, "rt"))
+        try:
+            ordered = sorted(DEFAULT_MIGRATIONS, key=lambda m: m.version)
+            for k in range(1, len(ordered) + 1):
+                migrate_record_store(store, backend_type="postgres", migrations=ordered[:k])
+                check("runtime", "rt")
+        finally:
+            store.close()
+    
+        for module_id in WORKING_MODULES:
+            _, location = discover_module_alembic_paths(module_id)
+            cfg = Config()
+            cfg.set_main_option("script_location", str(location))
+            chain = [
+                s.revision
+                for s in reversed(list(ScriptDirectory.from_config(cfg).walk_revisions()))
+            ]
+            schema = f"m_{module_id}"
+            _execute(database, f'CREATE SCHEMA "{schema}"')
+            engine = sa.create_engine(database)
+            try:
+                for revision in chain:
+                    report = MigrationRunner(
+                        module_id=module_id,
+                        db_path=tmp_path / f"{module_id}.db",
+                        module_application_id=get_module_application_id(module_id),
+                        backend_type="postgres",
+                        engine=engine,
+                        postgres_schema=ModuleSchema(module_id, schema, schema),
+                    ).migrate(target=revision)
+                    assert report.success, report.error
+                    check(module_id, schema)
+            finally:
+                engine.dispose()
+            # And the chain downgraded to base, as an operator can with Alembic.
+            try:
+                _legacy_module(
+                    schema_url(database, schema), module_id, "base", downgrade=True
+                )
+            except Exception as exc:  # noqa: BLE001
+                print("MEASURE no downgrade", module_id, type(exc).__name__)
+                continue
+            check(module_id, schema)
+    
+        # Each module store alone, after its module's Alembic head, and followed by it.
+        for index, (name, (module_id, build)) in enumerate(_STORES.items()):
+            for order in ("s", "a", "b"):
+                if order != "s" and module_id not in WORKING_MODULES:
+                    continue
+                base = f"b{index}{order}_{module_id}"
+                _execute(database, f'CREATE SCHEMA "{base}"')
+                url = schema_url(database, base)
+                if order == "a":
+                    assert _migrate_in(url, module_id, tmp_path).success
+                close = getattr(build(url, tmp_path / f"{base}-{name}"), "close", None)
+                if callable(close):
+                    close()
+                if order == "b":
+                    # A failed upgrade rolls back and leaves the store's own layout.
+                    _migrate_in(url, module_id, tmp_path)
+                check(module_id, f"{base}__{module_id}")
+    
+        # The secret store has no PostgreSQL factory: it is built on a record store
+        # its caller passes, in that record store's schema.
+        from openminion.modules.secret.storage.store import PostgresSecretStore
+    
+        _execute(database, 'CREATE SCHEMA "b_secret"')
+        secret = PostgresSecretStore(
+            record_store=RecordStorePostgres(schema_url(database, "b_secret"))
+        )
+        secret.close()
+        check("secret", "b_secret")
+    
+        listed = {
+            (owner, ledger)
+            for owner, ledgers in postgres_schema._catalog().histories.items()  # noqa: SLF001
+            for ledger, items in ledgers.items()
+            if any("current" in h.measured for h in items)
+        }
+>       assert not unlisted, _paste_ready(unlisted)
+E       AssertionError: Add to "signatures":
+E         Add to "histories" (or add "current" to an equal entry):
+E         {"owner": "secret", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+E         {"owner": "identity", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+E         {"owner": "registry", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+E         {"owner": "task", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+E         {"owner": "policy", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+E         {"owner": "compress", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+E         {"owner": "retrieve", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+E         {"owner": "artifact", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+E         {"owner": "a2a", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+E         {"owner": "controlplane", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+E         {"owner": "telemetry", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+E       assert not [('secret', 'alembic base', {}), ('identity', 'alembic base', {}), ('registry', 'alembic base', {}), ('task', 'alembic base', {}), ('policy', 'alembic base', {}), ('compress', 'alembic base', {}), ...]
+
+tests/integration/test_postgres_module_schemas.py:1418: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_postgres_module_schemas.py::test_this_code_builds_only_listed_histories - AssertionError: Add to "signatures":
+  Add to "histories" (or add "current" to an equal entry):
+  {"owner": "secret", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+  {"owner": "identity", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+  {"owner": "registry", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+  {"owner": "task", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+  {"owner": "policy", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+  {"owner": "compress", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+  {"owner": "retrieve", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+  {"owner": "artifact", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+  {"owner": "a2a", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+  {"owner": "controlplane", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+  {"owner": "telemetry", "ledger": "alembic base", "tables": [], "measured": ["current"]},
+assert not [('secret', 'alembic base', {}), ('identity', 'alembic base', {}), ('registry', 'alembic base', {}), ('task', 'alembic base', {}), ('policy', 'alembic base', {}), ('compress', 'alembic base', {}), ...]
+1 failed, 31 deselected in 11.23s

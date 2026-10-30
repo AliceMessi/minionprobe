@@ -1,0 +1,348 @@
+validate/direct_env_calls.py
+
+[INFO] Result
+  - [env-guard] checked 41 rule(s), violations=0, warnings=6
+
+....................................................................FF.. [ 27%]
+........................................................................ [ 55%]
+.............................F.......................................... [ 83%]
+..........................................                               [100%]
+=================================== FAILURES ===================================
+__ test_downgrade_removes_the_baseline_and_upgrade_restores_it[controlplane] ___
+
+schema = 'postgresql+psycopg://postgres:test@localhost:5432/postgres?options=-csearch_path%3Dbaseline_ce9e3f28b2ec45508ef46e555c4deb66'
+module_id = 'controlplane'
+tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_downgrade_removes_the_bas0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fb8ec76fcd0>
+
+    @pytest.mark.parametrize("module_id", MODULES)
+    def test_downgrade_removes_the_baseline_and_upgrade_restores_it(
+        schema: str, module_id: str, tmp_path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        assert _migrate(schema, module_id, tmp_path, capsys)["status"] == "ok"
+        module = _module_url(schema, module_id)
+        created = _tables(module)
+    
+        _downgrade_to_base(module, module_id)
+    
+        assert _revision(module) == []
+        # The module's Alembic environment writes om_meta again after every run.
+        assert _tables(module) == ["alembic_version", "om_meta"]
+        assert (
+            _scalars(
+                module,
+                "SELECT sequence_name FROM information_schema.sequences "
+                "WHERE sequence_schema = current_schema()",
+            )
+            == []
+        )
+    
+        entry = _migrate(schema, module_id, tmp_path, capsys)
+    
+>       assert entry == {"exit": 0, "module_id": module_id, "status": "ok", "success": True}
+E       assert {'error': "Mo... 'error', ...} == {'exit': 0, '...uccess': True}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'exit': 1} != {'exit': 0}
+E         {'success': False} != {'success': True}
+E         {'status': 'error'} != {'status': 'ok'}
+E         Left contains 1 more item:
+E         {'error': "Module 'controlplane': PostgreSQL schema "
+E                   '"baseline_ce9e3f28b2ec45508ef46e555c4deb66__controlplane" holds '
+E                   'tables (alembic_version, om_meta) but records no controlplane '
+E                   "ledger: tables without their owner's ledger are not evidence, also "
+E                   "when they have the columns this code's controlplane store creates "
+E                   '(a first start that stopped before it wrote om_meta leaves such a '
+E                   'schema). Nothing was written. OpenMinion does not move, repair or '
+E                   'restamp existing tables. Stop every OpenMinion process, take a full '
+E                   'pg_dump, and follow "PostgreSQL schemas per owner" in '
+E                   'docs/runtime-database-upgrades.md.'}
+E         
+E         Full diff:
+E           {
+E         +     'error': "Module 'controlplane': PostgreSQL schema "
+E         +     '"baseline_ce9e3f28b2ec45508ef46e555c4deb66__controlplane" holds tables '
+E         +     '(alembic_version, om_meta) but records no controlplane ledger: tables '
+E         +     "without their owner's ledger are not evidence, also when they have the "
+E         +     "columns this code's controlplane store creates (a first start that "
+E         +     'stopped before it wrote om_meta leaves such a schema). Nothing was '
+E         +     'written. OpenMinion does not move, repair or restamp existing tables. '
+E         +     'Stop every OpenMinion process, take a full pg_dump, and follow '
+E         +     '"PostgreSQL schemas per owner" in docs/runtime-database-upgrades.md.',
+E         -     'exit': 0,
+E         ?             ^
+E         +     'exit': 1,
+E         ?             ^
+E               'module_id': 'controlplane',
+E         -     'status': 'ok',
+E         ?                 ^
+E         +     'status': 'error',
+E         ?                +++ ^
+E         -     'success': True,
+E         ?                ^^^
+E         +     'success': False,
+E         ?                ^^^^
+E           }
+
+tests/integration/test_module_baselines_postgres.py:353: AssertionError
+____ test_downgrade_removes_the_baseline_and_upgrade_restores_it[telemetry] ____
+
+schema = 'postgresql+psycopg://postgres:test@localhost:5432/postgres?options=-csearch_path%3Dbaseline_d27cb9f9ab594d6484e807b9fbcf05bf'
+module_id = 'telemetry'
+tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_downgrade_removes_the_bas1')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fb8ec76f050>
+
+    @pytest.mark.parametrize("module_id", MODULES)
+    def test_downgrade_removes_the_baseline_and_upgrade_restores_it(
+        schema: str, module_id: str, tmp_path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        assert _migrate(schema, module_id, tmp_path, capsys)["status"] == "ok"
+        module = _module_url(schema, module_id)
+        created = _tables(module)
+    
+        _downgrade_to_base(module, module_id)
+    
+        assert _revision(module) == []
+        # The module's Alembic environment writes om_meta again after every run.
+        assert _tables(module) == ["alembic_version", "om_meta"]
+        assert (
+            _scalars(
+                module,
+                "SELECT sequence_name FROM information_schema.sequences "
+                "WHERE sequence_schema = current_schema()",
+            )
+            == []
+        )
+    
+        entry = _migrate(schema, module_id, tmp_path, capsys)
+    
+>       assert entry == {"exit": 0, "module_id": module_id, "status": "ok", "success": True}
+E       assert {'error': "Mo... 'error', ...} == {'exit': 0, '...uccess': True}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'exit': 1} != {'exit': 0}
+E         {'success': False} != {'success': True}
+E         {'status': 'error'} != {'status': 'ok'}
+E         Left contains 1 more item:
+E         {'error': "Module 'telemetry': PostgreSQL schema "
+E                   '"baseline_d27cb9f9ab594d6484e807b9fbcf05bf__telemetry" holds tables '
+E                   '(alembic_version, om_meta) but records no telemetry ledger: tables '
+E                   "without their owner's ledger are not evidence, also when they have "
+E                   "the columns this code's telemetry store creates (a first start that "
+E                   'stopped before it wrote om_meta leaves such a schema). Nothing was '
+E                   'written. OpenMinion does not move, repair or restamp existing '
+E                   'tables. Stop every OpenMinion process, take a full pg_dump, and '
+E                   'follow "PostgreSQL schemas per owner" in '
+E                   'docs/runtime-database-upgrades.md.'}
+E         
+E         Full diff:
+E           {
+E         +     'error': "Module 'telemetry': PostgreSQL schema "
+E         +     '"baseline_d27cb9f9ab594d6484e807b9fbcf05bf__telemetry" holds tables '
+E         +     '(alembic_version, om_meta) but records no telemetry ledger: tables '
+E         +     "without their owner's ledger are not evidence, also when they have the "
+E         +     "columns this code's telemetry store creates (a first start that stopped "
+E         +     'before it wrote om_meta leaves such a schema). Nothing was written. '
+E         +     'OpenMinion does not move, repair or restamp existing tables. Stop every '
+E         +     'OpenMinion process, take a full pg_dump, and follow "PostgreSQL schemas '
+E         +     'per owner" in docs/runtime-database-upgrades.md.',
+E         -     'exit': 0,
+E         ?             ^
+E         +     'exit': 1,
+E         ?             ^
+E               'module_id': 'telemetry',
+E         -     'status': 'ok',
+E         ?                 ^
+E         +     'status': 'error',
+E         ?                +++ ^
+E         -     'success': True,
+E         ?                ^^^
+E         +     'success': False,
+E         ?                ^^^^
+E           }
+
+tests/integration/test_module_baselines_postgres.py:353: AssertionError
+_ TestValidatePostgresConnectionFailure.test_unreachable_db_raises_with_redacted_url _
+
+self = <tests.storage.test_startup_validation.TestValidatePostgresConnectionFailure object at 0x7fb8ef9c6410>
+
+    def test_unreachable_db_raises_with_redacted_url(self):
+        url = (
+            "postgresql://user:MyPassword@192.0.2.1:5432/nonexistent"  # RFC5737 test IP
+        )
+        with pytest.raises(StorageConfigError) as exc_info:
+>           validate_postgres_config(url, check_connection=True, check_migrations=False)
+
+tests/storage/test_startup_validation.py:86: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/openminion/modules/storage/runtime/validation.py:58: in validate_postgres_config
+    with engine.connect() as conn:
+         ^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3275: in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:149: in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:3299: in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:445: in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:1324: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:709: in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:176: in _do_get
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/impl.py:174: in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:386: in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:671: in __init__
+    self.__connect()
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:916: in __connect
+    with util.safe_reraise():
+.venv/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.11/site-packages/sqlalchemy/pool/base.py:912: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/create.py:645: in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:869: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/psycopg/connection.py:109: in connect
+    rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/psycopg/waiting.py:141: in wait_conn
+    if not (rlist := sel.select(timeout=t)):
+                     ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <selectors.EpollSelector object at 0x7fb8ebc09f50>, timeout = 0.1
+
+    def select(self, timeout=None):
+        if timeout is None:
+            timeout = -1
+        elif timeout <= 0:
+            timeout = 0
+        else:
+            # epoll_wait() has a resolution of 1 millisecond, round away
+            # from zero to wait *at least* timeout seconds.
+            timeout = math.ceil(timeout * 1e3) * 1e-3
+    
+        # epoll_wait() expects `maxevents` to be greater than zero;
+        # we want to make sure that `select()` can be called when no
+        # FD is registered.
+        max_ev = max(len(self._fd_to_key), 1)
+    
+        ready = []
+        try:
+>           fd_event_list = self._selector.poll(timeout, max_ev)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: Timeout (>60.0s) from pytest-timeout.
+
+/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/selectors.py:468: Failed
+=========================== short test summary info ============================
+FAILED tests/integration/test_module_baselines_postgres.py::test_downgrade_removes_the_baseline_and_upgrade_restores_it[controlplane] - assert {'error': "Mo... 'error', ...} == {'exit': 0, '...uccess': True}
+  
+  Omitting 1 identical items, use -vv to show
+  Differing items:
+  {'exit': 1} != {'exit': 0}
+  {'success': False} != {'success': True}
+  {'status': 'error'} != {'status': 'ok'}
+  Left contains 1 more item:
+  {'error': "Module 'controlplane': PostgreSQL schema "
+            '"baseline_ce9e3f28b2ec45508ef46e555c4deb66__controlplane" holds '
+            'tables (alembic_version, om_meta) but records no controlplane '
+            "ledger: tables without their owner's ledger are not evidence, also "
+            "when they have the columns this code's controlplane store creates "
+            '(a first start that stopped before it wrote om_meta leaves such a '
+            'schema). Nothing was written. OpenMinion does not move, repair or '
+            'restamp existing tables. Stop every OpenMinion process, take a full '
+            'pg_dump, and follow "PostgreSQL schemas per owner" in '
+            'docs/runtime-database-upgrades.md.'}
+  
+  Full diff:
+    {
+  +     'error': "Module 'controlplane': PostgreSQL schema "
+  +     '"baseline_ce9e3f28b2ec45508ef46e555c4deb66__controlplane" holds tables '
+  +     '(alembic_version, om_meta) but records no controlplane ledger: tables '
+  +     "without their owner's ledger are not evidence, also when they have the "
+  +     "columns this code's controlplane store creates (a first start that "
+  +     'stopped before it wrote om_meta leaves such a schema). Nothing was '
+  +     'written. OpenMinion does not move, repair or restamp existing tables. '
+  +     'Stop every OpenMinion process, take a full pg_dump, and follow '
+  +     '"PostgreSQL schemas per owner" in docs/runtime-database-upgrades.md.',
+  -     'exit': 0,
+  ?             ^
+  +     'exit': 1,
+  ?             ^
+        'module_id': 'controlplane',
+  -     'status': 'ok',
+  ?                 ^
+  +     'status': 'error',
+  ?                +++ ^
+  -     'success': True,
+  ?                ^^^
+  +     'success': False,
+  ?                ^^^^
+    }
+FAILED tests/integration/test_module_baselines_postgres.py::test_downgrade_removes_the_baseline_and_upgrade_restores_it[telemetry] - assert {'error': "Mo... 'error', ...} == {'exit': 0, '...uccess': True}
+  
+  Omitting 1 identical items, use -vv to show
+  Differing items:
+  {'exit': 1} != {'exit': 0}
+  {'success': False} != {'success': True}
+  {'status': 'error'} != {'status': 'ok'}
+  Left contains 1 more item:
+  {'error': "Module 'telemetry': PostgreSQL schema "
+            '"baseline_d27cb9f9ab594d6484e807b9fbcf05bf__telemetry" holds tables '
+            '(alembic_version, om_meta) but records no telemetry ledger: tables '
+            "without their owner's ledger are not evidence, also when they have "
+            "the columns this code's telemetry store creates (a first start that "
+            'stopped before it wrote om_meta leaves such a schema). Nothing was '
+            'written. OpenMinion does not move, repair or restamp existing '
+            'tables. Stop every OpenMinion process, take a full pg_dump, and '
+            'follow "PostgreSQL schemas per owner" in '
+            'docs/runtime-database-upgrades.md.'}
+  
+  Full diff:
+    {
+  +     'error': "Module 'telemetry': PostgreSQL schema "
+  +     '"baseline_d27cb9f9ab594d6484e807b9fbcf05bf__telemetry" holds tables '
+  +     '(alembic_version, om_meta) but records no telemetry ledger: tables '
+  +     "without their owner's ledger are not evidence, also when they have the "
+  +     "columns this code's telemetry store creates (a first start that stopped "
+  +     'before it wrote om_meta leaves such a schema). Nothing was written. '
+  +     'OpenMinion does not move, repair or restamp existing tables. Stop every '
+  +     'OpenMinion process, take a full pg_dump, and follow "PostgreSQL schemas '
+  +     'per owner" in docs/runtime-database-upgrades.md.',
+  -     'exit': 0,
+  ?             ^
+  +     'exit': 1,
+  ?             ^
+        'module_id': 'telemetry',
+  -     'status': 'ok',
+  ?                 ^
+  +     'status': 'error',
+  ?                +++ ^
+  -     'success': True,
+  ?                ^^^
+  +     'success': False,
+  ?                ^^^^
+    }
+FAILED tests/storage/test_startup_validation.py::TestValidatePostgresConnectionFailure::test_unreachable_db_raises_with_redacted_url - Failed: Timeout (>60.0s) from pytest-timeout.
+3 failed, 255 passed in 128.09s (0:02:08)
