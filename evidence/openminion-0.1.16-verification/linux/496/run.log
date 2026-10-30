@@ -1,0 +1,74 @@
+Using Python 3.12.15 environment at: <VENV0115>
+Using Python 3.12.15 environment at: <VENV>
+Using Python 3.12.15 environment at: <VENV>
+provenance: version 0.1.16, on PyPI: 1, wheel sha256 match: 1
+provenance 0.1.15: wheel sha256 match: 1
+=== probe_496_sqlite_0115
+exit=1
+case W: 3.6 s, error=None
+case D: 1.8 s, error=None
+case WA: 2.0 s, error=None
+case N: 1.8 s, error=None
+case X: 2.0 s, error=None
+case P: 1.8 s, error=None
+case R: 3.2 s, error=None
+FAIL item 1: W (confirmation-required policy): in T1, T2, T3 and the consolidation run's scheduled turn the turn asks memory.write once (target memory-capture: require_approval); every decision-record attempt is skipped (brain.decision_memo
+FAIL item 1: D (denying policy: memory.write's min_scope POWER_USER, so the policy denies the agent's internal actor): every step's memory.write answer is deny / missing_tool_scope; no decision record, no stage_candidate call, no tool_outco
+FAIL item 2: N: the turn's memory.write answer is allow in every step (memory-capture: allow / allowed, once per turn) | observed={'T1': [], 'T2': [], 'T3': [], 'C': []}
+FAIL item 2: X: the turn's memory.write answer is allow in every step (memory-capture: allow / allowed, once per turn) | observed={'T1': [], 'T2': [], 'T3': [], 'C': []}
+FAIL item 2: ordinary tool approval unchanged under W: when the user approves the model's memory.write call (case WA) the approval callback is asked once with its arguments and the approved fact record is written (key fact:indentation); the
+FAIL item 3: one runner reused across allow/deny/allow: R1 (N profile) SDK turn; profile rewritten to W and reloaded; R2 SDK turn, R3 consolidation run, R4 diagnostic turn; back to N; R5 SDK turn, R6 consolidation run, R7 diagnostic turn, R
+FAIL item 3: each turn asks its current memory.write answer once (memory-capture), with no stale answer: allow, require_approval x3 (R2-R4, including the consolidation and diagnostic turns), then allow x4 | observed={'R1': [], 'R2': [], 'R3
+FAIL item 3: decision records follow each turn's answer: new decision records per turn 1, 0, 0, 0, 1, 1, 1, 1; the denied turns emit only brain.decision_memory.skipped (memory_write_not_authorized), the allowed turns brain.decision_memory.c
+FAIL item 3: tool_outcome staging follows each turn's answer: the refused memory.write call stages a candidate in R1 and R5 (allowed) and none in R2 (denied); the approval callback is asked once per SDK turn with the call's arguments; no ot
+FAIL item 3: the consolidation (excluded) and diagnostic (capture disabled) turns get the answer itself but no capture: capture authorized per turn True, False, False, False, True, False, False, False; extraction requests per step: R1 1, R2
+FAIL item 4: the working state keeps the decision metadata: in each denied turn write_decision_memory is still called with the turn's decision, and the decision's route and reason code, the working state's reason code and the persisted work
+FAIL item 4: the unauthorized turn's capture stays pending: W's T1 and R's R2 end with capture state pending, error_code CAPTURE_RECOVERY_UNAUTHORIZED, no extraction request; R3's denied consolidation run keeps R2's intent pending (recovery
+FAIL item 4: later authorized recovery commits once: R6 (allowed) recovers R2's intent (1, 1, 0) with one extraction request; R8 finds nothing (0, 0, 0); at the end R2's capture has exactly one memory.capture.result event, one bundle receip
+SUMMARY passed=9 failed=13 total=22
+=== probe_496_postgres_0115
+exit=1
+case W: 2.7 s, error=None
+case N: 1.9 s, error=None
+case R: 3.5 s, error=None
+FAIL item 1: W (confirmation-required policy): in T1, T2, T3 and the consolidation run's scheduled turn the turn asks memory.write once (target memory-capture: require_approval); every decision-record attempt is skipped (brain.decision_memo
+FAIL item 1: PostgreSQL, counted server-side in each case's own schema: W has 0 decision records, 0 tool_outcome candidates and no row in any table holding the refused text, while the allowed control N on the same server has 4 decision reco
+FAIL item 2: N: the turn's memory.write answer is allow in every step (memory-capture: allow / allowed, once per turn) | observed={'T1': [], 'T2': [], 'T3': [], 'C': []}
+FAIL item 3: one runner reused across allow/deny/allow: R1 (N profile) SDK turn; profile rewritten to W and reloaded; R2 SDK turn, R3 consolidation run, R4 diagnostic turn; back to N; R5 SDK turn, R6 consolidation run, R7 diagnostic turn, R
+FAIL item 3: each turn asks its current memory.write answer once (memory-capture), with no stale answer: allow, require_approval x3 (R2-R4, including the consolidation and diagnostic turns), then allow x4 | observed={'R1': [], 'R2': [], 'R3
+FAIL item 3: decision records follow each turn's answer: new decision records per turn 1, 0, 0, 0, 1, 1, 1, 1; the denied turns emit only brain.decision_memory.skipped (memory_write_not_authorized), the allowed turns brain.decision_memory.c
+FAIL item 3: tool_outcome staging follows each turn's answer: the refused memory.write call stages a candidate in R1 and R5 (allowed) and none in R2 (denied); the approval callback is asked once per SDK turn with the call's arguments; no ot
+FAIL item 3: the consolidation (excluded) and diagnostic (capture disabled) turns get the answer itself but no capture: capture authorized per turn True, False, False, False, True, False, False, False; extraction requests per step: R1 1, R2
+FAIL item 4: the working state keeps the decision metadata: in each denied turn write_decision_memory is still called with the turn's decision, and the decision's route and reason code, the working state's reason code and the persisted work
+FAIL item 4: the unauthorized turn's capture stays pending: W's T1 and R's R2 end with capture state pending, error_code CAPTURE_RECOVERY_UNAUTHORIZED, no extraction request; R3's denied consolidation run keeps R2's intent pending (recovery
+FAIL item 4: later authorized recovery commits once: R6 (allowed) recovers R2's intent (1, 1, 0) with one extraction request; R8 finds nothing (0, 0, 0); at the end R2's capture has exactly one memory.capture.result event, one bundle receip
+SUMMARY passed=4 failed=11 total=15
+=== probe_496_sqlite
+exit=0
+case W: 3.5 s, error=None
+case D: 1.6 s, error=None
+case WA: 1.8 s, error=None
+case N: 1.8 s, error=None
+case X: 2.0 s, error=None
+case P: 1.8 s, error=None
+case R: 3.3 s, error=None
+SUMMARY passed=24 failed=0 total=24
+=== probe_496_postgres
+exit=0
+case W: 2.6 s, error=None
+case N: 1.9 s, error=None
+case R: 3.3 s, error=None
+SUMMARY passed=17 failed=0 total=17
+empty dir after: 0 entries
+openminion[postgres]==0.1.16
+Name: openminion
+Version: 0.1.16
+Location: <VENV>/lib/python3.12/site-packages
+Requires: aiosqlite, alembic, cryptography, httpx, jsonschema, platformdirs, prompt-toolkit, psutil, pydantic, pyyaml, rich, send2trash, sophiagraph, typer, tzdata
+Required-by:
+Linux runnervm48cm3 7.0.0-1017-azure #17~24.04.1-Ubuntu SMP PREEMPT Thu Sep 24 18:46:57 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+PRETTY_NAME="Ubuntu 24.04.5 LTS"
+VERSION_ID="24.04"
+python 3.12.15 sqlite 3.45.1
+PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+<VENV>/lib/python3.12/site-packages/openminion/__init__.py 0.1.16

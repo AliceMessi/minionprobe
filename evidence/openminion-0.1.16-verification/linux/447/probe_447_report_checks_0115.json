@@ -1,0 +1,273 @@
+{
+  "retention": "probe_447_report_retention_0115.json",
+  "repro": "probe_447_report_repro_0115.txt",
+  "versions": {
+    "openminion": "0.1.15",
+    "openminion_file": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "postgres_server": "16.15 (Debian 16.15-1.pgdg13+2)",
+    "psutil": "7.2.2",
+    "psycopg": "3.3.6",
+    "python": "3.12.15",
+    "sqlalchemy": "2.1.6",
+    "sqlite": "3.45.1"
+  },
+  "summary": {
+    "passed": 27,
+    "failed": 7,
+    "total": 34
+  },
+  "checks": [
+    {
+      "check": "item 1: report probe postgres_437 (the #437 PostgreSQL start (starts since 0.1.15), then close()): the start (or build) succeeds",
+      "pass": true,
+      "observed": "started"
+    },
+    {
+      "check": "item 1: report probe postgres_437 (the #437 PostgreSQL start (starts since 0.1.15), then close()): after close(), with gc off and before gc.collect(), no file under the case root is open",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "item 1: report probe postgres_437 (the #437 PostgreSQL start (starts since 0.1.15), then close()): after close(), no runtime-manager or pool-health-emitter thread is alive",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "item 1: report probe postgres_437 (the #437 PostgreSQL start (starts since 0.1.15), then close()): after close(), 0 other server connections to the case database",
+      "pass": true,
+      "observed": 0
+    },
+    {
+      "check": "item 1: report probe postgres_437 (the #437 PostgreSQL start (starts since 0.1.15), then close()): after close(), the RuntimeStorageContext the attempt built was closed (close() ran once) or is gone",
+      "pass": true,
+      "observed": {
+        "contexts_built": 1,
+        "context_alive": true,
+        "context_close_calls": 1,
+        "close_runtime_components_calls": 1,
+        "sqlite_connection_open": null,
+        "pool_health_emitter_running": false
+      }
+    },
+    {
+      "check": "item 1: report probe postgres_437 (the #437 PostgreSQL start (starts since 0.1.15), then close()): the probe did not need to close anything itself",
+      "pass": true
+    },
+    {
+      "check": "item 4: report probe postgres_runtime_migration (the real runtime migration failure (existing sessions table, MigrationError), PostgreSQL): the caller gets the expected exception type",
+      "pass": true,
+      "observed": "MigrationError: Migration v1 (bootstrap_core_tables) failed: (psycopg.errors.DuplicateTable) relation \"sessions\" already exists"
+    },
+    {
+      "check": "item 4: report probe postgres_runtime_migration (the real runtime migration failure (existing sessions table, MigrationError), PostgreSQL): right after the exception, with gc off and before gc.collect(), no file under the case root is open",
+      "pass": false,
+      "observed": [
+        ".openminion/telemetry/telemetry.db",
+        ".openminion/telemetry/telemetry.db-shm",
+        ".openminion/telemetry/telemetry.db-wal"
+      ]
+    },
+    {
+      "check": "item 4: report probe postgres_runtime_migration (the real runtime migration failure (existing sessions table, MigrationError), PostgreSQL): right after the exception, no runtime-manager or pool-health-emitter thread is alive",
+      "pass": false,
+      "observed": [
+        "storage-pool-health-emitter"
+      ]
+    },
+    {
+      "check": "item 4: report probe postgres_runtime_migration (the real runtime migration failure (existing sessions table, MigrationError), PostgreSQL): right after the exception, 0 other server connections to the case database",
+      "pass": false,
+      "observed": 1
+    },
+    {
+      "check": "item 4: report probe postgres_runtime_migration (the real runtime migration failure (existing sessions table, MigrationError), PostgreSQL): right after the exception, the RuntimeStorageContext the attempt built was closed (close() ran once) or is gone",
+      "pass": true,
+      "observed": {
+        "contexts_built": 0,
+        "context_alive": false,
+        "context_close_calls": 0,
+        "close_runtime_components_calls": 0,
+        "sqlite_connection_open": null,
+        "pool_health_emitter_running": null
+      }
+    },
+    {
+      "check": "item 4: report probe postgres_runtime_migration (the real runtime migration failure (existing sessions table, MigrationError), PostgreSQL): the probe did not need to close anything itself",
+      "pass": false,
+      "observed": [
+        "PoolHealthEmitter.stop() on the leftover emitter thread",
+        "RecordStorePostgres.close() on the record store that emitter held"
+      ]
+    },
+    {
+      "check": "item 3: report probe postgres_storage_closed (control: build_runtime_storage on PostgreSQL with the caller's telemetry service, then close()): the start (or build) succeeds",
+      "pass": true,
+      "observed": "built RecordStorePostgres, migration v15"
+    },
+    {
+      "check": "item 3: report probe postgres_storage_closed (control: build_runtime_storage on PostgreSQL with the caller's telemetry service, then close()): after close(), only the probe's borrowed telemetry database is still open (the storage closed what it owned and left the borrowed telemetry service to its owner)",
+      "pass": true,
+      "observed": [
+        ".openminion/telemetry/telemetry.db",
+        ".openminion/telemetry/telemetry.db-shm",
+        ".openminion/telemetry/telemetry.db-wal"
+      ]
+    },
+    {
+      "check": "item 3: report probe postgres_storage_closed (control: build_runtime_storage on PostgreSQL with the caller's telemetry service, then close()): after close(), no runtime-manager or pool-health-emitter thread is alive",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "item 3: report probe postgres_storage_closed (control: build_runtime_storage on PostgreSQL with the caller's telemetry service, then close()): after close(), 0 other server connections to the case database",
+      "pass": true,
+      "observed": 0
+    },
+    {
+      "check": "item 3: report probe postgres_storage_closed (control: build_runtime_storage on PostgreSQL with the caller's telemetry service, then close()): the probe did not need to close anything itself",
+      "pass": true
+    },
+    {
+      "check": "item 2: report probe sqlite_437_point (an injected failure at the SQLite connection read in the constructor's arguments): the caller gets the expected exception type",
+      "pass": true,
+      "observed": "RuntimeError: runtime record_store does not expose sqlite connection"
+    },
+    {
+      "check": "item 2: report probe sqlite_437_point (an injected failure at the SQLite connection read in the constructor's arguments): right after the exception, with gc off and before gc.collect(), no file under the case root is open",
+      "pass": false,
+      "observed": [
+        ".openminion/artifact/index.db",
+        ".openminion/artifact/index.db-shm",
+        ".openminion/artifact/index.db-wal",
+        ".openminion/authored_tools/store.sqlite",
+        ".openminion/authored_tools/store.sqlite-shm",
+        ".openminion/authored_tools/store.sqlite-wal",
+        ".openminion/ops/evidence.db",
+        ".openminion/ops/jobs.db",
+        ".openminion/ops/plans.db",
+        ".openminion/policy/policy.db",
+        ".openminion/policy/policy.db-shm",
+        ".openminion/policy/policy.db-wal",
+        ".openminion/retrieve/retrieve.db",
+        ".openminion/retrieve/retrieve.db-shm",
+        ".openminion/retrieve/retrieve.db-wal",
+        ".openminion/state.db",
+        ".openminion/state.db-shm",
+        ".openminion/state.db-wal",
+        ".openminion/telemetry/telemetry.db",
+        ".openminion/telemetry/telemetry.db-shm",
+        ".openminion/telemetry/telemetry.db-wal"
+      ]
+    },
+    {
+      "check": "item 2: report probe sqlite_437_point (an injected failure at the SQLite connection read in the constructor's arguments): right after the exception, no runtime-manager or pool-health-emitter thread is alive",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "item 2: report probe sqlite_437_point (an injected failure at the SQLite connection read in the constructor's arguments): right after the exception, the RuntimeStorageContext the attempt built was closed (close() ran once) or is gone",
+      "pass": true,
+      "observed": {
+        "contexts_built": 1,
+        "context_alive": false,
+        "context_close_calls": 0,
+        "close_runtime_components_calls": 0,
+        "sqlite_connection_open": true,
+        "pool_health_emitter_running": null
+      }
+    },
+    {
+      "check": "item 2: report probe sqlite_437_point (an injected failure at the SQLite connection read in the constructor's arguments): the probe did not need to close anything itself",
+      "pass": true
+    },
+    {
+      "check": "item 4: report probe sqlite_memory_provider (the unsupported-memory-provider start failure (ConfigError), SQLite): the caller gets the expected exception type",
+      "pass": true,
+      "observed": "ConfigError: Unsupported runtime.memory_provider='not-a-provider'. Supported providers: memory_v2, memory_v2_smoke (memory_v2_hello_world is a legacy alias)."
+    },
+    {
+      "check": "item 4: report probe sqlite_memory_provider (the unsupported-memory-provider start failure (ConfigError), SQLite): right after the exception, with gc off and before gc.collect(), no file under the case root is open",
+      "pass": false,
+      "observed": [
+        ".openminion/ops/evidence.db",
+        ".openminion/ops/jobs.db",
+        ".openminion/ops/plans.db",
+        ".openminion/policy/policy.db",
+        ".openminion/policy/policy.db-shm",
+        ".openminion/policy/policy.db-wal",
+        ".openminion/retrieve/retrieve.db",
+        ".openminion/retrieve/retrieve.db-shm",
+        ".openminion/retrieve/retrieve.db-wal",
+        ".openminion/state.db",
+        ".openminion/state.db-shm",
+        ".openminion/state.db-wal",
+        ".openminion/telemetry/telemetry.db",
+        ".openminion/telemetry/telemetry.db-shm",
+        ".openminion/telemetry/telemetry.db-wal"
+      ]
+    },
+    {
+      "check": "item 4: report probe sqlite_memory_provider (the unsupported-memory-provider start failure (ConfigError), SQLite): right after the exception, no runtime-manager or pool-health-emitter thread is alive",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "item 4: report probe sqlite_memory_provider (the unsupported-memory-provider start failure (ConfigError), SQLite): right after the exception, the RuntimeStorageContext the attempt built was closed (close() ran once) or is gone",
+      "pass": true,
+      "observed": {
+        "contexts_built": 1,
+        "context_alive": false,
+        "context_close_calls": 0,
+        "close_runtime_components_calls": 0,
+        "sqlite_connection_open": true,
+        "pool_health_emitter_running": null
+      }
+    },
+    {
+      "check": "item 4: report probe sqlite_memory_provider (the unsupported-memory-provider start failure (ConfigError), SQLite): the probe did not need to close anything itself",
+      "pass": true
+    },
+    {
+      "check": "item 1: report probe sqlite_started_then_closed (control: SQLite start, then close()): the start (or build) succeeds",
+      "pass": true,
+      "observed": "started"
+    },
+    {
+      "check": "item 1: report probe sqlite_started_then_closed (control: SQLite start, then close()): after close(), with gc off and before gc.collect(), no file under the case root is open",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "item 1: report probe sqlite_started_then_closed (control: SQLite start, then close()): after close(), no runtime-manager or pool-health-emitter thread is alive",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "item 1: report probe sqlite_started_then_closed (control: SQLite start, then close()): after close(), the RuntimeStorageContext the attempt built was closed (close() ran once) or is gone",
+      "pass": true,
+      "observed": {
+        "contexts_built": 1,
+        "context_alive": true,
+        "context_close_calls": 1,
+        "close_runtime_components_calls": 1,
+        "sqlite_connection_open": false,
+        "pool_health_emitter_running": false
+      }
+    },
+    {
+      "check": "item 1: report probe sqlite_started_then_closed (control: SQLite start, then close()): the probe did not need to close anything itself",
+      "pass": true
+    },
+    {
+      "check": "item 4: report repro (OPENMINION_MEMORY_PROVIDER=not-a-provider, SQLite): the start fails with ConfigError",
+      "pass": true,
+      "observed": "start failed: ConfigError Unsupported runtime.memory_provider='not-a-provider'. Supported providers: memory_v2, memory_v2_smoke (memory_v2_hello_world is a legacy alias)."
+    },
+    {
+      "check": "item 4: report repro: after the exception, before gc.collect(), 0 open files under the root",
+      "pass": false,
+      "observed": "after the exception: 16 open files under the root, databases: ['.openminion/ops/evidence.db', '.openminion/ops/jobs.db', '.openminion/ops/plans.db', '.openminion/policy/policy.db', '.openminion/retrieve/retrieve.db', '.openminion/state.db', '.openminion/state.db', '.openminion/telemetry/telemetry.db']"
+    }
+  ]
+}

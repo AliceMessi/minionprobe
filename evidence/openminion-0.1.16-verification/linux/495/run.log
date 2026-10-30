@@ -1,0 +1,66 @@
+Using Python 3.12.15 environment at: <VENV0115>
+Using Python 3.12.15 environment at: <VENV>
+Using Python 3.12.15 environment at: <VENV>
+provenance: version 0.1.16, on PyPI: 1, wheel sha256 match: 1
+provenance 0.1.15: wheel sha256 match: 1
+=== probe_495_sqlite_0115
+exit=1
+FAIL item 3: [sqlite] T: a selection opens exactly one transaction, which commits, and sends inside it, in order, the session-row lock, the membership read (found) and the active-agent write; it sends
+FAIL item 3: [sqlite] T: that lock statement (`UPDATE sessions SET updated_at = updated_at WHERE id = ?`) is the one the join's and the leave's transactions start with | observed={'selection': [], 'T 
+FAIL item 2: [sqlite] I1 (the selection holds the lock): beta's selection on `first` passed its membership read and is held before its write; beta's leave on `second` waits for it (not finished during
+FAIL item 2: [sqlite] I1: then the selection returns beta and the leave returns True and runs its fallback: agents [alpha], alpha stored and active; the writes are the selection's beta, then the leave
+FAIL item 3: [sqlite] I1: at the hold the selection is inside its transaction, whose first statement is the session-row lock and which holds its membership read and its write | observed={'in_transacti
+FAIL item 4: [sqlite] I1: no committed active agent names a departed participant (read independently: stored alpha is listed, beta has left) | observed={'stored': 'beta', 'agents': ['alpha'], 'left': 
+FAIL item 2: [sqlite] I2: then the leave returns True and the selection is refused (ValueError: Agent 'beta' is not an active participant): agents [alpha], alpha stored and active, no active-agent wri
+FAIL item 3: [sqlite] I2: the selection reads beta's membership only after the leave committed (every membership read sent after the release, finding no row) and sends no active-agent write during the
+FAIL item 4: [sqlite] I2: no committed active agent names a departed participant (read independently: stored alpha is listed, beta has left) | observed={'stored': 'beta', 'agents': ['alpha'], 'left': 
+FAIL item 3: [sqlite] I3: held right after its membership read found beta, the selection is inside its transaction, and beta's leave on `second` waits for it; the leave then applies after the selectio
+FAIL item 4: [sqlite] I3: no committed active agent names a departed participant (read independently) | observed={'stored': 'beta', 'agents': ['alpha'], 'left': [['agent', 'beta', 3]]}
+FAIL item 7: [sqlite] L0: the owner record is written in its own transaction before the selection's transaction, which takes the session-row lock, reads the membership and writes the active agent | ob
+FAIL item 8: [sqlite] J2: a join on `second` waits for a selection held on `first` | observed={'ok': False, 'finished_while_held': True, 'seconds': 0.001, 'call_outstanding_across_release': None, 'pg_
+FAIL item 9: [sqlite] R1 normal path: held right after its write, the selection is still in its transaction and an independent reader still sees alpha; after it returns (commit), beta | observed={'in_
+FAIL item 9: [sqlite] R2 injected failure after the selection's write: the selection raises it, its transaction rolls back, and alpha is still stored (read independently); `first` is not left in a tra
+FAIL item 9: [sqlite] R4: a leave of beta on `second` waits for a selection of beta held on `first` | observed={'ok': False, 'finished_while_held': True, 'seconds': 0.0, 'call_outstanding_across_relea
+FAIL item 4: [sqlite] G unpaused stress (300 rooms, selection of beta on `first` and leave of beta on `second` released together from a barrier, the leave 0-10 ms later): no room stores a departed age
+FAIL item 4: [sqlite] E: across all 319 sessions in the database, no stored active agent is a departed agent or a non-participant (the legacy sessions whose stored agent is the session's own agent, as
+SUMMARY passed=24 failed=18 total=42
+=== probe_495_postgres_0115
+exit=1
+FAIL item 3: [postgres] T: a selection opens exactly one transaction, which commits, and sends inside it, in order, the session-row lock, the membership read (found) and the active-agent write; it sen
+FAIL item 3: [postgres] T: that lock statement (`UPDATE sessions SET updated_at = updated_at WHERE id = ?`) is the one the join's and the leave's transactions start with | observed={'selection': [], '
+FAIL item 2: [postgres] I1 (the selection holds the lock): beta's selection on `first` passed its membership read and is held before its write; beta's leave on `second` waits for it (not finished duri
+FAIL item 2: [postgres] I1: then the selection returns beta and the leave returns True and runs its fallback: agents [alpha], alpha stored and active; the writes are the selection's beta, then the lea
+FAIL item 3: [postgres] I1: at the hold the selection is inside its transaction, whose first statement is the session-row lock and which holds its membership read and its write | observed={'in_transac
+FAIL item 4: [postgres] I1: no committed active agent names a departed participant (read independently: stored alpha is listed, beta has left) | observed={'stored': 'beta', 'agents': ['alpha'], 'left'
+FAIL item 2: [postgres] I2: then the leave returns True and the selection is refused (ValueError: Agent 'beta' is not an active participant): agents [alpha], alpha stored and active, no active-agent w
+FAIL item 3: [postgres] I2: the selection reads beta's membership only after the leave committed (every membership read sent after the release, finding no row) and sends no active-agent write during t
+FAIL item 4: [postgres] I2: no committed active agent names a departed participant (read independently: stored alpha is listed, beta has left) | observed={'stored': 'beta', 'agents': ['alpha'], 'left'
+FAIL item 3: [postgres] I3: held right after its membership read found beta, the selection is inside its transaction, and beta's leave on `second` waits for it (server: blocked on the selection's lock
+FAIL item 4: [postgres] I3: no committed active agent names a departed participant (read independently) | observed={'stored': 'beta', 'agents': ['alpha'], 'left': [['agent', 'beta', 3]]}
+FAIL item 7: [postgres] L0: the owner record is written in its own transaction before the selection's transaction, which takes the session-row lock, reads the membership and writes the active agent | 
+FAIL item 8: [postgres] J2: a join on `second` waits for a selection held on `first` (server: blocked on the selection's lock) | observed={'ok': False, 'finished_while_held': True, 'seconds': 0.005, '
+FAIL item 9: [postgres] R1 normal path: held right after its write, the selection is still in its transaction and an independent reader still sees alpha; after it returns (commit), beta | observed={'i
+FAIL item 9: [postgres] R2 injected failure after the selection's write: the selection raises it, its transaction rolls back, and alpha is still stored (read independently); `first` is not left in a t
+FAIL item 9: [postgres] R4: a leave of beta on `second` waits for a selection of beta held on `first` (server: blocked on the selection's lock) | observed={'ok': False, 'finished_while_held': True, 's
+FAIL item 4: [postgres] G unpaused stress (300 rooms, selection of beta on `first` and leave of beta on `second` released together from a barrier, the leave 0-10 ms later): no room stores a departed a
+FAIL item 4: [postgres] E: across all 319 sessions in the database, no stored active agent is a departed agent or a non-participant (the legacy sessions whose stored agent is the session's own agent, 
+SUMMARY passed=24 failed=18 total=42
+=== probe_495_sqlite
+exit=0
+SUMMARY passed=42 failed=0 total=42
+=== probe_495_postgres
+exit=0
+SUMMARY passed=42 failed=0 total=42
+empty dir after: 0 entries
+openminion[postgres]==0.1.16
+Name: openminion
+Version: 0.1.16
+Location: <VENV>/lib/python3.12/site-packages
+Requires: aiosqlite, alembic, cryptography, httpx, jsonschema, platformdirs, prompt-toolkit, psutil, pydantic, pyyaml, rich, send2trash, sophiagraph, typer, tzdata
+Required-by:
+Linux runnervm48cm3 7.0.0-1017-azure #17~24.04.1-Ubuntu SMP PREEMPT Thu Sep 24 18:46:57 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+PRETTY_NAME="Ubuntu 24.04.5 LTS"
+VERSION_ID="24.04"
+python 3.12.15 sqlite 3.45.1
+PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+<VENV>/lib/python3.12/site-packages/openminion/__init__.py 0.1.16

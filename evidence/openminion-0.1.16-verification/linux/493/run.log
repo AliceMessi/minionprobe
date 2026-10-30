@@ -1,0 +1,87 @@
+Using Python 3.12.15 environment at: <VENV0115>
+Using Python 3.12.15 environment at: <VENV>
+Using Python 3.12.15 environment at: <VENV>
+provenance: version 0.1.16, on PyPI: 1, wheel sha256 match: 1
+provenance 0.1.15: wheel sha256 match: 1
+=== probe_493_sqlite
+exit=0
+SUMMARY passed=30 failed=0 total=30
+=== probe_493_postgres
+exit=0
+SUMMARY passed=48 failed=0 total=48
+=== probe_493_sqlite_0115
+exit=1
+FAIL item 1: `storage migrate --sqlite <new file> --module compress --json` exits 0 with the compress entry ok | observed={'exit': 1, 'entries': [{'module_id': 'compress', 'status': 'error', 'success': False, 'error': 'Alembic configuration
+FAIL item 1: the compress tables exist, and only they (with alembic_version and sqlite_sequence) | observed=[]
+FAIL item 1: each compress table has the baseline's columns and types | observed={'compression_runs': [], 'dropped_reasons': [], 'compression_failures': [], 'om_meta': []}
+FAIL item 1: dropped_reasons.run_id references compression_runs.run_id
+FAIL item 1: alembic_version is 0001_baseline
+FAIL item 1: module metadata (om_meta) names compress at 0001_baseline, with last_migrated_at | observed={}
+FAIL item 1: PRAGMA application_id is compress's module id (MODULE_APPLICATION_IDS['compress']) | observed='0x0'
+FAIL item 1: `--plan` after the migration shows compress at 0001_baseline, not pending | observed={'exit': 0, 'entries': [{'module_id': 'compress', 'status': 'plan', 'current_revision': None, 'head': 'head', 'pending': True}]}
+FAIL item 1: rerun (--json) exits 0 with the compress entry ok | observed={'exit': 1, 'entries': [{'module_id': 'compress', 'status': 'error', 'success': False, 'error': 'Alembic configuration missing. Provide alembic_ini_path or alembic_sc
+FAIL item 1: rerun in text mode exits 0 and prints `ok  compress` | observed={'exit': 1, 'stdout': 'FAIL  compress: Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.'}
+FAIL item 1: after both reruns alembic_version is still 0001_baseline
+FAIL item 1: after both reruns om_meta still names compress at 0001_baseline | observed={'before': {}, 'after': {}}
+FAIL item 1: the rows the probe inserted before the reruns are kept (1 compression_runs, 1 dropped_reasons) | observed={}
+FAIL item 3: discovery resolves compress to openminion/modules/context/compress/storage with its migrations (script location; the wheel ships no alembic.ini there) | observed={'storage_root': None, 'alembic_ini': None, 'script_location': No
+FAIL item 3: every installed `*/storage/migrations/env.py` package is found by discovery for the MODULE_ID it declares | observed={'packages': 17, 'not_found': ['compress']}
+FAIL item 3: only the module ids with no migrations package (storage, brain) have no script location | observed=['brain', 'compress', 'storage']
+FAIL item 3: compress's own run_migrations(<new file>) returns, twice | observed=['RuntimeError: Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.', 'RuntimeError: Alembic configuration missing. Provide ale
+FAIL item 3: after run_migrations the file has the compress tables, 0001_baseline, om_meta module_id compress, application_id 0x4f4d000e and user_version TARGET_USER_VERSION | observed={'tables': [], 'alembic_version': None, 'om_meta': None
+FAIL item 3: the second run_migrations leaves the schema and revision unchanged | observed={'first': '4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945', 'second': '4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202
+FAIL item 3: no module (each alone on a new SQLite file, the 17 with a migrations package) reports `Alembic configuration missing` | observed=['compress']
+SUMMARY passed=10 failed=20 total=30
+=== probe_493_postgres_0115
+exit=1
+FAIL item 2 [public schema of a new database]: `storage migrate --backend postgres --postgres-url <url> --module compress --json` exits 0 with the compress entry ok | observed={'exit': 1, 'entries': [{'module_id': 'compress', 'status': 'err
+FAIL item 2 [public schema of a new database]: the migration wrote only to the public schema (tables per schema) | observed={}
+FAIL item 2 [public schema of a new database]: the compress tables exist, and only they (with alembic_version) | observed=[]
+FAIL item 2 [public schema of a new database]: each compress table has the baseline's columns and types | observed={'compression_runs': [], 'dropped_reasons': [], 'compression_failures': [], 'om_meta': []}
+FAIL item 2 [public schema of a new database]: dropped_reasons.id is an identity column (GENERATED ALWAYS), as the PostgreSQL DDL declares | observed={}
+FAIL item 2 [public schema of a new database]: dropped_reasons.run_id references compression_runs.run_id | observed=[]
+FAIL item 2 [public schema of a new database]: alembic_version is 0001_baseline
+FAIL item 2 [public schema of a new database]: module metadata (om_meta) names compress at 0001_baseline, with last_migrated_at | observed={}
+FAIL item 2 [public schema of a new database]: `--plan` after the migration shows compress at 0001_baseline | observed={'exit': 0, 'entries': [{'module_id': 'compress', 'status': 'plan', 'current_revision': None, 'head': 'head', 'pending': 
+FAIL item 2 [public schema of a new database]: rerun (--json) exits 0 with the compress entry ok | observed={'exit': 1, 'entries': [{'module_id': 'compress', 'status': 'error', 'success': False, 'error': 'Alembic configuration missing. Prov
+FAIL item 2 [public schema of a new database]: rerun in text mode exits 0 and prints `ok  compress` | observed={'exit': 1, 'stdout': 'FAIL  compress: Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.'}
+FAIL item 2 [public schema of a new database]: after both reruns alembic_version is still 0001_baseline
+FAIL item 2 [public schema of a new database]: after both reruns om_meta still names compress at 0001_baseline | observed={'before': {}, 'after': {}}
+FAIL item 2 [public schema of a new database]: the rows the probe inserted before the reruns are kept (1 compression_runs, 1 dropped_reasons) | observed={}
+FAIL item 2 [public schema of a new database]: after the reruns the database still holds only the public schema's 5 tables | observed={}
+FAIL item 2 [om_compress schema of a new database]: `storage migrate --backend postgres --postgres-url <url> --module compress --json` exits 0 with the compress entry ok | observed={'exit': 1, 'entries': [{'module_id': 'compress', 'status':
+FAIL item 2 [om_compress schema of a new database]: the migration wrote only to the om_compress schema (tables per schema) | observed={}
+FAIL item 2 [om_compress schema of a new database]: the compress tables exist, and only they (with alembic_version) | observed=[]
+FAIL item 2 [om_compress schema of a new database]: each compress table has the baseline's columns and types | observed={'compression_runs': [], 'dropped_reasons': [], 'compression_failures': [], 'om_meta': []}
+FAIL item 2 [om_compress schema of a new database]: dropped_reasons.id is an identity column (GENERATED ALWAYS), as the PostgreSQL DDL declares | observed={}
+FAIL item 2 [om_compress schema of a new database]: dropped_reasons.run_id references compression_runs.run_id | observed=[]
+FAIL item 2 [om_compress schema of a new database]: alembic_version is 0001_baseline
+FAIL item 2 [om_compress schema of a new database]: module metadata (om_meta) names compress at 0001_baseline, with last_migrated_at | observed={}
+FAIL item 2 [om_compress schema of a new database]: `--plan` after the migration shows compress at 0001_baseline | observed={'exit': 0, 'entries': [{'module_id': 'compress', 'status': 'plan', 'current_revision': None, 'head': 'head', 'pendi
+FAIL item 2 [om_compress schema of a new database]: rerun (--json) exits 0 with the compress entry ok | observed={'exit': 1, 'entries': [{'module_id': 'compress', 'status': 'error', 'success': False, 'error': 'Alembic configuration missing.
+FAIL item 2 [om_compress schema of a new database]: rerun in text mode exits 0 and prints `ok  compress` | observed={'exit': 1, 'stdout': 'FAIL  compress: Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.'}
+FAIL item 2 [om_compress schema of a new database]: after both reruns alembic_version is still 0001_baseline
+FAIL item 2 [om_compress schema of a new database]: after both reruns om_meta still names compress at 0001_baseline | observed={'before': {}, 'after': {}}
+FAIL item 2 [om_compress schema of a new database]: the rows the probe inserted before the reruns are kept (1 compression_runs, 1 dropped_reasons) | observed={}
+FAIL item 2 [om_compress schema of a new database]: after the reruns the database still holds only the om_compress schema's 5 tables | observed={}
+FAIL item 3: discovery resolves compress to openminion/modules/context/compress/storage with its migrations (script location; the wheel ships no alembic.ini there) | observed={'storage_root': None, 'alembic_ini': None, 'script_location': No
+FAIL item 3: every installed `*/storage/migrations/env.py` package is found by discovery for the MODULE_ID it declares | observed={'packages': 17, 'not_found': ['compress']}
+FAIL item 3: only the module ids with no migrations package (storage, brain) have no script location | observed=['brain', 'compress', 'storage']
+FAIL item 3: compress's own run_migrations(<new file>) returns, twice | observed=['RuntimeError: Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.', 'RuntimeError: Alembic configuration missing. Provide ale
+FAIL item 3: after run_migrations the file has the compress tables, 0001_baseline, om_meta module_id compress, application_id 0x4f4d000e and user_version TARGET_USER_VERSION | observed={'tables': [], 'alembic_version': None, 'om_meta': None
+FAIL item 3: the second run_migrations leaves the schema and revision unchanged | observed={'first': '4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945', 'second': '4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202
+FAIL item 3: no PostgreSQL-validated module (each alone on a new database) reports `Alembic configuration missing` | observed=['compress']
+SUMMARY passed=11 failed=37 total=48
+empty dir after: 0 entries
+openminion[postgres]==0.1.16
+Name: openminion
+Version: 0.1.16
+Location: <VENV>/lib/python3.12/site-packages
+Requires: aiosqlite, alembic, cryptography, httpx, jsonschema, platformdirs, prompt-toolkit, psutil, pydantic, pyyaml, rich, send2trash, sophiagraph, typer, tzdata
+Required-by:
+Linux runnervm48cm3 7.0.0-1017-azure #17~24.04.1-Ubuntu SMP PREEMPT Thu Sep 24 18:46:57 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+PRETTY_NAME="Ubuntu 24.04.5 LTS"
+VERSION_ID="24.04"
+python 3.12.15 sqlite 3.45.1
+PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+<VENV>/lib/python3.12/site-packages/openminion/__init__.py 0.1.16

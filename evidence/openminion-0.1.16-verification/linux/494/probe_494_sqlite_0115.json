@@ -1,0 +1,1817 @@
+{
+  "banner": {
+    "probe": "probe_494",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.15",
+    "python": "3.12.15",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<RUNNER_TEMP>/empty",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "backend": "sqlite",
+    "console_script": "<VENV>/bin/openminion",
+    "console_script_exists": true,
+    "previous_console_script": null,
+    "previous_console_script_exists": null
+  },
+  "summary": {
+    "passed": 9,
+    "failed": 4,
+    "total": 13
+  },
+  "checks": [
+    {
+      "check": "setup: the installed `openminion` console script exists next to this interpreter",
+      "pass": true,
+      "observed": "<VENV>/bin/openminion"
+    },
+    {
+      "check": "item 4 (controlplane): `openminion storage migrate --sqlite <new file> --module controlplane` exits 0 and reaches 0002_index_audit",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "entry": {
+          "module_id": "controlplane",
+          "status": "ok",
+          "success": true
+        },
+        "alembic_version": [
+          "0002_index_audit"
+        ],
+        "application_id": 1330446344,
+        "user_version": 0
+      }
+    },
+    {
+      "check": "item 4 (controlplane): SQLite keeps its own DDL: AUTOINCREMENT ids",
+      "pass": true,
+      "observed": {
+        "autoincrement": {
+          "cp_inbound_messages": true,
+          "cp_outbound_messages": true,
+          "cp_pair_attempts": true
+        },
+        "events_sql": null
+      }
+    },
+    {
+      "check": "item 4 (controlplane): a second migrate exits 0 and changes nothing (sqlite_master, alembic_version, application_id, user_version)",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "sqlite_master_sha256": [
+          "8bce56c106a1494ab7e39de79a93ee6bc4f3086ec246a5772d185da30957d5c7",
+          "8bce56c106a1494ab7e39de79a93ee6bc4f3086ec246a5772d185da30957d5c7"
+        ]
+      }
+    },
+    {
+      "check": "item 4 (telemetry): `openminion storage migrate --sqlite <new file> --module telemetry` exits 0 and reaches 0003_debug_query_indexes",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "entry": {
+          "module_id": "telemetry",
+          "status": "ok",
+          "success": true
+        },
+        "alembic_version": [
+          "0003_debug_query_indexes"
+        ],
+        "application_id": 1330446343,
+        "user_version": 0
+      }
+    },
+    {
+      "check": "item 4 (telemetry): SQLite keeps its own DDL: AUTOINCREMENT ids and `timestamp REAL NOT NULL`",
+      "pass": true,
+      "observed": {
+        "autoincrement": {
+          "events": true
+        },
+        "events_sql": "CREATE TABLE events (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        session_id TEXT NOT NULL,\n        turn_id TEXT NOT NULL,\n        event_type TEXT NOT NULL,\n        timestamp REAL NOT NULL,\n        data TEXT NOT NULL\n    , \"schema_version\" TEXT, \"event_id\" TEXT, \"trace_key\" TEXT, \"invocation_id\" TEXT, \"execution_id\" TEXT, \"agent_id\" TEXT, \"mode\" TEXT)"
+      }
+    },
+    {
+      "check": "item 4 (telemetry): a second migrate exits 0 and changes nothing (sqlite_master, alembic_version, application_id, user_version)",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "sqlite_master_sha256": [
+          "2d0cc0c391d81a1eaf3e81893acf9efeb3eccd11e0e61c63eb9a1dfb57af2c15",
+          "2d0cc0c391d81a1eaf3e81893acf9efeb3eccd11e0e61c63eb9a1dfb57af2c15"
+        ]
+      }
+    },
+    {
+      "check": "item 4 (controlplane, file made by `openminion storage migrate`): SQLiteControlPlaneStore opens it without `duplicate column name: next_attempt_at` and round-trips (ids 1, 2)",
+      "pass": false,
+      "observed": {
+        "baseline_made": true,
+        "error": "OperationalError: duplicate column name: next_attempt_at",
+        "result": null
+      }
+    },
+    {
+      "check": "item 4 (controlplane, file made by `openminion storage migrate`): the store records every store migration, cp_inbox.next_attempt_at exists once, sqlite_master and alembic_version unchanged",
+      "pass": false,
+      "observed": {
+        "cp_migrations": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "next_attempt_at_columns": 1,
+        "sqlite_master_unchanged": true,
+        "alembic_version": [
+          "0002_index_audit"
+        ]
+      }
+    },
+    {
+      "check": "item 4 (controlplane, file made by the module's own `run_migrations`): SQLiteControlPlaneStore opens it without `duplicate column name: next_attempt_at` and round-trips (ids 1, 2)",
+      "pass": false,
+      "observed": {
+        "baseline_made": true,
+        "error": "OperationalError: duplicate column name: next_attempt_at",
+        "result": null
+      }
+    },
+    {
+      "check": "item 4 (controlplane, file made by the module's own `run_migrations`): the store records every store migration, cp_inbox.next_attempt_at exists once, sqlite_master and alembic_version unchanged",
+      "pass": false,
+      "observed": {
+        "cp_migrations": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "next_attempt_at_columns": 1,
+        "sqlite_master_unchanged": true,
+        "alembic_version": [
+          "0002_index_audit"
+        ]
+      }
+    },
+    {
+      "check": "item 4 (controlplane, unchanged behavior): an older store file without cp_inbox.next_attempt_at still gets the column when the store opens it",
+      "pass": true,
+      "observed": {
+        "before": 0,
+        "after": 1,
+        "error": null,
+        "cp_migrations": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    },
+    {
+      "check": "item 4 (telemetry): SQLiteTelemetryStore on the file the baseline created writes and reads ids 1, 2 with the exact timestamps",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "error": null,
+        "rows": [
+          [
+            1,
+            1761650000.123456,
+            true
+          ],
+          [
+            2,
+            1761650001.654321,
+            true
+          ]
+        ]
+      }
+    }
+  ],
+  "cli_runs": [
+    {
+      "n": 1,
+      "label": "item 4 controlplane: new file",
+      "release": "installed",
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "<RUNNER_TEMP>/work/probe_494_sqlite_0115/sqlite/controlplane-new.db",
+        "--module",
+        "controlplane",
+        "--json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"controlplane\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr_tail": "",
+      "stderr_has_traceback": false,
+      "seconds": 0.79,
+      "entries": [
+        {
+          "module_id": "controlplane",
+          "status": "ok",
+          "success": true
+        }
+      ]
+    },
+    {
+      "n": 2,
+      "label": "item 4 controlplane: rerun",
+      "release": "installed",
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "<RUNNER_TEMP>/work/probe_494_sqlite_0115/sqlite/controlplane-new.db",
+        "--module",
+        "controlplane",
+        "--json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"controlplane\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr_tail": "",
+      "stderr_has_traceback": false,
+      "seconds": 0.71,
+      "entries": [
+        {
+          "module_id": "controlplane",
+          "status": "ok",
+          "success": true
+        }
+      ]
+    },
+    {
+      "n": 3,
+      "label": "item 4 telemetry: new file",
+      "release": "installed",
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "<RUNNER_TEMP>/work/probe_494_sqlite_0115/sqlite/telemetry-new.db",
+        "--module",
+        "telemetry",
+        "--json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"telemetry\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr_tail": "",
+      "stderr_has_traceback": false,
+      "seconds": 0.68,
+      "entries": [
+        {
+          "module_id": "telemetry",
+          "status": "ok",
+          "success": true
+        }
+      ]
+    },
+    {
+      "n": 4,
+      "label": "item 4 telemetry: rerun",
+      "release": "installed",
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "<RUNNER_TEMP>/work/probe_494_sqlite_0115/sqlite/telemetry-new.db",
+        "--module",
+        "telemetry",
+        "--json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"telemetry\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr_tail": "",
+      "stderr_has_traceback": false,
+      "seconds": 0.64,
+      "entries": [
+        {
+          "module_id": "telemetry",
+          "status": "ok",
+          "success": true
+        }
+      ]
+    },
+    {
+      "n": 5,
+      "label": "item 4 controlplane: baseline file for the store",
+      "release": "installed",
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "<RUNNER_TEMP>/work/probe_494_sqlite_0115/sqlite/controlplane-baseline-cli.db",
+        "--module",
+        "controlplane",
+        "--json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"controlplane\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr_tail": "",
+      "stderr_has_traceback": false,
+      "seconds": 0.78,
+      "entries": [
+        {
+          "module_id": "controlplane",
+          "status": "ok",
+          "success": true
+        }
+      ]
+    },
+    {
+      "n": 6,
+      "label": "item 4 telemetry: baseline file for the store",
+      "release": "installed",
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "<RUNNER_TEMP>/work/probe_494_sqlite_0115/sqlite/telemetry-baseline-store.db",
+        "--module",
+        "telemetry",
+        "--json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"telemetry\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr_tail": "",
+      "stderr_has_traceback": false,
+      "seconds": 0.64,
+      "entries": [
+        {
+          "module_id": "telemetry",
+          "status": "ok",
+          "success": true
+        }
+      ]
+    }
+  ],
+  "cases": {
+    "history_installed": {
+      "controlplane": {
+        "revisions": [
+          [
+            "0002_index_audit",
+            "0001_baseline"
+          ],
+          [
+            "0001_baseline",
+            null
+          ]
+        ],
+        "head": "0002_index_audit",
+        "version_files": [
+          "0001_baseline.py",
+          "0002_index_audit.py"
+        ],
+        "sqlite_ddl_statements": 44,
+        "sqlite_ddl_sha256": "9f152bc88c993ad6cb59df3fc5007b4b7ed5646d0b69ceb8841307990615c613",
+        "sqlite_ddl_autoincrement_ids": 3,
+        "sqlite_ddl_real_timestamp": 0,
+        "has_POSTGRES_DDL": false,
+        "store_migrations_sha256": "85503bbdad030fc6649caff75f28b4300f2c6681e05c93bbb00aa5242aa78baf",
+        "store_migrations": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      "telemetry": {
+        "revisions": [
+          [
+            "0003_debug_query_indexes",
+            "0002_event_v2"
+          ],
+          [
+            "0002_event_v2",
+            "0001_baseline"
+          ],
+          [
+            "0001_baseline",
+            null
+          ]
+        ],
+        "head": "0003_debug_query_indexes",
+        "version_files": [
+          "0001_baseline.py",
+          "0002_event_v2.py",
+          "0003_debug_query_indexes.py"
+        ],
+        "sqlite_ddl_statements": 4,
+        "sqlite_ddl_sha256": "8cff07f7dab6a62ac81fe7d2b4ae305412cde18f947ee3645d51c8cfa67f27f6",
+        "sqlite_ddl_autoincrement_ids": 1,
+        "sqlite_ddl_real_timestamp": 1,
+        "has_POSTGRES_DDL": false
+      }
+    },
+    "sqlite_controlplane_new": {
+      "sqlite_master": [
+        [
+          "index",
+          "idx_cp_audit_chat_ts",
+          "cp_audit_events",
+          "CREATE INDEX idx_cp_audit_chat_ts ON cp_audit_events(chat_key, timestamp)"
+        ],
+        [
+          "index",
+          "idx_cp_audit_session_ts",
+          "cp_audit_events",
+          "CREATE INDEX idx_cp_audit_session_ts ON cp_audit_events(session_id, timestamp)"
+        ],
+        [
+          "index",
+          "idx_cp_audit_trace_ts",
+          "cp_audit_events",
+          "CREATE INDEX idx_cp_audit_trace_ts ON cp_audit_events(trace_id, timestamp)"
+        ],
+        [
+          "index",
+          "idx_cp_audit_type_ts",
+          "cp_audit_events",
+          "CREATE INDEX idx_cp_audit_type_ts ON cp_audit_events(event_type, timestamp)"
+        ],
+        [
+          "index",
+          "idx_cp_channel_subjects_channel_status",
+          "cp_channel_subjects",
+          "CREATE INDEX idx_cp_channel_subjects_channel_status ON cp_channel_subjects(channel, status)"
+        ],
+        [
+          "index",
+          "idx_cp_channel_subjects_principal",
+          "cp_channel_subjects",
+          "CREATE INDEX idx_cp_channel_subjects_principal ON cp_channel_subjects(principal_id, channel)"
+        ],
+        [
+          "index",
+          "idx_cp_channel_subjects_status",
+          "cp_channel_subjects",
+          "CREATE INDEX idx_cp_channel_subjects_status ON cp_channel_subjects(status, channel)"
+        ],
+        [
+          "index",
+          "idx_cp_chat_bindings_session",
+          "cp_chat_bindings",
+          "CREATE INDEX idx_cp_chat_bindings_session ON cp_chat_bindings(session_id, updated_at)"
+        ],
+        [
+          "index",
+          "idx_cp_inbound_chat_ts",
+          "cp_inbound_messages",
+          "CREATE INDEX idx_cp_inbound_chat_ts ON cp_inbound_messages(chat_key, timestamp, id)"
+        ],
+        [
+          "index",
+          "idx_cp_inbound_msg_id",
+          "cp_inbound_messages",
+          "CREATE INDEX idx_cp_inbound_msg_id ON cp_inbound_messages(message_id)"
+        ],
+        [
+          "index",
+          "idx_cp_inbound_session_ts",
+          "cp_inbound_messages",
+          "CREATE INDEX idx_cp_inbound_session_ts ON cp_inbound_messages(session_id, timestamp, id)"
+        ],
+        [
+          "index",
+          "idx_cp_inbox_channel_chat",
+          "cp_inbox",
+          "CREATE INDEX idx_cp_inbox_channel_chat ON cp_inbox(channel, chat_id)"
+        ],
+        [
+          "index",
+          "idx_cp_inbox_status_locked",
+          "cp_inbox",
+          "CREATE INDEX idx_cp_inbox_status_locked ON cp_inbox(status, locked_at)"
+        ],
+        [
+          "index",
+          "idx_cp_inbox_status_next",
+          "cp_inbox",
+          "CREATE INDEX idx_cp_inbox_status_next ON cp_inbox(status, next_attempt_at, received_at)"
+        ],
+        [
+          "index",
+          "idx_cp_inbox_status_received",
+          "cp_inbox",
+          "CREATE INDEX idx_cp_inbox_status_received ON cp_inbox(status, received_at)"
+        ],
+        [
+          "index",
+          "idx_cp_outbound_chat_ts",
+          "cp_outbound_messages",
+          "CREATE INDEX idx_cp_outbound_chat_ts ON cp_outbound_messages(chat_key, timestamp, id)"
+        ],
+        [
+          "index",
+          "idx_cp_outbound_session_ts",
+          "cp_outbound_messages",
+          "CREATE INDEX idx_cp_outbound_session_ts ON cp_outbound_messages(session_id, timestamp, id)"
+        ],
+        [
+          "index",
+          "idx_cp_outbox_channel_chat",
+          "cp_outbox",
+          "CREATE INDEX idx_cp_outbox_channel_chat ON cp_outbox(channel, chat_id)"
+        ],
+        [
+          "index",
+          "idx_cp_outbox_status_locked",
+          "cp_outbox",
+          "CREATE INDEX idx_cp_outbox_status_locked ON cp_outbox(status, locked_at)"
+        ],
+        [
+          "index",
+          "idx_cp_outbox_status_next",
+          "cp_outbox",
+          "CREATE INDEX idx_cp_outbox_status_next ON cp_outbox(status, next_attempt_at)"
+        ],
+        [
+          "index",
+          "idx_cp_pair_attempts_channel_account_time",
+          "cp_pair_attempts",
+          "CREATE INDEX idx_cp_pair_attempts_channel_account_time\n    ON cp_pair_attempts(channel, account_id, attempted_at_ts)"
+        ],
+        [
+          "index",
+          "idx_cp_pair_attempts_channel_chat_time",
+          "cp_pair_attempts",
+          "CREATE INDEX idx_cp_pair_attempts_channel_chat_time\n    ON cp_pair_attempts(channel, chat_key, attempted_at_ts)"
+        ],
+        [
+          "index",
+          "idx_cp_pair_tokens_channel_expected",
+          "cp_pair_tokens",
+          "CREATE INDEX idx_cp_pair_tokens_channel_expected\n    ON cp_pair_tokens(channel, expected_account_id, expected_chat_key)"
+        ],
+        [
+          "index",
+          "idx_cp_pair_tokens_expiry",
+          "cp_pair_tokens",
+          "CREATE INDEX idx_cp_pair_tokens_expiry\n    ON cp_pair_tokens(expires_at_ts)"
+        ],
+        [
+          "index",
+          "idx_cp_pairings_status_channel",
+          "cp_pairings",
+          "CREATE INDEX idx_cp_pairings_status_channel ON cp_pairings(status, channel)"
+        ],
+        [
+          "index",
+          "idx_cp_pending_clarify_updated",
+          "cp_pending_clarify",
+          "CREATE INDEX idx_cp_pending_clarify_updated ON cp_pending_clarify(updated_at)"
+        ],
+        [
+          "index",
+          "idx_cp_rate_limits_lookup",
+          "cp_rate_limits",
+          "CREATE INDEX idx_cp_rate_limits_lookup ON cp_rate_limits(key_type, key_id, window_start DESC)"
+        ],
+        [
+          "index",
+          "idx_cp_session_agents_agent",
+          "cp_session_agents",
+          "CREATE INDEX idx_cp_session_agents_agent ON cp_session_agents(agent_id, updated_at)"
+        ],
+        [
+          "index",
+          "idx_cp_sessions_user_chat",
+          "cp_sessions",
+          "CREATE INDEX idx_cp_sessions_user_chat ON cp_sessions(user_key, chat_key, updated_at)"
+        ],
+        [
+          "index",
+          "idx_cp_users_role",
+          "cp_users",
+          "CREATE INDEX idx_cp_users_role ON cp_users(role, updated_at)"
+        ],
+        [
+          "index",
+          "sqlite_autoindex_alembic_version_1",
+          "alembic_version",
+          null
+        ],
+        [
+          "index",
+          "sqlite_autoindex_cp_audit_events_1",
+          "cp_audit_events",
+          null
+        ],
+        [
+          "index",
+          "sqlite_autoindex_cp_channel_subjects_1",
+          "cp_channel_subjects",
+          null
+        ],
+        [
+          "index",
+          "sqlite_autoindex_cp_chat_bindings_1",
+          "cp_chat_bindings",
+          null
+        ],
+        [
+          "index",
+          "sqlite_autoindex_cp_inbox_1",
+          "cp_inbox",
+          null
+        ],
+        [
+          "index",
+          "sqlite_autoindex_cp_inbox_2",
+          "cp_inbox",
+          null
+        ],
+        [
+          "index",
+          "sqlite_autoindex_cp_outbox_1",
+          "cp_outbox",
+          null
+        ],
+        [
+          "index",
+          "sqlite_autoindex_cp_pair_tokens_1",
+          "cp_pair_tokens",
+          null
+        ],
+        [
+          "index",
+          "sqlite_autoindex_cp_pairings_1",
+          "cp_pairings",
+          null
+        ],
+        [
+          "index",
+          "sqlite_autoindex_cp_pairings_2",
+          "cp_pairings",
+          null
+        ],
+        [
+          "index",
+          "sqlite_autoindex_cp_pending_clarify_1",
+          "cp_pending_clarify",
+          null
+        ],
+        [
+          "index",
+          "sqlite_autoindex_cp_principals_1",
+          "cp_principals",
+          null
+        ],
+        [
+          "index",
+          "sqlite_autoindex_cp_rate_limits_1",
+          "cp_rate_limits",
+          null
+        ],
+        [
+          "index",
+          "sqlite_autoindex_cp_session_agents_1",
+          "cp_session_agents",
+          null
+        ],
+        [
+          "index",
+          "sqlite_autoindex_cp_sessions_1",
+          "cp_sessions",
+          null
+        ],
+        [
+          "index",
+          "sqlite_autoindex_cp_users_1",
+          "cp_users",
+          null
+        ],
+        [
+          "index",
+          "sqlite_autoindex_om_meta_1",
+          "om_meta",
+          null
+        ],
+        [
+          "table",
+          "alembic_version",
+          "alembic_version",
+          "CREATE TABLE alembic_version (\n\tversion_num VARCHAR(32) NOT NULL, \n\tCONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)\n)"
+        ],
+        [
+          "table",
+          "cp_audit_events",
+          "cp_audit_events",
+          "CREATE TABLE cp_audit_events (\n        event_id TEXT PRIMARY KEY,\n        timestamp TEXT NOT NULL,\n        event_type TEXT NOT NULL,\n        severity TEXT NOT NULL,\n        outcome TEXT NOT NULL,\n        chat_key TEXT,\n        user_key TEXT,\n        session_id TEXT,\n        agent_id TEXT,\n        trace_id TEXT NOT NULL,\n        span_id TEXT,\n        details_json TEXT NOT NULL,\n        error_json TEXT\n    )"
+        ],
+        [
+          "table",
+          "cp_channel_subjects",
+          "cp_channel_subjects",
+          "CREATE TABLE cp_channel_subjects (\n        principal_id TEXT NOT NULL,\n        channel TEXT NOT NULL,\n        subject_id TEXT NOT NULL,\n        status TEXT NOT NULL,\n        scopes_json TEXT,\n        note TEXT,\n        created_at TEXT NOT NULL,\n        last_seen_at TEXT NOT NULL,\n        meta_json TEXT NOT NULL DEFAULT '{}',\n        UNIQUE(channel, subject_id),\n        FOREIGN KEY(principal_id) REFERENCES cp_principals(principal_id) ON DELETE CASCADE\n    )"
+        ],
+        [
+          "table",
+          "cp_chat_bindings",
+          "cp_chat_bindings",
+          "CREATE TABLE cp_chat_bindings (\n        chat_key TEXT PRIMARY KEY,\n        session_id TEXT NOT NULL,\n        active_agent_id TEXT,\n        updated_at TEXT NOT NULL\n    )"
+        ],
+        [
+          "table",
+          "cp_inbound_messages",
+          "cp_inbound_messages",
+          "CREATE TABLE cp_inbound_messages (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        message_id TEXT NOT NULL,\n        chat_key TEXT NOT NULL,\n        user_key TEXT NOT NULL,\n        session_id TEXT,\n        agent_id TEXT,\n        timestamp TEXT NOT NULL,\n        text TEXT,\n        payload_json TEXT NOT NULL\n    )"
+        ],
+        [
+          "table",
+          "cp_inbox",
+          "cp_inbox",
+          "CREATE TABLE cp_inbox (\n        inbox_id TEXT PRIMARY KEY,\n        channel TEXT NOT NULL,\n        chat_id TEXT NOT NULL,\n        channel_message_id TEXT NOT NULL,\n        user_id TEXT NOT NULL,\n        thread_id TEXT,\n        received_at TEXT NOT NULL,\n        payload_json TEXT NOT NULL,\n        status TEXT NOT NULL,\n        error TEXT,\n        attempts INTEGER NOT NULL DEFAULT 0,\n        next_attempt_at TEXT NOT NULL DEFAULT '1970-01-01T00:00:00+00:00',\n        locked_at TEXT,\n        lock_owner TEXT,\n        UNIQUE(channel, chat_id, channel_message_id)\n    )"
+        ],
+        [
+          "table",
+          "cp_migrations",
+          "cp_migrations",
+          "CREATE TABLE cp_migrations (\n        version INTEGER PRIMARY KEY,\n        name TEXT NOT NULL,\n        applied_at TEXT NOT NULL\n    )"
+        ],
+        [
+          "table",
+          "cp_outbound_messages",
+          "cp_outbound_messages",
+          "CREATE TABLE cp_outbound_messages (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        chat_key TEXT NOT NULL,\n        session_id TEXT,\n        agent_id TEXT,\n        timestamp TEXT NOT NULL,\n        text TEXT,\n        payload_json TEXT NOT NULL\n    )"
+        ],
+        [
+          "table",
+          "cp_outbox",
+          "cp_outbox",
+          "CREATE TABLE cp_outbox (\n        outbox_id TEXT PRIMARY KEY,\n        channel TEXT NOT NULL,\n        chat_id TEXT NOT NULL,\n        thread_id TEXT,\n        reply_to TEXT,\n        payload_json TEXT NOT NULL,\n        status TEXT NOT NULL,\n        created_at TEXT NOT NULL,\n        next_attempt_at TEXT NOT NULL,\n        attempts INTEGER NOT NULL DEFAULT 0,\n        last_error TEXT,\n        lock_owner TEXT,\n        locked_at TEXT\n    )"
+        ],
+        [
+          "table",
+          "cp_pair_attempts",
+          "cp_pair_attempts",
+          "CREATE TABLE cp_pair_attempts (\n    id INTEGER PRIMARY KEY AUTOINCREMENT,\n    channel TEXT NOT NULL,\n    account_id TEXT NOT NULL,\n    chat_key TEXT,\n    attempted_at_ts INTEGER NOT NULL,\n    token_hash_prefix TEXT NOT NULL,\n    outcome TEXT NOT NULL,\n    detail_json TEXT NOT NULL DEFAULT '{}'\n)"
+        ],
+        [
+          "table",
+          "cp_pair_tokens",
+          "cp_pair_tokens",
+          "CREATE TABLE cp_pair_tokens (\n    token_hash TEXT PRIMARY KEY,\n    channel TEXT NOT NULL,\n    token_hint TEXT NOT NULL,\n    created_at_ts INTEGER NOT NULL,\n    expires_at_ts INTEGER NOT NULL,\n    used_at_ts INTEGER,\n    expected_account_id TEXT,\n    expected_chat_key TEXT,\n    consumer_account_id TEXT,\n    consumer_chat_key TEXT,\n    scopes_json TEXT NOT NULL\n)"
+        ],
+        [
+          "table",
+          "cp_pairings",
+          "cp_pairings",
+          "CREATE TABLE cp_pairings (\n        pairing_id TEXT PRIMARY KEY,\n        channel TEXT NOT NULL,\n        chat_id TEXT NOT NULL,\n        user_id TEXT NOT NULL,\n        session_id TEXT NOT NULL,\n        created_at TEXT NOT NULL,\n        last_seen_at TEXT NOT NULL,\n        status TEXT NOT NULL,\n        scopes_json TEXT,\n        note TEXT,\n        UNIQUE(channel, chat_id)\n    )"
+        ],
+        [
+          "table",
+          "cp_pending_clarify",
+          "cp_pending_clarify",
+          "CREATE TABLE cp_pending_clarify (\n        session_id TEXT PRIMARY KEY,\n        payload_json TEXT NOT NULL,\n        updated_at TEXT NOT NULL\n    )"
+        ],
+        [
+          "table",
+          "cp_principals",
+          "cp_principals",
+          "CREATE TABLE cp_principals (\n        principal_id TEXT PRIMARY KEY,\n        created_at TEXT NOT NULL,\n        updated_at TEXT NOT NULL,\n        meta_json TEXT NOT NULL DEFAULT '{}'\n    )"
+        ],
+        [
+          "table",
+          "cp_rate_limits",
+          "cp_rate_limits",
+          "CREATE TABLE cp_rate_limits (\n        key_type TEXT NOT NULL,\n        key_id TEXT NOT NULL,\n        window_start INTEGER NOT NULL,\n        count INTEGER NOT NULL DEFAULT 0,\n        updated_at TEXT NOT NULL,\n        PRIMARY KEY(key_type, key_id, window_start)\n    )"
+        ],
+        [
+          "table",
+          "cp_session_agents",
+          "cp_session_agents",
+          "CREATE TABLE cp_session_agents (\n        session_id TEXT PRIMARY KEY,\n        agent_id TEXT NOT NULL,\n        updated_at TEXT NOT NULL\n    )"
+        ],
+        [
+          "table",
+          "cp_sessions",
+          "cp_sessions",
+          "CREATE TABLE cp_sessions (\n        session_id TEXT PRIMARY KEY,\n        user_key TEXT,\n        chat_key TEXT,\n        title TEXT,\n        created_at TEXT NOT NULL,\n        updated_at TEXT NOT NULL\n    )"
+        ],
+        [
+          "table",
+          "cp_users",
+          "cp_users",
+          "CREATE TABLE cp_users (\n        user_key TEXT PRIMARY KEY,\n        role TEXT NOT NULL,\n        display_name TEXT,\n        profile_meta_json TEXT NOT NULL DEFAULT '{}',\n        created_at TEXT NOT NULL,\n        updated_at TEXT NOT NULL\n    )"
+        ],
+        [
+          "table",
+          "om_meta",
+          "om_meta",
+          "CREATE TABLE om_meta (\n        key TEXT PRIMARY KEY,\n        value TEXT NOT NULL\n    )"
+        ],
+        [
+          "table",
+          "sqlite_sequence",
+          "sqlite_sequence",
+          "CREATE TABLE sqlite_sequence(name,seq)"
+        ]
+      ],
+      "sqlite_master_sha256": "8bce56c106a1494ab7e39de79a93ee6bc4f3086ec246a5772d185da30957d5c7",
+      "alembic_version": [
+        "0002_index_audit"
+      ],
+      "application_id": 1330446344,
+      "user_version": 0,
+      "om_meta": {
+        "module_id": "controlplane",
+        "schema_head": "0002_index_audit",
+        "last_migrated_at": "2026-10-30T05:01:21+00:00"
+      },
+      "cp_migrations": [],
+      "cp_inbox_next_attempt_at_columns": 1,
+      "rows": {
+        "cp_inbound_messages": []
+      }
+    },
+    "sqlite_telemetry_new": {
+      "sqlite_master": [
+        [
+          "index",
+          "idx_events_event_id",
+          "events",
+          "CREATE UNIQUE INDEX idx_events_event_id ON events (event_id)"
+        ],
+        [
+          "index",
+          "idx_events_execution_time",
+          "events",
+          "CREATE INDEX idx_events_execution_time ON events (execution_id, timestamp)"
+        ],
+        [
+          "index",
+          "idx_events_invocation_time",
+          "events",
+          "CREATE INDEX idx_events_invocation_time ON events (invocation_id, timestamp)"
+        ],
+        [
+          "index",
+          "idx_events_invocation_time_id",
+          "events",
+          "CREATE INDEX idx_events_invocation_time_id ON events (invocation_id, timestamp, id)"
+        ],
+        [
+          "index",
+          "idx_events_session_turn_invocation_id",
+          "events",
+          "CREATE INDEX idx_events_session_turn_invocation_id ON events (session_id, turn_id, invocation_id, id)"
+        ],
+        [
+          "index",
+          "idx_events_type_time_invocation_id",
+          "events",
+          "CREATE INDEX idx_events_type_time_invocation_id ON events (event_type, timestamp, invocation_id, id)"
+        ],
+        [
+          "index",
+          "idx_session",
+          "events",
+          "CREATE INDEX idx_session ON events(session_id)"
+        ],
+        [
+          "index",
+          "idx_turn",
+          "events",
+          "CREATE INDEX idx_turn ON events(session_id, turn_id)"
+        ],
+        [
+          "index",
+          "sqlite_autoindex_alembic_version_1",
+          "alembic_version",
+          null
+        ],
+        [
+          "index",
+          "sqlite_autoindex_om_meta_1",
+          "om_meta",
+          null
+        ],
+        [
+          "table",
+          "alembic_version",
+          "alembic_version",
+          "CREATE TABLE alembic_version (\n\tversion_num VARCHAR(32) NOT NULL, \n\tCONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)\n)"
+        ],
+        [
+          "table",
+          "events",
+          "events",
+          "CREATE TABLE events (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        session_id TEXT NOT NULL,\n        turn_id TEXT NOT NULL,\n        event_type TEXT NOT NULL,\n        timestamp REAL NOT NULL,\n        data TEXT NOT NULL\n    , \"schema_version\" TEXT, \"event_id\" TEXT, \"trace_key\" TEXT, \"invocation_id\" TEXT, \"execution_id\" TEXT, \"agent_id\" TEXT, \"mode\" TEXT)"
+        ],
+        [
+          "table",
+          "om_meta",
+          "om_meta",
+          "CREATE TABLE om_meta (\n        key TEXT PRIMARY KEY,\n        value TEXT NOT NULL\n    )"
+        ],
+        [
+          "table",
+          "sqlite_sequence",
+          "sqlite_sequence",
+          "CREATE TABLE sqlite_sequence(name,seq)"
+        ]
+      ],
+      "sqlite_master_sha256": "2d0cc0c391d81a1eaf3e81893acf9efeb3eccd11e0e61c63eb9a1dfb57af2c15",
+      "alembic_version": [
+        "0003_debug_query_indexes"
+      ],
+      "application_id": 1330446343,
+      "user_version": 0,
+      "om_meta": {
+        "module_id": "telemetry",
+        "schema_head": "0003_debug_query_indexes",
+        "last_migrated_at": "2026-10-30T05:01:22+00:00"
+      },
+      "cp_migrations": null,
+      "cp_inbox_next_attempt_at_columns": null,
+      "rows": {
+        "events": []
+      }
+    },
+    "sqlite_controlplane_store_on_baseline_cli": {
+      "result": null,
+      "error": "OperationalError: duplicate column name: next_attempt_at",
+      "after": {
+        "sqlite_master": [
+          [
+            "index",
+            "idx_cp_audit_chat_ts",
+            "cp_audit_events",
+            "CREATE INDEX idx_cp_audit_chat_ts ON cp_audit_events(chat_key, timestamp)"
+          ],
+          [
+            "index",
+            "idx_cp_audit_session_ts",
+            "cp_audit_events",
+            "CREATE INDEX idx_cp_audit_session_ts ON cp_audit_events(session_id, timestamp)"
+          ],
+          [
+            "index",
+            "idx_cp_audit_trace_ts",
+            "cp_audit_events",
+            "CREATE INDEX idx_cp_audit_trace_ts ON cp_audit_events(trace_id, timestamp)"
+          ],
+          [
+            "index",
+            "idx_cp_audit_type_ts",
+            "cp_audit_events",
+            "CREATE INDEX idx_cp_audit_type_ts ON cp_audit_events(event_type, timestamp)"
+          ],
+          [
+            "index",
+            "idx_cp_channel_subjects_channel_status",
+            "cp_channel_subjects",
+            "CREATE INDEX idx_cp_channel_subjects_channel_status ON cp_channel_subjects(channel, status)"
+          ],
+          [
+            "index",
+            "idx_cp_channel_subjects_principal",
+            "cp_channel_subjects",
+            "CREATE INDEX idx_cp_channel_subjects_principal ON cp_channel_subjects(principal_id, channel)"
+          ],
+          [
+            "index",
+            "idx_cp_channel_subjects_status",
+            "cp_channel_subjects",
+            "CREATE INDEX idx_cp_channel_subjects_status ON cp_channel_subjects(status, channel)"
+          ],
+          [
+            "index",
+            "idx_cp_chat_bindings_session",
+            "cp_chat_bindings",
+            "CREATE INDEX idx_cp_chat_bindings_session ON cp_chat_bindings(session_id, updated_at)"
+          ],
+          [
+            "index",
+            "idx_cp_inbound_chat_ts",
+            "cp_inbound_messages",
+            "CREATE INDEX idx_cp_inbound_chat_ts ON cp_inbound_messages(chat_key, timestamp, id)"
+          ],
+          [
+            "index",
+            "idx_cp_inbound_msg_id",
+            "cp_inbound_messages",
+            "CREATE INDEX idx_cp_inbound_msg_id ON cp_inbound_messages(message_id)"
+          ],
+          [
+            "index",
+            "idx_cp_inbound_session_ts",
+            "cp_inbound_messages",
+            "CREATE INDEX idx_cp_inbound_session_ts ON cp_inbound_messages(session_id, timestamp, id)"
+          ],
+          [
+            "index",
+            "idx_cp_inbox_channel_chat",
+            "cp_inbox",
+            "CREATE INDEX idx_cp_inbox_channel_chat ON cp_inbox(channel, chat_id)"
+          ],
+          [
+            "index",
+            "idx_cp_inbox_status_locked",
+            "cp_inbox",
+            "CREATE INDEX idx_cp_inbox_status_locked ON cp_inbox(status, locked_at)"
+          ],
+          [
+            "index",
+            "idx_cp_inbox_status_next",
+            "cp_inbox",
+            "CREATE INDEX idx_cp_inbox_status_next ON cp_inbox(status, next_attempt_at, received_at)"
+          ],
+          [
+            "index",
+            "idx_cp_inbox_status_received",
+            "cp_inbox",
+            "CREATE INDEX idx_cp_inbox_status_received ON cp_inbox(status, received_at)"
+          ],
+          [
+            "index",
+            "idx_cp_outbound_chat_ts",
+            "cp_outbound_messages",
+            "CREATE INDEX idx_cp_outbound_chat_ts ON cp_outbound_messages(chat_key, timestamp, id)"
+          ],
+          [
+            "index",
+            "idx_cp_outbound_session_ts",
+            "cp_outbound_messages",
+            "CREATE INDEX idx_cp_outbound_session_ts ON cp_outbound_messages(session_id, timestamp, id)"
+          ],
+          [
+            "index",
+            "idx_cp_outbox_channel_chat",
+            "cp_outbox",
+            "CREATE INDEX idx_cp_outbox_channel_chat ON cp_outbox(channel, chat_id)"
+          ],
+          [
+            "index",
+            "idx_cp_outbox_status_locked",
+            "cp_outbox",
+            "CREATE INDEX idx_cp_outbox_status_locked ON cp_outbox(status, locked_at)"
+          ],
+          [
+            "index",
+            "idx_cp_outbox_status_next",
+            "cp_outbox",
+            "CREATE INDEX idx_cp_outbox_status_next ON cp_outbox(status, next_attempt_at)"
+          ],
+          [
+            "index",
+            "idx_cp_pair_attempts_channel_account_time",
+            "cp_pair_attempts",
+            "CREATE INDEX idx_cp_pair_attempts_channel_account_time\n    ON cp_pair_attempts(channel, account_id, attempted_at_ts)"
+          ],
+          [
+            "index",
+            "idx_cp_pair_attempts_channel_chat_time",
+            "cp_pair_attempts",
+            "CREATE INDEX idx_cp_pair_attempts_channel_chat_time\n    ON cp_pair_attempts(channel, chat_key, attempted_at_ts)"
+          ],
+          [
+            "index",
+            "idx_cp_pair_tokens_channel_expected",
+            "cp_pair_tokens",
+            "CREATE INDEX idx_cp_pair_tokens_channel_expected\n    ON cp_pair_tokens(channel, expected_account_id, expected_chat_key)"
+          ],
+          [
+            "index",
+            "idx_cp_pair_tokens_expiry",
+            "cp_pair_tokens",
+            "CREATE INDEX idx_cp_pair_tokens_expiry\n    ON cp_pair_tokens(expires_at_ts)"
+          ],
+          [
+            "index",
+            "idx_cp_pairings_status_channel",
+            "cp_pairings",
+            "CREATE INDEX idx_cp_pairings_status_channel ON cp_pairings(status, channel)"
+          ],
+          [
+            "index",
+            "idx_cp_pending_clarify_updated",
+            "cp_pending_clarify",
+            "CREATE INDEX idx_cp_pending_clarify_updated ON cp_pending_clarify(updated_at)"
+          ],
+          [
+            "index",
+            "idx_cp_rate_limits_lookup",
+            "cp_rate_limits",
+            "CREATE INDEX idx_cp_rate_limits_lookup ON cp_rate_limits(key_type, key_id, window_start DESC)"
+          ],
+          [
+            "index",
+            "idx_cp_session_agents_agent",
+            "cp_session_agents",
+            "CREATE INDEX idx_cp_session_agents_agent ON cp_session_agents(agent_id, updated_at)"
+          ],
+          [
+            "index",
+            "idx_cp_sessions_user_chat",
+            "cp_sessions",
+            "CREATE INDEX idx_cp_sessions_user_chat ON cp_sessions(user_key, chat_key, updated_at)"
+          ],
+          [
+            "index",
+            "idx_cp_users_role",
+            "cp_users",
+            "CREATE INDEX idx_cp_users_role ON cp_users(role, updated_at)"
+          ],
+          [
+            "index",
+            "sqlite_autoindex_alembic_version_1",
+            "alembic_version",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_audit_events_1",
+            "cp_audit_events",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_channel_subjects_1",
+            "cp_channel_subjects",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_chat_bindings_1",
+            "cp_chat_bindings",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_inbox_1",
+            "cp_inbox",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_inbox_2",
+            "cp_inbox",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_outbox_1",
+            "cp_outbox",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_pair_tokens_1",
+            "cp_pair_tokens",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_pairings_1",
+            "cp_pairings",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_pairings_2",
+            "cp_pairings",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_pending_clarify_1",
+            "cp_pending_clarify",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_principals_1",
+            "cp_principals",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_rate_limits_1",
+            "cp_rate_limits",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_session_agents_1",
+            "cp_session_agents",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_sessions_1",
+            "cp_sessions",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_users_1",
+            "cp_users",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_om_meta_1",
+            "om_meta",
+            null
+          ],
+          [
+            "table",
+            "alembic_version",
+            "alembic_version",
+            "CREATE TABLE alembic_version (\n\tversion_num VARCHAR(32) NOT NULL, \n\tCONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)\n)"
+          ],
+          [
+            "table",
+            "cp_audit_events",
+            "cp_audit_events",
+            "CREATE TABLE cp_audit_events (\n        event_id TEXT PRIMARY KEY,\n        timestamp TEXT NOT NULL,\n        event_type TEXT NOT NULL,\n        severity TEXT NOT NULL,\n        outcome TEXT NOT NULL,\n        chat_key TEXT,\n        user_key TEXT,\n        session_id TEXT,\n        agent_id TEXT,\n        trace_id TEXT NOT NULL,\n        span_id TEXT,\n        details_json TEXT NOT NULL,\n        error_json TEXT\n    )"
+          ],
+          [
+            "table",
+            "cp_channel_subjects",
+            "cp_channel_subjects",
+            "CREATE TABLE cp_channel_subjects (\n        principal_id TEXT NOT NULL,\n        channel TEXT NOT NULL,\n        subject_id TEXT NOT NULL,\n        status TEXT NOT NULL,\n        scopes_json TEXT,\n        note TEXT,\n        created_at TEXT NOT NULL,\n        last_seen_at TEXT NOT NULL,\n        meta_json TEXT NOT NULL DEFAULT '{}',\n        UNIQUE(channel, subject_id),\n        FOREIGN KEY(principal_id) REFERENCES cp_principals(principal_id) ON DELETE CASCADE\n    )"
+          ],
+          [
+            "table",
+            "cp_chat_bindings",
+            "cp_chat_bindings",
+            "CREATE TABLE cp_chat_bindings (\n        chat_key TEXT PRIMARY KEY,\n        session_id TEXT NOT NULL,\n        active_agent_id TEXT,\n        updated_at TEXT NOT NULL\n    )"
+          ],
+          [
+            "table",
+            "cp_inbound_messages",
+            "cp_inbound_messages",
+            "CREATE TABLE cp_inbound_messages (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        message_id TEXT NOT NULL,\n        chat_key TEXT NOT NULL,\n        user_key TEXT NOT NULL,\n        session_id TEXT,\n        agent_id TEXT,\n        timestamp TEXT NOT NULL,\n        text TEXT,\n        payload_json TEXT NOT NULL\n    )"
+          ],
+          [
+            "table",
+            "cp_inbox",
+            "cp_inbox",
+            "CREATE TABLE cp_inbox (\n        inbox_id TEXT PRIMARY KEY,\n        channel TEXT NOT NULL,\n        chat_id TEXT NOT NULL,\n        channel_message_id TEXT NOT NULL,\n        user_id TEXT NOT NULL,\n        thread_id TEXT,\n        received_at TEXT NOT NULL,\n        payload_json TEXT NOT NULL,\n        status TEXT NOT NULL,\n        error TEXT,\n        attempts INTEGER NOT NULL DEFAULT 0,\n        next_attempt_at TEXT NOT NULL DEFAULT '1970-01-01T00:00:00+00:00',\n        locked_at TEXT,\n        lock_owner TEXT,\n        UNIQUE(channel, chat_id, channel_message_id)\n    )"
+          ],
+          [
+            "table",
+            "cp_migrations",
+            "cp_migrations",
+            "CREATE TABLE cp_migrations (\n        version INTEGER PRIMARY KEY,\n        name TEXT NOT NULL,\n        applied_at TEXT NOT NULL\n    )"
+          ],
+          [
+            "table",
+            "cp_outbound_messages",
+            "cp_outbound_messages",
+            "CREATE TABLE cp_outbound_messages (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        chat_key TEXT NOT NULL,\n        session_id TEXT,\n        agent_id TEXT,\n        timestamp TEXT NOT NULL,\n        text TEXT,\n        payload_json TEXT NOT NULL\n    )"
+          ],
+          [
+            "table",
+            "cp_outbox",
+            "cp_outbox",
+            "CREATE TABLE cp_outbox (\n        outbox_id TEXT PRIMARY KEY,\n        channel TEXT NOT NULL,\n        chat_id TEXT NOT NULL,\n        thread_id TEXT,\n        reply_to TEXT,\n        payload_json TEXT NOT NULL,\n        status TEXT NOT NULL,\n        created_at TEXT NOT NULL,\n        next_attempt_at TEXT NOT NULL,\n        attempts INTEGER NOT NULL DEFAULT 0,\n        last_error TEXT,\n        lock_owner TEXT,\n        locked_at TEXT\n    )"
+          ],
+          [
+            "table",
+            "cp_pair_attempts",
+            "cp_pair_attempts",
+            "CREATE TABLE cp_pair_attempts (\n    id INTEGER PRIMARY KEY AUTOINCREMENT,\n    channel TEXT NOT NULL,\n    account_id TEXT NOT NULL,\n    chat_key TEXT,\n    attempted_at_ts INTEGER NOT NULL,\n    token_hash_prefix TEXT NOT NULL,\n    outcome TEXT NOT NULL,\n    detail_json TEXT NOT NULL DEFAULT '{}'\n)"
+          ],
+          [
+            "table",
+            "cp_pair_tokens",
+            "cp_pair_tokens",
+            "CREATE TABLE cp_pair_tokens (\n    token_hash TEXT PRIMARY KEY,\n    channel TEXT NOT NULL,\n    token_hint TEXT NOT NULL,\n    created_at_ts INTEGER NOT NULL,\n    expires_at_ts INTEGER NOT NULL,\n    used_at_ts INTEGER,\n    expected_account_id TEXT,\n    expected_chat_key TEXT,\n    consumer_account_id TEXT,\n    consumer_chat_key TEXT,\n    scopes_json TEXT NOT NULL\n)"
+          ],
+          [
+            "table",
+            "cp_pairings",
+            "cp_pairings",
+            "CREATE TABLE cp_pairings (\n        pairing_id TEXT PRIMARY KEY,\n        channel TEXT NOT NULL,\n        chat_id TEXT NOT NULL,\n        user_id TEXT NOT NULL,\n        session_id TEXT NOT NULL,\n        created_at TEXT NOT NULL,\n        last_seen_at TEXT NOT NULL,\n        status TEXT NOT NULL,\n        scopes_json TEXT,\n        note TEXT,\n        UNIQUE(channel, chat_id)\n    )"
+          ],
+          [
+            "table",
+            "cp_pending_clarify",
+            "cp_pending_clarify",
+            "CREATE TABLE cp_pending_clarify (\n        session_id TEXT PRIMARY KEY,\n        payload_json TEXT NOT NULL,\n        updated_at TEXT NOT NULL\n    )"
+          ],
+          [
+            "table",
+            "cp_principals",
+            "cp_principals",
+            "CREATE TABLE cp_principals (\n        principal_id TEXT PRIMARY KEY,\n        created_at TEXT NOT NULL,\n        updated_at TEXT NOT NULL,\n        meta_json TEXT NOT NULL DEFAULT '{}'\n    )"
+          ],
+          [
+            "table",
+            "cp_rate_limits",
+            "cp_rate_limits",
+            "CREATE TABLE cp_rate_limits (\n        key_type TEXT NOT NULL,\n        key_id TEXT NOT NULL,\n        window_start INTEGER NOT NULL,\n        count INTEGER NOT NULL DEFAULT 0,\n        updated_at TEXT NOT NULL,\n        PRIMARY KEY(key_type, key_id, window_start)\n    )"
+          ],
+          [
+            "table",
+            "cp_session_agents",
+            "cp_session_agents",
+            "CREATE TABLE cp_session_agents (\n        session_id TEXT PRIMARY KEY,\n        agent_id TEXT NOT NULL,\n        updated_at TEXT NOT NULL\n    )"
+          ],
+          [
+            "table",
+            "cp_sessions",
+            "cp_sessions",
+            "CREATE TABLE cp_sessions (\n        session_id TEXT PRIMARY KEY,\n        user_key TEXT,\n        chat_key TEXT,\n        title TEXT,\n        created_at TEXT NOT NULL,\n        updated_at TEXT NOT NULL\n    )"
+          ],
+          [
+            "table",
+            "cp_users",
+            "cp_users",
+            "CREATE TABLE cp_users (\n        user_key TEXT PRIMARY KEY,\n        role TEXT NOT NULL,\n        display_name TEXT,\n        profile_meta_json TEXT NOT NULL DEFAULT '{}',\n        created_at TEXT NOT NULL,\n        updated_at TEXT NOT NULL\n    )"
+          ],
+          [
+            "table",
+            "om_meta",
+            "om_meta",
+            "CREATE TABLE om_meta (\n        key TEXT PRIMARY KEY,\n        value TEXT NOT NULL\n    )"
+          ],
+          [
+            "table",
+            "sqlite_sequence",
+            "sqlite_sequence",
+            "CREATE TABLE sqlite_sequence(name,seq)"
+          ]
+        ],
+        "sqlite_master_sha256": "8bce56c106a1494ab7e39de79a93ee6bc4f3086ec246a5772d185da30957d5c7",
+        "alembic_version": [
+          "0002_index_audit"
+        ],
+        "application_id": 1330446344,
+        "user_version": 0,
+        "om_meta": {
+          "module_id": "controlplane",
+          "schema_head": "0002_index_audit",
+          "last_migrated_at": "2026-10-30T05:01:23+00:00"
+        },
+        "cp_migrations": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "cp_inbox_next_attempt_at_columns": 1,
+        "rows": {
+          "cp_inbound_messages": []
+        }
+      }
+    },
+    "sqlite_controlplane_store_on_baseline_run_migrations": {
+      "result": null,
+      "error": "OperationalError: duplicate column name: next_attempt_at",
+      "after": {
+        "sqlite_master": [
+          [
+            "index",
+            "idx_cp_audit_chat_ts",
+            "cp_audit_events",
+            "CREATE INDEX idx_cp_audit_chat_ts ON cp_audit_events(chat_key, timestamp)"
+          ],
+          [
+            "index",
+            "idx_cp_audit_session_ts",
+            "cp_audit_events",
+            "CREATE INDEX idx_cp_audit_session_ts ON cp_audit_events(session_id, timestamp)"
+          ],
+          [
+            "index",
+            "idx_cp_audit_trace_ts",
+            "cp_audit_events",
+            "CREATE INDEX idx_cp_audit_trace_ts ON cp_audit_events(trace_id, timestamp)"
+          ],
+          [
+            "index",
+            "idx_cp_audit_type_ts",
+            "cp_audit_events",
+            "CREATE INDEX idx_cp_audit_type_ts ON cp_audit_events(event_type, timestamp)"
+          ],
+          [
+            "index",
+            "idx_cp_channel_subjects_channel_status",
+            "cp_channel_subjects",
+            "CREATE INDEX idx_cp_channel_subjects_channel_status ON cp_channel_subjects(channel, status)"
+          ],
+          [
+            "index",
+            "idx_cp_channel_subjects_principal",
+            "cp_channel_subjects",
+            "CREATE INDEX idx_cp_channel_subjects_principal ON cp_channel_subjects(principal_id, channel)"
+          ],
+          [
+            "index",
+            "idx_cp_channel_subjects_status",
+            "cp_channel_subjects",
+            "CREATE INDEX idx_cp_channel_subjects_status ON cp_channel_subjects(status, channel)"
+          ],
+          [
+            "index",
+            "idx_cp_chat_bindings_session",
+            "cp_chat_bindings",
+            "CREATE INDEX idx_cp_chat_bindings_session ON cp_chat_bindings(session_id, updated_at)"
+          ],
+          [
+            "index",
+            "idx_cp_inbound_chat_ts",
+            "cp_inbound_messages",
+            "CREATE INDEX idx_cp_inbound_chat_ts ON cp_inbound_messages(chat_key, timestamp, id)"
+          ],
+          [
+            "index",
+            "idx_cp_inbound_msg_id",
+            "cp_inbound_messages",
+            "CREATE INDEX idx_cp_inbound_msg_id ON cp_inbound_messages(message_id)"
+          ],
+          [
+            "index",
+            "idx_cp_inbound_session_ts",
+            "cp_inbound_messages",
+            "CREATE INDEX idx_cp_inbound_session_ts ON cp_inbound_messages(session_id, timestamp, id)"
+          ],
+          [
+            "index",
+            "idx_cp_inbox_channel_chat",
+            "cp_inbox",
+            "CREATE INDEX idx_cp_inbox_channel_chat ON cp_inbox(channel, chat_id)"
+          ],
+          [
+            "index",
+            "idx_cp_inbox_status_locked",
+            "cp_inbox",
+            "CREATE INDEX idx_cp_inbox_status_locked ON cp_inbox(status, locked_at)"
+          ],
+          [
+            "index",
+            "idx_cp_inbox_status_next",
+            "cp_inbox",
+            "CREATE INDEX idx_cp_inbox_status_next ON cp_inbox(status, next_attempt_at, received_at)"
+          ],
+          [
+            "index",
+            "idx_cp_inbox_status_received",
+            "cp_inbox",
+            "CREATE INDEX idx_cp_inbox_status_received ON cp_inbox(status, received_at)"
+          ],
+          [
+            "index",
+            "idx_cp_outbound_chat_ts",
+            "cp_outbound_messages",
+            "CREATE INDEX idx_cp_outbound_chat_ts ON cp_outbound_messages(chat_key, timestamp, id)"
+          ],
+          [
+            "index",
+            "idx_cp_outbound_session_ts",
+            "cp_outbound_messages",
+            "CREATE INDEX idx_cp_outbound_session_ts ON cp_outbound_messages(session_id, timestamp, id)"
+          ],
+          [
+            "index",
+            "idx_cp_outbox_channel_chat",
+            "cp_outbox",
+            "CREATE INDEX idx_cp_outbox_channel_chat ON cp_outbox(channel, chat_id)"
+          ],
+          [
+            "index",
+            "idx_cp_outbox_status_locked",
+            "cp_outbox",
+            "CREATE INDEX idx_cp_outbox_status_locked ON cp_outbox(status, locked_at)"
+          ],
+          [
+            "index",
+            "idx_cp_outbox_status_next",
+            "cp_outbox",
+            "CREATE INDEX idx_cp_outbox_status_next ON cp_outbox(status, next_attempt_at)"
+          ],
+          [
+            "index",
+            "idx_cp_pair_attempts_channel_account_time",
+            "cp_pair_attempts",
+            "CREATE INDEX idx_cp_pair_attempts_channel_account_time\n    ON cp_pair_attempts(channel, account_id, attempted_at_ts)"
+          ],
+          [
+            "index",
+            "idx_cp_pair_attempts_channel_chat_time",
+            "cp_pair_attempts",
+            "CREATE INDEX idx_cp_pair_attempts_channel_chat_time\n    ON cp_pair_attempts(channel, chat_key, attempted_at_ts)"
+          ],
+          [
+            "index",
+            "idx_cp_pair_tokens_channel_expected",
+            "cp_pair_tokens",
+            "CREATE INDEX idx_cp_pair_tokens_channel_expected\n    ON cp_pair_tokens(channel, expected_account_id, expected_chat_key)"
+          ],
+          [
+            "index",
+            "idx_cp_pair_tokens_expiry",
+            "cp_pair_tokens",
+            "CREATE INDEX idx_cp_pair_tokens_expiry\n    ON cp_pair_tokens(expires_at_ts)"
+          ],
+          [
+            "index",
+            "idx_cp_pairings_status_channel",
+            "cp_pairings",
+            "CREATE INDEX idx_cp_pairings_status_channel ON cp_pairings(status, channel)"
+          ],
+          [
+            "index",
+            "idx_cp_pending_clarify_updated",
+            "cp_pending_clarify",
+            "CREATE INDEX idx_cp_pending_clarify_updated ON cp_pending_clarify(updated_at)"
+          ],
+          [
+            "index",
+            "idx_cp_rate_limits_lookup",
+            "cp_rate_limits",
+            "CREATE INDEX idx_cp_rate_limits_lookup ON cp_rate_limits(key_type, key_id, window_start DESC)"
+          ],
+          [
+            "index",
+            "idx_cp_session_agents_agent",
+            "cp_session_agents",
+            "CREATE INDEX idx_cp_session_agents_agent ON cp_session_agents(agent_id, updated_at)"
+          ],
+          [
+            "index",
+            "idx_cp_sessions_user_chat",
+            "cp_sessions",
+            "CREATE INDEX idx_cp_sessions_user_chat ON cp_sessions(user_key, chat_key, updated_at)"
+          ],
+          [
+            "index",
+            "idx_cp_users_role",
+            "cp_users",
+            "CREATE INDEX idx_cp_users_role ON cp_users(role, updated_at)"
+          ],
+          [
+            "index",
+            "sqlite_autoindex_alembic_version_1",
+            "alembic_version",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_audit_events_1",
+            "cp_audit_events",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_channel_subjects_1",
+            "cp_channel_subjects",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_chat_bindings_1",
+            "cp_chat_bindings",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_inbox_1",
+            "cp_inbox",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_inbox_2",
+            "cp_inbox",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_outbox_1",
+            "cp_outbox",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_pair_tokens_1",
+            "cp_pair_tokens",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_pairings_1",
+            "cp_pairings",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_pairings_2",
+            "cp_pairings",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_pending_clarify_1",
+            "cp_pending_clarify",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_principals_1",
+            "cp_principals",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_rate_limits_1",
+            "cp_rate_limits",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_session_agents_1",
+            "cp_session_agents",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_sessions_1",
+            "cp_sessions",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_cp_users_1",
+            "cp_users",
+            null
+          ],
+          [
+            "index",
+            "sqlite_autoindex_om_meta_1",
+            "om_meta",
+            null
+          ],
+          [
+            "table",
+            "alembic_version",
+            "alembic_version",
+            "CREATE TABLE alembic_version (\n\tversion_num VARCHAR(32) NOT NULL, \n\tCONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)\n)"
+          ],
+          [
+            "table",
+            "cp_audit_events",
+            "cp_audit_events",
+            "CREATE TABLE cp_audit_events (\n        event_id TEXT PRIMARY KEY,\n        timestamp TEXT NOT NULL,\n        event_type TEXT NOT NULL,\n        severity TEXT NOT NULL,\n        outcome TEXT NOT NULL,\n        chat_key TEXT,\n        user_key TEXT,\n        session_id TEXT,\n        agent_id TEXT,\n        trace_id TEXT NOT NULL,\n        span_id TEXT,\n        details_json TEXT NOT NULL,\n        error_json TEXT\n    )"
+          ],
+          [
+            "table",
+            "cp_channel_subjects",
+            "cp_channel_subjects",
+            "CREATE TABLE cp_channel_subjects (\n        principal_id TEXT NOT NULL,\n        channel TEXT NOT NULL,\n        subject_id TEXT NOT NULL,\n        status TEXT NOT NULL,\n        scopes_json TEXT,\n        note TEXT,\n        created_at TEXT NOT NULL,\n        last_seen_at TEXT NOT NULL,\n        meta_json TEXT NOT NULL DEFAULT '{}',\n        UNIQUE(channel, subject_id),\n        FOREIGN KEY(principal_id) REFERENCES cp_principals(principal_id) ON DELETE CASCADE\n    )"
+          ],
+          [
+            "table",
+            "cp_chat_bindings",
+            "cp_chat_bindings",
+            "CREATE TABLE cp_chat_bindings (\n        chat_key TEXT PRIMARY KEY,\n        session_id TEXT NOT NULL,\n        active_agent_id TEXT,\n        updated_at TEXT NOT NULL\n    )"
+          ],
+          [
+            "table",
+            "cp_inbound_messages",
+            "cp_inbound_messages",
+            "CREATE TABLE cp_inbound_messages (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        message_id TEXT NOT NULL,\n        chat_key TEXT NOT NULL,\n        user_key TEXT NOT NULL,\n        session_id TEXT,\n        agent_id TEXT,\n        timestamp TEXT NOT NULL,\n        text TEXT,\n        payload_json TEXT NOT NULL\n    )"
+          ],
+          [
+            "table",
+            "cp_inbox",
+            "cp_inbox",
+            "CREATE TABLE cp_inbox (\n        inbox_id TEXT PRIMARY KEY,\n        channel TEXT NOT NULL,\n        chat_id TEXT NOT NULL,\n        channel_message_id TEXT NOT NULL,\n        user_id TEXT NOT NULL,\n        thread_id TEXT,\n        received_at TEXT NOT NULL,\n        payload_json TEXT NOT NULL,\n        status TEXT NOT NULL,\n        error TEXT,\n        attempts INTEGER NOT NULL DEFAULT 0,\n        next_attempt_at TEXT NOT NULL DEFAULT '1970-01-01T00:00:00+00:00',\n        locked_at TEXT,\n        lock_owner TEXT,\n        UNIQUE(channel, chat_id, channel_message_id)\n    )"
+          ],
+          [
+            "table",
+            "cp_migrations",
+            "cp_migrations",
+            "CREATE TABLE cp_migrations (\n        version INTEGER PRIMARY KEY,\n        name TEXT NOT NULL,\n        applied_at TEXT NOT NULL\n    )"
+          ],
+          [
+            "table",
+            "cp_outbound_messages",
+            "cp_outbound_messages",
+            "CREATE TABLE cp_outbound_messages (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        chat_key TEXT NOT NULL,\n        session_id TEXT,\n        agent_id TEXT,\n        timestamp TEXT NOT NULL,\n        text TEXT,\n        payload_json TEXT NOT NULL\n    )"
+          ],
+          [
+            "table",
+            "cp_outbox",
+            "cp_outbox",
+            "CREATE TABLE cp_outbox (\n        outbox_id TEXT PRIMARY KEY,\n        channel TEXT NOT NULL,\n        chat_id TEXT NOT NULL,\n        thread_id TEXT,\n        reply_to TEXT,\n        payload_json TEXT NOT NULL,\n        status TEXT NOT NULL,\n        created_at TEXT NOT NULL,\n        next_attempt_at TEXT NOT NULL,\n        attempts INTEGER NOT NULL DEFAULT 0,\n        last_error TEXT,\n        lock_owner TEXT,\n        locked_at TEXT\n    )"
+          ],
+          [
+            "table",
+            "cp_pair_attempts",
+            "cp_pair_attempts",
+            "CREATE TABLE cp_pair_attempts (\n    id INTEGER PRIMARY KEY AUTOINCREMENT,\n    channel TEXT NOT NULL,\n    account_id TEXT NOT NULL,\n    chat_key TEXT,\n    attempted_at_ts INTEGER NOT NULL,\n    token_hash_prefix TEXT NOT NULL,\n    outcome TEXT NOT NULL,\n    detail_json TEXT NOT NULL DEFAULT '{}'\n)"
+          ],
+          [
+            "table",
+            "cp_pair_tokens",
+            "cp_pair_tokens",
+            "CREATE TABLE cp_pair_tokens (\n    token_hash TEXT PRIMARY KEY,\n    channel TEXT NOT NULL,\n    token_hint TEXT NOT NULL,\n    created_at_ts INTEGER NOT NULL,\n    expires_at_ts INTEGER NOT NULL,\n    used_at_ts INTEGER,\n    expected_account_id TEXT,\n    expected_chat_key TEXT,\n    consumer_account_id TEXT,\n    consumer_chat_key TEXT,\n    scopes_json TEXT NOT NULL\n)"
+          ],
+          [
+            "table",
+            "cp_pairings",
+            "cp_pairings",
+            "CREATE TABLE cp_pairings (\n        pairing_id TEXT PRIMARY KEY,\n        channel TEXT NOT NULL,\n        chat_id TEXT NOT NULL,\n        user_id TEXT NOT NULL,\n        session_id TEXT NOT NULL,\n        created_at TEXT NOT NULL,\n        last_seen_at TEXT NOT NULL,\n        status TEXT NOT NULL,\n        scopes_json TEXT,\n        note TEXT,\n        UNIQUE(channel, chat_id)\n    )"
+          ],
+          [
+            "table",
+            "cp_pending_clarify",
+            "cp_pending_clarify",
+            "CREATE TABLE cp_pending_clarify (\n        session_id TEXT PRIMARY KEY,\n        payload_json TEXT NOT NULL,\n        updated_at TEXT NOT NULL\n    )"
+          ],
+          [
+            "table",
+            "cp_principals",
+            "cp_principals",
+            "CREATE TABLE cp_principals (\n        principal_id TEXT PRIMARY KEY,\n        created_at TEXT NOT NULL,\n        updated_at TEXT NOT NULL,\n        meta_json TEXT NOT NULL DEFAULT '{}'\n    )"
+          ],
+          [
+            "table",
+            "cp_rate_limits",
+            "cp_rate_limits",
+            "CREATE TABLE cp_rate_limits (\n        key_type TEXT NOT NULL,\n        key_id TEXT NOT NULL,\n        window_start INTEGER NOT NULL,\n        count INTEGER NOT NULL DEFAULT 0,\n        updated_at TEXT NOT NULL,\n        PRIMARY KEY(key_type, key_id, window_start)\n    )"
+          ],
+          [
+            "table",
+            "cp_session_agents",
+            "cp_session_agents",
+            "CREATE TABLE cp_session_agents (\n        session_id TEXT PRIMARY KEY,\n        agent_id TEXT NOT NULL,\n        updated_at TEXT NOT NULL\n    )"
+          ],
+          [
+            "table",
+            "cp_sessions",
+            "cp_sessions",
+            "CREATE TABLE cp_sessions (\n        session_id TEXT PRIMARY KEY,\n        user_key TEXT,\n        chat_key TEXT,\n        title TEXT,\n        created_at TEXT NOT NULL,\n        updated_at TEXT NOT NULL\n    )"
+          ],
+          [
+            "table",
+            "cp_users",
+            "cp_users",
+            "CREATE TABLE cp_users (\n        user_key TEXT PRIMARY KEY,\n        role TEXT NOT NULL,\n        display_name TEXT,\n        profile_meta_json TEXT NOT NULL DEFAULT '{}',\n        created_at TEXT NOT NULL,\n        updated_at TEXT NOT NULL\n    )"
+          ],
+          [
+            "table",
+            "om_meta",
+            "om_meta",
+            "CREATE TABLE om_meta (\n        key TEXT PRIMARY KEY,\n        value TEXT NOT NULL\n    )"
+          ],
+          [
+            "table",
+            "sqlite_sequence",
+            "sqlite_sequence",
+            "CREATE TABLE sqlite_sequence(name,seq)"
+          ]
+        ],
+        "sqlite_master_sha256": "8bce56c106a1494ab7e39de79a93ee6bc4f3086ec246a5772d185da30957d5c7",
+        "alembic_version": [
+          "0002_index_audit"
+        ],
+        "application_id": 1330446344,
+        "user_version": 0,
+        "om_meta": {
+          "module_id": "controlplane",
+          "schema_head": "0002_index_audit",
+          "last_migrated_at": "2026-10-30T05:01:24+00:00"
+        },
+        "cp_migrations": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "cp_inbox_next_attempt_at_columns": 1,
+        "rows": {
+          "cp_inbound_messages": []
+        }
+      }
+    }
+  }
+}

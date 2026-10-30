@@ -1,0 +1,956 @@
+{
+  "info": {
+    "probe": "probe_493",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.15",
+    "python": "3.12.15",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<RUNNER_TEMP>/empty",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "backend": "sqlite",
+    "cli": "<VENV>/bin/openminion"
+  },
+  "postgres_version": null,
+  "checks": [
+    {
+      "check": "item 1: `--plan` before the migration shows compress pending (no revision)",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "plan",
+            "current_revision": null,
+            "head": "head",
+            "pending": true
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 1: `storage migrate --sqlite <new file> --module compress --json` exits 0 with the compress entry ok",
+      "pass": false,
+      "observed": {
+        "exit": 1,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "error",
+            "success": false,
+            "error": "Alembic configuration missing. Provide alembic_ini_path or alembic_script_location."
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 1: the compress tables exist, and only they (with alembic_version and sqlite_sequence)",
+      "pass": false,
+      "observed": [],
+      "expected": [
+        "alembic_version",
+        "compression_failures",
+        "compression_runs",
+        "dropped_reasons",
+        "om_meta",
+        "sqlite_sequence"
+      ]
+    },
+    {
+      "check": "item 1: each compress table has the baseline's columns and types",
+      "pass": false,
+      "observed": {
+        "compression_runs": [],
+        "dropped_reasons": [],
+        "compression_failures": [],
+        "om_meta": []
+      }
+    },
+    {
+      "check": "item 1: dropped_reasons.run_id references compression_runs.run_id",
+      "pass": false
+    },
+    {
+      "check": "item 1: alembic_version is 0001_baseline",
+      "pass": false
+    },
+    {
+      "check": "item 1: module metadata (om_meta) names compress at 0001_baseline, with last_migrated_at",
+      "pass": false,
+      "observed": {}
+    },
+    {
+      "check": "item 1: PRAGMA application_id is compress's module id (MODULE_APPLICATION_IDS['compress'])",
+      "pass": false,
+      "observed": "0x0",
+      "expected": "0x4f4d000e"
+    },
+    {
+      "check": "item 1: `--plan` after the migration shows compress at 0001_baseline, not pending",
+      "pass": false,
+      "observed": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "plan",
+            "current_revision": null,
+            "head": "head",
+            "pending": true
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 1: `storage verify --sqlite <file> --module compress` passes",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "passed",
+            "report": "VerificationReport(module_id='compress', db_path='<CASE_WORK>/sqlite/compress_cli/compress_cli.db', level='quick', quick_check='ok', integrity_check=None, findings=[], ok=True)"
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 1: rerun (--json) exits 0 with the compress entry ok",
+      "pass": false,
+      "observed": {
+        "exit": 1,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "error",
+            "success": false,
+            "error": "Alembic configuration missing. Provide alembic_ini_path or alembic_script_location."
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 1: rerun in text mode exits 0 and prints `ok  compress`",
+      "pass": false,
+      "observed": {
+        "exit": 1,
+        "stdout": "FAIL  compress: Alembic configuration missing. Provide alembic_ini_path or alembic_script_location."
+      }
+    },
+    {
+      "check": "item 1: after both reruns the schema is unchanged (same objects and columns)",
+      "pass": true,
+      "observed": {
+        "before": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "after": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "tables": []
+      }
+    },
+    {
+      "check": "item 1: after both reruns alembic_version is still 0001_baseline",
+      "pass": false
+    },
+    {
+      "check": "item 1: after both reruns om_meta still names compress at 0001_baseline",
+      "pass": false,
+      "observed": {
+        "before": {},
+        "after": {}
+      }
+    },
+    {
+      "check": "item 1: the rows the probe inserted before the reruns are kept (1 compression_runs, 1 dropped_reasons)",
+      "pass": false,
+      "observed": {}
+    },
+    {
+      "check": "item 3: discovery resolves compress to openminion/modules/context/compress/storage with its migrations (script location; the wheel ships no alembic.ini there)",
+      "pass": false,
+      "observed": {
+        "storage_root": null,
+        "alembic_ini": null,
+        "script_location": null,
+        "nested_module_storage_import_paths": {
+          "authoring": [
+            "openminion.modules.tool.authoring.storage"
+          ],
+          "commerce": [
+            "openminion.tools.commerce.storage"
+          ]
+        },
+        "installed_alembic_py_sha256": "7adbb914e3d0c749f68ad2ea9611c2ef5339a69dc6067033582717c869eedd1a"
+      }
+    },
+    {
+      "check": "item 3: every installed `*/storage/migrations/env.py` package is found by discovery for the MODULE_ID it declares",
+      "pass": false,
+      "observed": {
+        "packages": 17,
+        "not_found": [
+          "compress"
+        ]
+      }
+    },
+    {
+      "check": "item 3: control: every such package other than compress is found by discovery (16 packages)",
+      "pass": true,
+      "observed": {
+        "not_found_other_than_compress": []
+      }
+    },
+    {
+      "check": "item 3: control: ordinary (`openminion.modules.<id>.storage`), nested (authoring, commerce) and channel (controlplane_telegram) modules resolve to their packages",
+      "pass": true,
+      "observed": {
+        "secret": "openminion/modules/secret/storage",
+        "session": "openminion/modules/session/storage",
+        "authoring": "openminion/modules/tool/authoring/storage",
+        "commerce": "openminion/tools/commerce/storage",
+        "controlplane_telegram": "openminion/modules/controlplane/channels/telegram/storage"
+      },
+      "expected": {
+        "secret": "openminion/modules/secret/storage",
+        "session": "openminion/modules/session/storage",
+        "authoring": "openminion/modules/tool/authoring/storage",
+        "commerce": "openminion/tools/commerce/storage",
+        "controlplane_telegram": "openminion/modules/controlplane/channels/telegram/storage"
+      }
+    },
+    {
+      "check": "item 3: only the module ids with no migrations package (storage, brain) have no script location",
+      "pass": false,
+      "observed": [
+        "brain",
+        "compress",
+        "storage"
+      ],
+      "expected": [
+        "brain",
+        "storage"
+      ]
+    },
+    {
+      "check": "item 3: compress's own run_migrations(<new file>) returns, twice",
+      "pass": false,
+      "observed": [
+        "RuntimeError: Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.",
+        "RuntimeError: Alembic configuration missing. Provide alembic_ini_path or alembic_script_location."
+      ]
+    },
+    {
+      "check": "item 3: after run_migrations the file has the compress tables, 0001_baseline, om_meta module_id compress, application_id 0x4f4d000e and user_version TARGET_USER_VERSION",
+      "pass": false,
+      "observed": {
+        "tables": [],
+        "alembic_version": null,
+        "om_meta": null,
+        "application_id": "0x0",
+        "user_version": 0
+      }
+    },
+    {
+      "check": "item 3: the second run_migrations leaves the schema and revision unchanged",
+      "pass": false,
+      "observed": {
+        "first": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "second": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "alembic": null
+      }
+    },
+    {
+      "check": "item 3: compress's list_migrations() and MODULE_ID",
+      "pass": true,
+      "observed": {
+        "list_migrations": [
+          "0001_baseline"
+        ],
+        "MODULE_ID": "compress"
+      }
+    },
+    {
+      "check": "item 3: control: `storage migrate --sqlite <new file> --module secret` exits 0, ok, at its head, with its application_id and om_meta module_id",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "secret",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "application_id": "0x4f4d0006",
+        "om_meta_module_id": "secret"
+      }
+    },
+    {
+      "check": "item 3: control: `storage migrate --sqlite <new file> --module authoring` exits 0, ok, at its head, with its application_id and om_meta module_id",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "authoring",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "application_id": "0x4f4d0010",
+        "om_meta_module_id": "authoring"
+      }
+    },
+    {
+      "check": "item 3: control: `storage migrate --sqlite <new file> --module commerce` exits 0, ok, at its head, with its application_id and om_meta module_id",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "commerce",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0004_action_preparations"
+        ],
+        "application_id": "0x4f4d0012",
+        "om_meta_module_id": "commerce"
+      }
+    },
+    {
+      "check": "item 3: no module (each alone on a new SQLite file, the 17 with a migrations package) reports `Alembic configuration missing`",
+      "pass": false,
+      "observed": [
+        "compress"
+      ]
+    },
+    {
+      "check": "item 3: control: no module other than compress reports `Alembic configuration missing` on SQLite",
+      "pass": true,
+      "observed": []
+    }
+  ],
+  "summary": {
+    "passed": 10,
+    "failed": 20,
+    "total": 30
+  },
+  "cases": {
+    "item 1 failed run": {
+      "file_unchanged": true,
+      "tables_after": [],
+      "application_id_after": "0x0"
+    },
+    "item 1": {
+      "file_before": {
+        "tables": [],
+        "alembic_version": null,
+        "om_meta": null,
+        "columns": {},
+        "foreign_keys": {},
+        "row_counts": {},
+        "application_id": "0x0",
+        "user_version": 0,
+        "schema_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "plan_before": {
+        "argv": "openminion storage migrate --sqlite <CASE_WORK>/sqlite/compress_cli/compress_cli.db --module compress --plan --json",
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "plan",
+            "current_revision": null,
+            "head": "head",
+            "pending": true
+          }
+        ],
+        "stdout_tail": "{\n  \"modules\": [\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"plan\",\n      \"current_revision\": null,\n      \"head\": \"head\",\n      \"pending\": true\n    }\n  ]\n}\n",
+        "stderr_tail": ""
+      },
+      "migrate": {
+        "argv": "openminion storage migrate --sqlite <CASE_WORK>/sqlite/compress_cli/compress_cli.db --module compress --json",
+        "exit": 1,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "error",
+            "success": false,
+            "error": "Alembic configuration missing. Provide alembic_ini_path or alembic_script_location."
+          }
+        ],
+        "stdout_tail": "{\n  \"modules\": [\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.\"\n    }\n  ]\n}\n",
+        "stderr_tail": ""
+      },
+      "after_migrate": {
+        "tables": [],
+        "alembic_version": null,
+        "om_meta": null,
+        "columns": {},
+        "foreign_keys": {},
+        "row_counts": {},
+        "application_id": "0x0",
+        "user_version": 0,
+        "schema_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "plan_after": {
+        "argv": "openminion storage migrate --sqlite <CASE_WORK>/sqlite/compress_cli/compress_cli.db --module compress --plan --json",
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "plan",
+            "current_revision": null,
+            "head": "head",
+            "pending": true
+          }
+        ],
+        "stdout_tail": "{\n  \"modules\": [\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"plan\",\n      \"current_revision\": null,\n      \"head\": \"head\",\n      \"pending\": true\n    }\n  ]\n}\n",
+        "stderr_tail": ""
+      },
+      "verify": {
+        "argv": "openminion storage verify --sqlite <CASE_WORK>/sqlite/compress_cli/compress_cli.db --module compress --json",
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "passed",
+            "report": "VerificationReport(module_id='compress', db_path='<CASE_WORK>/sqlite/compress_cli/compress_cli.db', level='quick', quick_check='ok', integrity_check=None, findings=[], ok=True)"
+          }
+        ],
+        "stdout_tail": "{\n  \"modules\": [\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"passed\",\n      \"report\": \"VerificationReport(module_id='compress', db_path='<CASE_WORK>/sqlite/compress_cli/compress_cli.db', level='quick', quick_check='ok', integrity_check=None, findings=[], ok=True)\"\n    }\n  ]\n}\n",
+        "stderr_tail": ""
+      },
+      "before_rerun": {
+        "tables": [],
+        "alembic_version": null,
+        "om_meta": null,
+        "columns": {},
+        "foreign_keys": {},
+        "row_counts": {},
+        "application_id": "0x0",
+        "user_version": 0,
+        "schema_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "rerun_json": {
+        "argv": "openminion storage migrate --sqlite <CASE_WORK>/sqlite/compress_cli/compress_cli.db --module compress --json",
+        "exit": 1,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "error",
+            "success": false,
+            "error": "Alembic configuration missing. Provide alembic_ini_path or alembic_script_location."
+          }
+        ],
+        "stdout_tail": "{\n  \"modules\": [\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.\"\n    }\n  ]\n}\n",
+        "stderr_tail": ""
+      },
+      "rerun_text": {
+        "argv": "openminion storage migrate --sqlite <CASE_WORK>/sqlite/compress_cli/compress_cli.db --module compress",
+        "exit": 1,
+        "entries": null,
+        "stdout_tail": "  FAIL  compress: Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.\n",
+        "stderr_tail": ""
+      },
+      "after_reruns": {
+        "tables": [],
+        "alembic_version": null,
+        "om_meta": null,
+        "columns": {},
+        "foreign_keys": {},
+        "row_counts": {},
+        "application_id": "0x0",
+        "user_version": 0,
+        "schema_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "files_in_db_dir": [
+        "compress_cli.db",
+        "compress_cli.db.bak",
+        "compress_cli.db.bak/20261030T045625749582Z-0-none.sqlite",
+        "compress_cli.db.bak/20261030T045626564938Z-0-none.sqlite",
+        "compress_cli.db.bak/20261030T045626843178Z-0-none.sqlite"
+      ]
+    },
+    "item 3 discovery": {
+      "by_module": {
+        "storage": {
+          "storage_root": null,
+          "alembic_ini": null,
+          "script_location": null
+        },
+        "session": {
+          "storage_root": "openminion/modules/session/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/session/storage/migrations"
+        },
+        "artifact": {
+          "storage_root": "openminion/modules/artifact/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/artifact/storage/migrations"
+        },
+        "registry": {
+          "storage_root": "openminion/modules/registry/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/registry/storage/migrations"
+        },
+        "identity": {
+          "storage_root": "openminion/modules/identity/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/identity/storage/migrations"
+        },
+        "policy": {
+          "storage_root": "openminion/modules/policy/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/policy/storage/migrations"
+        },
+        "secret": {
+          "storage_root": "openminion/modules/secret/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/secret/storage/migrations"
+        },
+        "telemetry": {
+          "storage_root": "openminion/modules/telemetry/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/telemetry/storage/migrations"
+        },
+        "controlplane": {
+          "storage_root": "openminion/modules/controlplane/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/controlplane/storage/migrations"
+        },
+        "controlplane_telegram": {
+          "storage_root": "openminion/modules/controlplane/channels/telegram/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/controlplane/channels/telegram/storage/migrations"
+        },
+        "retrieve": {
+          "storage_root": "openminion/modules/retrieve/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/retrieve/storage/migrations"
+        },
+        "memory": {
+          "storage_root": "openminion/modules/memory/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/memory/storage/migrations"
+        },
+        "skill": {
+          "storage_root": "openminion/modules/skill/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/skill/storage/migrations"
+        },
+        "a2a": {
+          "storage_root": "openminion/modules/a2a/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/a2a/storage/migrations"
+        },
+        "compress": {
+          "storage_root": null,
+          "alembic_ini": null,
+          "script_location": null
+        },
+        "task": {
+          "storage_root": "openminion/modules/task/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/task/storage/migrations"
+        },
+        "authoring": {
+          "storage_root": "openminion/modules/tool/authoring/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/tool/authoring/storage/migrations"
+        },
+        "brain": {
+          "storage_root": "openminion/modules/brain/storage",
+          "alembic_ini": null,
+          "script_location": null
+        },
+        "commerce": {
+          "storage_root": "openminion/tools/commerce/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/tools/commerce/storage/migrations"
+        }
+      },
+      "packages": [
+        {
+          "package": "openminion.modules.a2a.storage",
+          "module_id": "a2a",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.artifact.storage",
+          "module_id": "artifact",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.context.compress.storage",
+          "module_id": "compress",
+          "discovered": false
+        },
+        {
+          "package": "openminion.modules.controlplane.channels.telegram.storage",
+          "module_id": "controlplane_telegram",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.controlplane.storage",
+          "module_id": "controlplane",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.identity.storage",
+          "module_id": "identity",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.memory.storage",
+          "module_id": "memory",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.policy.storage",
+          "module_id": "policy",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.registry.storage",
+          "module_id": "registry",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.retrieve.storage",
+          "module_id": "retrieve",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.secret.storage",
+          "module_id": "secret",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.session.storage",
+          "module_id": "session",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.skill.storage",
+          "module_id": "skill",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.task.storage",
+          "module_id": "task",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.telemetry.storage",
+          "module_id": "telemetry",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.tool.authoring.storage",
+          "module_id": "authoring",
+          "discovered": true
+        },
+        {
+          "package": "openminion.tools.commerce.storage",
+          "module_id": "commerce",
+          "discovered": true
+        }
+      ]
+    },
+    "item 3 entry point": {
+      "results": [
+        "RuntimeError: Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.",
+        "RuntimeError: Alembic configuration missing. Provide alembic_ini_path or alembic_script_location."
+      ],
+      "after_first": {
+        "tables": [],
+        "alembic_version": null,
+        "om_meta": null,
+        "columns": {},
+        "foreign_keys": {},
+        "row_counts": {},
+        "application_id": "0x0",
+        "user_version": 0,
+        "schema_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "after_second": {
+        "tables": [],
+        "alembic_version": null,
+        "om_meta": null,
+        "columns": {},
+        "foreign_keys": {},
+        "row_counts": {},
+        "application_id": "0x0",
+        "user_version": 0,
+        "schema_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    "item 3 sqlite each module alone": {
+      "a2a": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "a2a",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0005_job_idempotency_scope"
+        ],
+        "application_id": "0x4f4d000d",
+        "om_meta_module_id": "a2a"
+      },
+      "artifact": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "artifact",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "application_id": "0x4f4d0002",
+        "om_meta_module_id": "artifact"
+      },
+      "authoring": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "authoring",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "application_id": "0x4f4d0010",
+        "om_meta_module_id": "authoring"
+      },
+      "commerce": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "commerce",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0004_action_preparations"
+        ],
+        "application_id": "0x4f4d0012",
+        "om_meta_module_id": "commerce"
+      },
+      "compress": {
+        "exit": 1,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "error",
+            "success": false,
+            "error": "Alembic configuration missing. Provide alembic_ini_path or alembic_script_location."
+          }
+        ],
+        "alembic_version": null,
+        "application_id": "0x0",
+        "om_meta_module_id": null
+      },
+      "controlplane": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "controlplane",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0002_index_audit"
+        ],
+        "application_id": "0x4f4d0008",
+        "om_meta_module_id": "controlplane"
+      },
+      "controlplane_telegram": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "controlplane_telegram",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0002_polling_lease_schema"
+        ],
+        "application_id": "0x4f4d0009",
+        "om_meta_module_id": "controlplane_telegram"
+      },
+      "identity": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "identity",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "application_id": "0x4f4d0004",
+        "om_meta_module_id": "identity"
+      },
+      "memory": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "memory",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0004_namespace"
+        ],
+        "application_id": "0x4f4d000b",
+        "om_meta_module_id": "memory"
+      },
+      "policy": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "policy",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0002_blockchain_confirmations"
+        ],
+        "application_id": "0x4f4d0005",
+        "om_meta_module_id": "policy"
+      },
+      "registry": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "registry",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "application_id": "0x4f4d0003",
+        "om_meta_module_id": "registry"
+      },
+      "retrieve": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "retrieve",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0002_index"
+        ],
+        "application_id": "0x4f4d000a",
+        "om_meta_module_id": "retrieve"
+      },
+      "secret": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "secret",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "application_id": "0x4f4d0006",
+        "om_meta_module_id": "secret"
+      },
+      "session": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "session",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0005_cron_scheduler_control"
+        ],
+        "application_id": "0x4f4d0001",
+        "om_meta_module_id": "session"
+      },
+      "skill": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "skill",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0007_workflow_observations"
+        ],
+        "application_id": "0x4f4d000c",
+        "om_meta_module_id": "skill"
+      },
+      "task": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "task",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "application_id": "0x4f4d000f",
+        "om_meta_module_id": "task"
+      },
+      "telemetry": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "telemetry",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0003_debug_query_indexes"
+        ],
+        "application_id": "0x4f4d0007",
+        "om_meta_module_id": "telemetry"
+      }
+    }
+  }
+}

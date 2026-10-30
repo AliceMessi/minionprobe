@@ -1,0 +1,2889 @@
+{
+  "info": {
+    "probe": "probe_493",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.16",
+    "python": "3.12.15",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<WORK>/empty",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "backend": "postgres",
+    "cli": "<VENV>/bin/openminion"
+  },
+  "postgres_version": "PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+  "checks": [
+    {
+      "check": "item 2 [public schema of a new database]: `--plan` before the migration shows compress pending (no revision)",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "plan",
+            "current_revision": null,
+            "head": "head",
+            "pending": true
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 2 [public schema of a new database]: `storage migrate --backend postgres --postgres-url <url> --module compress --json` exits 0 with the compress entry ok",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "ok",
+            "success": true
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 2 [public schema of a new database]: the migration wrote only to the public schema (tables per schema)",
+      "pass": true,
+      "observed": {
+        "public": 5
+      },
+      "expected": {
+        "public": 5
+      }
+    },
+    {
+      "check": "item 2 [public schema of a new database]: the compress tables exist, and only they (with alembic_version)",
+      "pass": true,
+      "observed": [
+        "alembic_version",
+        "compression_failures",
+        "compression_runs",
+        "dropped_reasons",
+        "om_meta"
+      ],
+      "expected": [
+        "alembic_version",
+        "compression_failures",
+        "compression_runs",
+        "dropped_reasons",
+        "om_meta"
+      ]
+    },
+    {
+      "check": "item 2 [public schema of a new database]: each compress table has the baseline's columns and types",
+      "pass": true,
+      "observed": {
+        "compression_runs": [
+          [
+            "run_id",
+            "text"
+          ],
+          [
+            "request_id",
+            "text"
+          ],
+          [
+            "method_id",
+            "text"
+          ],
+          [
+            "input_tokens",
+            "integer"
+          ],
+          [
+            "output_tokens",
+            "integer"
+          ],
+          [
+            "ratio",
+            "double precision"
+          ],
+          [
+            "compression_hash",
+            "text"
+          ],
+          [
+            "empty_augmentation",
+            "integer"
+          ],
+          [
+            "fallback_used",
+            "integer"
+          ],
+          [
+            "policy_hash",
+            "text"
+          ],
+          [
+            "input_hash",
+            "text"
+          ],
+          [
+            "output_hash",
+            "text"
+          ],
+          [
+            "engine_version",
+            "text"
+          ],
+          [
+            "tokenizer_id",
+            "text"
+          ],
+          [
+            "scorer_version",
+            "text"
+          ],
+          [
+            "warnings",
+            "text"
+          ]
+        ],
+        "dropped_reasons": [
+          [
+            "id",
+            "integer"
+          ],
+          [
+            "run_id",
+            "text"
+          ],
+          [
+            "reason",
+            "text"
+          ],
+          [
+            "count",
+            "integer"
+          ]
+        ],
+        "compression_failures": [
+          [
+            "failure_id",
+            "text"
+          ],
+          [
+            "request_id",
+            "text"
+          ],
+          [
+            "error_code",
+            "text"
+          ],
+          [
+            "message",
+            "text"
+          ]
+        ],
+        "om_meta": [
+          [
+            "key",
+            "text"
+          ],
+          [
+            "value",
+            "text"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "item 2 [public schema of a new database]: dropped_reasons.id is an identity column (GENERATED ALWAYS), as the PostgreSQL DDL declares",
+      "pass": true,
+      "observed": {
+        "dropped_reasons.id": "ALWAYS"
+      }
+    },
+    {
+      "check": "item 2 [public schema of a new database]: dropped_reasons.run_id references compression_runs.run_id",
+      "pass": true,
+      "observed": [
+        [
+          "dropped_reasons",
+          "FOREIGN KEY",
+          "run_id",
+          "compression_runs",
+          "run_id"
+        ]
+      ]
+    },
+    {
+      "check": "item 2 [public schema of a new database]: alembic_version is 0001_baseline",
+      "pass": true,
+      "observed": [
+        "0001_baseline"
+      ]
+    },
+    {
+      "check": "item 2 [public schema of a new database]: module metadata (om_meta) names compress at 0001_baseline, with last_migrated_at",
+      "pass": true,
+      "observed": {
+        "module_id": "compress",
+        "schema_head": "0001_baseline",
+        "last_migrated_at": "2026-10-30T04:55:57+00:00"
+      }
+    },
+    {
+      "check": "item 2 [public schema of a new database]: no connection to the database is left after the CLI exits",
+      "pass": true,
+      "observed": 0
+    },
+    {
+      "check": "item 2 [public schema of a new database]: `--plan` after the migration shows compress at 0001_baseline",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "plan",
+            "current_revision": "0001_baseline",
+            "head": "head",
+            "pending": false
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 2 [public schema of a new database]: rerun (--json) exits 0 with the compress entry ok",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "ok",
+            "success": true
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 2 [public schema of a new database]: rerun in text mode exits 0 and prints `ok  compress`",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "stdout": "ok  compress"
+      }
+    },
+    {
+      "check": "item 2 [public schema of a new database]: after both reruns the schema is unchanged (same objects and columns)",
+      "pass": true,
+      "observed": {
+        "before": "7791c526f5fdc114d2800fb15c242ef012907d2336ebcec46fdae1a5f100a290",
+        "after": "7791c526f5fdc114d2800fb15c242ef012907d2336ebcec46fdae1a5f100a290",
+        "tables": [
+          "alembic_version",
+          "compression_failures",
+          "compression_runs",
+          "dropped_reasons",
+          "om_meta"
+        ]
+      }
+    },
+    {
+      "check": "item 2 [public schema of a new database]: after both reruns alembic_version is still 0001_baseline",
+      "pass": true,
+      "observed": [
+        "0001_baseline"
+      ]
+    },
+    {
+      "check": "item 2 [public schema of a new database]: after both reruns om_meta still names compress at 0001_baseline",
+      "pass": true,
+      "observed": {
+        "before": {
+          "module_id": "compress",
+          "schema_head": "0001_baseline",
+          "last_migrated_at": "2026-10-30T04:55:57+00:00"
+        },
+        "after": {
+          "module_id": "compress",
+          "schema_head": "0001_baseline",
+          "last_migrated_at": "2026-10-30T04:56:01+00:00"
+        }
+      }
+    },
+    {
+      "check": "item 2 [public schema of a new database]: the rows the probe inserted before the reruns are kept (1 compression_runs, 1 dropped_reasons)",
+      "pass": true,
+      "observed": {
+        "alembic_version": 1,
+        "compression_failures": 0,
+        "compression_runs": 1,
+        "dropped_reasons": 1,
+        "om_meta": 3
+      }
+    },
+    {
+      "check": "item 2 [public schema of a new database]: after the reruns the database still holds only the public schema's 5 tables",
+      "pass": true,
+      "observed": {
+        "public": 5
+      }
+    },
+    {
+      "check": "item 2 [om_compress schema of a new database]: `--plan` before the migration shows compress pending (no revision)",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "plan",
+            "current_revision": null,
+            "head": "head",
+            "pending": true
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 2 [om_compress schema of a new database]: `storage migrate --backend postgres --postgres-url <url> --module compress --json` exits 0 with the compress entry ok",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "ok",
+            "success": true
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 2 [om_compress schema of a new database]: the migration wrote only to the om_compress schema (tables per schema)",
+      "pass": true,
+      "observed": {
+        "om_compress": 5
+      },
+      "expected": {
+        "om_compress": 5
+      }
+    },
+    {
+      "check": "item 2 [om_compress schema of a new database]: the compress tables exist, and only they (with alembic_version)",
+      "pass": true,
+      "observed": [
+        "alembic_version",
+        "compression_failures",
+        "compression_runs",
+        "dropped_reasons",
+        "om_meta"
+      ],
+      "expected": [
+        "alembic_version",
+        "compression_failures",
+        "compression_runs",
+        "dropped_reasons",
+        "om_meta"
+      ]
+    },
+    {
+      "check": "item 2 [om_compress schema of a new database]: each compress table has the baseline's columns and types",
+      "pass": true,
+      "observed": {
+        "compression_runs": [
+          [
+            "run_id",
+            "text"
+          ],
+          [
+            "request_id",
+            "text"
+          ],
+          [
+            "method_id",
+            "text"
+          ],
+          [
+            "input_tokens",
+            "integer"
+          ],
+          [
+            "output_tokens",
+            "integer"
+          ],
+          [
+            "ratio",
+            "double precision"
+          ],
+          [
+            "compression_hash",
+            "text"
+          ],
+          [
+            "empty_augmentation",
+            "integer"
+          ],
+          [
+            "fallback_used",
+            "integer"
+          ],
+          [
+            "policy_hash",
+            "text"
+          ],
+          [
+            "input_hash",
+            "text"
+          ],
+          [
+            "output_hash",
+            "text"
+          ],
+          [
+            "engine_version",
+            "text"
+          ],
+          [
+            "tokenizer_id",
+            "text"
+          ],
+          [
+            "scorer_version",
+            "text"
+          ],
+          [
+            "warnings",
+            "text"
+          ]
+        ],
+        "dropped_reasons": [
+          [
+            "id",
+            "integer"
+          ],
+          [
+            "run_id",
+            "text"
+          ],
+          [
+            "reason",
+            "text"
+          ],
+          [
+            "count",
+            "integer"
+          ]
+        ],
+        "compression_failures": [
+          [
+            "failure_id",
+            "text"
+          ],
+          [
+            "request_id",
+            "text"
+          ],
+          [
+            "error_code",
+            "text"
+          ],
+          [
+            "message",
+            "text"
+          ]
+        ],
+        "om_meta": [
+          [
+            "key",
+            "text"
+          ],
+          [
+            "value",
+            "text"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "item 2 [om_compress schema of a new database]: dropped_reasons.id is an identity column (GENERATED ALWAYS), as the PostgreSQL DDL declares",
+      "pass": true,
+      "observed": {
+        "dropped_reasons.id": "ALWAYS"
+      }
+    },
+    {
+      "check": "item 2 [om_compress schema of a new database]: dropped_reasons.run_id references compression_runs.run_id",
+      "pass": true,
+      "observed": [
+        [
+          "dropped_reasons",
+          "FOREIGN KEY",
+          "run_id",
+          "compression_runs",
+          "run_id"
+        ]
+      ]
+    },
+    {
+      "check": "item 2 [om_compress schema of a new database]: alembic_version is 0001_baseline",
+      "pass": true,
+      "observed": [
+        "0001_baseline"
+      ]
+    },
+    {
+      "check": "item 2 [om_compress schema of a new database]: module metadata (om_meta) names compress at 0001_baseline, with last_migrated_at",
+      "pass": true,
+      "observed": {
+        "module_id": "compress",
+        "schema_head": "0001_baseline",
+        "last_migrated_at": "2026-10-30T04:56:03+00:00"
+      }
+    },
+    {
+      "check": "item 2 [om_compress schema of a new database]: no connection to the database is left after the CLI exits",
+      "pass": true,
+      "observed": 0
+    },
+    {
+      "check": "item 2 [om_compress schema of a new database]: `--plan` after the migration shows compress at 0001_baseline",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "plan",
+            "current_revision": "0001_baseline",
+            "head": "head",
+            "pending": false
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 2 [om_compress schema of a new database]: rerun (--json) exits 0 with the compress entry ok",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "ok",
+            "success": true
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 2 [om_compress schema of a new database]: rerun in text mode exits 0 and prints `ok  compress`",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "stdout": "ok  compress"
+      }
+    },
+    {
+      "check": "item 2 [om_compress schema of a new database]: after both reruns the schema is unchanged (same objects and columns)",
+      "pass": true,
+      "observed": {
+        "before": "7791c526f5fdc114d2800fb15c242ef012907d2336ebcec46fdae1a5f100a290",
+        "after": "7791c526f5fdc114d2800fb15c242ef012907d2336ebcec46fdae1a5f100a290",
+        "tables": [
+          "alembic_version",
+          "compression_failures",
+          "compression_runs",
+          "dropped_reasons",
+          "om_meta"
+        ]
+      }
+    },
+    {
+      "check": "item 2 [om_compress schema of a new database]: after both reruns alembic_version is still 0001_baseline",
+      "pass": true,
+      "observed": [
+        "0001_baseline"
+      ]
+    },
+    {
+      "check": "item 2 [om_compress schema of a new database]: after both reruns om_meta still names compress at 0001_baseline",
+      "pass": true,
+      "observed": {
+        "before": {
+          "module_id": "compress",
+          "schema_head": "0001_baseline",
+          "last_migrated_at": "2026-10-30T04:56:03+00:00"
+        },
+        "after": {
+          "module_id": "compress",
+          "schema_head": "0001_baseline",
+          "last_migrated_at": "2026-10-30T04:56:07+00:00"
+        }
+      }
+    },
+    {
+      "check": "item 2 [om_compress schema of a new database]: the rows the probe inserted before the reruns are kept (1 compression_runs, 1 dropped_reasons)",
+      "pass": true,
+      "observed": {
+        "alembic_version": 1,
+        "compression_failures": 0,
+        "compression_runs": 1,
+        "dropped_reasons": 1,
+        "om_meta": 3
+      }
+    },
+    {
+      "check": "item 2 [om_compress schema of a new database]: after the reruns the database still holds only the om_compress schema's 5 tables",
+      "pass": true,
+      "observed": {
+        "om_compress": 5
+      }
+    },
+    {
+      "check": "item 3: discovery resolves compress to openminion/modules/context/compress/storage with its migrations (script location; the wheel ships no alembic.ini there)",
+      "pass": true,
+      "observed": {
+        "storage_root": "openminion/modules/context/compress/storage",
+        "alembic_ini": null,
+        "script_location": "openminion/modules/context/compress/storage/migrations",
+        "nested_module_storage_import_paths": {
+          "authoring": [
+            "openminion.modules.tool.authoring.storage"
+          ],
+          "commerce": [
+            "openminion.tools.commerce.storage"
+          ],
+          "compress": [
+            "openminion.modules.context.compress.storage"
+          ]
+        },
+        "installed_alembic_py_sha256": "12b27527ea4cbe1a1ba5e47de449fd32affd02644bcb3017e1eedd8e717eee5d"
+      }
+    },
+    {
+      "check": "item 3: every installed `*/storage/migrations/env.py` package is found by discovery for the MODULE_ID it declares",
+      "pass": true,
+      "observed": {
+        "packages": 17,
+        "not_found": []
+      }
+    },
+    {
+      "check": "item 3: control: every such package other than compress is found by discovery (16 packages)",
+      "pass": true,
+      "observed": {
+        "not_found_other_than_compress": []
+      }
+    },
+    {
+      "check": "item 3: control: ordinary (`openminion.modules.<id>.storage`), nested (authoring, commerce) and channel (controlplane_telegram) modules resolve to their packages",
+      "pass": true,
+      "observed": {
+        "secret": "openminion/modules/secret/storage",
+        "session": "openminion/modules/session/storage",
+        "authoring": "openminion/modules/tool/authoring/storage",
+        "commerce": "openminion/tools/commerce/storage",
+        "controlplane_telegram": "openminion/modules/controlplane/channels/telegram/storage"
+      },
+      "expected": {
+        "secret": "openminion/modules/secret/storage",
+        "session": "openminion/modules/session/storage",
+        "authoring": "openminion/modules/tool/authoring/storage",
+        "commerce": "openminion/tools/commerce/storage",
+        "controlplane_telegram": "openminion/modules/controlplane/channels/telegram/storage"
+      }
+    },
+    {
+      "check": "item 3: only the module ids with no migrations package (storage, brain) have no script location",
+      "pass": true,
+      "observed": [
+        "brain",
+        "storage"
+      ],
+      "expected": [
+        "brain",
+        "storage"
+      ]
+    },
+    {
+      "check": "item 3: compress's own run_migrations(<new file>) returns, twice",
+      "pass": true,
+      "observed": [
+        "returned",
+        "returned"
+      ]
+    },
+    {
+      "check": "item 3: after run_migrations the file has the compress tables, 0001_baseline, om_meta module_id compress, application_id 0x4f4d000e and user_version TARGET_USER_VERSION",
+      "pass": true,
+      "observed": {
+        "tables": [
+          "alembic_version",
+          "compression_failures",
+          "compression_runs",
+          "dropped_reasons",
+          "om_meta",
+          "sqlite_sequence"
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "om_meta": {
+          "module_id": "compress",
+          "schema_head": "0001_baseline",
+          "last_migrated_at": "2026-10-30T04:56:10+00:00"
+        },
+        "application_id": "0x4f4d000e",
+        "user_version": 0
+      }
+    },
+    {
+      "check": "item 3: the second run_migrations leaves the schema and revision unchanged",
+      "pass": true,
+      "observed": {
+        "first": "077e9798c9055effaaf6f549f80b6f8b67386847a5f85607a085968334e794ac",
+        "second": "077e9798c9055effaaf6f549f80b6f8b67386847a5f85607a085968334e794ac",
+        "alembic": [
+          "0001_baseline"
+        ]
+      }
+    },
+    {
+      "check": "item 3: compress's list_migrations() and MODULE_ID",
+      "pass": true,
+      "observed": {
+        "list_migrations": [
+          "0001_baseline"
+        ],
+        "MODULE_ID": "compress"
+      }
+    },
+    {
+      "check": "item 3: control: `storage migrate --backend postgres --module secret` on a new database exits 0, ok, at its head",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "secret",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "om_meta_module_id": "secret",
+        "tables": 3
+      }
+    },
+    {
+      "check": "item 3: no PostgreSQL-validated module (each alone on a new database) reports `Alembic configuration missing`",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "item 3: control: no PostgreSQL-validated module other than compress reports `Alembic configuration missing`",
+      "pass": true,
+      "observed": []
+    }
+  ],
+  "summary": {
+    "passed": 48,
+    "failed": 0,
+    "total": 48
+  },
+  "cases": {
+    "item 2 [newdb]": {
+      "database": "p493_v0_1_16_newdb",
+      "schema": "public",
+      "url": "postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_newdb",
+      "plan_before": {
+        "argv": "openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_newdb --module compress --plan --json",
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "plan",
+            "current_revision": null,
+            "head": "head",
+            "pending": true
+          }
+        ],
+        "stdout_tail": "{\n  \"modules\": [\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"plan\",\n      \"current_revision\": null,\n      \"head\": \"head\",\n      \"pending\": true\n    }\n  ]\n}\n",
+        "stderr_tail": ""
+      },
+      "migrate": {
+        "argv": "openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_newdb --module compress --json",
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "stdout_tail": "{\n  \"modules\": [\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+        "stderr_tail": ""
+      },
+      "after_migrate": {
+        "tables_per_schema": {
+          "public": 5
+        },
+        "schema": "public",
+        "tables": [
+          "alembic_version",
+          "compression_failures",
+          "compression_runs",
+          "dropped_reasons",
+          "om_meta"
+        ],
+        "columns": {
+          "alembic_version": [
+            [
+              "version_num",
+              "character varying"
+            ]
+          ],
+          "compression_failures": [
+            [
+              "failure_id",
+              "text"
+            ],
+            [
+              "request_id",
+              "text"
+            ],
+            [
+              "error_code",
+              "text"
+            ],
+            [
+              "message",
+              "text"
+            ]
+          ],
+          "compression_runs": [
+            [
+              "run_id",
+              "text"
+            ],
+            [
+              "request_id",
+              "text"
+            ],
+            [
+              "method_id",
+              "text"
+            ],
+            [
+              "input_tokens",
+              "integer"
+            ],
+            [
+              "output_tokens",
+              "integer"
+            ],
+            [
+              "ratio",
+              "double precision"
+            ],
+            [
+              "compression_hash",
+              "text"
+            ],
+            [
+              "empty_augmentation",
+              "integer"
+            ],
+            [
+              "fallback_used",
+              "integer"
+            ],
+            [
+              "policy_hash",
+              "text"
+            ],
+            [
+              "input_hash",
+              "text"
+            ],
+            [
+              "output_hash",
+              "text"
+            ],
+            [
+              "engine_version",
+              "text"
+            ],
+            [
+              "tokenizer_id",
+              "text"
+            ],
+            [
+              "scorer_version",
+              "text"
+            ],
+            [
+              "warnings",
+              "text"
+            ]
+          ],
+          "dropped_reasons": [
+            [
+              "id",
+              "integer"
+            ],
+            [
+              "run_id",
+              "text"
+            ],
+            [
+              "reason",
+              "text"
+            ],
+            [
+              "count",
+              "integer"
+            ]
+          ],
+          "om_meta": [
+            [
+              "key",
+              "text"
+            ],
+            [
+              "value",
+              "text"
+            ]
+          ]
+        },
+        "identity_columns": {
+          "dropped_reasons.id": "ALWAYS"
+        },
+        "constraints": [
+          [
+            "alembic_version",
+            "PRIMARY KEY",
+            "version_num",
+            null,
+            null
+          ],
+          [
+            "compression_failures",
+            "PRIMARY KEY",
+            "failure_id",
+            null,
+            null
+          ],
+          [
+            "compression_runs",
+            "PRIMARY KEY",
+            "run_id",
+            null,
+            null
+          ],
+          [
+            "dropped_reasons",
+            "FOREIGN KEY",
+            "run_id",
+            "compression_runs",
+            "run_id"
+          ],
+          [
+            "dropped_reasons",
+            "PRIMARY KEY",
+            "id",
+            null,
+            null
+          ],
+          [
+            "om_meta",
+            "PRIMARY KEY",
+            "key",
+            null,
+            null
+          ]
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "om_meta": {
+          "module_id": "compress",
+          "schema_head": "0001_baseline",
+          "last_migrated_at": "2026-10-30T04:55:57+00:00"
+        },
+        "row_counts": {
+          "alembic_version": 1,
+          "compression_failures": 0,
+          "compression_runs": 0,
+          "dropped_reasons": 0,
+          "om_meta": 3
+        },
+        "other_connections_to_db": 0,
+        "schema_sha256": "7791c526f5fdc114d2800fb15c242ef012907d2336ebcec46fdae1a5f100a290"
+      },
+      "plan_after": {
+        "argv": "openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_newdb --module compress --plan --json",
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "plan",
+            "current_revision": "0001_baseline",
+            "head": "head",
+            "pending": false
+          }
+        ],
+        "stdout_tail": "{\n  \"modules\": [\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"plan\",\n      \"current_revision\": \"0001_baseline\",\n      \"head\": \"head\",\n      \"pending\": false\n    }\n  ]\n}\n",
+        "stderr_tail": ""
+      },
+      "verify_observed": {
+        "argv": "openminion storage verify --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_newdb --module compress --json",
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "passed",
+            "report": "VerificationReport(module_id='compress', db_path='<WORK>/empty/:memory:', level='quick', quick_check='ok', integrity_check=None, findings=[], ok=True)"
+          }
+        ],
+        "stdout_tail": "{\n  \"modules\": [\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"passed\",\n      \"report\": \"VerificationReport(module_id='compress', db_path='<WORK>/empty/:memory:', level='quick', quick_check='ok', integrity_check=None, findings=[], ok=True)\"\n    }\n  ]\n}\n",
+        "stderr_tail": ""
+      },
+      "before_rerun": {
+        "tables_per_schema": {
+          "public": 5
+        },
+        "schema": "public",
+        "tables": [
+          "alembic_version",
+          "compression_failures",
+          "compression_runs",
+          "dropped_reasons",
+          "om_meta"
+        ],
+        "columns": {
+          "alembic_version": [
+            [
+              "version_num",
+              "character varying"
+            ]
+          ],
+          "compression_failures": [
+            [
+              "failure_id",
+              "text"
+            ],
+            [
+              "request_id",
+              "text"
+            ],
+            [
+              "error_code",
+              "text"
+            ],
+            [
+              "message",
+              "text"
+            ]
+          ],
+          "compression_runs": [
+            [
+              "run_id",
+              "text"
+            ],
+            [
+              "request_id",
+              "text"
+            ],
+            [
+              "method_id",
+              "text"
+            ],
+            [
+              "input_tokens",
+              "integer"
+            ],
+            [
+              "output_tokens",
+              "integer"
+            ],
+            [
+              "ratio",
+              "double precision"
+            ],
+            [
+              "compression_hash",
+              "text"
+            ],
+            [
+              "empty_augmentation",
+              "integer"
+            ],
+            [
+              "fallback_used",
+              "integer"
+            ],
+            [
+              "policy_hash",
+              "text"
+            ],
+            [
+              "input_hash",
+              "text"
+            ],
+            [
+              "output_hash",
+              "text"
+            ],
+            [
+              "engine_version",
+              "text"
+            ],
+            [
+              "tokenizer_id",
+              "text"
+            ],
+            [
+              "scorer_version",
+              "text"
+            ],
+            [
+              "warnings",
+              "text"
+            ]
+          ],
+          "dropped_reasons": [
+            [
+              "id",
+              "integer"
+            ],
+            [
+              "run_id",
+              "text"
+            ],
+            [
+              "reason",
+              "text"
+            ],
+            [
+              "count",
+              "integer"
+            ]
+          ],
+          "om_meta": [
+            [
+              "key",
+              "text"
+            ],
+            [
+              "value",
+              "text"
+            ]
+          ]
+        },
+        "identity_columns": {
+          "dropped_reasons.id": "ALWAYS"
+        },
+        "constraints": [
+          [
+            "alembic_version",
+            "PRIMARY KEY",
+            "version_num",
+            null,
+            null
+          ],
+          [
+            "compression_failures",
+            "PRIMARY KEY",
+            "failure_id",
+            null,
+            null
+          ],
+          [
+            "compression_runs",
+            "PRIMARY KEY",
+            "run_id",
+            null,
+            null
+          ],
+          [
+            "dropped_reasons",
+            "FOREIGN KEY",
+            "run_id",
+            "compression_runs",
+            "run_id"
+          ],
+          [
+            "dropped_reasons",
+            "PRIMARY KEY",
+            "id",
+            null,
+            null
+          ],
+          [
+            "om_meta",
+            "PRIMARY KEY",
+            "key",
+            null,
+            null
+          ]
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "om_meta": {
+          "module_id": "compress",
+          "schema_head": "0001_baseline",
+          "last_migrated_at": "2026-10-30T04:55:57+00:00"
+        },
+        "row_counts": {
+          "alembic_version": 1,
+          "compression_failures": 0,
+          "compression_runs": 1,
+          "dropped_reasons": 1,
+          "om_meta": 3
+        },
+        "other_connections_to_db": 0,
+        "schema_sha256": "7791c526f5fdc114d2800fb15c242ef012907d2336ebcec46fdae1a5f100a290"
+      },
+      "rerun_json": {
+        "argv": "openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_newdb --module compress --json",
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "stdout_tail": "{\n  \"modules\": [\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+        "stderr_tail": ""
+      },
+      "rerun_text": {
+        "argv": "openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_newdb --module compress",
+        "exit": 0,
+        "entries": null,
+        "stdout_tail": "  ok  compress\n",
+        "stderr_tail": ""
+      },
+      "after_reruns": {
+        "tables_per_schema": {
+          "public": 5
+        },
+        "schema": "public",
+        "tables": [
+          "alembic_version",
+          "compression_failures",
+          "compression_runs",
+          "dropped_reasons",
+          "om_meta"
+        ],
+        "columns": {
+          "alembic_version": [
+            [
+              "version_num",
+              "character varying"
+            ]
+          ],
+          "compression_failures": [
+            [
+              "failure_id",
+              "text"
+            ],
+            [
+              "request_id",
+              "text"
+            ],
+            [
+              "error_code",
+              "text"
+            ],
+            [
+              "message",
+              "text"
+            ]
+          ],
+          "compression_runs": [
+            [
+              "run_id",
+              "text"
+            ],
+            [
+              "request_id",
+              "text"
+            ],
+            [
+              "method_id",
+              "text"
+            ],
+            [
+              "input_tokens",
+              "integer"
+            ],
+            [
+              "output_tokens",
+              "integer"
+            ],
+            [
+              "ratio",
+              "double precision"
+            ],
+            [
+              "compression_hash",
+              "text"
+            ],
+            [
+              "empty_augmentation",
+              "integer"
+            ],
+            [
+              "fallback_used",
+              "integer"
+            ],
+            [
+              "policy_hash",
+              "text"
+            ],
+            [
+              "input_hash",
+              "text"
+            ],
+            [
+              "output_hash",
+              "text"
+            ],
+            [
+              "engine_version",
+              "text"
+            ],
+            [
+              "tokenizer_id",
+              "text"
+            ],
+            [
+              "scorer_version",
+              "text"
+            ],
+            [
+              "warnings",
+              "text"
+            ]
+          ],
+          "dropped_reasons": [
+            [
+              "id",
+              "integer"
+            ],
+            [
+              "run_id",
+              "text"
+            ],
+            [
+              "reason",
+              "text"
+            ],
+            [
+              "count",
+              "integer"
+            ]
+          ],
+          "om_meta": [
+            [
+              "key",
+              "text"
+            ],
+            [
+              "value",
+              "text"
+            ]
+          ]
+        },
+        "identity_columns": {
+          "dropped_reasons.id": "ALWAYS"
+        },
+        "constraints": [
+          [
+            "alembic_version",
+            "PRIMARY KEY",
+            "version_num",
+            null,
+            null
+          ],
+          [
+            "compression_failures",
+            "PRIMARY KEY",
+            "failure_id",
+            null,
+            null
+          ],
+          [
+            "compression_runs",
+            "PRIMARY KEY",
+            "run_id",
+            null,
+            null
+          ],
+          [
+            "dropped_reasons",
+            "FOREIGN KEY",
+            "run_id",
+            "compression_runs",
+            "run_id"
+          ],
+          [
+            "dropped_reasons",
+            "PRIMARY KEY",
+            "id",
+            null,
+            null
+          ],
+          [
+            "om_meta",
+            "PRIMARY KEY",
+            "key",
+            null,
+            null
+          ]
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "om_meta": {
+          "module_id": "compress",
+          "schema_head": "0001_baseline",
+          "last_migrated_at": "2026-10-30T04:56:01+00:00"
+        },
+        "row_counts": {
+          "alembic_version": 1,
+          "compression_failures": 0,
+          "compression_runs": 1,
+          "dropped_reasons": 1,
+          "om_meta": 3
+        },
+        "other_connections_to_db": 0,
+        "schema_sha256": "7791c526f5fdc114d2800fb15c242ef012907d2336ebcec46fdae1a5f100a290"
+      }
+    },
+    "item 2 [schema]": {
+      "database": "p493_v0_1_16_schema",
+      "schema": "om_compress",
+      "url": "postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_schema?options=-csearch_path%3Dom_compress",
+      "plan_before": {
+        "argv": "openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_schema?options=-csearch_path%3Dom_compress --module compress --plan --json",
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "plan",
+            "current_revision": null,
+            "head": "head",
+            "pending": true
+          }
+        ],
+        "stdout_tail": "{\n  \"modules\": [\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"plan\",\n      \"current_revision\": null,\n      \"head\": \"head\",\n      \"pending\": true\n    }\n  ]\n}\n",
+        "stderr_tail": ""
+      },
+      "migrate": {
+        "argv": "openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_schema?options=-csearch_path%3Dom_compress --module compress --json",
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "stdout_tail": "{\n  \"modules\": [\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+        "stderr_tail": ""
+      },
+      "after_migrate": {
+        "tables_per_schema": {
+          "om_compress": 5
+        },
+        "schema": "om_compress",
+        "tables": [
+          "alembic_version",
+          "compression_failures",
+          "compression_runs",
+          "dropped_reasons",
+          "om_meta"
+        ],
+        "columns": {
+          "alembic_version": [
+            [
+              "version_num",
+              "character varying"
+            ]
+          ],
+          "compression_failures": [
+            [
+              "failure_id",
+              "text"
+            ],
+            [
+              "request_id",
+              "text"
+            ],
+            [
+              "error_code",
+              "text"
+            ],
+            [
+              "message",
+              "text"
+            ]
+          ],
+          "compression_runs": [
+            [
+              "run_id",
+              "text"
+            ],
+            [
+              "request_id",
+              "text"
+            ],
+            [
+              "method_id",
+              "text"
+            ],
+            [
+              "input_tokens",
+              "integer"
+            ],
+            [
+              "output_tokens",
+              "integer"
+            ],
+            [
+              "ratio",
+              "double precision"
+            ],
+            [
+              "compression_hash",
+              "text"
+            ],
+            [
+              "empty_augmentation",
+              "integer"
+            ],
+            [
+              "fallback_used",
+              "integer"
+            ],
+            [
+              "policy_hash",
+              "text"
+            ],
+            [
+              "input_hash",
+              "text"
+            ],
+            [
+              "output_hash",
+              "text"
+            ],
+            [
+              "engine_version",
+              "text"
+            ],
+            [
+              "tokenizer_id",
+              "text"
+            ],
+            [
+              "scorer_version",
+              "text"
+            ],
+            [
+              "warnings",
+              "text"
+            ]
+          ],
+          "dropped_reasons": [
+            [
+              "id",
+              "integer"
+            ],
+            [
+              "run_id",
+              "text"
+            ],
+            [
+              "reason",
+              "text"
+            ],
+            [
+              "count",
+              "integer"
+            ]
+          ],
+          "om_meta": [
+            [
+              "key",
+              "text"
+            ],
+            [
+              "value",
+              "text"
+            ]
+          ]
+        },
+        "identity_columns": {
+          "dropped_reasons.id": "ALWAYS"
+        },
+        "constraints": [
+          [
+            "alembic_version",
+            "PRIMARY KEY",
+            "version_num",
+            null,
+            null
+          ],
+          [
+            "compression_failures",
+            "PRIMARY KEY",
+            "failure_id",
+            null,
+            null
+          ],
+          [
+            "compression_runs",
+            "PRIMARY KEY",
+            "run_id",
+            null,
+            null
+          ],
+          [
+            "dropped_reasons",
+            "FOREIGN KEY",
+            "run_id",
+            "compression_runs",
+            "run_id"
+          ],
+          [
+            "dropped_reasons",
+            "PRIMARY KEY",
+            "id",
+            null,
+            null
+          ],
+          [
+            "om_meta",
+            "PRIMARY KEY",
+            "key",
+            null,
+            null
+          ]
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "om_meta": {
+          "module_id": "compress",
+          "schema_head": "0001_baseline",
+          "last_migrated_at": "2026-10-30T04:56:03+00:00"
+        },
+        "row_counts": {
+          "alembic_version": 1,
+          "compression_failures": 0,
+          "compression_runs": 0,
+          "dropped_reasons": 0,
+          "om_meta": 3
+        },
+        "other_connections_to_db": 0,
+        "schema_sha256": "7791c526f5fdc114d2800fb15c242ef012907d2336ebcec46fdae1a5f100a290"
+      },
+      "plan_after": {
+        "argv": "openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_schema?options=-csearch_path%3Dom_compress --module compress --plan --json",
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "plan",
+            "current_revision": "0001_baseline",
+            "head": "head",
+            "pending": false
+          }
+        ],
+        "stdout_tail": "{\n  \"modules\": [\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"plan\",\n      \"current_revision\": \"0001_baseline\",\n      \"head\": \"head\",\n      \"pending\": false\n    }\n  ]\n}\n",
+        "stderr_tail": ""
+      },
+      "verify_observed": {
+        "argv": "openminion storage verify --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_schema?options=-csearch_path%3Dom_compress --module compress --json",
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "passed",
+            "report": "VerificationReport(module_id='compress', db_path='<WORK>/empty/:memory:', level='quick', quick_check='ok', integrity_check=None, findings=[], ok=True)"
+          }
+        ],
+        "stdout_tail": "{\n  \"modules\": [\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"passed\",\n      \"report\": \"VerificationReport(module_id='compress', db_path='<WORK>/empty/:memory:', level='quick', quick_check='ok', integrity_check=None, findings=[], ok=True)\"\n    }\n  ]\n}\n",
+        "stderr_tail": ""
+      },
+      "before_rerun": {
+        "tables_per_schema": {
+          "om_compress": 5
+        },
+        "schema": "om_compress",
+        "tables": [
+          "alembic_version",
+          "compression_failures",
+          "compression_runs",
+          "dropped_reasons",
+          "om_meta"
+        ],
+        "columns": {
+          "alembic_version": [
+            [
+              "version_num",
+              "character varying"
+            ]
+          ],
+          "compression_failures": [
+            [
+              "failure_id",
+              "text"
+            ],
+            [
+              "request_id",
+              "text"
+            ],
+            [
+              "error_code",
+              "text"
+            ],
+            [
+              "message",
+              "text"
+            ]
+          ],
+          "compression_runs": [
+            [
+              "run_id",
+              "text"
+            ],
+            [
+              "request_id",
+              "text"
+            ],
+            [
+              "method_id",
+              "text"
+            ],
+            [
+              "input_tokens",
+              "integer"
+            ],
+            [
+              "output_tokens",
+              "integer"
+            ],
+            [
+              "ratio",
+              "double precision"
+            ],
+            [
+              "compression_hash",
+              "text"
+            ],
+            [
+              "empty_augmentation",
+              "integer"
+            ],
+            [
+              "fallback_used",
+              "integer"
+            ],
+            [
+              "policy_hash",
+              "text"
+            ],
+            [
+              "input_hash",
+              "text"
+            ],
+            [
+              "output_hash",
+              "text"
+            ],
+            [
+              "engine_version",
+              "text"
+            ],
+            [
+              "tokenizer_id",
+              "text"
+            ],
+            [
+              "scorer_version",
+              "text"
+            ],
+            [
+              "warnings",
+              "text"
+            ]
+          ],
+          "dropped_reasons": [
+            [
+              "id",
+              "integer"
+            ],
+            [
+              "run_id",
+              "text"
+            ],
+            [
+              "reason",
+              "text"
+            ],
+            [
+              "count",
+              "integer"
+            ]
+          ],
+          "om_meta": [
+            [
+              "key",
+              "text"
+            ],
+            [
+              "value",
+              "text"
+            ]
+          ]
+        },
+        "identity_columns": {
+          "dropped_reasons.id": "ALWAYS"
+        },
+        "constraints": [
+          [
+            "alembic_version",
+            "PRIMARY KEY",
+            "version_num",
+            null,
+            null
+          ],
+          [
+            "compression_failures",
+            "PRIMARY KEY",
+            "failure_id",
+            null,
+            null
+          ],
+          [
+            "compression_runs",
+            "PRIMARY KEY",
+            "run_id",
+            null,
+            null
+          ],
+          [
+            "dropped_reasons",
+            "FOREIGN KEY",
+            "run_id",
+            "compression_runs",
+            "run_id"
+          ],
+          [
+            "dropped_reasons",
+            "PRIMARY KEY",
+            "id",
+            null,
+            null
+          ],
+          [
+            "om_meta",
+            "PRIMARY KEY",
+            "key",
+            null,
+            null
+          ]
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "om_meta": {
+          "module_id": "compress",
+          "schema_head": "0001_baseline",
+          "last_migrated_at": "2026-10-30T04:56:03+00:00"
+        },
+        "row_counts": {
+          "alembic_version": 1,
+          "compression_failures": 0,
+          "compression_runs": 1,
+          "dropped_reasons": 1,
+          "om_meta": 3
+        },
+        "other_connections_to_db": 0,
+        "schema_sha256": "7791c526f5fdc114d2800fb15c242ef012907d2336ebcec46fdae1a5f100a290"
+      },
+      "rerun_json": {
+        "argv": "openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_schema?options=-csearch_path%3Dom_compress --module compress --json",
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "stdout_tail": "{\n  \"modules\": [\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+        "stderr_tail": ""
+      },
+      "rerun_text": {
+        "argv": "openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_schema?options=-csearch_path%3Dom_compress --module compress",
+        "exit": 0,
+        "entries": null,
+        "stdout_tail": "  ok  compress\n",
+        "stderr_tail": ""
+      },
+      "after_reruns": {
+        "tables_per_schema": {
+          "om_compress": 5
+        },
+        "schema": "om_compress",
+        "tables": [
+          "alembic_version",
+          "compression_failures",
+          "compression_runs",
+          "dropped_reasons",
+          "om_meta"
+        ],
+        "columns": {
+          "alembic_version": [
+            [
+              "version_num",
+              "character varying"
+            ]
+          ],
+          "compression_failures": [
+            [
+              "failure_id",
+              "text"
+            ],
+            [
+              "request_id",
+              "text"
+            ],
+            [
+              "error_code",
+              "text"
+            ],
+            [
+              "message",
+              "text"
+            ]
+          ],
+          "compression_runs": [
+            [
+              "run_id",
+              "text"
+            ],
+            [
+              "request_id",
+              "text"
+            ],
+            [
+              "method_id",
+              "text"
+            ],
+            [
+              "input_tokens",
+              "integer"
+            ],
+            [
+              "output_tokens",
+              "integer"
+            ],
+            [
+              "ratio",
+              "double precision"
+            ],
+            [
+              "compression_hash",
+              "text"
+            ],
+            [
+              "empty_augmentation",
+              "integer"
+            ],
+            [
+              "fallback_used",
+              "integer"
+            ],
+            [
+              "policy_hash",
+              "text"
+            ],
+            [
+              "input_hash",
+              "text"
+            ],
+            [
+              "output_hash",
+              "text"
+            ],
+            [
+              "engine_version",
+              "text"
+            ],
+            [
+              "tokenizer_id",
+              "text"
+            ],
+            [
+              "scorer_version",
+              "text"
+            ],
+            [
+              "warnings",
+              "text"
+            ]
+          ],
+          "dropped_reasons": [
+            [
+              "id",
+              "integer"
+            ],
+            [
+              "run_id",
+              "text"
+            ],
+            [
+              "reason",
+              "text"
+            ],
+            [
+              "count",
+              "integer"
+            ]
+          ],
+          "om_meta": [
+            [
+              "key",
+              "text"
+            ],
+            [
+              "value",
+              "text"
+            ]
+          ]
+        },
+        "identity_columns": {
+          "dropped_reasons.id": "ALWAYS"
+        },
+        "constraints": [
+          [
+            "alembic_version",
+            "PRIMARY KEY",
+            "version_num",
+            null,
+            null
+          ],
+          [
+            "compression_failures",
+            "PRIMARY KEY",
+            "failure_id",
+            null,
+            null
+          ],
+          [
+            "compression_runs",
+            "PRIMARY KEY",
+            "run_id",
+            null,
+            null
+          ],
+          [
+            "dropped_reasons",
+            "FOREIGN KEY",
+            "run_id",
+            "compression_runs",
+            "run_id"
+          ],
+          [
+            "dropped_reasons",
+            "PRIMARY KEY",
+            "id",
+            null,
+            null
+          ],
+          [
+            "om_meta",
+            "PRIMARY KEY",
+            "key",
+            null,
+            null
+          ]
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "om_meta": {
+          "module_id": "compress",
+          "schema_head": "0001_baseline",
+          "last_migrated_at": "2026-10-30T04:56:07+00:00"
+        },
+        "row_counts": {
+          "alembic_version": 1,
+          "compression_failures": 0,
+          "compression_runs": 1,
+          "dropped_reasons": 1,
+          "om_meta": 3
+        },
+        "other_connections_to_db": 0,
+        "schema_sha256": "7791c526f5fdc114d2800fb15c242ef012907d2336ebcec46fdae1a5f100a290"
+      }
+    },
+    "item 3 discovery": {
+      "by_module": {
+        "storage": {
+          "storage_root": null,
+          "alembic_ini": null,
+          "script_location": null
+        },
+        "session": {
+          "storage_root": "openminion/modules/session/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/session/storage/migrations"
+        },
+        "artifact": {
+          "storage_root": "openminion/modules/artifact/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/artifact/storage/migrations"
+        },
+        "registry": {
+          "storage_root": "openminion/modules/registry/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/registry/storage/migrations"
+        },
+        "identity": {
+          "storage_root": "openminion/modules/identity/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/identity/storage/migrations"
+        },
+        "policy": {
+          "storage_root": "openminion/modules/policy/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/policy/storage/migrations"
+        },
+        "secret": {
+          "storage_root": "openminion/modules/secret/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/secret/storage/migrations"
+        },
+        "telemetry": {
+          "storage_root": "openminion/modules/telemetry/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/telemetry/storage/migrations"
+        },
+        "controlplane": {
+          "storage_root": "openminion/modules/controlplane/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/controlplane/storage/migrations"
+        },
+        "controlplane_telegram": {
+          "storage_root": "openminion/modules/controlplane/channels/telegram/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/controlplane/channels/telegram/storage/migrations"
+        },
+        "retrieve": {
+          "storage_root": "openminion/modules/retrieve/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/retrieve/storage/migrations"
+        },
+        "memory": {
+          "storage_root": "openminion/modules/memory/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/memory/storage/migrations"
+        },
+        "skill": {
+          "storage_root": "openminion/modules/skill/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/skill/storage/migrations"
+        },
+        "a2a": {
+          "storage_root": "openminion/modules/a2a/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/a2a/storage/migrations"
+        },
+        "compress": {
+          "storage_root": "openminion/modules/context/compress/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/context/compress/storage/migrations"
+        },
+        "task": {
+          "storage_root": "openminion/modules/task/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/task/storage/migrations"
+        },
+        "authoring": {
+          "storage_root": "openminion/modules/tool/authoring/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/modules/tool/authoring/storage/migrations"
+        },
+        "brain": {
+          "storage_root": "openminion/modules/brain/storage",
+          "alembic_ini": null,
+          "script_location": null
+        },
+        "commerce": {
+          "storage_root": "openminion/tools/commerce/storage",
+          "alembic_ini": null,
+          "script_location": "openminion/tools/commerce/storage/migrations"
+        }
+      },
+      "packages": [
+        {
+          "package": "openminion.modules.a2a.storage",
+          "module_id": "a2a",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.artifact.storage",
+          "module_id": "artifact",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.context.compress.storage",
+          "module_id": "compress",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.controlplane.channels.telegram.storage",
+          "module_id": "controlplane_telegram",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.controlplane.storage",
+          "module_id": "controlplane",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.identity.storage",
+          "module_id": "identity",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.memory.storage",
+          "module_id": "memory",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.policy.storage",
+          "module_id": "policy",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.registry.storage",
+          "module_id": "registry",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.retrieve.storage",
+          "module_id": "retrieve",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.secret.storage",
+          "module_id": "secret",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.session.storage",
+          "module_id": "session",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.skill.storage",
+          "module_id": "skill",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.task.storage",
+          "module_id": "task",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.telemetry.storage",
+          "module_id": "telemetry",
+          "discovered": true
+        },
+        {
+          "package": "openminion.modules.tool.authoring.storage",
+          "module_id": "authoring",
+          "discovered": true
+        },
+        {
+          "package": "openminion.tools.commerce.storage",
+          "module_id": "commerce",
+          "discovered": true
+        }
+      ]
+    },
+    "item 3 entry point": {
+      "results": [
+        "returned",
+        "returned"
+      ],
+      "after_first": {
+        "tables": [
+          "alembic_version",
+          "compression_failures",
+          "compression_runs",
+          "dropped_reasons",
+          "om_meta",
+          "sqlite_sequence"
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "om_meta": {
+          "module_id": "compress",
+          "schema_head": "0001_baseline",
+          "last_migrated_at": "2026-10-30T04:56:10+00:00"
+        },
+        "columns": {
+          "alembic_version": [
+            [
+              "version_num",
+              "VARCHAR(32)"
+            ]
+          ],
+          "compression_failures": [
+            [
+              "failure_id",
+              "TEXT"
+            ],
+            [
+              "request_id",
+              "TEXT"
+            ],
+            [
+              "error_code",
+              "TEXT"
+            ],
+            [
+              "message",
+              "TEXT"
+            ]
+          ],
+          "compression_runs": [
+            [
+              "run_id",
+              "TEXT"
+            ],
+            [
+              "request_id",
+              "TEXT"
+            ],
+            [
+              "method_id",
+              "TEXT"
+            ],
+            [
+              "input_tokens",
+              "INTEGER"
+            ],
+            [
+              "output_tokens",
+              "INTEGER"
+            ],
+            [
+              "ratio",
+              "REAL"
+            ],
+            [
+              "compression_hash",
+              "TEXT"
+            ],
+            [
+              "empty_augmentation",
+              "INTEGER"
+            ],
+            [
+              "fallback_used",
+              "INTEGER"
+            ],
+            [
+              "policy_hash",
+              "TEXT"
+            ],
+            [
+              "input_hash",
+              "TEXT"
+            ],
+            [
+              "output_hash",
+              "TEXT"
+            ],
+            [
+              "engine_version",
+              "TEXT"
+            ],
+            [
+              "tokenizer_id",
+              "TEXT"
+            ],
+            [
+              "scorer_version",
+              "TEXT"
+            ],
+            [
+              "warnings",
+              "TEXT"
+            ]
+          ],
+          "dropped_reasons": [
+            [
+              "id",
+              "INTEGER"
+            ],
+            [
+              "run_id",
+              "TEXT"
+            ],
+            [
+              "reason",
+              "TEXT"
+            ],
+            [
+              "count",
+              "INTEGER"
+            ]
+          ],
+          "om_meta": [
+            [
+              "key",
+              "TEXT"
+            ],
+            [
+              "value",
+              "TEXT"
+            ]
+          ],
+          "sqlite_sequence": [
+            [
+              "name",
+              ""
+            ],
+            [
+              "seq",
+              ""
+            ]
+          ]
+        },
+        "foreign_keys": {
+          "alembic_version": [],
+          "compression_failures": [],
+          "compression_runs": [],
+          "dropped_reasons": [
+            [
+              "compression_runs",
+              "run_id",
+              "run_id"
+            ]
+          ],
+          "om_meta": [],
+          "sqlite_sequence": []
+        },
+        "row_counts": {
+          "alembic_version": 1,
+          "compression_failures": 0,
+          "compression_runs": 0,
+          "dropped_reasons": 0,
+          "om_meta": 3,
+          "sqlite_sequence": 0
+        },
+        "application_id": "0x4f4d000e",
+        "user_version": 0,
+        "schema_sha256": "077e9798c9055effaaf6f549f80b6f8b67386847a5f85607a085968334e794ac"
+      },
+      "after_second": {
+        "tables": [
+          "alembic_version",
+          "compression_failures",
+          "compression_runs",
+          "dropped_reasons",
+          "om_meta",
+          "sqlite_sequence"
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "om_meta": {
+          "module_id": "compress",
+          "schema_head": "0001_baseline",
+          "last_migrated_at": "2026-10-30T04:56:10+00:00"
+        },
+        "columns": {
+          "alembic_version": [
+            [
+              "version_num",
+              "VARCHAR(32)"
+            ]
+          ],
+          "compression_failures": [
+            [
+              "failure_id",
+              "TEXT"
+            ],
+            [
+              "request_id",
+              "TEXT"
+            ],
+            [
+              "error_code",
+              "TEXT"
+            ],
+            [
+              "message",
+              "TEXT"
+            ]
+          ],
+          "compression_runs": [
+            [
+              "run_id",
+              "TEXT"
+            ],
+            [
+              "request_id",
+              "TEXT"
+            ],
+            [
+              "method_id",
+              "TEXT"
+            ],
+            [
+              "input_tokens",
+              "INTEGER"
+            ],
+            [
+              "output_tokens",
+              "INTEGER"
+            ],
+            [
+              "ratio",
+              "REAL"
+            ],
+            [
+              "compression_hash",
+              "TEXT"
+            ],
+            [
+              "empty_augmentation",
+              "INTEGER"
+            ],
+            [
+              "fallback_used",
+              "INTEGER"
+            ],
+            [
+              "policy_hash",
+              "TEXT"
+            ],
+            [
+              "input_hash",
+              "TEXT"
+            ],
+            [
+              "output_hash",
+              "TEXT"
+            ],
+            [
+              "engine_version",
+              "TEXT"
+            ],
+            [
+              "tokenizer_id",
+              "TEXT"
+            ],
+            [
+              "scorer_version",
+              "TEXT"
+            ],
+            [
+              "warnings",
+              "TEXT"
+            ]
+          ],
+          "dropped_reasons": [
+            [
+              "id",
+              "INTEGER"
+            ],
+            [
+              "run_id",
+              "TEXT"
+            ],
+            [
+              "reason",
+              "TEXT"
+            ],
+            [
+              "count",
+              "INTEGER"
+            ]
+          ],
+          "om_meta": [
+            [
+              "key",
+              "TEXT"
+            ],
+            [
+              "value",
+              "TEXT"
+            ]
+          ],
+          "sqlite_sequence": [
+            [
+              "name",
+              ""
+            ],
+            [
+              "seq",
+              ""
+            ]
+          ]
+        },
+        "foreign_keys": {
+          "alembic_version": [],
+          "compression_failures": [],
+          "compression_runs": [],
+          "dropped_reasons": [
+            [
+              "compression_runs",
+              "run_id",
+              "run_id"
+            ]
+          ],
+          "om_meta": [],
+          "sqlite_sequence": []
+        },
+        "row_counts": {
+          "alembic_version": 1,
+          "compression_failures": 0,
+          "compression_runs": 0,
+          "dropped_reasons": 0,
+          "om_meta": 3,
+          "sqlite_sequence": 0
+        },
+        "application_id": "0x4f4d000e",
+        "user_version": 0,
+        "schema_sha256": "077e9798c9055effaaf6f549f80b6f8b67386847a5f85607a085968334e794ac"
+      }
+    },
+    "item 3 postgres each module alone": {
+      "a2a": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "a2a",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0005_job_idempotency_scope"
+        ],
+        "om_meta_module_id": "a2a",
+        "tables": 7
+      },
+      "artifact": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "artifact",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "om_meta_module_id": "artifact",
+        "tables": 6
+      },
+      "compress": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "compress",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "om_meta_module_id": "compress",
+        "tables": 5
+      },
+      "controlplane": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "controlplane",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0002_index_audit"
+        ],
+        "om_meta_module_id": "controlplane",
+        "tables": 19
+      },
+      "identity": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "identity",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "om_meta_module_id": "identity",
+        "tables": 4
+      },
+      "memory": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "memory",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0004_namespace"
+        ],
+        "om_meta_module_id": "memory",
+        "tables": 7
+      },
+      "policy": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "policy",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0002_blockchain_confirmations"
+        ],
+        "om_meta_module_id": "policy",
+        "tables": 6
+      },
+      "registry": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "registry",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "om_meta_module_id": "registry",
+        "tables": 5
+      },
+      "retrieve": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "retrieve",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0002_index"
+        ],
+        "om_meta_module_id": "retrieve",
+        "tables": 7
+      },
+      "secret": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "secret",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "om_meta_module_id": "secret",
+        "tables": 3
+      },
+      "session": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "session",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0005_cron_scheduler_control"
+        ],
+        "om_meta_module_id": "session",
+        "tables": 21
+      },
+      "skill": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "skill",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0007_workflow_observations"
+        ],
+        "om_meta_module_id": "skill",
+        "tables": 11
+      },
+      "task": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "task",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0001_baseline"
+        ],
+        "om_meta_module_id": "task",
+        "tables": 7
+      },
+      "telemetry": {
+        "exit": 0,
+        "entries": [
+          {
+            "module_id": "telemetry",
+            "status": "ok",
+            "success": true
+          }
+        ],
+        "alembic_version": [
+          "0003_debug_query_indexes"
+        ],
+        "om_meta_module_id": "telemetry",
+        "tables": 3
+      }
+    }
+  }
+}

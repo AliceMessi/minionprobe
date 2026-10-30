@@ -1,0 +1,8175 @@
+{
+  "banner": {
+    "probe": "probe_495",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.16",
+    "python": "3.12.15",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<RUNNER_TEMP>/empty",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "backend": "sqlite",
+    "rooms_per_stress": 300,
+    "hold_seconds": 1.5
+  },
+  "summary": {
+    "passed": 42,
+    "failed": 0,
+    "total": 42
+  },
+  "checks": [
+    {
+      "check": "item 1: the package is the installed one: imported from the venv's site-packages, Python in isolated mode, run from an empty directory with no checkout (.git or pyproject.toml) in it or its parents",
+      "pass": true,
+      "observed": {
+        "openminion.__version__": "0.1.16",
+        "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+        "cwd": "<RUNNER_TEMP>/empty",
+        "checkout markers": [],
+        "installed participants.py": {
+          "file": "<VENV>/lib/python3.12/site-packages/openminion/modules/storage/runtime/session_store/participants.py",
+          "sha256": "e42fd0c7ca0f6716d3eea5c644267903400cc7f14dc5faf8f6da46da154102d4"
+        }
+      }
+    },
+    {
+      "check": "item 2: [sqlite] A: main, first and second are independent sqlite3 connections (WAL) on one database file",
+      "pass": true,
+      "observed": {
+        "main": {
+          "record_store": "RecordStoreSQLite",
+          "connection_id": 140378656391232,
+          "file": "<RUNNER_TEMP>/work/probe_495_sqlite/state/openminion.db",
+          "journal_mode": "wal",
+          "busy_timeout_ms": 5000
+        },
+        "first": {
+          "record_store": "RecordStoreSQLite",
+          "connection_id": 140378656391712,
+          "file": "<RUNNER_TEMP>/work/probe_495_sqlite/state/openminion.db",
+          "journal_mode": "wal",
+          "busy_timeout_ms": 5000
+        },
+        "second": {
+          "record_store": "RecordStoreSQLite",
+          "connection_id": 140378656392432,
+          "file": "<RUNNER_TEMP>/work/probe_495_sqlite/state/openminion.db",
+          "journal_mode": "wal",
+          "busy_timeout_ms": 5000
+        }
+      }
+    },
+    {
+      "check": "item 3: [sqlite] T: a selection opens exactly one transaction, which commits, and sends inside it, in order, the session-row lock, the membership read (found) and the active-agent write; it sends neither outside it",
+      "pass": true,
+      "observed": {
+        "selection": "ok: 'beta'",
+        "transactions": [
+          {
+            "tx": 5,
+            "statements": [
+              "session-row lock",
+              "membership read",
+              "active-agent write"
+            ],
+            "outcome": "commit"
+          }
+        ],
+        "membership_reads [tx, in_transaction, found]": [
+          [
+            5,
+            true,
+            true
+          ]
+        ],
+        "writes [tx, in_transaction, value]": [
+          [
+            5,
+            true,
+            "beta"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "item 3: [sqlite] T: that lock statement (`UPDATE sessions SET updated_at = updated_at WHERE id = ?`) is the one the join's and the leave's transactions start with",
+      "pass": true,
+      "observed": {
+        "selection": [
+          [
+            "session-row lock"
+          ]
+        ],
+        "T join gamma (second)": [
+          [
+            "session-row lock"
+          ]
+        ],
+        "T leave gamma (second)": [
+          [
+            "session-row lock"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "item 2: [sqlite] I1 (the selection holds the lock): beta's selection on `first` passed its membership read and is held before its write; beta's leave on `second` waits for it (not finished during the 1.5 s hold, a call outstanding across the release)",
+      "pass": true,
+      "observed": {
+        "ok": true,
+        "finished_while_held": false,
+        "seconds": 1.531,
+        "call_outstanding_across_release": {
+          "kind": "transaction",
+          "event": "begin",
+          "sent_before_release_s": 1.504,
+          "returned_after_release_s": 0.027
+        },
+        "pg_lock_wait": null
+      }
+    },
+    {
+      "check": "item 2: [sqlite] I1: then the selection returns beta and the leave returns True and runs its fallback: agents [alpha], alpha stored and active; the writes are the selection's beta, then the leave's fallback alpha",
+      "pass": true,
+      "observed": {
+        "selection": "ok: 'beta'",
+        "leave": "ok: True",
+        "final": {
+          "stored": "alpha",
+          "active": "alpha",
+          "agents": [
+            "alpha"
+          ]
+        },
+        "writes": [
+          [
+            "first",
+            "I1 select beta (first, held before its write)",
+            "beta"
+          ],
+          [
+            "second",
+            "I1 leave beta (second)",
+            "alpha"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "item 3: [sqlite] I1: at the hold the selection is inside its transaction, whose first statement is the session-row lock and which holds its membership read and its write",
+      "pass": true,
+      "observed": {
+        "in_transaction_at_hold": true,
+        "transactions": [
+          {
+            "tx": 12,
+            "statements": [
+              "session-row lock",
+              "membership read",
+              "active-agent write"
+            ],
+            "outcome": "commit"
+          }
+        ],
+        "membership_reads [tx, in_transaction, found]": [
+          [
+            12,
+            true,
+            true
+          ]
+        ],
+        "writes [tx, in_transaction, value]": [
+          [
+            12,
+            true,
+            "beta"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "item 4: [sqlite] I1: no committed active agent names a departed participant (read independently: stored alpha is listed, beta has left)",
+      "pass": true,
+      "observed": {
+        "stored": "alpha",
+        "agents": [
+          "alpha"
+        ],
+        "left": [
+          [
+            "agent",
+            "beta",
+            3
+          ]
+        ]
+      }
+    },
+    {
+      "check": "item 2: [sqlite] I2 (the leave holds the lock): beta's leave on `second` marked beta as left and is held in its transaction before its fallback; beta's selection on `first` waits for it (not finished during the 1.5 s hold, a call outstanding across the release)",
+      "pass": true,
+      "observed": {
+        "leave_in_transaction_at_hold": true,
+        "ok": true,
+        "finished_while_held": false,
+        "seconds": 1.531,
+        "call_outstanding_across_release": {
+          "kind": "transaction",
+          "event": "begin",
+          "sent_before_release_s": 1.503,
+          "returned_after_release_s": 0.027
+        },
+        "pg_lock_wait": null
+      }
+    },
+    {
+      "check": "item 2: [sqlite] I2: then the leave returns True and the selection is refused (ValueError: Agent 'beta' is not an active participant): agents [alpha], alpha stored and active, no active-agent write",
+      "pass": true,
+      "observed": {
+        "leave": "ok: True",
+        "selection": "builtins.ValueError: Agent 'beta' is not an active participant",
+        "final": {
+          "stored": "alpha",
+          "active": "alpha",
+          "agents": [
+            "alpha"
+          ]
+        },
+        "writes": []
+      }
+    },
+    {
+      "check": "item 3: [sqlite] I2: the selection reads beta's membership only after the leave committed (every membership read sent after the release, finding no row) and sends no active-agent write during the hold",
+      "pass": true,
+      "observed": {
+        "membership_reads [sent after release s, found, in_transaction]": [
+          [
+            0.027,
+            false,
+            true
+          ]
+        ],
+        "writes sent during the hold": []
+      }
+    },
+    {
+      "check": "item 4: [sqlite] I2: no committed active agent names a departed participant (read independently: stored alpha is listed, beta has left)",
+      "pass": true,
+      "observed": {
+        "stored": "alpha",
+        "agents": [
+          "alpha"
+        ],
+        "left": [
+          [
+            "agent",
+            "beta",
+            3
+          ]
+        ]
+      }
+    },
+    {
+      "check": "item 3: [sqlite] I3: held right after its membership read found beta, the selection is inside its transaction, and beta's leave on `second` waits for it; the leave then applies after the selection's write: agents [alpha], alpha stored",
+      "pass": true,
+      "observed": {
+        "read found": true,
+        "in_transaction_at_hold": true,
+        "leave_waited": {
+          "ok": true,
+          "finished_while_held": false,
+          "seconds": 1.531,
+          "call_outstanding_across_release": {
+            "kind": "transaction",
+            "event": "begin",
+            "sent_before_release_s": 1.504,
+            "returned_after_release_s": 0.027
+          },
+          "pg_lock_wait": null
+        },
+        "selection": "ok: 'beta'",
+        "leave": "ok: True",
+        "final": {
+          "stored": "alpha",
+          "active": "alpha",
+          "agents": [
+            "alpha"
+          ]
+        },
+        "writes": [
+          [
+            "first",
+            "I3 select beta (first, held after its membership read)",
+            "beta"
+          ],
+          [
+            "second",
+            "I3 leave beta (second)",
+            "alpha"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "item 4: [sqlite] I3: no committed active agent names a departed participant (read independently)",
+      "pass": true,
+      "observed": {
+        "stored": "alpha",
+        "agents": [
+          "alpha"
+        ],
+        "left": [
+          [
+            "agent",
+            "beta",
+            3
+          ]
+        ]
+      }
+    },
+    {
+      "check": "item 5: [sqlite] S: selections of existing participants apply across connections: an agent joined on the other connection, the current active agent again, a mixed-case/padded id (normalized), and from a storage opened after the joins; each returns the agent, is stored, read by all three connections, one write each",
+      "pass": true,
+      "observed": [
+        [
+          "second selects beta (joined on first)",
+          "ok: 'beta'",
+          "beta",
+          true
+        ],
+        [
+          "first selects gamma (joined on second)",
+          "ok: 'gamma'",
+          "gamma",
+          true
+        ],
+        [
+          "main selects '  ALPHA ' (normalized to alpha)",
+          "ok: 'alpha'",
+          "alpha",
+          true
+        ],
+        [
+          "second selects alpha again (already the active agent)",
+          "ok: 'alpha'",
+          "alpha",
+          true
+        ],
+        [
+          "a storage opened after the joins selects beta",
+          "ok: 'beta'",
+          "beta",
+          true
+        ]
+      ]
+    },
+    {
+      "check": "item 5: [sqlite] S: an agent that left and rejoined on the other connection can be selected again",
+      "pass": true,
+      "observed": {
+        "selection": "ok: 'gamma'",
+        "final": {
+          "stored": "gamma",
+          "active": "gamma",
+          "agents": [
+            "alpha",
+            "beta",
+            "gamma"
+          ]
+        }
+      }
+    },
+    {
+      "check": "item 6: [sqlite] V: refused on `first`, each with its error and with nothing written (stored alpha, agents [alpha, beta], no active-agent write, `first` not left in a transaction): an agent that never joined, an agent that left on the other connection, the human owner's id, an empty and a spaces-only id (agent_id is required), an unknown session (Session not found)",
+      "pass": true,
+      "observed": [
+        [
+          "zeta (never a participant)",
+          "builtins.ValueError: Agent 'zeta' is not an active participant",
+          "alpha",
+          0,
+          false,
+          0
+        ],
+        [
+          "delta (left on the other connection)",
+          "builtins.ValueError: Agent 'delta' is not an active participant",
+          "alpha",
+          0,
+          false,
+          0
+        ],
+        [
+          "owner (a human participant, not an agent)",
+          "builtins.ValueError: Agent 'owner' is not an active participant",
+          "alpha",
+          0,
+          false,
+          0
+        ],
+        [
+          "'' (empty id)",
+          "builtins.ValueError: agent_id is required",
+          "alpha",
+          0,
+          false,
+          0
+        ],
+        [
+          "'   ' (spaces only)",
+          "builtins.ValueError: agent_id is required",
+          "alpha",
+          0,
+          false,
+          0
+        ],
+        [
+          "alpha in a session that does not exist",
+          "builtins.ValueError: Session not found: no-such-session-495",
+          "alpha",
+          0,
+          false,
+          0
+        ]
+      ]
+    },
+    {
+      "check": "item 6: [sqlite] V: after the refusals the lock is free: a selection of beta on `second` completes at once (under 1 s) and applies",
+      "pass": true,
+      "observed": {
+        "selection": "ok: 'beta'",
+        "seconds": 0.0,
+        "final": {
+          "stored": "beta",
+          "active": "beta",
+          "agents": [
+            "alpha",
+            "beta"
+          ]
+        }
+      }
+    },
+    {
+      "check": "item 7: [sqlite] L0: in a legacy session with no participant record, the session's own agent can be selected: its owner record is written and the selection applies (stored legacy-agent)",
+      "pass": true,
+      "observed": {
+        "before": [],
+        "selection": "ok: 'legacy-agent'",
+        "after": [
+          [
+            [
+              "agent",
+              "legacy-agent",
+              "owner",
+              1
+            ]
+          ],
+          "legacy-agent"
+        ]
+      }
+    },
+    {
+      "check": "item 7: [sqlite] L0: the owner record is written in its own transaction before the selection's transaction, which takes the session-row lock, reads the membership and writes the active agent",
+      "pass": true,
+      "observed": [
+        {
+          "tx": 50,
+          "statements": [
+            "session-row lock",
+            "participant row write"
+          ],
+          "outcome": "commit"
+        },
+        {
+          "tx": 51,
+          "statements": [
+            "session-row lock",
+            "membership read",
+            "active-agent write"
+          ],
+          "outcome": "commit"
+        }
+      ]
+    },
+    {
+      "check": "item 7: [sqlite] L1: another agent is refused before it joins (Legacy session ... is bound to agent 'legacy-agent'), storing no active agent; the owner record is listed",
+      "pass": true,
+      "observed": {
+        "selection": "builtins.ValueError: Legacy session '51df301910934ea498dd40f46713b142' is bound to agent 'legacy-agent'",
+        "stored": null,
+        "participants": [
+          [
+            "agent",
+            "legacy-agent",
+            "owner",
+            1
+          ]
+        ],
+        "writes": []
+      }
+    },
+    {
+      "check": "item 7: [sqlite] L3/L4: once it joined (on the other connection, activating it in a session with no stored agent), guest-agent can be selected, and so can the session's own agent",
+      "pass": true,
+      "observed": {
+        "after join": "guest-agent",
+        "L3": "ok: 'guest-agent'",
+        "L4": "ok: 'legacy-agent'"
+      }
+    },
+    {
+      "check": "item 7: [sqlite] L5/L6: the own agent leaves (fallback to guest-agent); the session's own agent can still be selected after its owner record left, as the legacy rule allows (unchanged, upstream's check_legacy_session_selection)",
+      "pass": true,
+      "observed": {
+        "after leave": [
+          [
+            "guest-agent"
+          ],
+          "guest-agent"
+        ],
+        "L6": "ok: 'legacy-agent'",
+        "after L6": [
+          [
+            "guest-agent"
+          ],
+          "legacy-agent"
+        ]
+      }
+    },
+    {
+      "check": "item 7: [sqlite] L7: an agent that is not a participant is still refused (bound to agent 'legacy-agent'), and the stored agent is unchanged",
+      "pass": true,
+      "observed": {
+        "selection": "builtins.ValueError: Legacy session '51df301910934ea498dd40f46713b142' is bound to agent 'legacy-agent'",
+        "stored": "legacy-agent"
+      }
+    },
+    {
+      "check": "item 8: [sqlite] J1: the first join into a room with no active agent activates it (alpha); a later join on the other connection keeps it; one write",
+      "pass": true,
+      "observed": {
+        "final": {
+          "stored": "alpha",
+          "active": "alpha",
+          "agents": [
+            "alpha",
+            "beta"
+          ]
+        },
+        "writes": [
+          [
+            "first",
+            "J1 first joins alpha",
+            "alpha"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "item 8: [sqlite] J2: a join on `second` waits for a selection held on `first`",
+      "pass": true,
+      "observed": {
+        "ok": true,
+        "finished_while_held": false,
+        "seconds": 1.531,
+        "call_outstanding_across_release": {
+          "kind": "transaction",
+          "event": "begin",
+          "sent_before_release_s": 1.503,
+          "returned_after_release_s": 0.027
+        },
+        "pg_lock_wait": null
+      }
+    },
+    {
+      "check": "item 8: [sqlite] J2: the join then adds gamma without writing the active agent; the selection's beta stays",
+      "pass": true,
+      "observed": {
+        "selection": "ok: 'beta'",
+        "join": "ok: 'gamma'",
+        "final": {
+          "stored": "beta",
+          "active": "beta",
+          "agents": [
+            "alpha",
+            "beta",
+            "gamma"
+          ]
+        },
+        "writes": [
+          [
+            "first",
+            "J2 select beta (first, held before its write)",
+            "beta"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "item 8: [sqlite] J3: with a first join held at its activation read, a join plus selection on the other connection waits, then the selection applies over the first activation (writes: alpha's activation, then beta)",
+      "pass": true,
+      "observed": {
+        "waited": {
+          "ok": true,
+          "finished_while_held": false,
+          "seconds": 1.531,
+          "call_outstanding_across_release": {
+            "kind": "transaction",
+            "event": "begin",
+            "sent_before_release_s": 1.504,
+            "returned_after_release_s": 0.027
+          },
+          "pg_lock_wait": null
+        },
+        "alpha": "ok: 'alpha'",
+        "selection": "ok: 'beta'",
+        "final": {
+          "stored": "beta",
+          "active": "beta",
+          "agents": [
+            "alpha",
+            "beta"
+          ]
+        },
+        "writes": [
+          [
+            "first",
+            "J3 join alpha (first, held at its activation read)",
+            "alpha"
+          ],
+          [
+            "second",
+            "J3 join beta + select beta (second)",
+            "beta"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "item 8: [sqlite] J4: two overlapping first joins: the second waits; the first committed activation (alpha) stays; one write",
+      "pass": true,
+      "observed": {
+        "waited": {
+          "ok": true,
+          "finished_while_held": false,
+          "seconds": 1.531,
+          "call_outstanding_across_release": {
+            "kind": "transaction",
+            "event": "begin",
+            "sent_before_release_s": 1.504,
+            "returned_after_release_s": 0.027
+          },
+          "pg_lock_wait": null
+        },
+        "final": {
+          "stored": "alpha",
+          "active": "alpha",
+          "agents": [
+            "alpha",
+            "beta"
+          ]
+        },
+        "writes": [
+          [
+            "first",
+            "J4 join alpha (first, held)",
+            "alpha"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "item 8: [sqlite] J5: a leave of the active agent falls back to the first listed agent, a rejoin keeps the active agent and is listed last, the rejoined agent can be selected, a leave of another agent changes nothing",
+      "pass": true,
+      "observed": {
+        "timeline": [
+          [
+            "first selects gamma",
+            "gamma",
+            true
+          ],
+          [
+            "second: gamma (the active agent) leaves",
+            "alpha",
+            true
+          ],
+          [
+            "first: gamma rejoins",
+            "alpha",
+            true
+          ],
+          [
+            "second selects gamma",
+            "gamma",
+            true
+          ],
+          [
+            "first: alpha (not active) leaves",
+            "gamma",
+            true
+          ]
+        ],
+        "agents": [
+          "beta",
+          "gamma"
+        ]
+      }
+    },
+    {
+      "check": "item 9: [sqlite] R1 normal path: held right after its write, the selection is still in its transaction and an independent reader still sees alpha; after it returns (commit), beta",
+      "pass": true,
+      "observed": {
+        "in_transaction": true,
+        "stored during": "alpha",
+        "selection": "ok: 'beta'",
+        "stored after": "beta"
+      }
+    },
+    {
+      "check": "item 9: [sqlite] R2 injected failure after the selection's write: the selection raises it, its transaction rolls back, and alpha is still stored (read independently); `first` is not left in a transaction",
+      "pass": true,
+      "observed": {
+        "selection": "builtins.RuntimeError: probe: injected failure after the selection write",
+        "stored after failure": "alpha",
+        "transactions": [
+          {
+            "tx": 99,
+            "statements": [
+              "session-row lock",
+              "membership read",
+              "active-agent write"
+            ],
+            "outcome": "rollback"
+          }
+        ],
+        "in_transaction": false,
+        "locks": 0
+      }
+    },
+    {
+      "check": "item 9: [sqlite] R2: a leave of beta on `second` then completes at once (under 1 s): agents [alpha], alpha stored",
+      "pass": true,
+      "observed": {
+        "leave": "ok: True",
+        "seconds": 0.0,
+        "final": {
+          "stored": "alpha",
+          "active": "alpha",
+          "agents": [
+            "alpha"
+          ]
+        }
+      }
+    },
+    {
+      "check": "item 9: [sqlite] R3 injected failure at the membership read: the selection raises it and writes nothing (alpha stored); `first` is not left in a transaction; a selection of beta on `second` then completes at once and applies",
+      "pass": true,
+      "observed": {
+        "selection": "builtins.RuntimeError: probe: injected failure at the membership read",
+        "stored after failure": "alpha",
+        "transactions": [
+          {
+            "tx": 105,
+            "statements": [
+              "session-row lock",
+              "membership read"
+            ],
+            "outcome": "rollback"
+          }
+        ],
+        "in_transaction": false,
+        "locks": 0,
+        "second": "ok: 'beta'",
+        "seconds": 0.0
+      }
+    },
+    {
+      "check": "item 9: [sqlite] R4: a leave of beta on `second` waits for a selection of beta held on `first`",
+      "pass": true,
+      "observed": {
+        "ok": true,
+        "finished_while_held": false,
+        "seconds": 1.531,
+        "call_outstanding_across_release": {
+          "kind": "transaction",
+          "event": "begin",
+          "sent_before_release_s": 1.504,
+          "returned_after_release_s": 0.027
+        },
+        "pg_lock_wait": null
+      }
+    },
+    {
+      "check": "item 9: [sqlite] R4: the held selection then fails with an injected exception and writes nothing; the leave applies: agents [alpha], alpha stored, no active-agent write",
+      "pass": true,
+      "observed": {
+        "selection": "builtins.RuntimeError: probe: injected failure in the held selection",
+        "leave": "ok: True",
+        "final": {
+          "stored": "alpha",
+          "active": "alpha",
+          "agents": [
+            "alpha"
+          ]
+        },
+        "writes": []
+      }
+    },
+    {
+      "check": "item 9: [sqlite] R5: a selection of beta on `first` waits for a leave of beta held on `second`; the leave then fails with an injected exception and rolls back (beta still listed, no left_at); the selection applies: beta stored and listed",
+      "pass": true,
+      "observed": {
+        "waited": {
+          "ok": true,
+          "finished_while_held": false,
+          "seconds": 1.531,
+          "call_outstanding_across_release": {
+            "kind": "transaction",
+            "event": "begin",
+            "sent_before_release_s": 1.503,
+            "returned_after_release_s": 0.027
+          },
+          "pg_lock_wait": null
+        },
+        "leave": "builtins.RuntimeError: probe: injected failure in the held leave",
+        "selection": "ok: 'beta'",
+        "final": {
+          "stored": "beta",
+          "active": "beta",
+          "agents": [
+            "alpha",
+            "beta"
+          ]
+        },
+        "left": []
+      }
+    },
+    {
+      "check": "item 9: [sqlite] R6: a selection waiting on a held leave fails with the database's own lock error after waiting (busy timeout 5 s), writes nothing and leaves its connection out of any transaction; the leave then commits, and the same connection selects alpha afterwards",
+      "pass": true,
+      "observed": {
+        "selection": "sqlite3.OperationalError: database is locked",
+        "seconds": 5.007,
+        "in_transaction": false,
+        "leave": "ok: True",
+        "after": {
+          "stored": "alpha",
+          "active": "alpha",
+          "agents": [
+            "alpha"
+          ]
+        },
+        "again": "ok: 'alpha'"
+      }
+    },
+    {
+      "check": "item 4: [sqlite] G unpaused stress (300 rooms, selection of beta on `first` and leave of beta on `second` released together from a barrier, the leave 0-10 ms later): no room stores a departed agent, no unexpected error; each room ends either with the selection applied and then the leave's fallback, or with the selection refused after the leave",
+      "pass": true,
+      "observed": {
+        "rooms": 300,
+        "violations": 0,
+        "errors": 0,
+        "selection applied, then the leave fell back": 226,
+        "selection refused after the leave": 74,
+        "other": 0,
+        "outcomes": {
+          "builtins.ValueError | ok: True": 74,
+          "ok | ok: True": 226
+        },
+        "by_leave_delay": {
+          "leave delayed 0 ms": {
+            "selection refused": 74,
+            "selection applied first": 12
+          },
+          "leave delayed 2 ms": {
+            "selection applied first": 43
+          },
+          "leave delayed 4 ms": {
+            "selection applied first": 43
+          },
+          "leave delayed 6 ms": {
+            "selection applied first": 43
+          },
+          "leave delayed 8 ms": {
+            "selection applied first": 43
+          },
+          "leave delayed 10 ms": {
+            "selection applied first": 42
+          }
+        },
+        "examples": []
+      }
+    },
+    {
+      "check": "item 10: [sqlite] E reopen: a new process opens a new runtime storage on the same database and reads, for every one of the 319 rooms (19 case rooms, the rest the stress rooms), the stored and active agent and the agents listed that the cases left (read through `main` at the end of each case)",
+      "pass": true,
+      "observed": {
+        "child exit": 0,
+        "mismatches": [],
+        "child openminion": [
+          "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+          "0.1.16"
+        ],
+        "sessions counted by child": 319
+      }
+    },
+    {
+      "check": "item 10: [sqlite] E reopen: read independently of openminion, the stored active_agent_id and the active agent rows of every room match",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "item 4: [sqlite] E: across all 319 sessions in the database, no stored active agent is a departed agent or a non-participant (the legacy sessions whose stored agent is the session's own agent, as the legacy rule allows, are listed separately)",
+      "pass": true,
+      "observed": {
+        "violations": [],
+        "legacy own agent": [
+          [
+            "51df301910934ea498dd40f46713b142",
+            "legacy-agent",
+            "departed"
+          ]
+        ]
+      }
+    }
+  ],
+  "expect": {
+    "room-445477cdea864267b8950d45a6ec76d0": {
+      "case": "T",
+      "ideal": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      },
+      "at_end": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      }
+    },
+    "room-5e3e36e002cb416aaca9d4b41789cc4d": {
+      "case": "I1",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-214d3abb1e91472984b37be8b85ef445": {
+      "case": "I2",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-d7f5e965d1be4101ae9f3b73b6182613": {
+      "case": "I3",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-9d4c91c08814463e8d9b6dd31e0f5026": {
+      "case": "S",
+      "ideal": {
+        "stored": "gamma",
+        "active": "gamma",
+        "agents": [
+          "alpha",
+          "beta",
+          "gamma"
+        ]
+      },
+      "at_end": {
+        "stored": "gamma",
+        "active": "gamma",
+        "agents": [
+          "alpha",
+          "beta",
+          "gamma"
+        ]
+      }
+    },
+    "room-3c58f6d6bebe46308ded1a8a71c37020": {
+      "case": "V",
+      "ideal": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      },
+      "at_end": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      }
+    },
+    "5c4b738162a7463e8629deda0197ee9c": {
+      "case": "L0",
+      "ideal": {
+        "stored": "legacy-agent",
+        "active": "legacy-agent",
+        "agents": [
+          "legacy-agent"
+        ]
+      },
+      "at_end": {
+        "stored": "legacy-agent",
+        "active": "legacy-agent",
+        "agents": [
+          "legacy-agent"
+        ]
+      }
+    },
+    "51df301910934ea498dd40f46713b142": {
+      "case": "L1-L7",
+      "ideal": {
+        "stored": "legacy-agent",
+        "active": "legacy-agent",
+        "agents": [
+          "guest-agent"
+        ]
+      },
+      "at_end": {
+        "stored": "legacy-agent",
+        "active": "legacy-agent",
+        "agents": [
+          "guest-agent"
+        ]
+      }
+    },
+    "room-a1cae467081a491e9eefcd0d812e2e89": {
+      "case": "J1",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      }
+    },
+    "room-fff5c56fd9c647aebac28cd8a9560a54": {
+      "case": "J2",
+      "ideal": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta",
+          "gamma"
+        ]
+      },
+      "at_end": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta",
+          "gamma"
+        ]
+      }
+    },
+    "room-6d38156f605d4e2784bc4b6da673bdc0": {
+      "case": "J3",
+      "ideal": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      },
+      "at_end": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      }
+    },
+    "room-7cc621d889ea4fa091b14e6c7e088b0f": {
+      "case": "J4",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      }
+    },
+    "room-bef9450185e44e449b83be0320a08159": {
+      "case": "J5",
+      "ideal": {
+        "stored": "gamma",
+        "active": "gamma",
+        "agents": [
+          "beta",
+          "gamma"
+        ]
+      },
+      "at_end": {
+        "stored": "gamma",
+        "active": "gamma",
+        "agents": [
+          "beta",
+          "gamma"
+        ]
+      }
+    },
+    "room-a56080ee904b4d139084ff355489742e": {
+      "case": "R1",
+      "ideal": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      },
+      "at_end": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      }
+    },
+    "room-ab2c69f20461413b974f5755fb46d0f1": {
+      "case": "R2",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-0e006332619c45299a086585eb549026": {
+      "case": "R3",
+      "ideal": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      },
+      "at_end": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      }
+    },
+    "room-7be0610fb4b54e5b81a9325aaf77cec7": {
+      "case": "R4",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-0e9ce54ae3a84b6e9b2f791e9ccf37a0": {
+      "case": "R5",
+      "ideal": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      },
+      "at_end": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      }
+    },
+    "room-120cb12043b648be8f706dead9df3638": {
+      "case": "R6",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-94a3e47e1e374f68bbf02340f24b8901": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-4a72e52b2a754ec9b808544d618e0169": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-8f94a83932824c35809768c4ed054d99": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-831e228353bc455e98821265767f13a8": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-de2d1fdd6d8c4e90ae141a25b9101457": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-8be53c1eab8f4bc7ba496f13c5835530": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-3a5eed2f631e4179ab42b39d4ac3fa98": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-03e4113397b946db8ce5d62b4895916d": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-b20e580d32e848db8b1d30195d0a34bc": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-aba89e28a15f44d78d533cc4bec84436": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-a7d5b6d1062341ef8138537df767611c": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-d209eb9c19594a82b3d974afd5d55727": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-f54db684e95b495d870ec19cc8d413c4": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-d35372be46d84ff78f6f2e1f13891dd9": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-81d071a98ba54e749eced5140c0f4444": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-33e54d4f78fa49658292ee8cc4524517": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-5715de9de19e4160ae0fe1c82d0390e1": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-6f58fb87b3ef491ebbda18e398dd90a3": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-f7525f4c41ae4b48a9aef0296f887977": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-8b8e70c8352e4c51b2fb5cb45518ad32": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-2a2a72128e8645aa851f6d443e9569ea": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-713c223f1a7d4e6890d4c493eaaa7f75": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-5272796dcd3f4f9a91a33651f5281939": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-7d4f055275f0436da3dd5c0f804b1027": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-8afc0724fa984979a781bef67e63a272": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-0738f50bbab640ed930996d9e1a9b1fa": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-f64fba1bf62e4cc4b85cd928f25eb5c5": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-9dcf5c3fc16f4f8ba3be89bdb7fded06": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-2d8662d4453c47e782f4c3b1e9906d0f": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-80f449184ad143529ca81bf1d1aa611e": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-3522d4f227714c5f8a01eb08d3f518cd": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-d9c6271eebc34b56a4ddc35de36bd3b6": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-df93a01ca6d0496990a1a4ae638158dd": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-2423dbbab0e44618a4bb5bf2e110a40f": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-5efab3b11ed1483cad4b821e0ed493ac": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-023d4aa7b5504750b4e3494f5d8b0e99": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-628e9df0ade94d7aa613827fa2c2d4dd": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-cf0a5c5253ae418f8d3e80e374fbd45e": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-721eb721f2784a5c85b612af65f4257b": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-16e72d146cab49a3979026eca6db820b": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-6af04788026d4209b9c3f5a4d8ebe430": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-076430c026504404b3f57533f2c9cee6": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-a213513eeb594dad8d045a673b599483": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-93a48b5a09d14b07a6f9cda16dc096a4": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-144f3986c1b840b5a6123ac1510dc8e0": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-7736af529b5546abb5d55e9a3a43534f": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-acb8ea16b031490ab4cd7ae09c28078e": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-2aeb989c785a4069a71e2b94f166c451": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-4b198f83bbe842fcb1767b80fcf56ca2": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-11b58745f2ae4d2f86837d6cd5c3acc3": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-03740c1fc1044d32adf04a202badaeff": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-8f47f4e42a1d4b40941ad57aa821d515": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-a6b8d9cf57784934a169b17a79b61b45": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-e0c4268afd0a474ca0e1cc2abc2004d1": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-7836adf453f2481888c351a7708d027c": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-130b7b104f594d9d9c0df9ca09f21dfa": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-bfdabaf3eaeb466e8cd753e8f6d76d1b": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-847f9dd8f08a424889313992b4bdb499": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-9265264ce857441d8148223e0e19866d": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-8a8aa929eaa44e66af05b3c4a3781bf5": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-9b17f620526748588db5dcf9104e8f1a": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-3fb45d2071cd4c3d9492bd80caa97e02": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-af67dc5f4ade41909aa03ed94c1abc97": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-82f2498cb42544b7b4ab27ae7ab61bde": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-64c30ef16edc481db7d84cc839a825e6": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-20faa37057e046c68ec1b9fe2d2d3572": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-d30f8ee822224fc0a8cc5a0832aca7de": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-ec5926ac38d94e56aa63e9f6091510cf": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-109c3c38a32d4e6a8f6b2efa7f46d36f": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-d2152a93b6d04087b1255e542c688908": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-ff07e913d9714c3c9cfb2c50b8228b16": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-bd50211d0c524956999c8ce715aeadd3": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-0b6b135ec04c40ddbfca034874eb0d69": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-d9e0c3708186448c98e49ac32ecc011c": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-3c77a9356219485eaec37ace4f7a3e21": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-a23bddf957d94419ad07de7aab8dc8a5": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-9884131ddd7840dab4f03b83c915d8e6": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-50ef9cb99655418d855ad543a6a12668": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-227b3f95d3f14737bf17ad698b7f4a93": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-5cde557384f5404fa00d572903e04ec0": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-100dfed723f14665a5131de593a5a7ee": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-d662c06b704243a6ba3e42d34eceda66": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-b3695b276f8949bfb2164d28c5775fe4": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-2d8fbff60430469cabb57125211a299d": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-fa9a0ea638c74324bf0886959a98cb9f": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-5f8351ea23174117932edc0a2964d8c5": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-cc6ef8caf8d3452f86818e1876d59642": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-add1fe471e694f66b7e69e7952215e04": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-5c0fa00827784d3c980ec841e444d311": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-82a760e6426341e182411909dacd5be0": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-aeb7d1daf78141aa80bb49b72f41b36d": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-eac53ae513f94ad9a99c2671dd666235": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-9214da2dc1574dd4a8d12d364614c686": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-455dcd6260624787a768f54ffa80e1bd": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-5cdb80fb4fa446efb94e8c10aa56e51d": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-c3757351072d41d882c7b89209d35fc2": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-a13bca0ced3441d58bcc55ebef24bc8b": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-551d4079082c4d7e9416b7d4c9af8a31": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-ae9bd3e82afb4b308ad26f2d881aa0a9": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-4a5c0c6b7e364e369ee6f277a70cd2fc": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-145179ec2cf245eaa13c966009a1d09e": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-f05757b2ef794337b80a4ef9997bf3f3": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-c0dd350898544142b26c4df0cf61b95f": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-1c0d4a1b2ee744c9ac4ac31a472e436e": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-b2aec818836144968fc9319fa41f37cf": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-65a7fde5051a452ab1477908c929ef5b": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-ab2a2a75133144af8819fefec437ce0a": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-92fc6fd6f6f842faa94666d9375e192c": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-4496285f55314648b1e98ef2876ae51d": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-87b925be8b9c48fdbea2f1acb5e0f862": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-b134b360354b494fa5e4f0fd67e3750a": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-b5d9164a2bed40d78cff7386ddfc97c9": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-9f0df0af494a465eb2165eb2150918da": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-22cbb99328b2465598fadbbb7cf76c3b": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-3b0032fd899041b58a8fde92995da4e5": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-2543f0e155fd4505b784b201504dae6e": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-4171079d2ac74ba6922e41522712d031": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-9167cdd58fc84e559d9f3a0ce724c18e": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-1b28eec333614362866e4e43c15f2a29": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-d1c9abd2ccf34b23858d69fb29fa5747": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-f037d3732cf445d68781b83a74991c97": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-5e85a00e25ec4c7fbdaed8c1c63e9847": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-83dde611b96d48d3b10abba4bcdf2053": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-762fc8d327f14770ace13eb9d7cbdc79": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-3cf674d46b1c41338f4ada9b4ab70d47": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-0b216a9361bc4113854c17275ce0a010": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-3a7250aa68b14fa685e1ffcbee6e66d7": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-7602f7772c804aba81ed46307b923239": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-a66436b7e60349dea3e22779edb2a2d0": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-38f6bb379ff1491d8da993d9fcc72da3": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-c58b5bef71b2400f95adfb16fae48f8b": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-8f3d7e9d7f714109b035c2d33220b2ae": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-000c7cf150e645ffb02f2c6a815969d7": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-dd4dde55c735461c9d0b46d01eafdaa3": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-a48c952e4888476d8368b4377fde05bd": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-eab8229770524815aa951568f9bba3d3": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-dd9e586fdd5a40558146a000c8003470": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-6087612774ff409c8e807ced11213f49": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-95132e05dd664b3f90d69ad954e21fc5": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-0709dc2f5893461cac35c56cf634e7c8": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-8645a07a1f2445e0b8bcb1f7647718d2": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-0e950726886e4a728812b89d0b7b6bcd": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-e2f319572c414d2e881333dd81b2e0d2": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-439b366333f8470f8f04a871c2fb935d": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-4ce8bdda03304d7b8864e6add861de48": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-297a7a04db2a40dd9b51da49bc9edbc1": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-58b32ab81c1f4819b249efb2ede4eae5": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-fa9d2e66740848d1bbd60aafff20bae1": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-d3e3339498504af4981bff676de66bce": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-1b887193abb748c9a4b79361965ebfe2": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-764b7d3b7a0b47dfb914d08d79125a4b": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-02f9e5531e6d4b33b214fab99c93cde6": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-e3fe5a521921496f8a3ff163861b3586": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-0335cf356180424091cb96d2e2fe6acc": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-aeb77e3671fb4c7786a1f7b3ae29c7c4": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-7611b08d72034cc18973fa23c32dcb1a": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-b0025588c69540dea67b3b5502187ab0": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-ab1cbafd2a1242af925145e6b2dd61fb": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-3458d3c77f464203ae706fd3e02f03da": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-a82ceb96ec4248028bbcfcdaccd3b55a": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-4cb3bea5bbe74455a55f0b6b83fbced3": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-c108d6e178a24cafac6039c316884350": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-87bf565635984496b38f2112b05ba4a4": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-a7109cd92f7242668bebffd7270d1277": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-d0fe6ac12ab54b18b26c349a0d896f8c": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-f2011b0a99374319908bbf315cdf42bd": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-c64ae1a453c44926b7736fe7a5bc9c43": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-a7332a108f734bc89adbfb20cbba4d28": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-a06e0de7a5dd4996be4d3ef675fc8e86": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-dd65ea9670ea4c35923b4b337423d6bc": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-a735de8a8ffb4b02a3035ea56ea47ab1": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-df0cad80e6cb45b5a663822a00dd7198": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-15c060a0ccde44f5b8baf62981e32d78": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-8ab1047d2e7c48f990bbe8762fba5d85": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-f07e14a2bcfb42d3a58ded3a2747191a": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-f09d17c4baab47a696647a075e9327bb": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-c358d512aac647639c4ed3974af4768f": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-1555f9153928452cae6fc29d77b29b3c": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-1f28fb6998fb4a17ba8c4d447c22ef77": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-0c1cf980edaa4ae1ae89287d1619d44c": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-21d6a5c524784fbaa58e48bd7f777408": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-ec70c04c705e45ff8080fbd46f495a66": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-dc84034ca8b04a9cb4bebf0ec1c35518": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-ba5b8be510c94de5b7e3a3fb64210d1c": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-787fae348e2a4727be5a03205616d564": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-bf4d82d0b74b476e8f86d4cb6d625e96": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-6d121bf048854b5cace605b1b7a368ce": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-37d373618ee64034a6d10d28c33cf85b": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-10cd3b3585ad4b099eafaca16723bc72": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-ba95ae97b4b7444c8138b90a86a40130": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-2dceb09ec2cc44b9af1073c64dd50491": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-41c707dbf4e14952bdc221aa195fd78e": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-e7a4e840451f4e63ae21cdf096fc9c1e": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-5de442b95fed4786b15b9984f4802182": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-892c58fc434547fb9dce666cb92f096f": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-f1902a74a1e5405c8a950eb6de09282a": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-3387e820b95249e8bab3b2b1568ee045": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-d1bb7c41a79a49d6b861893147d2f8f0": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-d3be02efa72745849f33cab4dbdf8ecb": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-747177305615479e93194d9c82e9db90": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-4ac7243dee444e7d9de0755365582b2a": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-1abe3fe7b11a460480585f9b17d3a12c": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-91156b4f4a1d4d308fe3103779fcbc10": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-506779ea7dc14c17aa69f7aa1e320d1a": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-51d485db25774dbca2ad5769957ac442": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-a4136726c53748cc83b3e5e366c467e5": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-8d5a91cbc1454784b04abc0fc7e7965f": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-196eb73dcbd84c149dcd181f568ff211": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-9d686339f69d4c598b10fc58108a0701": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-41743e78eb604e899e9119e7dd71740d": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-30bb1cc0642046e996881ef427b6bb31": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-9322460de03742c19a0d531362f96e49": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-a893af237b754d62863a243ed66389c7": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-8dea06d36455417eb4ef8a987417b550": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-4872b13d969e4095860d950d2572ddf9": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-49c6f00329a64e689024aa1504c95a6f": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-e34c91e197e64ad68e5540456d9f1d21": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-bbd88ff944664128928f33daf37bcd35": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-388d64b749c349839c90b1bbf2fc4c35": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-cab6f8341aef4664a021701111e14a46": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-454da24e55994079a49ccbef65a612a1": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-06ed525d5c344995ae9eada4478eaab0": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-db4403e802f349238c6db5e62faf3da7": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-19671651d70a419fb202fe70e9c18e4b": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-e73e3c8202c84b74a159fbec78d64469": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-f98be64e9ea544138662e387648c745e": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-082236740ffc468499a33a772e75e1d5": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-176da38df7c74e8383ec9105f08df6fd": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-f33da2b43fcf45eca51e7a57bd4f247d": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-d496f11fcfd947cebd63c869e525b4c7": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-c5e9045fe0f94403bd6ae7dc07df343a": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-5571c00a38e845edb3387c375fc21220": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-7e3d27423fff427490ad02026a09a7d7": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-012deea1eff94d4cb6b959c05d9ac43d": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-e44dba3e6c174ed88f6747d23745d305": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-ba73a4049c564ba0b4d791e09abdc603": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-8b0d664ffcee4a84837f77c926b641dd": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-2246a9e1a0c14e18b16c24a443bbfd41": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-9ece4ab1cce84a9f9c33e70b2d12dc6d": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-8473b42e73004f87bac4d50c9400a61e": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-97c03e02e0cb4d84bd40ea182b59a7d1": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-ab3c7809dd804130a8177da0c8884bec": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-703ef134d9ee4552b6d3d50b2711aa56": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-c6457777e8c84125bf82df593adb514c": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-11aa8541dd304f869699cf78ed57b2dd": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-7a7d2f701352431eb75f921123f60e4e": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-e136f023e95c42269f6013f41c5e2cde": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-182fcdb76d7c4989b9dc2daf00fd916d": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-23c917b33fdd4c91b4bc6b71751e534e": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-dbea2bdef43b4766a9e02a9a2d897afb": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-9434fe10d0c04fd3afc4c0672c18e7c0": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-25bfc62dbf274641ae58a89344071e91": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-ec06af6cb06640f6b5a4cb68a3eae7c3": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-ed71852886f14ce2a6755ff059351ab6": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-1b5378b1da9a4b26b21626e2b35e37db": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-db89d215c57646aba89ac3be4ce742c2": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-134177c996264d3b9a55df0e446f19f7": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-6e0fd09147a64b5c96ecf16f38a8c01d": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-586ea9073030416c98aa1d0b27918211": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-3a630dc9765043c3ba14aaa9a8264a16": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-cb8b950930964726b02b85925fa9b612": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-a28687df99e54bc692cc621039d8c28c": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-1208cff426424419a58c51afce2bfdb2": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-eb16b48289ed42dc8400709abec6b538": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-bf0aa919772a4f2da0366af4f56ee20c": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-f42672ae393547eeb0d93a7908841866": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-28b07a7d180f4b8a8b89a0897b94527d": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-ed448fe1cdc14cefbe4e9ad6fa03b1ff": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-f3a2bee551cc44758dbb19c97b4a86df": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-2c3cdf3618234ce080becd7277f9c841": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-205c1605e42f482d8693dce0b7cce60e": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-d97cb158748d4cada77244f3913b4d15": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-576709b7e04b4b4fbb48e0caba27f1fe": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-287315b9cc764c18bc230f73ff8b41fc": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-a9551ffd161d4cb9854f123c987da96c": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-329f78a4a1814b149ec28c83c284b130": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-2663d371ecb94c65ab05776d89c130a2": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-b1e550b33eb04250bc31c610d6d97809": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-d6b67a1a605e481ba25e46bd223ef3dd": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-8fff51c240714a2299bcd14852a39158": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-b94b78f32722405a8114594f3828934c": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-4025a5efb2814d4c9e99ff4a95693775": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-76eca299ffa2480483379d14fbbbb76d": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-1efcf9f81b704d348d112a1eaa7265d7": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-d668844246dc4d0faf5254e408fbfe64": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-bfaa193d2b354747850dddd9b843edd1": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-5833c97f9a294d9ba4f03ecc54537c59": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-3b8bb4e30e154a63b663e47390a1d138": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-05fd8af4eb674688bc470dfab5fc6868": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-5b362a1dfcae4751a5fb584476ab6e2d": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-8759e22f155f4e9ab261b3c769e78380": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-9a764a26723d4d32baa492e9b0161406": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-26eb93da962c43c4bfe3109aa4ce87ac": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-2ac14f774aec47faa26176f7bd52d23c": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-6dd7116a00dd43d38b722eb10a744766": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-e78882c5672f4029ab21df6166cd3f2c": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-de7c606c9dce41dfa5a6eb286c21e9f5": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-d68867470d924a199a47da87785ed710": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-289923e3a3fa47fd8e417e09ab768cd7": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "room-b44aad79cce6484c9fec028ab797f8f0": {
+      "case": "G",
+      "ideal": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "at_end": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    }
+  },
+  "legacy_sessions": {
+    "5c4b738162a7463e8629deda0197ee9c": "legacy-agent",
+    "51df301910934ea498dd40f46713b142": "legacy-agent"
+  },
+  "cases": {
+    "installed participants.py": {
+      "file": "<VENV>/lib/python3.12/site-packages/openminion/modules/storage/runtime/session_store/participants.py",
+      "sha256": "e42fd0c7ca0f6716d3eea5c644267903400cc7f14dc5faf8f6da46da154102d4"
+    },
+    "sqlite A connections": {
+      "main": {
+        "record_store": "RecordStoreSQLite",
+        "connection_id": 140378656391232,
+        "file": "<RUNNER_TEMP>/work/probe_495_sqlite/state/openminion.db",
+        "journal_mode": "wal",
+        "busy_timeout_ms": 5000
+      },
+      "first": {
+        "record_store": "RecordStoreSQLite",
+        "connection_id": 140378656391712,
+        "file": "<RUNNER_TEMP>/work/probe_495_sqlite/state/openminion.db",
+        "journal_mode": "wal",
+        "busy_timeout_ms": 5000
+      },
+      "second": {
+        "record_store": "RecordStoreSQLite",
+        "connection_id": 140378656392432,
+        "file": "<RUNNER_TEMP>/work/probe_495_sqlite/state/openminion.db",
+        "journal_mode": "wal",
+        "busy_timeout_ms": 5000
+      }
+    },
+    "sqlite T": {
+      "room": "room-445477cdea864267b8950d45a6ec76d0",
+      "selection": "ok: 'beta'",
+      "join": "ok: 'gamma'",
+      "leave": "ok: True",
+      "selection_trace": [
+        {
+          "by": "first",
+          "kind": "session read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 1
+        },
+        {
+          "by": "first",
+          "kind": "transaction",
+          "tx": 5,
+          "in_transaction": false,
+          "event": "begin"
+        },
+        {
+          "by": "first",
+          "kind": "session-row lock",
+          "tx": 5,
+          "in_transaction": true,
+          "rowcount": 1
+        },
+        {
+          "by": "first",
+          "kind": "membership read",
+          "tx": 5,
+          "in_transaction": true,
+          "value": "beta",
+          "found": true,
+          "rows": 1
+        },
+        {
+          "by": "first",
+          "kind": "active-agent write",
+          "tx": 5,
+          "in_transaction": true,
+          "value": "beta",
+          "rowcount": 1
+        },
+        {
+          "by": "first",
+          "kind": "transaction",
+          "tx": 5,
+          "in_transaction": false,
+          "event": "commit"
+        },
+        {
+          "by": "first",
+          "kind": "session read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 1
+        }
+      ],
+      "selection_shape": {
+        "transactions": [
+          {
+            "tx": 5,
+            "statements": [
+              "session-row lock",
+              "membership read",
+              "active-agent write"
+            ],
+            "outcome": "commit"
+          }
+        ],
+        "membership_reads": [
+          [
+            5,
+            true,
+            true
+          ]
+        ],
+        "writes": [
+          [
+            5,
+            true,
+            "beta"
+          ]
+        ],
+        "read_and_write_share_a_locked_transaction": true
+      },
+      "first_statement": {
+        "T join gamma (second)": [
+          [
+            "session-row lock"
+          ]
+        ],
+        "T leave gamma (second)": [
+          [
+            "session-row lock"
+          ]
+        ]
+      },
+      "final": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      }
+    },
+    "sqlite I1": {
+      "room": "room-5e3e36e002cb416aaca9d4b41789cc4d",
+      "held_in_transaction": true,
+      "independent_read_while_held": {
+        "exists": true,
+        "stored": "alpha",
+        "agents": [
+          "alpha",
+          "beta"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            2
+          ],
+          [
+            "agent",
+            "beta",
+            "participant",
+            3
+          ]
+        ],
+        "left": []
+      },
+      "leave_waited": {
+        "ok": true,
+        "finished_while_held": false,
+        "seconds": 1.531,
+        "call_outstanding_across_release": {
+          "kind": "transaction",
+          "event": "begin",
+          "sent_before_release_s": 1.504,
+          "returned_after_release_s": 0.027
+        },
+        "pg_lock_wait": null
+      },
+      "selection": "ok: 'beta'",
+      "leave": "ok: True",
+      "final": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "raw": {
+        "exists": true,
+        "stored": "alpha",
+        "agents": [
+          "alpha"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            2
+          ]
+        ],
+        "left": [
+          [
+            "agent",
+            "beta",
+            3
+          ]
+        ]
+      },
+      "selection_shape": {
+        "transactions": [
+          {
+            "tx": 12,
+            "statements": [
+              "session-row lock",
+              "membership read",
+              "active-agent write"
+            ],
+            "outcome": "commit"
+          }
+        ],
+        "membership_reads": [
+          [
+            12,
+            true,
+            true
+          ]
+        ],
+        "writes": [
+          [
+            12,
+            true,
+            "beta"
+          ]
+        ],
+        "read_and_write_share_a_locked_transaction": true
+      },
+      "active_agent_writes": [
+        [
+          "first",
+          "I1 select beta (first, held before its write)",
+          "beta"
+        ],
+        [
+          "second",
+          "I1 leave beta (second)",
+          "alpha"
+        ]
+      ],
+      "trace": [
+        {
+          "by": "first",
+          "kind": "session read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 1,
+          "sent_s": -1.505,
+          "done_s": -1.505
+        },
+        {
+          "by": "first",
+          "kind": "transaction",
+          "tx": 12,
+          "in_transaction": false,
+          "event": "begin",
+          "sent_s": -1.505,
+          "done_s": -1.505
+        },
+        {
+          "by": "first",
+          "kind": "session-row lock",
+          "tx": 12,
+          "in_transaction": true,
+          "rowcount": 1,
+          "sent_s": -1.505,
+          "done_s": -1.505
+        },
+        {
+          "by": "first",
+          "kind": "membership read",
+          "tx": 12,
+          "in_transaction": true,
+          "value": "beta",
+          "found": true,
+          "rows": 1,
+          "sent_s": -1.505,
+          "done_s": -1.505
+        },
+        {
+          "by": "second",
+          "kind": "session read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 1,
+          "sent_s": -1.504,
+          "done_s": -1.504
+        },
+        {
+          "by": "second",
+          "kind": "transaction",
+          "tx": 13,
+          "in_transaction": false,
+          "event": "begin",
+          "sent_s": -1.504,
+          "done_s": 0.027
+        },
+        {
+          "by": "first",
+          "kind": "active-agent write",
+          "tx": 12,
+          "in_transaction": true,
+          "value": "beta",
+          "rowcount": 1,
+          "sent_s": 0.0,
+          "done_s": 0.0
+        },
+        {
+          "by": "first",
+          "kind": "transaction",
+          "tx": 12,
+          "in_transaction": false,
+          "event": "commit",
+          "sent_s": 0.0,
+          "done_s": 0.0
+        },
+        {
+          "by": "first",
+          "kind": "session read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 1,
+          "sent_s": 0.0,
+          "done_s": 0.0
+        },
+        {
+          "by": "second",
+          "kind": "session-row lock",
+          "tx": 13,
+          "in_transaction": true,
+          "rowcount": 1,
+          "sent_s": 0.027,
+          "done_s": 0.027
+        },
+        {
+          "by": "second",
+          "kind": "leave write",
+          "tx": 13,
+          "in_transaction": true,
+          "rowcount": 1,
+          "sent_s": 0.027,
+          "done_s": 0.027
+        },
+        {
+          "by": "second",
+          "kind": "session read",
+          "tx": 13,
+          "in_transaction": true,
+          "rows": 1,
+          "sent_s": 0.027,
+          "done_s": 0.027
+        },
+        {
+          "by": "second",
+          "kind": "session read",
+          "tx": 13,
+          "in_transaction": true,
+          "rows": 1,
+          "sent_s": 0.027,
+          "done_s": 0.027
+        },
+        {
+          "by": "second",
+          "kind": "participants read",
+          "tx": 13,
+          "in_transaction": true,
+          "rows": 2,
+          "sent_s": 0.027,
+          "done_s": 0.027
+        },
+        {
+          "by": "second",
+          "kind": "active-agent write",
+          "tx": 13,
+          "in_transaction": true,
+          "value": "alpha",
+          "rowcount": 1,
+          "sent_s": 0.027,
+          "done_s": 0.027
+        },
+        {
+          "by": "second",
+          "kind": "transaction",
+          "tx": 13,
+          "in_transaction": false,
+          "event": "commit",
+          "sent_s": 0.027,
+          "done_s": 0.027
+        },
+        {
+          "by": "main",
+          "kind": "session read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 1,
+          "sent_s": 0.028,
+          "done_s": 0.028
+        },
+        {
+          "by": "main",
+          "kind": "session read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 1,
+          "sent_s": 0.028,
+          "done_s": 0.028
+        },
+        {
+          "by": "main",
+          "kind": "session read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 1,
+          "sent_s": 0.028,
+          "done_s": 0.028
+        },
+        {
+          "by": "main",
+          "kind": "participants read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 2,
+          "sent_s": 0.028,
+          "done_s": 0.028
+        }
+      ]
+    },
+    "sqlite I2": {
+      "room": "room-214d3abb1e91472984b37be8b85ef445",
+      "held_in_transaction": true,
+      "independent_read_while_held": {
+        "exists": true,
+        "stored": "alpha",
+        "agents": [
+          "alpha",
+          "beta"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            2
+          ],
+          [
+            "agent",
+            "beta",
+            "participant",
+            3
+          ]
+        ],
+        "left": []
+      },
+      "selection_waited": {
+        "ok": true,
+        "finished_while_held": false,
+        "seconds": 1.531,
+        "call_outstanding_across_release": {
+          "kind": "transaction",
+          "event": "begin",
+          "sent_before_release_s": 1.503,
+          "returned_after_release_s": 0.027
+        },
+        "pg_lock_wait": null
+      },
+      "leave": "ok: True",
+      "selection": "builtins.ValueError: Agent 'beta' is not an active participant",
+      "final": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "raw": {
+        "exists": true,
+        "stored": "alpha",
+        "agents": [
+          "alpha"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            2
+          ]
+        ],
+        "left": [
+          [
+            "agent",
+            "beta",
+            3
+          ]
+        ]
+      },
+      "selection_shape": {
+        "transactions": [
+          {
+            "tx": 19,
+            "statements": [
+              "session-row lock",
+              "membership read"
+            ],
+            "outcome": "rollback"
+          }
+        ],
+        "membership_reads": [
+          [
+            19,
+            true,
+            false
+          ]
+        ],
+        "writes": [],
+        "read_and_write_share_a_locked_transaction": true
+      },
+      "active_agent_writes": [],
+      "trace": [
+        {
+          "by": "second",
+          "kind": "session read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 1,
+          "sent_s": -1.505,
+          "done_s": -1.505
+        },
+        {
+          "by": "second",
+          "kind": "transaction",
+          "tx": 18,
+          "in_transaction": false,
+          "event": "begin",
+          "sent_s": -1.505,
+          "done_s": -1.505
+        },
+        {
+          "by": "second",
+          "kind": "session-row lock",
+          "tx": 18,
+          "in_transaction": true,
+          "rowcount": 1,
+          "sent_s": -1.505,
+          "done_s": -1.505
+        },
+        {
+          "by": "second",
+          "kind": "leave write",
+          "tx": 18,
+          "in_transaction": true,
+          "rowcount": 1,
+          "sent_s": -1.505,
+          "done_s": -1.505
+        },
+        {
+          "by": "first",
+          "kind": "session read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 1,
+          "sent_s": -1.503,
+          "done_s": -1.503
+        },
+        {
+          "by": "first",
+          "kind": "transaction",
+          "tx": 19,
+          "in_transaction": false,
+          "event": "begin",
+          "sent_s": -1.503,
+          "done_s": 0.027
+        },
+        {
+          "by": "second",
+          "kind": "session read",
+          "tx": 18,
+          "in_transaction": true,
+          "rows": 1,
+          "sent_s": 0.0,
+          "done_s": 0.0
+        },
+        {
+          "by": "second",
+          "kind": "transaction",
+          "tx": 18,
+          "in_transaction": false,
+          "event": "commit",
+          "sent_s": 0.0,
+          "done_s": 0.0
+        },
+        {
+          "by": "first",
+          "kind": "session-row lock",
+          "tx": 19,
+          "in_transaction": true,
+          "rowcount": 1,
+          "sent_s": 0.027,
+          "done_s": 0.027
+        },
+        {
+          "by": "first",
+          "kind": "membership read",
+          "tx": 19,
+          "in_transaction": true,
+          "value": "beta",
+          "found": false,
+          "rows": 0,
+          "sent_s": 0.027,
+          "done_s": 0.027
+        },
+        {
+          "by": "first",
+          "kind": "transaction",
+          "tx": 19,
+          "in_transaction": false,
+          "event": "rollback",
+          "sent_s": 0.027,
+          "done_s": 0.027
+        },
+        {
+          "by": "main",
+          "kind": "session read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 1,
+          "sent_s": 0.028,
+          "done_s": 0.028
+        },
+        {
+          "by": "main",
+          "kind": "session read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 1,
+          "sent_s": 0.028,
+          "done_s": 0.028
+        },
+        {
+          "by": "main",
+          "kind": "session read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 1,
+          "sent_s": 0.028,
+          "done_s": 0.028
+        },
+        {
+          "by": "main",
+          "kind": "participants read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 2,
+          "sent_s": 0.028,
+          "done_s": 0.028
+        }
+      ]
+    },
+    "sqlite I3": {
+      "room": "room-d7f5e965d1be4101ae9f3b73b6182613",
+      "membership_read_found": true,
+      "held_in_transaction": true,
+      "leave_waited": {
+        "ok": true,
+        "finished_while_held": false,
+        "seconds": 1.531,
+        "call_outstanding_across_release": {
+          "kind": "transaction",
+          "event": "begin",
+          "sent_before_release_s": 1.504,
+          "returned_after_release_s": 0.027
+        },
+        "pg_lock_wait": null
+      },
+      "selection": "ok: 'beta'",
+      "leave": "ok: True",
+      "final": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "raw": {
+        "exists": true,
+        "stored": "alpha",
+        "agents": [
+          "alpha"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            2
+          ]
+        ],
+        "left": [
+          [
+            "agent",
+            "beta",
+            3
+          ]
+        ]
+      },
+      "active_agent_writes": [
+        [
+          "first",
+          "I3 select beta (first, held after its membership read)",
+          "beta"
+        ],
+        [
+          "second",
+          "I3 leave beta (second)",
+          "alpha"
+        ]
+      ],
+      "trace": [
+        {
+          "by": "first",
+          "kind": "session read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 1,
+          "sent_s": -1.504,
+          "done_s": -1.504
+        },
+        {
+          "by": "first",
+          "kind": "transaction",
+          "tx": 24,
+          "in_transaction": false,
+          "event": "begin",
+          "sent_s": -1.504,
+          "done_s": -1.504
+        },
+        {
+          "by": "first",
+          "kind": "session-row lock",
+          "tx": 24,
+          "in_transaction": true,
+          "rowcount": 1,
+          "sent_s": -1.504,
+          "done_s": -1.504
+        },
+        {
+          "by": "first",
+          "kind": "membership read",
+          "tx": 24,
+          "in_transaction": true,
+          "value": "beta",
+          "found": true,
+          "rows": 1,
+          "sent_s": -1.504,
+          "done_s": -1.504
+        },
+        {
+          "by": "second",
+          "kind": "session read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 1,
+          "sent_s": -1.504,
+          "done_s": -1.504
+        },
+        {
+          "by": "second",
+          "kind": "transaction",
+          "tx": 25,
+          "in_transaction": false,
+          "event": "begin",
+          "sent_s": -1.504,
+          "done_s": 0.027
+        },
+        {
+          "by": "first",
+          "kind": "active-agent write",
+          "tx": 24,
+          "in_transaction": true,
+          "value": "beta",
+          "rowcount": 1,
+          "sent_s": 0.0,
+          "done_s": 0.0
+        },
+        {
+          "by": "first",
+          "kind": "transaction",
+          "tx": 24,
+          "in_transaction": false,
+          "event": "commit",
+          "sent_s": 0.0,
+          "done_s": 0.0
+        },
+        {
+          "by": "first",
+          "kind": "session read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 1,
+          "sent_s": 0.0,
+          "done_s": 0.0
+        },
+        {
+          "by": "second",
+          "kind": "session-row lock",
+          "tx": 25,
+          "in_transaction": true,
+          "rowcount": 1,
+          "sent_s": 0.027,
+          "done_s": 0.027
+        },
+        {
+          "by": "second",
+          "kind": "leave write",
+          "tx": 25,
+          "in_transaction": true,
+          "rowcount": 1,
+          "sent_s": 0.027,
+          "done_s": 0.027
+        },
+        {
+          "by": "second",
+          "kind": "session read",
+          "tx": 25,
+          "in_transaction": true,
+          "rows": 1,
+          "sent_s": 0.027,
+          "done_s": 0.027
+        },
+        {
+          "by": "second",
+          "kind": "session read",
+          "tx": 25,
+          "in_transaction": true,
+          "rows": 1,
+          "sent_s": 0.027,
+          "done_s": 0.027
+        },
+        {
+          "by": "second",
+          "kind": "participants read",
+          "tx": 25,
+          "in_transaction": true,
+          "rows": 2,
+          "sent_s": 0.027,
+          "done_s": 0.027
+        },
+        {
+          "by": "second",
+          "kind": "active-agent write",
+          "tx": 25,
+          "in_transaction": true,
+          "value": "alpha",
+          "rowcount": 1,
+          "sent_s": 0.027,
+          "done_s": 0.027
+        },
+        {
+          "by": "second",
+          "kind": "transaction",
+          "tx": 25,
+          "in_transaction": false,
+          "event": "commit",
+          "sent_s": 0.027,
+          "done_s": 0.027
+        },
+        {
+          "by": "main",
+          "kind": "session read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 1,
+          "sent_s": 0.027,
+          "done_s": 0.027
+        },
+        {
+          "by": "main",
+          "kind": "session read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 1,
+          "sent_s": 0.027,
+          "done_s": 0.027
+        },
+        {
+          "by": "main",
+          "kind": "session read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 1,
+          "sent_s": 0.028,
+          "done_s": 0.028
+        },
+        {
+          "by": "main",
+          "kind": "participants read",
+          "tx": null,
+          "in_transaction": false,
+          "rows": 2,
+          "sent_s": 0.028,
+          "done_s": 0.028
+        }
+      ]
+    },
+    "sqlite S": {
+      "room": "room-9d4c91c08814463e8d9b6dd31e0f5026",
+      "timeline": [
+        {
+          "step": "second selects beta (joined on first)",
+          "returned": "ok: 'beta'",
+          "raw": "beta",
+          "main": "beta",
+          "first": "beta",
+          "second": "beta",
+          "writes": [
+            [
+              "second",
+              "S second selects beta (joined on first)",
+              "beta"
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "step": "first selects gamma (joined on second)",
+          "returned": "ok: 'gamma'",
+          "raw": "gamma",
+          "main": "gamma",
+          "first": "gamma",
+          "second": "gamma",
+          "writes": [
+            [
+              "first",
+              "S first selects gamma (joined on second)",
+              "gamma"
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "step": "main selects '  ALPHA ' (normalized to alpha)",
+          "returned": "ok: 'alpha'",
+          "raw": "alpha",
+          "main": "alpha",
+          "first": "alpha",
+          "second": "alpha",
+          "writes": [
+            [
+              "main",
+              "S main selects '  ALPHA ' (normalized to alpha)",
+              "alpha"
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "step": "second selects alpha again (already the active agent)",
+          "returned": "ok: 'alpha'",
+          "raw": "alpha",
+          "main": "alpha",
+          "first": "alpha",
+          "second": "alpha",
+          "writes": [
+            [
+              "second",
+              "S second selects alpha again (already the active agent)",
+              "alpha"
+            ]
+          ],
+          "ok": true
+        },
+        {
+          "step": "a storage opened after the joins selects beta",
+          "returned": "ok: 'beta'",
+          "raw": "beta",
+          "main": "beta",
+          "first": "beta",
+          "second": "beta",
+          "writes": [
+            [
+              "fresh",
+              "S a storage opened after the joins selects beta",
+              "beta"
+            ]
+          ],
+          "ok": true
+        }
+      ],
+      "rejoined selection": "ok: 'gamma'",
+      "final": {
+        "stored": "gamma",
+        "active": "gamma",
+        "agents": [
+          "alpha",
+          "beta",
+          "gamma"
+        ]
+      }
+    },
+    "sqlite V": {
+      "room": "room-3c58f6d6bebe46308ded1a8a71c37020",
+      "before": {
+        "exists": true,
+        "stored": "alpha",
+        "agents": [
+          "alpha",
+          "beta"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            2
+          ],
+          [
+            "agent",
+            "beta",
+            "participant",
+            3
+          ]
+        ],
+        "left": [
+          [
+            "agent",
+            "delta",
+            4
+          ]
+        ]
+      },
+      "attempts": [
+        {
+          "attempt": "zeta (never a participant)",
+          "result": "builtins.ValueError: Agent 'zeta' is not an active participant",
+          "stored_after": "alpha",
+          "agents_after": [
+            "alpha",
+            "beta"
+          ],
+          "active_agent_writes": 0,
+          "first_in_transaction_after": false,
+          "pg_locks_held_by_first": 0,
+          "transactions": [
+            {
+              "tx": 45,
+              "statements": [
+                "session-row lock",
+                "membership read"
+              ],
+              "outcome": "rollback"
+            }
+          ],
+          "ok": true
+        },
+        {
+          "attempt": "delta (left on the other connection)",
+          "result": "builtins.ValueError: Agent 'delta' is not an active participant",
+          "stored_after": "alpha",
+          "agents_after": [
+            "alpha",
+            "beta"
+          ],
+          "active_agent_writes": 0,
+          "first_in_transaction_after": false,
+          "pg_locks_held_by_first": 0,
+          "transactions": [
+            {
+              "tx": 46,
+              "statements": [
+                "session-row lock",
+                "membership read"
+              ],
+              "outcome": "rollback"
+            }
+          ],
+          "ok": true
+        },
+        {
+          "attempt": "owner (a human participant, not an agent)",
+          "result": "builtins.ValueError: Agent 'owner' is not an active participant",
+          "stored_after": "alpha",
+          "agents_after": [
+            "alpha",
+            "beta"
+          ],
+          "active_agent_writes": 0,
+          "first_in_transaction_after": false,
+          "pg_locks_held_by_first": 0,
+          "transactions": [
+            {
+              "tx": 47,
+              "statements": [
+                "session-row lock",
+                "membership read"
+              ],
+              "outcome": "rollback"
+            }
+          ],
+          "ok": true
+        },
+        {
+          "attempt": "'' (empty id)",
+          "result": "builtins.ValueError: agent_id is required",
+          "stored_after": "alpha",
+          "agents_after": [
+            "alpha",
+            "beta"
+          ],
+          "active_agent_writes": 0,
+          "first_in_transaction_after": false,
+          "pg_locks_held_by_first": 0,
+          "transactions": [],
+          "ok": true
+        },
+        {
+          "attempt": "'   ' (spaces only)",
+          "result": "builtins.ValueError: agent_id is required",
+          "stored_after": "alpha",
+          "agents_after": [
+            "alpha",
+            "beta"
+          ],
+          "active_agent_writes": 0,
+          "first_in_transaction_after": false,
+          "pg_locks_held_by_first": 0,
+          "transactions": [],
+          "ok": true
+        },
+        {
+          "attempt": "alpha in a session that does not exist",
+          "result": "builtins.ValueError: Session not found: no-such-session-495",
+          "stored_after": "alpha",
+          "agents_after": [
+            "alpha",
+            "beta"
+          ],
+          "active_agent_writes": 0,
+          "first_in_transaction_after": false,
+          "pg_locks_held_by_first": 0,
+          "transactions": [],
+          "ok": true
+        }
+      ],
+      "second selects beta": "ok: 'beta'",
+      "seconds": 0.0,
+      "final": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      }
+    },
+    "sqlite L": {
+      "L0": {
+        "session": "5c4b738162a7463e8629deda0197ee9c",
+        "raw_before": {
+          "exists": true,
+          "stored": null,
+          "agents": [],
+          "participants": [],
+          "left": []
+        },
+        "selection": "ok: 'legacy-agent'",
+        "raw_after": {
+          "exists": true,
+          "stored": "legacy-agent",
+          "agents": [
+            "legacy-agent"
+          ],
+          "participants": [
+            [
+              "agent",
+              "legacy-agent",
+              "owner",
+              1
+            ]
+          ],
+          "left": []
+        },
+        "transactions": [
+          {
+            "tx": 50,
+            "statements": [
+              "session-row lock",
+              "participant row write"
+            ],
+            "outcome": "commit"
+          },
+          {
+            "tx": 51,
+            "statements": [
+              "session-row lock",
+              "membership read",
+              "active-agent write"
+            ],
+            "outcome": "commit"
+          }
+        ]
+      },
+      "L1-L7": {
+        "session": "51df301910934ea498dd40f46713b142",
+        "L1 select guest-agent": "builtins.ValueError: Legacy session '51df301910934ea498dd40f46713b142' is bound to agent 'legacy-agent'",
+        "after L1": {
+          "exists": true,
+          "stored": null,
+          "agents": [
+            "legacy-agent"
+          ],
+          "participants": [
+            [
+              "agent",
+              "legacy-agent",
+              "owner",
+              1
+            ]
+          ],
+          "left": []
+        },
+        "L1 writes": [],
+        "after guest-agent joins": {
+          "exists": true,
+          "stored": "guest-agent",
+          "agents": [
+            "legacy-agent",
+            "guest-agent"
+          ],
+          "participants": [
+            [
+              "agent",
+              "legacy-agent",
+              "owner",
+              1
+            ],
+            [
+              "agent",
+              "guest-agent",
+              "participant",
+              2
+            ]
+          ],
+          "left": []
+        },
+        "L3 select guest-agent": "ok: 'guest-agent'",
+        "L4 select legacy-agent": "ok: 'legacy-agent'",
+        "after legacy-agent leaves": {
+          "exists": true,
+          "stored": "guest-agent",
+          "agents": [
+            "guest-agent"
+          ],
+          "participants": [
+            [
+              "agent",
+              "guest-agent",
+              "participant",
+              2
+            ]
+          ],
+          "left": [
+            [
+              "agent",
+              "legacy-agent",
+              1
+            ]
+          ]
+        },
+        "L6 select legacy-agent": "ok: 'legacy-agent'",
+        "after L6": {
+          "exists": true,
+          "stored": "legacy-agent",
+          "agents": [
+            "guest-agent"
+          ],
+          "participants": [
+            [
+              "agent",
+              "guest-agent",
+              "participant",
+              2
+            ]
+          ],
+          "left": [
+            [
+              "agent",
+              "legacy-agent",
+              1
+            ]
+          ]
+        },
+        "L7 select other-agent": "builtins.ValueError: Legacy session '51df301910934ea498dd40f46713b142' is bound to agent 'legacy-agent'",
+        "after L7": {
+          "exists": true,
+          "stored": "legacy-agent",
+          "agents": [
+            "guest-agent"
+          ],
+          "participants": [
+            [
+              "agent",
+              "guest-agent",
+              "participant",
+              2
+            ]
+          ],
+          "left": [
+            [
+              "agent",
+              "legacy-agent",
+              1
+            ]
+          ]
+        }
+      }
+    },
+    "sqlite J2": {
+      "room": "room-fff5c56fd9c647aebac28cd8a9560a54",
+      "join_waited": {
+        "ok": true,
+        "finished_while_held": false,
+        "seconds": 1.531,
+        "call_outstanding_across_release": {
+          "kind": "transaction",
+          "event": "begin",
+          "sent_before_release_s": 1.503,
+          "returned_after_release_s": 0.027
+        },
+        "pg_lock_wait": null
+      },
+      "selection": "ok: 'beta'",
+      "join": "ok: 'gamma'",
+      "final": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta",
+          "gamma"
+        ]
+      },
+      "writes": [
+        [
+          "first",
+          "J2 select beta (first, held before its write)",
+          "beta"
+        ]
+      ]
+    },
+    "sqlite J3": {
+      "room": "room-6d38156f605d4e2784bc4b6da673bdc0",
+      "held_read_saw": null,
+      "waited": {
+        "ok": true,
+        "finished_while_held": false,
+        "seconds": 1.531,
+        "call_outstanding_across_release": {
+          "kind": "transaction",
+          "event": "begin",
+          "sent_before_release_s": 1.504,
+          "returned_after_release_s": 0.027
+        },
+        "pg_lock_wait": null
+      },
+      "alpha": "ok: 'alpha'",
+      "selection": "ok: 'beta'",
+      "final": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      },
+      "writes": [
+        [
+          "first",
+          "J3 join alpha (first, held at its activation read)",
+          "alpha"
+        ],
+        [
+          "second",
+          "J3 join beta + select beta (second)",
+          "beta"
+        ]
+      ]
+    },
+    "sqlite R1": {
+      "room": "room-a56080ee904b4d139084ff355489742e",
+      "in_transaction_at_hold": true,
+      "during": {
+        "exists": true,
+        "stored": "alpha",
+        "agents": [
+          "alpha",
+          "beta"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            2
+          ],
+          [
+            "agent",
+            "beta",
+            "participant",
+            3
+          ]
+        ],
+        "left": []
+      },
+      "selection": "ok: 'beta'",
+      "after": {
+        "exists": true,
+        "stored": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            2
+          ],
+          [
+            "agent",
+            "beta",
+            "participant",
+            3
+          ]
+        ],
+        "left": []
+      }
+    },
+    "sqlite R2": {
+      "room": "room-ab2c69f20461413b974f5755fb46d0f1",
+      "selection": "builtins.RuntimeError: probe: injected failure after the selection write",
+      "transactions": [
+        {
+          "tx": 99,
+          "statements": [
+            "session-row lock",
+            "membership read",
+            "active-agent write"
+          ],
+          "outcome": "rollback"
+        }
+      ],
+      "raw_after_failure": {
+        "exists": true,
+        "stored": "alpha",
+        "agents": [
+          "alpha",
+          "beta"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            2
+          ],
+          [
+            "agent",
+            "beta",
+            "participant",
+            3
+          ]
+        ],
+        "left": []
+      },
+      "first_in_transaction": false,
+      "pg_locks_held_by_first": 0,
+      "leave": "ok: True",
+      "leave_seconds": 0.0,
+      "final": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "sqlite R3": {
+      "room": "room-0e006332619c45299a086585eb549026",
+      "selection": "builtins.RuntimeError: probe: injected failure at the membership read",
+      "transactions": [
+        {
+          "tx": 105,
+          "statements": [
+            "session-row lock",
+            "membership read"
+          ],
+          "outcome": "rollback"
+        }
+      ],
+      "raw_after_failure": {
+        "exists": true,
+        "stored": "alpha",
+        "agents": [
+          "alpha",
+          "beta"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            2
+          ],
+          [
+            "agent",
+            "beta",
+            "participant",
+            3
+          ]
+        ],
+        "left": []
+      },
+      "first_in_transaction": false,
+      "pg_locks_held_by_first": 0,
+      "second": "ok: 'beta'",
+      "seconds": 0.0,
+      "final": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      }
+    },
+    "sqlite R4": {
+      "room": "room-7be0610fb4b54e5b81a9325aaf77cec7",
+      "leave_waited": {
+        "ok": true,
+        "finished_while_held": false,
+        "seconds": 1.531,
+        "call_outstanding_across_release": {
+          "kind": "transaction",
+          "event": "begin",
+          "sent_before_release_s": 1.504,
+          "returned_after_release_s": 0.027
+        },
+        "pg_lock_wait": null
+      },
+      "selection": "builtins.RuntimeError: probe: injected failure in the held selection",
+      "leave": "ok: True",
+      "final": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "writes": []
+    },
+    "sqlite R5": {
+      "room": "room-0e9ce54ae3a84b6e9b2f791e9ccf37a0",
+      "selection_waited": {
+        "ok": true,
+        "finished_while_held": false,
+        "seconds": 1.531,
+        "call_outstanding_across_release": {
+          "kind": "transaction",
+          "event": "begin",
+          "sent_before_release_s": 1.503,
+          "returned_after_release_s": 0.027
+        },
+        "pg_lock_wait": null
+      },
+      "leave": "builtins.RuntimeError: probe: injected failure in the held leave",
+      "selection": "ok: 'beta'",
+      "final": {
+        "stored": "beta",
+        "active": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ]
+      },
+      "raw": {
+        "exists": true,
+        "stored": "beta",
+        "agents": [
+          "alpha",
+          "beta"
+        ],
+        "participants": [
+          [
+            "human",
+            "owner",
+            "owner",
+            1
+          ],
+          [
+            "agent",
+            "alpha",
+            "participant",
+            2
+          ],
+          [
+            "agent",
+            "beta",
+            "participant",
+            3
+          ]
+        ],
+        "left": []
+      },
+      "selection_reads [sent after release s, found]": [
+        [
+          0.027,
+          true
+        ]
+      ]
+    },
+    "sqlite R6": {
+      "room": "room-120cb12043b648be8f706dead9df3638",
+      "waiter": "first",
+      "hold_seconds": 6.5,
+      "watch": {
+        "finished_while_held": true,
+        "seconds_watched": 6.5,
+        "pg_lock_wait": null
+      },
+      "selection": "sqlite3.OperationalError: database is locked",
+      "selection_seconds": 5.007,
+      "transactions": [
+        {
+          "tx": 124,
+          "statements": [],
+          "outcome": "begin failed"
+        }
+      ],
+      "waiter_in_transaction_after": false,
+      "leave": "ok: True",
+      "after": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      },
+      "again": "ok: 'alpha'",
+      "final": {
+        "stored": "alpha",
+        "active": "alpha",
+        "agents": [
+          "alpha"
+        ]
+      }
+    },
+    "sqlite G": {
+      "rooms": 300,
+      "violations": 0,
+      "errors": 0,
+      "selection applied, then the leave fell back": 226,
+      "selection refused after the leave": 74,
+      "other": 0,
+      "outcomes": {
+        "builtins.ValueError | ok: True": 74,
+        "ok | ok: True": 226
+      },
+      "by_leave_delay": {
+        "leave delayed 0 ms": {
+          "selection refused": 74,
+          "selection applied first": 12
+        },
+        "leave delayed 2 ms": {
+          "selection applied first": 43
+        },
+        "leave delayed 4 ms": {
+          "selection applied first": 43
+        },
+        "leave delayed 6 ms": {
+          "selection applied first": 43
+        },
+        "leave delayed 8 ms": {
+          "selection applied first": 43
+        },
+        "leave delayed 10 ms": {
+          "selection applied first": 42
+        }
+      },
+      "examples": []
+    },
+    "sqlite traced statements (all)": 15390,
+    "sqlite E reopen": {
+      "child_exit": 0,
+      "child_stderr_tail": "",
+      "child_openminion": [
+        "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+        "0.1.16"
+      ],
+      "child_pid": 5077,
+      "parent_pid": 4449,
+      "sessions_counted_by_child": 319,
+      "rooms_checked": 319,
+      "named_cases": 19,
+      "api_mismatches": [],
+      "raw_mismatches": [],
+      "raw_sessions": 319,
+      "raw_participant_rows": 959,
+      "stored_active_not_a_participant": [],
+      "legacy_sessions_storing_their_own_agent": [
+        [
+          "51df301910934ea498dd40f46713b142",
+          "legacy-agent",
+          "departed"
+        ]
+      ],
+      "case_rooms_whose_end_state_differs_from_the_fixed_behavior": []
+    }
+  }
+}

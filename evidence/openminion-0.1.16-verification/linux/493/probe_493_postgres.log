@@ -1,0 +1,143 @@
+{
+  "probe": "probe_493",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.16",
+  "python": "3.12.15",
+  "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<WORK>/empty",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "backend": "postgres",
+  "cli": "<VENV>/bin/openminion"
+}
+postgres: PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+CASE item 2 [newdb]: new database p493_v0_1_16_newdb, schema public
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_newdb --module compress --plan --json
+  exit=0 entries=[{"module_id": "compress", "status": "plan", "current_revision": null, "head": "head", "pending": true}]
+PASS item 2 [public schema of a new database]: `--plan` before the migration shows compress pending (no revision) | observed={'exit': 0, 'entries': [{'module_id': 'compress', 'status': 'plan', 'current_revision': None, 'head': 'head', 'pending': True}]}
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_newdb --module compress --json
+  exit=0 entries=[{"module_id": "compress", "status": "ok", "success": true}]
+PASS item 2 [public schema of a new database]: `storage migrate --backend postgres --postgres-url <url> --module compress --json` exits 0 with the compress entry ok | observed={'exit': 0, 'entries': [{'module_id': 'compress', 'status': 'ok', 'success': True}]}
+PASS item 2 [public schema of a new database]: the migration wrote only to the public schema (tables per schema) | observed={'public': 5}
+PASS item 2 [public schema of a new database]: the compress tables exist, and only they (with alembic_version) | observed=['alembic_version', 'compression_failures', 'compression_runs', 'dropped_reasons', 'om_meta']
+PASS item 2 [public schema of a new database]: each compress table has the baseline's columns and types | observed={'compression_runs': [['run_id', 'text'], ['request_id', 'text'], ['method_id', 'text'], ['input_tokens', 'integer'], ['output_tokens', 'integer'], ['ratio', 'double precision'], ['compression_hash', 'text'], ['empty_augmentation', 'integer'], ['fallback_used', 'integer'], ['policy_hash', 'text'], ['input_hash', 'text'], ['output_hash', 'text'], ['engine_version', 'text'], ['tokenizer_id', 'text'], ['scorer_version', 'text'], ['warnings', 'text']], 'dropped_reasons': [['id', 'integer'], ['run_id', 'text'], ['reason', 'text'], ['count', 'integer']], 'compression_failures': [['failure_id', 'text'], ['request_id', 'text'], ['error_code', 'text'], ['message', 'text']], 'om_meta': [['key', 'text'], ['value', 'text']]}
+PASS item 2 [public schema of a new database]: dropped_reasons.id is an identity column (GENERATED ALWAYS), as the PostgreSQL DDL declares | observed={'dropped_reasons.id': 'ALWAYS'}
+PASS item 2 [public schema of a new database]: dropped_reasons.run_id references compression_runs.run_id | observed=[['dropped_reasons', 'FOREIGN KEY', 'run_id', 'compression_runs', 'run_id']]
+PASS item 2 [public schema of a new database]: alembic_version is 0001_baseline | observed=['0001_baseline']
+PASS item 2 [public schema of a new database]: module metadata (om_meta) names compress at 0001_baseline, with last_migrated_at | observed={'module_id': 'compress', 'schema_head': '0001_baseline', 'last_migrated_at': '2026-10-30T04:55:57+00:00'}
+PASS item 2 [public schema of a new database]: no connection to the database is left after the CLI exits | observed=0
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_newdb --module compress --plan --json
+  exit=0 entries=[{"module_id": "compress", "status": "plan", "current_revision": "0001_baseline", "head": "head", "pending": false}]
+PASS item 2 [public schema of a new database]: `--plan` after the migration shows compress at 0001_baseline | observed={'exit': 0, 'entries': [{'module_id': 'compress', 'status': 'plan', 'current_revision': '0001_baseline', 'head': 'head', 'pending': False}]}
+$ openminion storage verify --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_newdb --module compress --json
+  exit=0 entries=[{"module_id": "compress", "status": "passed", "report": "VerificationReport(module_id='compress', db_path='<WORK>/empty/:memory:', level='quick', quick_check='ok', integrity_check=None, findings=[], ok=True)"}]
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_newdb --module compress --json
+  exit=0 entries=[{"module_id": "compress", "status": "ok", "success": true}]
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_newdb --module compress
+  exit=0 stdout='ok  compress'
+PASS item 2 [public schema of a new database]: rerun (--json) exits 0 with the compress entry ok | observed={'exit': 0, 'entries': [{'module_id': 'compress', 'status': 'ok', 'success': True}]}
+PASS item 2 [public schema of a new database]: rerun in text mode exits 0 and prints `ok  compress` | observed={'exit': 0, 'stdout': 'ok  compress'}
+PASS item 2 [public schema of a new database]: after both reruns the schema is unchanged (same objects and columns) | observed={'before': '7791c526f5fdc114d2800fb15c242ef012907d2336ebcec46fdae1a5f100a290', 'after': '7791c526f5fdc114d2800fb15c242ef012907d2336ebcec46fdae1a5f100a290', 'tables': ['alembic_version', 'compression_failures', 'compression_runs', 'dropped_reasons', 'om_meta']}
+PASS item 2 [public schema of a new database]: after both reruns alembic_version is still 0001_baseline | observed=['0001_baseline']
+PASS item 2 [public schema of a new database]: after both reruns om_meta still names compress at 0001_baseline | observed={'before': {'module_id': 'compress', 'schema_head': '0001_baseline', 'last_migrated_at': '2026-10-30T04:55:57+00:00'}, 'after': {'module_id': 'compress', 'schema_head': '0001_baseline', 'last_migrated_at': '2026-10-30T04:56:01+00:00'}}
+PASS item 2 [public schema of a new database]: the rows the probe inserted before the reruns are kept (1 compression_runs, 1 dropped_reasons) | observed={'alembic_version': 1, 'compression_failures': 0, 'compression_runs': 1, 'dropped_reasons': 1, 'om_meta': 3}
+PASS item 2 [public schema of a new database]: after the reruns the database still holds only the public schema's 5 tables | observed={'public': 5}
+  after: tables=['alembic_version', 'compression_failures', 'compression_runs', 'dropped_reasons', 'om_meta'] alembic=['0001_baseline'] om_meta={'module_id': 'compress', 'schema_head': '0001_baseline', 'last_migrated_at': '2026-10-30T04:56:01+00:00'} identity={'dropped_reasons.id': 'ALWAYS'} rows={'alembic_version': 1, 'compression_failures': 0, 'compression_runs': 1, 'dropped_reasons': 1, 'om_meta': 3} per_schema={'public': 5}
+  observed only: storage verify --backend postgres --module compress: exit=0 entries=[{'module_id': 'compress', 'status': 'passed', 'report': "VerificationReport(module_id='compress', db_path='<WORK>/empty/:memory:', level='quick', quick_check='ok', integrity_check=None, findings=[], ok=True)"}]
+CASE item 2 [schema]: new database p493_v0_1_16_schema, schema om_compress (selected by the URL's search_path)
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_schema?options=-csearch_path%3Dom_compress --module compress --plan --json
+  exit=0 entries=[{"module_id": "compress", "status": "plan", "current_revision": null, "head": "head", "pending": true}]
+PASS item 2 [om_compress schema of a new database]: `--plan` before the migration shows compress pending (no revision) | observed={'exit': 0, 'entries': [{'module_id': 'compress', 'status': 'plan', 'current_revision': None, 'head': 'head', 'pending': True}]}
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_schema?options=-csearch_path%3Dom_compress --module compress --json
+  exit=0 entries=[{"module_id": "compress", "status": "ok", "success": true}]
+PASS item 2 [om_compress schema of a new database]: `storage migrate --backend postgres --postgres-url <url> --module compress --json` exits 0 with the compress entry ok | observed={'exit': 0, 'entries': [{'module_id': 'compress', 'status': 'ok', 'success': True}]}
+PASS item 2 [om_compress schema of a new database]: the migration wrote only to the om_compress schema (tables per schema) | observed={'om_compress': 5}
+PASS item 2 [om_compress schema of a new database]: the compress tables exist, and only they (with alembic_version) | observed=['alembic_version', 'compression_failures', 'compression_runs', 'dropped_reasons', 'om_meta']
+PASS item 2 [om_compress schema of a new database]: each compress table has the baseline's columns and types | observed={'compression_runs': [['run_id', 'text'], ['request_id', 'text'], ['method_id', 'text'], ['input_tokens', 'integer'], ['output_tokens', 'integer'], ['ratio', 'double precision'], ['compression_hash', 'text'], ['empty_augmentation', 'integer'], ['fallback_used', 'integer'], ['policy_hash', 'text'], ['input_hash', 'text'], ['output_hash', 'text'], ['engine_version', 'text'], ['tokenizer_id', 'text'], ['scorer_version', 'text'], ['warnings', 'text']], 'dropped_reasons': [['id', 'integer'], ['run_id', 'text'], ['reason', 'text'], ['count', 'integer']], 'compression_failures': [['failure_id', 'text'], ['request_id', 'text'], ['error_code', 'text'], ['message', 'text']], 'om_meta': [['key', 'text'], ['value', 'text']]}
+PASS item 2 [om_compress schema of a new database]: dropped_reasons.id is an identity column (GENERATED ALWAYS), as the PostgreSQL DDL declares | observed={'dropped_reasons.id': 'ALWAYS'}
+PASS item 2 [om_compress schema of a new database]: dropped_reasons.run_id references compression_runs.run_id | observed=[['dropped_reasons', 'FOREIGN KEY', 'run_id', 'compression_runs', 'run_id']]
+PASS item 2 [om_compress schema of a new database]: alembic_version is 0001_baseline | observed=['0001_baseline']
+PASS item 2 [om_compress schema of a new database]: module metadata (om_meta) names compress at 0001_baseline, with last_migrated_at | observed={'module_id': 'compress', 'schema_head': '0001_baseline', 'last_migrated_at': '2026-10-30T04:56:03+00:00'}
+PASS item 2 [om_compress schema of a new database]: no connection to the database is left after the CLI exits | observed=0
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_schema?options=-csearch_path%3Dom_compress --module compress --plan --json
+  exit=0 entries=[{"module_id": "compress", "status": "plan", "current_revision": "0001_baseline", "head": "head", "pending": false}]
+PASS item 2 [om_compress schema of a new database]: `--plan` after the migration shows compress at 0001_baseline | observed={'exit': 0, 'entries': [{'module_id': 'compress', 'status': 'plan', 'current_revision': '0001_baseline', 'head': 'head', 'pending': False}]}
+$ openminion storage verify --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_schema?options=-csearch_path%3Dom_compress --module compress --json
+  exit=0 entries=[{"module_id": "compress", "status": "passed", "report": "VerificationReport(module_id='compress', db_path='<WORK>/empty/:memory:', level='quick', quick_check='ok', integrity_check=None, findings=[], ok=True)"}]
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_schema?options=-csearch_path%3Dom_compress --module compress --json
+  exit=0 entries=[{"module_id": "compress", "status": "ok", "success": true}]
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_schema?options=-csearch_path%3Dom_compress --module compress
+  exit=0 stdout='ok  compress'
+PASS item 2 [om_compress schema of a new database]: rerun (--json) exits 0 with the compress entry ok | observed={'exit': 0, 'entries': [{'module_id': 'compress', 'status': 'ok', 'success': True}]}
+PASS item 2 [om_compress schema of a new database]: rerun in text mode exits 0 and prints `ok  compress` | observed={'exit': 0, 'stdout': 'ok  compress'}
+PASS item 2 [om_compress schema of a new database]: after both reruns the schema is unchanged (same objects and columns) | observed={'before': '7791c526f5fdc114d2800fb15c242ef012907d2336ebcec46fdae1a5f100a290', 'after': '7791c526f5fdc114d2800fb15c242ef012907d2336ebcec46fdae1a5f100a290', 'tables': ['alembic_version', 'compression_failures', 'compression_runs', 'dropped_reasons', 'om_meta']}
+PASS item 2 [om_compress schema of a new database]: after both reruns alembic_version is still 0001_baseline | observed=['0001_baseline']
+PASS item 2 [om_compress schema of a new database]: after both reruns om_meta still names compress at 0001_baseline | observed={'before': {'module_id': 'compress', 'schema_head': '0001_baseline', 'last_migrated_at': '2026-10-30T04:56:03+00:00'}, 'after': {'module_id': 'compress', 'schema_head': '0001_baseline', 'last_migrated_at': '2026-10-30T04:56:07+00:00'}}
+PASS item 2 [om_compress schema of a new database]: the rows the probe inserted before the reruns are kept (1 compression_runs, 1 dropped_reasons) | observed={'alembic_version': 1, 'compression_failures': 0, 'compression_runs': 1, 'dropped_reasons': 1, 'om_meta': 3}
+PASS item 2 [om_compress schema of a new database]: after the reruns the database still holds only the om_compress schema's 5 tables | observed={'om_compress': 5}
+  after: tables=['alembic_version', 'compression_failures', 'compression_runs', 'dropped_reasons', 'om_meta'] alembic=['0001_baseline'] om_meta={'module_id': 'compress', 'schema_head': '0001_baseline', 'last_migrated_at': '2026-10-30T04:56:07+00:00'} identity={'dropped_reasons.id': 'ALWAYS'} rows={'alembic_version': 1, 'compression_failures': 0, 'compression_runs': 1, 'dropped_reasons': 1, 'om_meta': 3} per_schema={'om_compress': 5}
+  observed only: storage verify --backend postgres --module compress: exit=0 entries=[{'module_id': 'compress', 'status': 'passed', 'report': "VerificationReport(module_id='compress', db_path='<WORK>/empty/:memory:', level='quick', quick_check='ok', integrity_check=None, findings=[], ok=True)"}]
+  package openminion.modules.a2a.storage MODULE_ID='a2a' found_by_discovery=True
+  package openminion.modules.artifact.storage MODULE_ID='artifact' found_by_discovery=True
+  package openminion.modules.context.compress.storage MODULE_ID='compress' found_by_discovery=True
+  package openminion.modules.controlplane.channels.telegram.storage MODULE_ID='controlplane_telegram' found_by_discovery=True
+  package openminion.modules.controlplane.storage MODULE_ID='controlplane' found_by_discovery=True
+  package openminion.modules.identity.storage MODULE_ID='identity' found_by_discovery=True
+  package openminion.modules.memory.storage MODULE_ID='memory' found_by_discovery=True
+  package openminion.modules.policy.storage MODULE_ID='policy' found_by_discovery=True
+  package openminion.modules.registry.storage MODULE_ID='registry' found_by_discovery=True
+  package openminion.modules.retrieve.storage MODULE_ID='retrieve' found_by_discovery=True
+  package openminion.modules.secret.storage MODULE_ID='secret' found_by_discovery=True
+  package openminion.modules.session.storage MODULE_ID='session' found_by_discovery=True
+  package openminion.modules.skill.storage MODULE_ID='skill' found_by_discovery=True
+  package openminion.modules.task.storage MODULE_ID='task' found_by_discovery=True
+  package openminion.modules.telemetry.storage MODULE_ID='telemetry' found_by_discovery=True
+  package openminion.modules.tool.authoring.storage MODULE_ID='authoring' found_by_discovery=True
+  package openminion.tools.commerce.storage MODULE_ID='commerce' found_by_discovery=True
+  installed openminion/modules/storage/migrations/alembic.py sha256=12b27527ea4cbe1a1ba5e47de449fd32affd02644bcb3017e1eedd8e717eee5d nested map={'authoring': ['openminion.modules.tool.authoring.storage'], 'commerce': ['openminion.tools.commerce.storage'], 'compress': ['openminion.modules.context.compress.storage']}
+PASS item 3: discovery resolves compress to openminion/modules/context/compress/storage with its migrations (script location; the wheel ships no alembic.ini there) | observed={'storage_root': 'openminion/modules/context/compress/storage', 'alembic_ini': None, 'script_location': 'openminion/modules/context/compress/storage/migrations', 'nested_module_storage_import_paths': {'authoring': ['openminion.modules.tool.authoring.storage'], 'commerce': ['openminion.tools.commerce.storage'], 'compress': ['openminion.modules.context.compress.storage']}, 'installed_alembic_py_sha256': '12b27527ea4cbe1a1ba5e47de449fd32affd02644bcb3017e1eedd8e717eee5d'}
+PASS item 3: every installed `*/storage/migrations/env.py` package is found by discovery for the MODULE_ID it declares | observed={'packages': 17, 'not_found': []}
+PASS item 3: control: every such package other than compress is found by discovery (16 packages) | observed={'not_found_other_than_compress': []}
+PASS item 3: control: ordinary (`openminion.modules.<id>.storage`), nested (authoring, commerce) and channel (controlplane_telegram) modules resolve to their packages | observed={'secret': 'openminion/modules/secret/storage', 'session': 'openminion/modules/session/storage', 'authoring': 'openminion/modules/tool/authoring/storage', 'commerce': 'openminion/tools/commerce/storage', 'controlplane_telegram': 'openminion/modules/controlplane/channels/telegram/storage'}
+PASS item 3: only the module ids with no migrations package (storage, brain) have no script location | observed=['brain', 'storage']
+CASE item 3: openminion.modules.context.compress.storage.migrations.run_migrations(<new file>)
+  results=['returned', 'returned']
+PASS item 3: compress's own run_migrations(<new file>) returns, twice | observed=['returned', 'returned']
+PASS item 3: after run_migrations the file has the compress tables, 0001_baseline, om_meta module_id compress, application_id 0x4f4d000e and user_version TARGET_USER_VERSION | observed={'tables': ['alembic_version', 'compression_failures', 'compression_runs', 'dropped_reasons', 'om_meta', 'sqlite_sequence'], 'alembic_version': ['0001_baseline'], 'om_meta': {'module_id': 'compress', 'schema_head': '0001_baseline', 'last_migrated_at': '2026-10-30T04:56:10+00:00'}, 'application_id': '0x4f4d000e', 'user_version': 0}
+PASS item 3: the second run_migrations leaves the schema and revision unchanged | observed={'first': '077e9798c9055effaaf6f549f80b6f8b67386847a5f85607a085968334e794ac', 'second': '077e9798c9055effaaf6f549f80b6f8b67386847a5f85607a085968334e794ac', 'alembic': ['0001_baseline']}
+PASS item 3: compress's list_migrations() and MODULE_ID | observed={'list_migrations': ['0001_baseline'], 'MODULE_ID': 'compress'}
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_alone_a2a --module a2a --json
+  exit=0 entries=[{"module_id": "a2a", "status": "ok", "success": true}]
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_alone_artifact --module artifact --json
+  exit=0 entries=[{"module_id": "artifact", "status": "ok", "success": true}]
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_alone_compress --module compress --json
+  exit=0 entries=[{"module_id": "compress", "status": "ok", "success": true}]
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_alone_controlplane --module controlplane --json
+  exit=0 entries=[{"module_id": "controlplane", "status": "ok", "success": true}]
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_alone_identity --module identity --json
+  exit=0 entries=[{"module_id": "identity", "status": "ok", "success": true}]
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_alone_memory --module memory --json
+  exit=0 entries=[{"module_id": "memory", "status": "ok", "success": true}]
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_alone_policy --module policy --json
+  exit=0 entries=[{"module_id": "policy", "status": "ok", "success": true}]
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_alone_registry --module registry --json
+  exit=0 entries=[{"module_id": "registry", "status": "ok", "success": true}]
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_alone_retrieve --module retrieve --json
+  exit=0 entries=[{"module_id": "retrieve", "status": "ok", "success": true}]
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_alone_secret --module secret --json
+  exit=0 entries=[{"module_id": "secret", "status": "ok", "success": true}]
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_alone_session --module session --json
+  exit=0 entries=[{"module_id": "session", "status": "ok", "success": true}]
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_alone_skill --module skill --json
+  exit=0 entries=[{"module_id": "skill", "status": "ok", "success": true}]
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_alone_task --module task --json
+  exit=0 entries=[{"module_id": "task", "status": "ok", "success": true}]
+$ openminion storage migrate --backend postgres --postgres-url postgresql+psycopg://postgres:***@localhost:5432/p493_v0_1_16_alone_telemetry --module telemetry --json
+  exit=0 entries=[{"module_id": "telemetry", "status": "ok", "success": true}]
+PASS item 3: control: `storage migrate --backend postgres --module secret` on a new database exits 0, ok, at its head | observed={'exit': 0, 'entries': [{'module_id': 'secret', 'status': 'ok', 'success': True}], 'alembic_version': ['0001_baseline'], 'om_meta_module_id': 'secret', 'tables': 3}
+PASS item 3: no PostgreSQL-validated module (each alone on a new database) reports `Alembic configuration missing` | observed=[]
+PASS item 3: control: no PostgreSQL-validated module other than compress reports `Alembic configuration missing` | observed=[]
+  each validated module alone on PostgreSQL (observed; telemetry/controlplane are #494): {'a2a': ('ok', ['0005_job_idempotency_scope']), 'artifact': ('ok', ['0001_baseline']), 'compress': ('ok', ['0001_baseline']), 'controlplane': ('ok', ['0002_index_audit']), 'identity': ('ok', ['0001_baseline']), 'memory': ('ok', ['0004_namespace']), 'policy': ('ok', ['0002_blockchain_confirmations']), 'registry': ('ok', ['0001_baseline']), 'retrieve': ('ok', ['0002_index']), 'secret': ('ok', ['0001_baseline']), 'session': ('ok', ['0005_cron_scheduler_control']), 'skill': ('ok', ['0007_workflow_observations']), 'task': ('ok', ['0001_baseline']), 'telemetry': ('ok', ['0003_debug_query_indexes'])}
+SUMMARY passed=48 failed=0 total=48
+exit=0

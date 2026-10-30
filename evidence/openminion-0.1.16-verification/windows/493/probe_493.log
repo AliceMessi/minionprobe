@@ -1,0 +1,114 @@
+{
+  "probe": "probe_493",
+  "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+  "openminion.__version__": "0.1.16",
+  "python": "3.12.11",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "sqlite3.sqlite_version": "3.50.4",
+  "cwd": "<WORK>\\empty-493",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "backend": "sqlite",
+  "cli": "<VENV>\\Scripts\\openminion.EXE"
+}
+CASE item 1: new SQLite file <CASE_WORK>/sqlite/compress_cli/compress_cli.db
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\compress_cli\compress_cli.db --module compress --plan --json
+  exit=0 entries=[{"module_id": "compress", "status": "plan", "current_revision": null, "head": "head", "pending": true}]
+PASS item 1: `--plan` before the migration shows compress pending (no revision) | observed={'exit': 0, 'entries': [{'module_id': 'compress', 'status': 'plan', 'current_revision': None, 'head': 'head', 'pending': True}]}
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\compress_cli\compress_cli.db --module compress --json
+  exit=0 entries=[{"module_id": "compress", "status": "ok", "success": true}]
+PASS item 1: `storage migrate --sqlite <new file> --module compress --json` exits 0 with the compress entry ok | observed={'exit': 0, 'entries': [{'module_id': 'compress', 'status': 'ok', 'success': True}]}
+PASS item 1: the compress tables exist, and only they (with alembic_version and sqlite_sequence) | observed=['alembic_version', 'compression_failures', 'compression_runs', 'dropped_reasons', 'om_meta', 'sqlite_sequence']
+PASS item 1: each compress table has the baseline's columns and types | observed={'compression_runs': [['run_id', 'TEXT'], ['request_id', 'TEXT'], ['method_id', 'TEXT'], ['input_tokens', 'INTEGER'], ['output_tokens', 'INTEGER'], ['ratio', 'REAL'], ['compression_hash', 'TEXT'], ['empty_augmentation', 'INTEGER'], ['fallback_used', 'INTEGER'], ['policy_hash', 'TEXT'], ['input_hash', 'TEXT'], ['output_hash', 'TEXT'], ['engine_version', 'TEXT'], ['tokenizer_id', 'TEXT'], ['scorer_version', 'TEXT'], ['warnings', 'TEXT']], 'dropped_reasons': [['id', 'INTEGER'], ['run_id', 'TEXT'], ['reason', 'TEXT'], ['count', 'INTEGER']], 'compression_failures': [['failure_id', 'TEXT'], ['request_id', 'TEXT'], ['error_code', 'TEXT'], ['message', 'TEXT']], 'om_meta': [['key', 'TEXT'], ['value', 'TEXT']]}
+PASS item 1: dropped_reasons.run_id references compression_runs.run_id | observed=[['compression_runs', 'run_id', 'run_id']]
+PASS item 1: alembic_version is 0001_baseline | observed=['0001_baseline']
+PASS item 1: module metadata (om_meta) names compress at 0001_baseline, with last_migrated_at | observed={'module_id': 'compress', 'schema_head': '0001_baseline', 'last_migrated_at': '2026-10-30T04:55:11+00:00'}
+PASS item 1: PRAGMA application_id is compress's module id (MODULE_APPLICATION_IDS['compress']) | observed='0x4f4d000e'
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\compress_cli\compress_cli.db --module compress --plan --json
+  exit=0 entries=[{"module_id": "compress", "status": "plan", "current_revision": "0001_baseline", "head": "head", "pending": false}]
+PASS item 1: `--plan` after the migration shows compress at 0001_baseline, not pending | observed={'exit': 0, 'entries': [{'module_id': 'compress', 'status': 'plan', 'current_revision': '0001_baseline', 'head': 'head', 'pending': False}]}
+$ openminion storage verify --sqlite <CASE_WORK>\sqlite\compress_cli\compress_cli.db --module compress --json
+  exit=0 entries=[{"module_id": "compress", "status": "passed", "report": "VerificationReport(module_id='compress', db_path='<CASE_WORK>\\\\sqlite\\\\compress_cli\\\\compress_cli.db', level='quick', quick_check='ok', integrity_check=None, findings=[], ok=True)"}]
+PASS item 1: `storage verify --sqlite <file> --module compress` passes | observed={'exit': 0, 'entries': [{'module_id': 'compress', 'status': 'passed', 'report': "VerificationReport(module_id='compress', db_path='<CASE_WORK>\\\\sqlite\\\\compress_cli\\\\compress_cli.db', level='quick', quick_check='ok', integrity_check=None, findings=[], ok=True)"}]}
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\compress_cli\compress_cli.db --module compress --json
+  exit=0 entries=[{"module_id": "compress", "status": "ok", "success": true}]
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\compress_cli\compress_cli.db --module compress
+  exit=0 stdout='ok  compress'
+PASS item 1: rerun (--json) exits 0 with the compress entry ok | observed={'exit': 0, 'entries': [{'module_id': 'compress', 'status': 'ok', 'success': True}]}
+PASS item 1: rerun in text mode exits 0 and prints `ok  compress` | observed={'exit': 0, 'stdout': 'ok  compress'}
+PASS item 1: after both reruns the schema is unchanged (same objects and columns) | observed={'before': '077e9798c9055effaaf6f549f80b6f8b67386847a5f85607a085968334e794ac', 'after': '077e9798c9055effaaf6f549f80b6f8b67386847a5f85607a085968334e794ac', 'tables': ['alembic_version', 'compression_failures', 'compression_runs', 'dropped_reasons', 'om_meta', 'sqlite_sequence']}
+PASS item 1: after both reruns alembic_version is still 0001_baseline | observed=['0001_baseline']
+PASS item 1: after both reruns om_meta still names compress at 0001_baseline | observed={'before': {'module_id': 'compress', 'schema_head': '0001_baseline', 'last_migrated_at': '2026-10-30T04:55:11+00:00'}, 'after': {'module_id': 'compress', 'schema_head': '0001_baseline', 'last_migrated_at': '2026-10-30T04:55:18+00:00'}}
+PASS item 1: the rows the probe inserted before the reruns are kept (1 compression_runs, 1 dropped_reasons) | observed={'alembic_version': 1, 'compression_failures': 0, 'compression_runs': 1, 'dropped_reasons': 1, 'om_meta': 3, 'sqlite_sequence': 1}
+  after: tables=['alembic_version', 'compression_failures', 'compression_runs', 'dropped_reasons', 'om_meta', 'sqlite_sequence'] alembic=['0001_baseline'] om_meta={'module_id': 'compress', 'schema_head': '0001_baseline', 'last_migrated_at': '2026-10-30T04:55:18+00:00'} application_id=0x4f4d000e rows={'alembic_version': 1, 'compression_failures': 0, 'compression_runs': 1, 'dropped_reasons': 1, 'om_meta': 3, 'sqlite_sequence': 1}
+  package openminion.modules.a2a.storage MODULE_ID='a2a' found_by_discovery=True
+  package openminion.modules.artifact.storage MODULE_ID='artifact' found_by_discovery=True
+  package openminion.modules.context.compress.storage MODULE_ID='compress' found_by_discovery=True
+  package openminion.modules.controlplane.channels.telegram.storage MODULE_ID='controlplane_telegram' found_by_discovery=True
+  package openminion.modules.controlplane.storage MODULE_ID='controlplane' found_by_discovery=True
+  package openminion.modules.identity.storage MODULE_ID='identity' found_by_discovery=True
+  package openminion.modules.memory.storage MODULE_ID='memory' found_by_discovery=True
+  package openminion.modules.policy.storage MODULE_ID='policy' found_by_discovery=True
+  package openminion.modules.registry.storage MODULE_ID='registry' found_by_discovery=True
+  package openminion.modules.retrieve.storage MODULE_ID='retrieve' found_by_discovery=True
+  package openminion.modules.secret.storage MODULE_ID='secret' found_by_discovery=True
+  package openminion.modules.session.storage MODULE_ID='session' found_by_discovery=True
+  package openminion.modules.skill.storage MODULE_ID='skill' found_by_discovery=True
+  package openminion.modules.task.storage MODULE_ID='task' found_by_discovery=True
+  package openminion.modules.telemetry.storage MODULE_ID='telemetry' found_by_discovery=True
+  package openminion.modules.tool.authoring.storage MODULE_ID='authoring' found_by_discovery=True
+  package openminion.tools.commerce.storage MODULE_ID='commerce' found_by_discovery=True
+  installed openminion/modules/storage/migrations/alembic.py sha256=12b27527ea4cbe1a1ba5e47de449fd32affd02644bcb3017e1eedd8e717eee5d nested map={'authoring': ['openminion.modules.tool.authoring.storage'], 'commerce': ['openminion.tools.commerce.storage'], 'compress': ['openminion.modules.context.compress.storage']}
+PASS item 3: discovery resolves compress to openminion/modules/context/compress/storage with its migrations (script location; the wheel ships no alembic.ini there) | observed={'storage_root': 'openminion/modules/context/compress/storage', 'alembic_ini': None, 'script_location': 'openminion/modules/context/compress/storage/migrations', 'nested_module_storage_import_paths': {'authoring': ['openminion.modules.tool.authoring.storage'], 'commerce': ['openminion.tools.commerce.storage'], 'compress': ['openminion.modules.context.compress.storage']}, 'installed_alembic_py_sha256': '12b27527ea4cbe1a1ba5e47de449fd32affd02644bcb3017e1eedd8e717eee5d'}
+PASS item 3: every installed `*/storage/migrations/env.py` package is found by discovery for the MODULE_ID it declares | observed={'packages': 17, 'not_found': []}
+PASS item 3: control: every such package other than compress is found by discovery (16 packages) | observed={'not_found_other_than_compress': []}
+PASS item 3: control: ordinary (`openminion.modules.<id>.storage`), nested (authoring, commerce) and channel (controlplane_telegram) modules resolve to their packages | observed={'secret': 'openminion/modules/secret/storage', 'session': 'openminion/modules/session/storage', 'authoring': 'openminion/modules/tool/authoring/storage', 'commerce': 'openminion/tools/commerce/storage', 'controlplane_telegram': 'openminion/modules/controlplane/channels/telegram/storage'}
+PASS item 3: only the module ids with no migrations package (storage, brain) have no script location | observed=['brain', 'storage']
+CASE item 3: openminion.modules.context.compress.storage.migrations.run_migrations(<new file>)
+  results=['returned', 'returned']
+PASS item 3: compress's own run_migrations(<new file>) returns, twice | observed=['returned', 'returned']
+PASS item 3: after run_migrations the file has the compress tables, 0001_baseline, om_meta module_id compress, application_id 0x4f4d000e and user_version TARGET_USER_VERSION | observed={'tables': ['alembic_version', 'compression_failures', 'compression_runs', 'dropped_reasons', 'om_meta', 'sqlite_sequence'], 'alembic_version': ['0001_baseline'], 'om_meta': {'module_id': 'compress', 'schema_head': '0001_baseline', 'last_migrated_at': '2026-10-30T04:55:22+00:00'}, 'application_id': '0x4f4d000e', 'user_version': 0}
+PASS item 3: the second run_migrations leaves the schema and revision unchanged | observed={'first': '077e9798c9055effaaf6f549f80b6f8b67386847a5f85607a085968334e794ac', 'second': '077e9798c9055effaaf6f549f80b6f8b67386847a5f85607a085968334e794ac', 'alembic': ['0001_baseline']}
+PASS item 3: compress's list_migrations() and MODULE_ID | observed={'list_migrations': ['0001_baseline'], 'MODULE_ID': 'compress'}
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\alone_a2a\alone_a2a.db --module a2a --json
+  exit=0 entries=[{"module_id": "a2a", "status": "ok", "success": true}]
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\alone_artifact\alone_artifact.db --module artifact --json
+  exit=0 entries=[{"module_id": "artifact", "status": "ok", "success": true}]
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\alone_authoring\alone_authoring.db --module authoring --json
+  exit=0 entries=[{"module_id": "authoring", "status": "ok", "success": true}]
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\alone_commerce\alone_commerce.db --module commerce --json
+  exit=0 entries=[{"module_id": "commerce", "status": "ok", "success": true}]
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\alone_compress\alone_compress.db --module compress --json
+  exit=0 entries=[{"module_id": "compress", "status": "ok", "success": true}]
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\alone_controlplane\alone_controlplane.db --module controlplane --json
+  exit=0 entries=[{"module_id": "controlplane", "status": "ok", "success": true}]
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\alone_controlplane_telegram\alone_controlplane_telegram.db --module controlplane_telegram --json
+  exit=0 entries=[{"module_id": "controlplane_telegram", "status": "ok", "success": true}]
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\alone_identity\alone_identity.db --module identity --json
+  exit=0 entries=[{"module_id": "identity", "status": "ok", "success": true}]
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\alone_memory\alone_memory.db --module memory --json
+  exit=0 entries=[{"module_id": "memory", "status": "ok", "success": true}]
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\alone_policy\alone_policy.db --module policy --json
+  exit=0 entries=[{"module_id": "policy", "status": "ok", "success": true}]
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\alone_registry\alone_registry.db --module registry --json
+  exit=0 entries=[{"module_id": "registry", "status": "ok", "success": true}]
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\alone_retrieve\alone_retrieve.db --module retrieve --json
+  exit=0 entries=[{"module_id": "retrieve", "status": "ok", "success": true}]
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\alone_secret\alone_secret.db --module secret --json
+  exit=0 entries=[{"module_id": "secret", "status": "ok", "success": true}]
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\alone_session\alone_session.db --module session --json
+  exit=0 entries=[{"module_id": "session", "status": "ok", "success": true}]
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\alone_skill\alone_skill.db --module skill --json
+  exit=0 entries=[{"module_id": "skill", "status": "ok", "success": true}]
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\alone_task\alone_task.db --module task --json
+  exit=0 entries=[{"module_id": "task", "status": "ok", "success": true}]
+$ openminion storage migrate --sqlite <CASE_WORK>\sqlite\alone_telemetry\alone_telemetry.db --module telemetry --json
+  exit=0 entries=[{"module_id": "telemetry", "status": "ok", "success": true}]
+PASS item 3: control: `storage migrate --sqlite <new file> --module secret` exits 0, ok, at its head, with its application_id and om_meta module_id | observed={'exit': 0, 'entries': [{'module_id': 'secret', 'status': 'ok', 'success': True}], 'alembic_version': ['0001_baseline'], 'application_id': '0x4f4d0006', 'om_meta_module_id': 'secret'}
+PASS item 3: control: `storage migrate --sqlite <new file> --module authoring` exits 0, ok, at its head, with its application_id and om_meta module_id | observed={'exit': 0, 'entries': [{'module_id': 'authoring', 'status': 'ok', 'success': True}], 'alembic_version': ['0001_baseline'], 'application_id': '0x4f4d0010', 'om_meta_module_id': 'authoring'}
+PASS item 3: control: `storage migrate --sqlite <new file> --module commerce` exits 0, ok, at its head, with its application_id and om_meta module_id | observed={'exit': 0, 'entries': [{'module_id': 'commerce', 'status': 'ok', 'success': True}], 'alembic_version': ['0004_action_preparations'], 'application_id': '0x4f4d0012', 'om_meta_module_id': 'commerce'}
+PASS item 3: no module (each alone on a new SQLite file, the 17 with a migrations package) reports `Alembic configuration missing` | observed=[]
+PASS item 3: control: no module other than compress reports `Alembic configuration missing` on SQLite | observed=[]
+  each module alone on SQLite: {'a2a': ('ok', ['0005_job_idempotency_scope']), 'artifact': ('ok', ['0001_baseline']), 'authoring': ('ok', ['0001_baseline']), 'commerce': ('ok', ['0004_action_preparations']), 'compress': ('ok', ['0001_baseline']), 'controlplane': ('ok', ['0002_index_audit']), 'controlplane_telegram': ('ok', ['0002_polling_lease_schema']), 'identity': ('ok', ['0001_baseline']), 'memory': ('ok', ['0004_namespace']), 'policy': ('ok', ['0002_blockchain_confirmations']), 'registry': ('ok', ['0001_baseline']), 'retrieve': ('ok', ['0002_index']), 'secret': ('ok', ['0001_baseline']), 'session': ('ok', ['0005_cron_scheduler_control']), 'skill': ('ok', ['0007_workflow_observations']), 'task': ('ok', ['0001_baseline']), 'telemetry': ('ok', ['0003_debug_query_indexes'])}
+SUMMARY passed=30 failed=0 total=30
+exit=0

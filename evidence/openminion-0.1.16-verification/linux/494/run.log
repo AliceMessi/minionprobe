@@ -1,0 +1,89 @@
+Using Python 3.12.15 environment at: <VENV0115>
+Using Python 3.12.15 environment at: <VENV>
+Using Python 3.12.15 environment at: <VENV>
+provenance: version 0.1.16, on PyPI: 1, wheel sha256 match: 1
+provenance 0.1.15: wheel sha256 match: 1
+=== probe_494_postgres
+exit=0
+SUMMARY passed=69 failed=0 total=69
+=== probe_494_sqlite
+exit=0
+SUMMARY passed=24 failed=0 total=24
+=== probe_494_postgres_0115
+exit=1
+FAIL item 1 (controlplane): `openminion storage migrate --backend postgres --module controlplane --json` on a new, empty schema exits 0 with status ok | observed={'tables_before': [], 'exit': 1, 'entry': {'module_id': 'controlplane', 'status': 'error', 'succes
+FAIL item 1 (controlplane): the schema is at the expected head 0002_index_audit, with the module's om_meta | observed={'alembic_version': None, 'om_meta': None}
+FAIL item 1 (controlplane): generated ids: every AUTOINCREMENT id of the baseline is an integer with a sequence default on PostgreSQL (SERIAL) | observed={'id columns': {'cp_inbound_messages': ['missing', None], 'cp_outbound_messages': ['missing', None], 'cp_p
+FAIL item 1 (controlplane): a second migrate exits 0 with status ok and changes nothing (tables, columns, indexes, sequences, constraints, alembic_version, om_meta module_id/schema_head) | observed={'exit': 1, 'entry': {'module_id': 'controlplane', 'status': '
+FAIL item 1 (controlplane): `openminion storage verify --backend postgres --module controlplane` passes on the migrated schema | observed={'migrated': False, 'exit': 0, 'status': 'passed'}
+FAIL item 1 (controlplane): PostgresControlPlaneStore opens the schema the baseline created (no DuplicateColumn on cp_inbox.next_attempt_at) and its generated ids are 1, 2; outbound id 1; one pair attempt | observed={'migrated': False, 'error': None, 'result':
+FAIL item 1 (controlplane): opening the store records every store migration in cp_migrations and leaves the baseline's tables and columns unchanged (cp_inbox.next_attempt_at once) | observed={'cp_migrations': [[1], [2], [3], [4], [5], [6], [7]], 'catalog_uncha
+FAIL item 1 (controlplane): read on the server, the rows carry the generated ids (cp_inbound_messages 1, 2; cp_outbound_messages 1; cp_pair_attempts 1) | observed={'cp_inbound_messages': [[1], [2]], 'cp_outbound_messages': [[1]], 'cp_pair_attempts': [[1]]}
+FAIL item 1 (controlplane): a second store instance reads the rows and its next generated id is 3 | observed={'migrated': False, 'error': None, 'result': {'written': {'inbound_ids': [3], 'outbound_id': 2, 'pair_attempts': 2}, 'read': [[1, 'message 0'], [2, 'me
+FAIL item 1 (controlplane): migrate after the store's writes exits 0 and changes nothing; every row is unchanged | observed={'exit': 1, 'entry': {'module_id': 'controlplane', 'status': 'error', 'success': False, 'error': 'Alembic upgrade failed for module \'co
+FAIL item 1 (telemetry): `openminion storage migrate --backend postgres --module telemetry --json` on a new, empty schema exits 0 with status ok | observed={'tables_before': [], 'exit': 1, 'entry': {'module_id': 'telemetry', 'status': 'error', 'success': False
+FAIL item 1 (telemetry): the schema is at the expected head 0003_debug_query_indexes, with the module's om_meta | observed={'alembic_version': None, 'om_meta': None}
+FAIL item 1 (telemetry): generated ids: every AUTOINCREMENT id of the baseline is an integer with a sequence default on PostgreSQL (SERIAL) | observed={'id columns': {'events': ['missing', None]}, 'sequences': []}
+FAIL item 1 (telemetry): events.timestamp is DOUBLE PRECISION on the server | observed='missing'
+FAIL item 1 (telemetry): a second migrate exits 0 with status ok and changes nothing (tables, columns, indexes, sequences, constraints, alembic_version, om_meta module_id/schema_head) | observed={'exit': 1, 'entry': {'module_id': 'telemetry', 'status': 'error'
+FAIL item 1 (telemetry): `openminion storage verify --backend postgres --module telemetry` passes on the migrated schema | observed={'migrated': False, 'exit': 0, 'status': 'passed'}
+FAIL item 1 (telemetry): PostgresTelemetryStore writes two events on the baseline schema and reads them back with ids 1, 2 and the exact timestamps 1761650000.123456, 1761650001.654321 | observed={'migrated': False, 'error': None, 'result': {'written': {'inser
+FAIL item 1 (telemetry): read on the server, events (id, timestamp) are (1, 1761650000.123456) and (2, 1761650001.654321), typed double precision; REAL would have stored 1761650048.0 | observed={'server_rows': [[1, 1761650000.123456, 'double precision'], [2, 1
+FAIL item 1 (telemetry): opening the store leaves the baseline's tables and columns unchanged | observed={'catalog_unchanged': False}
+FAIL item 1 (telemetry): a second store instance reads the rows and its next generated id is 3 | observed={'migrated': False, 'error': None, 'result': {'written': {'inserted': 1}, 'read': [[1, 1761650000.123456, True], [2, 1761650001.654321, True], [3, 1761650
+FAIL item 1 (telemetry): migrate after the store's writes exits 0 and changes nothing; every row is unchanged | observed={'exit': 1, 'entry': {'module_id': 'telemetry', 'status': 'error', 'success': False, 'error': 'Alembic upgrade failed for module \'telemetr
+FAIL item 2 (controlplane): migrate over the store-created tables exits 0 with status ok and reaches 0002_index_audit | observed={'exit': 1, 'entry': {'module_id': 'controlplane', 'status': 'error', 'success': False, 'error': 'Alembic upgrade failed for module
+FAIL item 2 (controlplane): every store-created table keeps its columns and types (SERIAL ids) | observed={'migrated': False, 'columns_unchanged': {'cp_audit_events': True, 'cp_channel_subjects': True, 'cp_chat_bindings': True, 'cp_inbound_messages': True, 'cp
+FAIL item 2 (controlplane): every row of every store-created table is unchanged after the migration (om_meta aside, which the migration updates) | observed={'migrated': False, 'rows_before_sha256': '51c064d0101f20c1423329869b11c157dd9b196165bb972ade11487efee4a
+FAIL item 2 (controlplane): the store reopened after the migration reads the old rows and writes new ones (next generated id 2) | observed={'migrated': False, 'error': None, 'result': {'written': {'inbound_ids': [2], 'outbound_id': 2, 'pair_attempts': 2}, 'rea
+FAIL item 2 (controlplane): a second migrate exits 0 and changes nothing (catalog and rows) | observed={'exit': 1, 'entry': {'module_id': 'controlplane', 'status': 'error', 'success': False, 'error': 'Alembic upgrade failed for module \'controlplane\': (psycop
+FAIL item 2 (telemetry): migrate over the store-created tables exits 0 with status ok and reaches 0003_debug_query_indexes | observed={'exit': 1, 'entry': {'module_id': 'telemetry', 'status': 'error', 'success': False, 'error': 'Alembic upgrade failed for modu
+FAIL item 2 (telemetry): every store-created table keeps its columns and types (SERIAL ids, DOUBLE PRECISION timestamp) | observed={'migrated': False, 'columns_unchanged': {'events': True, 'om_meta': True}, 'id columns': {'events': ['integer', "nextval('events
+FAIL item 2 (telemetry): every row of every store-created table is unchanged after the migration (om_meta aside, which the migration updates) | observed={'migrated': False, 'rows_before_sha256': 'e94e780f892ea263e2fee5c6a371de672fb044eb9ef3a74752f12740ad7e79ac
+FAIL item 2 (telemetry): the store reopened after the migration reads the old rows and writes new ones (next generated id 2, exact timestamps) | observed={'migrated': False, 'error': None, 'result': {'written': {'inserted': 1}, 'read': [[1, 1761650000.123456, 
+FAIL item 2 (telemetry): a second migrate exits 0 and changes nothing (catalog and rows) | observed={'exit': 1, 'entry': {'module_id': 'telemetry', 'status': 'error', 'success': False, 'error': 'Alembic upgrade failed for module \'telemetry\': (psycopg.errors.
+FAIL item 2 (telemetry-real-timestamp): migrate is refused: exit 1, status error, and the error says `Existing tables differ from this revision and are not adopted: events.timestamp is REAL, expected DOUBLE PRECISION` | observed={'exit': 1, 'status': 'error', 
+FAIL item 2 (telemetry-real-timestamp): the text output also refuses: exit 1, `FAIL  telemetry: ...events.timestamp is REAL, expected DOUBLE PRECISION`; still nothing changed | observed={'exit': 1, 'stdout': '  FAIL  telemetry: Alembic upgrade failed for modul
+FAIL item 2 (telemetry-bigint-identity-id): migrate is refused: exit 1, status error, and the error says `Existing tables differ from this revision and are not adopted: events.id is BIGINT, expected SERIAL` | observed={'exit': 1, 'status': 'error', 'error': 'A
+FAIL item 2 (telemetry-other-columns): migrate is refused: exit 1, status error, and the error says `Existing tables differ from this revision and are not adopted: events.id is missing, expected SERIAL; events.timestamp is missing, expected DOUBLE PRECISION` |
+FAIL item 2 (controlplane-integer-id): migrate is refused: exit 1, status error, and the error says `Existing tables differ from this revision and are not adopted: cp_inbound_messages.id is INTEGER, expected SERIAL` | observed={'exit': 1, 'status': 'error', 'e
+FAIL item 2 (controlplane-text-id): migrate is refused: exit 1, status error, and the error says `Existing tables differ from this revision and are not adopted: cp_pair_attempts.id is TEXT, expected SERIAL` | observed={'exit': 1, 'status': 'error', 'error': 'A
+FAIL item 3 (controlplane): disposable schema migrated to 0002_index_audit and one store write | observed={'exit': 1, 'alembic_version': None, 'write_error': None}
+FAIL item 3 (controlplane): Alembic downgrade 0002_index_audit -> 0001_baseline removes that revision's indexes only; tables, ids and rows stay | observed={'error': 'CommandError: Destination 0001_baseline is not a valid downgrade target from current head(s)',
+FAIL item 3 (controlplane): migrate from 0001_baseline exits 0 and restores exactly the head catalog; rows kept | observed={'exit': 1, 'alembic_version': None, 'catalog_identical': False}
+FAIL item 3 (controlplane): Alembic downgrade to base leaves only alembic_version (empty) and om_meta, no sequence and no index other than their keys | observed={'error': None, 'tables': ['alembic_version', 'cp_audit_events', 'cp_channel_subjects', 'cp_chat_bi
+FAIL item 3 (controlplane): migrate from base exits 0 and recreates exactly the head catalog (tables, column types and defaults, indexes, sequences, constraints) | observed={'exit': 1, 'alembic_version': [], 'catalog_identical': False}
+FAIL item 3 (controlplane): after the re-upgrade the store round-trips again (ids 1, 2 from the new sequence) | observed={'error': None, 'result': {'written': {'inbound_ids': [2, 3], 'outbound_id': 2, 'pair_attempts': 2}, 'read': [[1, 'message 0'], [2, 'messag
+FAIL item 3 (telemetry): disposable schema migrated to 0003_debug_query_indexes and one store write | observed={'exit': 1, 'alembic_version': None, 'write_error': None}
+FAIL item 3 (telemetry): Alembic downgrade 0003_debug_query_indexes -> 0002_event_v2 removes that revision's indexes only; tables, ids and rows stay | observed={'error': 'CommandError: Destination 0002_event_v2 is not a valid downgrade target from current head
+FAIL item 3 (telemetry): migrate from 0002_event_v2 exits 0 and restores exactly the head catalog; rows kept | observed={'exit': 1, 'alembic_version': None, 'catalog_identical': False}
+FAIL item 3 (telemetry): Alembic downgrade to base leaves only alembic_version (empty) and om_meta, no sequence and no index other than their keys | observed={'error': None, 'tables': ['alembic_version', 'events', 'om_meta'], 'alembic_version': [], 'sequences'
+FAIL item 3 (telemetry): migrate from base exits 0 and recreates exactly the head catalog (tables, column types and defaults, indexes, sequences, constraints) | observed={'exit': 1, 'alembic_version': [], 'catalog_identical': False}
+FAIL item 3 (telemetry): after the re-upgrade the store round-trips again (ids 1, 2 from the new sequence, exact timestamps) | observed={'error': 'IntegrityError: (psycopg.errors.UniqueViolation) duplicate key value violates unique constraint "idx_events_event
+FAIL item 3 (telemetry-events-without-turn_id): a later statement of the baseline fails on the existing table (UndefinedColumn `turn_id`): exit 1, status error | observed={'exit': 1, 'error': 'Alembic upgrade failed for module \'telemetry\': (psycopg.errors.Sy
+FAIL item 3 (controlplane-cp_users-without-role): a later statement of the baseline fails on the existing table (UndefinedColumn `role`): exit 1, status error | observed={'exit': 1, 'error': 'Alembic upgrade failed for module \'controlplane\': (psycopg.errors.
+FAIL item 3 (controlplane): an event trigger makes the last revision's index idx_cp_pairings_status_channel fail after the earlier revisions' DDL ran in the same transaction: exit 1 with the injected error | observed={'exit': 1, 'error': 'Alembic upgrade faile
+FAIL item 3 (telemetry): an event trigger makes the last revision's index idx_events_session_turn_invocation_id fail after the earlier revisions' DDL ran in the same transaction: exit 1 with the injected error | observed={'exit': 1, 'error': 'Alembic upgrade f
+FAIL item 3 (controlplane): with the trigger dropped, the same schema migrates to 0002_index_audit (exit 0) | observed={'exit': 1, 'entry': {'module_id': 'controlplane', 'status': 'error', 'success': False, 'error': 'Alembic upgrade failed for module \'control
+FAIL item 3 (telemetry): with the trigger dropped, the same schema migrates to 0003_debug_query_indexes (exit 0) | observed={'exit': 1, 'entry': {'module_id': 'telemetry', 'status': 'error', 'success': False, 'error': 'Alembic upgrade failed for module \'telem
+SUMMARY passed=14 failed=55 total=69
+=== probe_494_sqlite_0115
+exit=1
+FAIL item 4 (controlplane, file made by `openminion storage migrate`): SQLiteControlPlaneStore opens it without `duplicate column name: next_attempt_at` and round-trips (ids 1, 2) | observed={'baseline_made': True, 'error': 'OperationalError: duplicate column 
+FAIL item 4 (controlplane, file made by `openminion storage migrate`): the store records every store migration, cp_inbox.next_attempt_at exists once, sqlite_master and alembic_version unchanged | observed={'cp_migrations': [1, 2, 3, 4, 5], 'next_attempt_at_col
+FAIL item 4 (controlplane, file made by the module's own `run_migrations`): SQLiteControlPlaneStore opens it without `duplicate column name: next_attempt_at` and round-trips (ids 1, 2) | observed={'baseline_made': True, 'error': 'OperationalError: duplicate co
+FAIL item 4 (controlplane, file made by the module's own `run_migrations`): the store records every store migration, cp_inbox.next_attempt_at exists once, sqlite_master and alembic_version unchanged | observed={'cp_migrations': [1, 2, 3, 4, 5], 'next_attempt_a
+SUMMARY passed=9 failed=4 total=13
+empty dir after: 0 entries
+openminion[postgres]==0.1.16
+Name: openminion
+Version: 0.1.16
+Location: <VENV>/lib/python3.12/site-packages
+Requires: aiosqlite, alembic, cryptography, httpx, jsonschema, platformdirs, prompt-toolkit, psutil, pydantic, pyyaml, rich, send2trash, sophiagraph, typer, tzdata
+Required-by:
+Linux runnervm48cm3 7.0.0-1017-azure #17~24.04.1-Ubuntu SMP PREEMPT Thu Sep 24 18:46:57 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+PRETTY_NAME="Ubuntu 24.04.5 LTS"
+VERSION_ID="24.04"
+python 3.12.15 sqlite 3.45.1
+PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+<VENV>/lib/python3.12/site-packages/openminion/__init__.py 0.1.16

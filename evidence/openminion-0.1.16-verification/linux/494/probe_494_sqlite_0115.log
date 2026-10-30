@@ -1,0 +1,37 @@
+{
+  "probe": "probe_494",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.15",
+  "python": "3.12.15",
+  "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "backend": "sqlite",
+  "console_script": "<VENV>/bin/openminion",
+  "console_script_exists": true,
+  "previous_console_script": null,
+  "previous_console_script_exists": null
+}
+PASS setup: the installed `openminion` console script exists next to this interpreter | observed='<VENV>/bin/openminion'
+--- CLI 1 [installed] item 4 controlplane: new file: exit=0 [{"module_id": "controlplane", "status": "ok", "success": true}]
+PASS item 4 (controlplane): `openminion storage migrate --sqlite <new file> --module controlplane` exits 0 and reaches 0002_index_audit | observed={'exit': 0, 'entry': {'module_id': 'controlplane', 'status': 'ok', 'success': True}, 'alembic_version': ['0002_index_audit'], 'application_id': 1330446344, 'user_version': 0}
+PASS item 4 (controlplane): SQLite keeps its own DDL: AUTOINCREMENT ids | observed={'autoincrement': {'cp_inbound_messages': True, 'cp_outbound_messages': True, 'cp_pair_attempts': True}, 'events_sql': None}
+--- CLI 2 [installed] item 4 controlplane: rerun: exit=0 [{"module_id": "controlplane", "status": "ok", "success": true}]
+PASS item 4 (controlplane): a second migrate exits 0 and changes nothing (sqlite_master, alembic_version, application_id, user_version) | observed={'exit': 0, 'sqlite_master_sha256': ['8bce56c106a1494ab7e39de79a93ee6bc4f3086ec246a5772d185da30957d5c7', '8bce56c106a1494ab7e39de79a93ee6bc4f3086ec246a5772d185da30957d5c7']}
+--- CLI 3 [installed] item 4 telemetry: new file: exit=0 [{"module_id": "telemetry", "status": "ok", "success": true}]
+PASS item 4 (telemetry): `openminion storage migrate --sqlite <new file> --module telemetry` exits 0 and reaches 0003_debug_query_indexes | observed={'exit': 0, 'entry': {'module_id': 'telemetry', 'status': 'ok', 'success': True}, 'alembic_version': ['0003_debug_query_indexes'], 'application_id': 1330446343, 'user_version': 0}
+PASS item 4 (telemetry): SQLite keeps its own DDL: AUTOINCREMENT ids and `timestamp REAL NOT NULL` | observed={'autoincrement': {'events': True}, 'events_sql': 'CREATE TABLE events (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        session_id TEXT NOT NULL,\n        turn_id TEXT NOT NULL,\n        event_type TEXT NOT NULL,\n        timestamp REAL NOT NULL,\n        data TEXT NOT NULL\n    , "schema_version" TEXT, "event_id" TEXT, "trace_key" TEXT, "invocation_id" TEXT, "execution_id" TEXT, "agent_id" TEXT, "mode" TEXT)'}
+--- CLI 4 [installed] item 4 telemetry: rerun: exit=0 [{"module_id": "telemetry", "status": "ok", "success": true}]
+PASS item 4 (telemetry): a second migrate exits 0 and changes nothing (sqlite_master, alembic_version, application_id, user_version) | observed={'exit': 0, 'sqlite_master_sha256': ['2d0cc0c391d81a1eaf3e81893acf9efeb3eccd11e0e61c63eb9a1dfb57af2c15', '2d0cc0c391d81a1eaf3e81893acf9efeb3eccd11e0e61c63eb9a1dfb57af2c15']}
+--- CLI 5 [installed] item 4 controlplane: baseline file for the store: exit=0 [{"module_id": "controlplane", "status": "ok", "success": true}]
+FAIL item 4 (controlplane, file made by `openminion storage migrate`): SQLiteControlPlaneStore opens it without `duplicate column name: next_attempt_at` and round-trips (ids 1, 2) | observed={'baseline_made': True, 'error': 'OperationalError: duplicate column name: next_attempt_at', 'result': None}
+FAIL item 4 (controlplane, file made by `openminion storage migrate`): the store records every store migration, cp_inbox.next_attempt_at exists once, sqlite_master and alembic_version unchanged | observed={'cp_migrations': [1, 2, 3, 4, 5], 'next_attempt_at_columns': 1, 'sqlite_master_unchanged': True, 'alembic_version': ['0002_index_audit']}
+FAIL item 4 (controlplane, file made by the module's own `run_migrations`): SQLiteControlPlaneStore opens it without `duplicate column name: next_attempt_at` and round-trips (ids 1, 2) | observed={'baseline_made': True, 'error': 'OperationalError: duplicate column name: next_attempt_at', 'result': None}
+FAIL item 4 (controlplane, file made by the module's own `run_migrations`): the store records every store migration, cp_inbox.next_attempt_at exists once, sqlite_master and alembic_version unchanged | observed={'cp_migrations': [1, 2, 3, 4, 5], 'next_attempt_at_columns': 1, 'sqlite_master_unchanged': True, 'alembic_version': ['0002_index_audit']}
+PASS item 4 (controlplane, unchanged behavior): an older store file without cp_inbox.next_attempt_at still gets the column when the store opens it | observed={'before': 0, 'after': 1, 'error': None, 'cp_migrations': [1, 2, 3, 4, 5, 6, 7]}
+--- CLI 6 [installed] item 4 telemetry: baseline file for the store: exit=0 [{"module_id": "telemetry", "status": "ok", "success": true}]
+PASS item 4 (telemetry): SQLiteTelemetryStore on the file the baseline created writes and reads ids 1, 2 with the exact timestamps | observed={'exit': 0, 'error': None, 'rows': [[1, 1761650000.123456, True], [2, 1761650001.654321, True]]}
+SUMMARY passed=9 failed=4 total=13
+exit=1

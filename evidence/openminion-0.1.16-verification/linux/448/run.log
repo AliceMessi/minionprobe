@@ -1,0 +1,74 @@
+Using Python 3.12.15 environment at: <VENV0115>
+Using Python 3.12.15 environment at: <VENV>
+Using Python 3.12.15 environment at: <VENV>
+provenance: version 0.1.16, on PyPI: 1, wheel sha256 match: 1
+provenance 0.1.15: wheel sha256 match: 1
+=== probe_448_sqlite
+exit=0
+PASS setup: every case ran to the end (no case error)
+SUMMARY passed=39 failed=0 total=39
+=== probe_448_postgres
+exit=0
+PASS setup: every case ran to the end (no case error)
+SUMMARY passed=41 failed=0 total=41
+=== probe_448_sqlite_0115
+exit=1
+FAIL item 1: require_approval (identity `NEVER write memory records`, case T): the SDK turn asks memory.write once with the turn's context (console, memory-capture, its runtime session, its root turn) and gets require_approval / identity_ha
+FAIL item 1: require_approval (T): no automatic extraction request, no extractor call, no bundle write, no capture candidate, no receipt and no memory.capture.result | observed={'run_state': 'completed', 'text': 'openminion: Noted: tabs ove
+FAIL item 1: deny (case D, memory.write registered as POWER_USER; the internal actor lacks tool.execute.elevated): the turn asks memory.write once with its context and gets deny / missing_tool_scope | observed={'profile_before': ['tool.exec
+FAIL item 1: deny (D): no extraction request, no bundle write, candidate, receipt or result; no approval callback call or approval event; the reply is the same | observed={'run_state': 'completed', 'text': 'openminion: Noted: tabs over spac
+FAIL item 1: the user's approval of the model's own memory.write tool call is not borrowed (Ma, callback approves): the turn's capture still asks its own question (require_approval), makes no extraction request and writes no capture candida
+FAIL item 1: the user's approval of the model's own memory.write tool call is not borrowed (Md, callback refuses): the turn's capture still asks its own question (require_approval), makes no extraction request and writes no capture candidat
+FAIL item 2: the capture intent stays pending; the turn's memory_capture_state is pending and its memory_capture_bundle_result is {capture_id, disposition pending, error_code CAPTURE_RECOVERY_UNAUTHORIZED} (T require_approval and D deny) | 
+FAIL item 2: a consolidation run while the write is still denied checks policy first and stops: recovery (1, 0, 1), the user intent's steps are exactly [identity, authorize=False] (no capability query, source read, extraction, bundle write 
+FAIL item 2: reopened with the write allowed, the next run checks policy and capability before extraction and recovers the intent once: recovery (1, 1, 0); the user intent's steps in order are identity, authorize=True, capability=True, sour
+FAIL item 2: the intent is committed once: one memory.capture.result (succeeded, one output id), one capture candidate and one receipt for its capture id; the next run scans nothing (0, 0, 0) with no recovery step | observed={'results': [{'
+FAIL item 2: no duplicates on replay: replaying the recovered bundle write returns the original receipt (same disposition and output ids); another run scans nothing; still one candidate, one receipt and one memory.capture.result | observed=
+FAIL item 3: the allowed turn asked memory.write once, before its capture, with its context, and got allow | observed=[]
+FAIL item 3: the decision is refreshed per turn on that runner: _capture_authorized_for_turn at each executed turn is allow-1 True, consolidation False (excluded), deny-2 False, allow-3 True, deny-4 False, allow-5 True, diagnostic False (di
+FAIL item 3: allow->deny and deny->allow transitions (twice each) use the actual context: each SDK turn asks memory.write once with channel console, target memory-capture, its own runtime session and its own root turn (all different), and g
+FAIL item 3: the outcomes follow the current answer: allowed turns captured (1 extraction, succeeded), denied turns made no extraction request and stay pending with CAPTURE_RECOVERY_UNAUTHORIZED | observed={'allow-1': ['succeeded', 1, {'cap
+FAIL item 4: capture-disabled diagnostic turns make no extraction request: the installed `openminion agent-check --json` (exit 0, ok, healthy) and `openminion doctor --check-turn --json` (agent.turn_smoke ok) each ran a real turn against th
+FAIL item 4: no identity profile (N1): the turn's memory.write question is answered allow | observed=[]
+FAIL item 4: the turn's installed predicate (memory_capture_allowed) has the same standalone rule, and a runner before its first turn has _capture_authorized_for_turn True (a BrainRunner used without the service keeps capturing) | observed=
+FAIL item 5: U1: the allowed turn asked memory.write first (allow), so authorization comes before the store's capability answer | observed=[]
+FAIL item 5: #468 control with a denial (U2, reference-sqlite, `NEVER write memory records`): the turn makes no extraction request and no bundle write, and stays pending with CAPTURE_RECOVERY_UNAUTHORIZED (the denial comes before the store'
+PASS setup: every case ran to the end (no case error)
+SUMMARY passed=19 failed=20 total=39
+=== probe_448_postgres_0115
+exit=1
+FAIL item 1: require_approval (identity `NEVER write memory records`, case T): the SDK turn asks memory.write once with the turn's context (console, memory-capture, its runtime session, its root turn) and gets require_approval / identity_ha
+FAIL item 1: require_approval (T): no automatic extraction request, no extractor call, no bundle write, no capture candidate, no receipt and no memory.capture.result | observed={'run_state': 'completed', 'text': 'openminion: Noted: tabs ove
+FAIL item 1: deny (case D, memory.write registered as POWER_USER; the internal actor lacks tool.execute.elevated): the turn asks memory.write once with its context and gets deny / missing_tool_scope | observed={'profile_before': ['tool.exec
+FAIL item 1: deny (D): no extraction request, no bundle write, candidate, receipt or result; no approval callback call or approval event; the reply is the same | observed={'run_state': 'completed', 'text': 'openminion: Noted: tabs over spac
+FAIL item 1: the user's approval of the model's own memory.write tool call is not borrowed (Ma, callback approves): the turn's capture still asks its own question (require_approval), makes no extraction request and writes no capture candida
+FAIL item 1: the user's approval of the model's own memory.write tool call is not borrowed (Md, callback refuses): the turn's capture still asks its own question (require_approval), makes no extraction request and writes no capture candidat
+FAIL item 2: the capture intent stays pending; the turn's memory_capture_state is pending and its memory_capture_bundle_result is {capture_id, disposition pending, error_code CAPTURE_RECOVERY_UNAUTHORIZED} (T require_approval and D deny) | 
+FAIL item 2: a consolidation run while the write is still denied checks policy first and stops: recovery (1, 0, 1), the user intent's steps are exactly [identity, authorize=False] (no capability query, source read, extraction, bundle write 
+FAIL item 2: reopened with the write allowed, the next run checks policy and capability before extraction and recovers the intent once: recovery (1, 1, 0); the user intent's steps in order are identity, authorize=True, capability=True, sour
+FAIL item 2: the intent is committed once: one memory.capture.result (succeeded, one output id), one capture candidate and one receipt for its capture id; the next run scans nothing (0, 0, 0) with no recovery step | observed={'results': [{'
+FAIL item 2: no duplicates on replay: replaying the recovered bundle write returns the original receipt (same disposition and output ids); another run scans nothing; still one candidate, one receipt and one memory.capture.result | observed=
+FAIL item 3: the allowed turn asked memory.write once, before its capture, with its context, and got allow | observed=[]
+FAIL item 3: the decision is refreshed per turn on that runner: _capture_authorized_for_turn at each executed turn is allow-1 True, consolidation False (excluded), deny-2 False, allow-3 True, deny-4 False, allow-5 True, diagnostic False (di
+FAIL item 3: allow->deny and deny->allow transitions (twice each) use the actual context: each SDK turn asks memory.write once with channel console, target memory-capture, its own runtime session and its own root turn (all different), and g
+FAIL item 3: the outcomes follow the current answer: allowed turns captured (1 extraction, succeeded), denied turns made no extraction request and stay pending with CAPTURE_RECOVERY_UNAUTHORIZED | observed={'allow-1': ['succeeded', 1, {'cap
+FAIL item 4: capture-disabled diagnostic turns make no extraction request: the installed `openminion agent-check --json` (exit 0, ok, healthy) and `openminion doctor --check-turn --json` (agent.turn_smoke ok) each ran a real turn against th
+FAIL item 4: no identity profile (N1): the turn's memory.write question is answered allow | observed=[]
+FAIL item 4: the turn's installed predicate (memory_capture_allowed) has the same standalone rule, and a runner before its first turn has _capture_authorized_for_turn True (a BrainRunner used without the service keeps capturing) | observed=
+FAIL item 5: U1: the allowed turn asked memory.write first (allow), so authorization comes before the store's capability answer | observed=[]
+FAIL item 5: #468 control with a denial (U2, reference-sqlite, `NEVER write memory records`): the turn makes no extraction request and no bundle write, and stays pending with CAPTURE_RECOVERY_UNAUTHORIZED (the denial comes before the store'
+PASS setup: every case ran to the end (no case error)
+SUMMARY passed=21 failed=20 total=41
+empty dir after: 0 entries
+openminion[postgres]==0.1.16
+Name: openminion
+Version: 0.1.16
+Location: <VENV>/lib/python3.12/site-packages
+Requires: aiosqlite, alembic, cryptography, httpx, jsonschema, platformdirs, prompt-toolkit, psutil, pydantic, pyyaml, rich, send2trash, sophiagraph, typer, tzdata
+Required-by:
+Linux runnervm48cm3 7.0.0-1017-azure #17~24.04.1-Ubuntu SMP PREEMPT Thu Sep 24 18:46:57 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+PRETTY_NAME="Ubuntu 24.04.5 LTS"
+VERSION_ID="24.04"
+python 3.12.15 sqlite 3.45.1
+PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+<VENV>/lib/python3.12/site-packages/openminion/__init__.py 0.1.16
