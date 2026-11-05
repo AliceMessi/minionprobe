@@ -1,0 +1,2206 @@
+{
+  "banner": {
+    "probe": "probe_446_sqlite",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.16",
+    "python": "3.12.15",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<WORK>/empty",
+    "imported_from_site_packages": true,
+    "isolated_mode": true
+  },
+  "summary": {
+    "passed": 9,
+    "failed": 0,
+    "total": 9
+  },
+  "checks": [
+    {
+      "check": "item4 SQLite runtime storage: a new file starts at v15 (15 applied), a session and a message are written and read; the next start applies nothing and reads them back",
+      "pass": true,
+      "observed": {
+        "first": [
+          15,
+          15
+        ],
+        "second": [
+          15,
+          0
+        ],
+        "messages": [
+          [
+            "hello 446"
+          ],
+          [
+            "hello 446"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "item4 SQLite runtime storage: migrations holds v1..v15",
+      "pass": true,
+      "observed": [
+        [
+          1,
+          "bootstrap_core_tables"
+        ],
+        [
+          2,
+          "add_session_contexts_table"
+        ],
+        [
+          3,
+          "add_agent_runtime_and_a2a_tables"
+        ],
+        [
+          4,
+          "add_vector_memory_tables"
+        ],
+        [
+          5,
+          "add_message_conversation_id"
+        ],
+        [
+          6,
+          "add_message_thread_attach_ids"
+        ],
+        [
+          7,
+          "add_session_lifecycle_columns"
+        ],
+        [
+          8,
+          "add_session_context_summary_short"
+        ],
+        [
+          9,
+          "add_room_participants_and_active_agent"
+        ],
+        [
+          10,
+          "add_session_turn_leases"
+        ],
+        [
+          11,
+          "add_canonical_events_and_capture_holds"
+        ],
+        [
+          12,
+          "add_message_append_seq"
+        ],
+        [
+          13,
+          "add_event_run_facts"
+        ],
+        [
+          14,
+          "add_room_participant_join_seq"
+        ],
+        [
+          15,
+          "add_session_metadata_strings"
+        ]
+      ]
+    },
+    {
+      "check": "item4 lifecycle: every sqlite3 connection runtime storage opened is closed after RuntimeStorageContext.close(), on both starts",
+      "pass": true,
+      "observed": {
+        "opened": [
+          3,
+          3
+        ],
+        "open": []
+      }
+    },
+    {
+      "check": "item4 rollback on an initialization failure (SQLite): the start fails with \"Migration v13 (add_event_run_facts) failed\"; v1..v12 stay committed; the other application's event_run_facts table and its row are unchanged; every connection the start opened is closed",
+      "pass": true,
+      "observed": {
+        "error": "MigrationError: Migration v13 (add_event_run_facts) failed: table event_run_facts already exists",
+        "versions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "open": []
+      }
+    },
+    {
+      "check": "item4 rollback (SQLite): once the operator removes that table, the next start applies v13..v15",
+      "pass": true,
+      "observed": [
+        15,
+        [
+          13,
+          14,
+          15
+        ]
+      ]
+    },
+    {
+      "check": "item4 SQLite migrations: `openminion storage migrate --sqlite <new empty file> --module <id> --json` exits 0 with status ok for every module with an Alembic chain (17 of 19), and a rerun exits 0 and changes nothing",
+      "pass": true,
+      "observed": {
+        "a2a": [
+          [
+            0,
+            0
+          ],
+          "ok",
+          true
+        ],
+        "artifact": [
+          [
+            0,
+            0
+          ],
+          "ok",
+          true
+        ],
+        "authoring": [
+          [
+            0,
+            0
+          ],
+          "ok",
+          true
+        ],
+        "commerce": [
+          [
+            0,
+            0
+          ],
+          "ok",
+          true
+        ],
+        "compress": [
+          [
+            0,
+            0
+          ],
+          "ok",
+          true
+        ],
+        "controlplane": [
+          [
+            0,
+            0
+          ],
+          "ok",
+          true
+        ],
+        "controlplane_telegram": [
+          [
+            0,
+            0
+          ],
+          "ok",
+          true
+        ],
+        "identity": [
+          [
+            0,
+            0
+          ],
+          "ok",
+          true
+        ],
+        "memory": [
+          [
+            0,
+            0
+          ],
+          "ok",
+          true
+        ],
+        "policy": [
+          [
+            0,
+            0
+          ],
+          "ok",
+          true
+        ],
+        "registry": [
+          [
+            0,
+            0
+          ],
+          "ok",
+          true
+        ],
+        "retrieve": [
+          [
+            0,
+            0
+          ],
+          "ok",
+          true
+        ],
+        "secret": [
+          [
+            0,
+            0
+          ],
+          "ok",
+          true
+        ],
+        "session": [
+          [
+            0,
+            0
+          ],
+          "ok",
+          true
+        ],
+        "skill": [
+          [
+            0,
+            0
+          ],
+          "ok",
+          true
+        ],
+        "task": [
+          [
+            0,
+            0
+          ],
+          "ok",
+          true
+        ],
+        "telemetry": [
+          [
+            0,
+            0
+          ],
+          "ok",
+          true
+        ]
+      }
+    },
+    {
+      "check": "item4 SQLite migrations: each of those files records its module (om_meta.module_id) and one Alembic head",
+      "pass": true,
+      "observed": {
+        "a2a": [
+          [
+            "0005_job_idempotency_scope"
+          ],
+          {
+            "module_id": "a2a",
+            "schema_head": "0005_job_idempotency_scope"
+          }
+        ],
+        "artifact": [
+          [
+            "0001_baseline"
+          ],
+          {
+            "module_id": "artifact",
+            "schema_head": "0001_baseline"
+          }
+        ],
+        "authoring": [
+          [
+            "0001_baseline"
+          ],
+          {
+            "module_id": "authoring",
+            "schema_head": "0001_baseline"
+          }
+        ],
+        "commerce": [
+          [
+            "0004_action_preparations"
+          ],
+          {
+            "module_id": "commerce",
+            "schema_head": "0004_action_preparations"
+          }
+        ],
+        "compress": [
+          [
+            "0001_baseline"
+          ],
+          {
+            "module_id": "compress",
+            "schema_head": "0001_baseline"
+          }
+        ],
+        "controlplane": [
+          [
+            "0002_index_audit"
+          ],
+          {
+            "module_id": "controlplane",
+            "schema_head": "0002_index_audit"
+          }
+        ],
+        "controlplane_telegram": [
+          [
+            "0002_polling_lease_schema"
+          ],
+          {
+            "module_id": "controlplane_telegram",
+            "schema_head": "0002_polling_lease_schema"
+          }
+        ],
+        "identity": [
+          [
+            "0001_baseline"
+          ],
+          {
+            "module_id": "identity",
+            "schema_head": "0001_baseline"
+          }
+        ],
+        "memory": [
+          [
+            "0004_namespace"
+          ],
+          {
+            "module_id": "memory",
+            "schema_head": "0004_namespace"
+          }
+        ],
+        "policy": [
+          [
+            "0002_blockchain_confirmations"
+          ],
+          {
+            "module_id": "policy",
+            "schema_head": "0002_blockchain_confirmations"
+          }
+        ],
+        "registry": [
+          [
+            "0001_baseline"
+          ],
+          {
+            "module_id": "registry",
+            "schema_head": "0001_baseline"
+          }
+        ],
+        "retrieve": [
+          [
+            "0002_index"
+          ],
+          {
+            "module_id": "retrieve",
+            "schema_head": "0002_index"
+          }
+        ],
+        "secret": [
+          [
+            "0001_baseline"
+          ],
+          {
+            "module_id": "secret",
+            "schema_head": "0001_baseline"
+          }
+        ],
+        "session": [
+          [
+            "0005_cron_scheduler_control"
+          ],
+          {
+            "module_id": "session",
+            "schema_head": "0005_cron_scheduler_control"
+          }
+        ],
+        "skill": [
+          [
+            "0007_workflow_observations"
+          ],
+          {
+            "module_id": "skill",
+            "schema_head": "0007_workflow_observations"
+          }
+        ],
+        "task": [
+          [
+            "0001_baseline"
+          ],
+          {
+            "module_id": "task",
+            "schema_head": "0001_baseline"
+          }
+        ],
+        "telemetry": [
+          [
+            "0003_debug_query_indexes"
+          ],
+          {
+            "module_id": "telemetry",
+            "schema_head": "0003_debug_query_indexes"
+          }
+        ]
+      }
+    },
+    {
+      "check": "item4 SQLite: no command left a file in its working directory",
+      "pass": true,
+      "observed": []
+    },
+    {
+      "check": "item4 SQLite module stores: every SQLite store factory opens and closes; the memory, session and A2A audit stores round-trip a row",
+      "pass": true,
+      "observed": {
+        "session_store": "SQLiteSessionStore round-trip=True",
+        "a2a_state_store": "SQLiteStateStore",
+        "registry_store": "SQLiteRegistryStore",
+        "artifact_store": "SQLiteArtifactIndex",
+        "identity_store": "SQLiteIdentityStore",
+        "policy_store": "SQLitePolicyStore",
+        "retrieve_store": "SQLiteRetrieveStore",
+        "skill_store": "SQLiteSkillStore",
+        "task_store": "SQLiteTaskStore",
+        "telemetry_store": "SQLiteTelemetryStore",
+        "controlplane_store": "SQLiteControlPlaneStore",
+        "compress_store": "SQLiteTelemetryStore",
+        "memory_store": "SQLiteMemoryStore round-trip=True",
+        "a2a_audit_store": "SQLiteAuditStore round-trip=True"
+      }
+    }
+  ],
+  "result": {
+    "runtime": {
+      "first": [
+        15,
+        15
+      ],
+      "second": [
+        15,
+        0
+      ],
+      "fingerprint": {
+        "sqlite_master_sha256": "6d59d4b342c0c7abf56bac804c34babd903a60bbb2e04b10a5bd05a4c542ac24",
+        "tables": [
+          "a2a_jobs",
+          "core_events",
+          "core_sidecar_rows",
+          "daemon_heartbeats",
+          "daemon_registry",
+          "event_run_facts",
+          "events",
+          "idempotency_keys",
+          "memory_records",
+          "memory_vectors",
+          "messages",
+          "migrations",
+          "room_participants",
+          "session_contexts",
+          "session_metadata_strings",
+          "session_retention_holds",
+          "session_turn_leases",
+          "sessions",
+          "sidecar_ingest_log",
+          "sqlite_sequence"
+        ],
+        "user_version": 0,
+        "application_id": 0,
+        "migrations": [
+          [
+            1,
+            "bootstrap_core_tables"
+          ],
+          [
+            2,
+            "add_session_contexts_table"
+          ],
+          [
+            3,
+            "add_agent_runtime_and_a2a_tables"
+          ],
+          [
+            4,
+            "add_vector_memory_tables"
+          ],
+          [
+            5,
+            "add_message_conversation_id"
+          ],
+          [
+            6,
+            "add_message_thread_attach_ids"
+          ],
+          [
+            7,
+            "add_session_lifecycle_columns"
+          ],
+          [
+            8,
+            "add_session_context_summary_short"
+          ],
+          [
+            9,
+            "add_room_participants_and_active_agent"
+          ],
+          [
+            10,
+            "add_session_turn_leases"
+          ],
+          [
+            11,
+            "add_canonical_events_and_capture_holds"
+          ],
+          [
+            12,
+            "add_message_append_seq"
+          ],
+          [
+            13,
+            "add_event_run_facts"
+          ],
+          [
+            14,
+            "add_room_participant_join_seq"
+          ],
+          [
+            15,
+            "add_session_metadata_strings"
+          ]
+        ]
+      },
+      "connections": [
+        3,
+        3
+      ]
+    },
+    "init_failure": {
+      "error": "MigrationError: Migration v13 (add_event_run_facts) failed: table event_run_facts already exists",
+      "versions": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "connections": 2
+    },
+    "modules": {
+      "a2a": {
+        "exit": [
+          0,
+          0
+        ],
+        "status": "ok",
+        "fingerprint": {
+          "sqlite_master_sha256": "5edccfa3dc5cc454cdab6b17253a67194babcfab6edbe41da2f8e148ffa86324",
+          "tables": [
+            "agents",
+            "alembic_version",
+            "idempotency_keys",
+            "jobs",
+            "om_meta"
+          ],
+          "user_version": 0,
+          "application_id": 1330446349,
+          "alembic_version": [
+            "0005_job_idempotency_scope"
+          ],
+          "om_meta": {
+            "module_id": "a2a",
+            "schema_head": "0005_job_idempotency_scope"
+          }
+        },
+        "rerun_unchanged": true
+      },
+      "artifact": {
+        "exit": [
+          0,
+          0
+        ],
+        "status": "ok",
+        "fingerprint": {
+          "sqlite_master_sha256": "20453aa79887bb49d01d2324f6713a48a15b842ec24124265ecb7aacb169f3ae",
+          "tables": [
+            "alembic_version",
+            "aliases",
+            "artifact_views",
+            "artifacts",
+            "om_meta",
+            "reference_edges"
+          ],
+          "user_version": 0,
+          "application_id": 1330446338,
+          "alembic_version": [
+            "0001_baseline"
+          ],
+          "om_meta": {
+            "module_id": "artifact",
+            "schema_head": "0001_baseline"
+          }
+        },
+        "rerun_unchanged": true
+      },
+      "authoring": {
+        "exit": [
+          0,
+          0
+        ],
+        "status": "ok",
+        "fingerprint": {
+          "sqlite_master_sha256": "8548272763cdfdb5f73e492ace4b0b164652d20eeaa8307d20797c9a15d5b481",
+          "tables": [
+            "alembic_version",
+            "authored_tools",
+            "om_meta",
+            "tool_authoring_audit_events",
+            "tool_drafts"
+          ],
+          "user_version": 0,
+          "application_id": 1330446352,
+          "alembic_version": [
+            "0001_baseline"
+          ],
+          "om_meta": {
+            "module_id": "authoring",
+            "schema_head": "0001_baseline"
+          }
+        },
+        "rerun_unchanged": true
+      },
+      "brain": {
+        "exit": [
+          1,
+          1
+        ],
+        "status": "error",
+        "fingerprint": {
+          "sqlite_master_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "tables": [],
+          "user_version": 0,
+          "application_id": 0
+        },
+        "rerun_unchanged": true
+      },
+      "commerce": {
+        "exit": [
+          0,
+          0
+        ],
+        "status": "ok",
+        "fingerprint": {
+          "sqlite_master_sha256": "d58ebade89164d99715aa95e3b3163812200effe027440869ba39b3f73932698",
+          "tables": [
+            "alembic_version",
+            "commerce_action_preparations",
+            "commerce_attempts",
+            "commerce_material_snapshots",
+            "commerce_orders",
+            "commerce_preparations",
+            "om_meta"
+          ],
+          "user_version": 0,
+          "application_id": 1330446354,
+          "alembic_version": [
+            "0004_action_preparations"
+          ],
+          "om_meta": {
+            "module_id": "commerce",
+            "schema_head": "0004_action_preparations"
+          }
+        },
+        "rerun_unchanged": true
+      },
+      "compress": {
+        "exit": [
+          0,
+          0
+        ],
+        "status": "ok",
+        "fingerprint": {
+          "sqlite_master_sha256": "d75279dfa1499ea25ff4e331e1e4bb3a940c89116060347b7e1b98059e3524a0",
+          "tables": [
+            "alembic_version",
+            "compression_failures",
+            "compression_runs",
+            "dropped_reasons",
+            "om_meta",
+            "sqlite_sequence"
+          ],
+          "user_version": 0,
+          "application_id": 1330446350,
+          "alembic_version": [
+            "0001_baseline"
+          ],
+          "om_meta": {
+            "module_id": "compress",
+            "schema_head": "0001_baseline"
+          }
+        },
+        "rerun_unchanged": true
+      },
+      "controlplane": {
+        "exit": [
+          0,
+          0
+        ],
+        "status": "ok",
+        "fingerprint": {
+          "sqlite_master_sha256": "8bce56c106a1494ab7e39de79a93ee6bc4f3086ec246a5772d185da30957d5c7",
+          "tables": [
+            "alembic_version",
+            "cp_audit_events",
+            "cp_channel_subjects",
+            "cp_chat_bindings",
+            "cp_inbound_messages",
+            "cp_inbox",
+            "cp_migrations",
+            "cp_outbound_messages",
+            "cp_outbox",
+            "cp_pair_attempts",
+            "cp_pair_tokens",
+            "cp_pairings",
+            "cp_pending_clarify",
+            "cp_principals",
+            "cp_rate_limits",
+            "cp_session_agents",
+            "cp_sessions",
+            "cp_users",
+            "om_meta",
+            "sqlite_sequence"
+          ],
+          "user_version": 0,
+          "application_id": 1330446344,
+          "alembic_version": [
+            "0002_index_audit"
+          ],
+          "om_meta": {
+            "module_id": "controlplane",
+            "schema_head": "0002_index_audit"
+          }
+        },
+        "rerun_unchanged": true
+      },
+      "controlplane_telegram": {
+        "exit": [
+          0,
+          0
+        ],
+        "status": "ok",
+        "fingerprint": {
+          "sqlite_master_sha256": "a955e21d1315e39ce0efc860bb6d5691a4196598753e4f2727c631826219b4f3",
+          "tables": [
+            "alembic_version",
+            "om_meta",
+            "sqlite_sequence",
+            "telegram_pair_attempts",
+            "telegram_pair_tokens",
+            "telegram_pending_clarify",
+            "telegram_poll_state",
+            "telegram_polling_leases"
+          ],
+          "user_version": 0,
+          "application_id": 1330446345,
+          "alembic_version": [
+            "0002_polling_lease_schema"
+          ],
+          "om_meta": {
+            "module_id": "controlplane_telegram",
+            "schema_head": "0002_polling_lease_schema"
+          }
+        },
+        "rerun_unchanged": true
+      },
+      "identity": {
+        "exit": [
+          0,
+          0
+        ],
+        "status": "ok",
+        "fingerprint": {
+          "sqlite_master_sha256": "fb5f778b774bf691ceca6f1a39ac63d61dc8efef27115d234627fc15715be7ff",
+          "tables": [
+            "alembic_version",
+            "identity_profiles",
+            "identity_snippet_cache",
+            "om_meta"
+          ],
+          "user_version": 0,
+          "application_id": 1330446340,
+          "alembic_version": [
+            "0001_baseline"
+          ],
+          "om_meta": {
+            "module_id": "identity",
+            "schema_head": "0001_baseline"
+          }
+        },
+        "rerun_unchanged": true
+      },
+      "memory": {
+        "exit": [
+          0,
+          0
+        ],
+        "status": "ok",
+        "fingerprint": {
+          "sqlite_master_sha256": "544888735e9cd27369febc19e5340bbf88545cae44efb06a7cde7d43869ac80a",
+          "tables": [
+            "alembic_version",
+            "memory_candidates",
+            "memory_entities",
+            "memory_fts",
+            "memory_fts_config",
+            "memory_fts_content",
+            "memory_fts_data",
+            "memory_fts_docsize",
+            "memory_fts_idx",
+            "memory_records",
+            "memory_tier_transitions",
+            "migrations",
+            "om_meta"
+          ],
+          "user_version": 0,
+          "application_id": 1330446347,
+          "alembic_version": [
+            "0004_namespace"
+          ],
+          "om_meta": {
+            "module_id": "memory",
+            "schema_head": "0004_namespace"
+          },
+          "migrations": []
+        },
+        "rerun_unchanged": true
+      },
+      "policy": {
+        "exit": [
+          0,
+          0
+        ],
+        "status": "ok",
+        "fingerprint": {
+          "sqlite_master_sha256": "2db50d05e032dc17daf001ffa39e6afeb9b71f92ded4eb83d24e91ebba20f92d",
+          "tables": [
+            "alembic_version",
+            "om_meta",
+            "policy_decisions",
+            "policy_grants",
+            "policy_pending_confirmations",
+            "policy_settings"
+          ],
+          "user_version": 0,
+          "application_id": 1330446341,
+          "alembic_version": [
+            "0002_blockchain_confirmations"
+          ],
+          "om_meta": {
+            "module_id": "policy",
+            "schema_head": "0002_blockchain_confirmations"
+          }
+        },
+        "rerun_unchanged": true
+      },
+      "registry": {
+        "exit": [
+          0,
+          0
+        ],
+        "status": "ok",
+        "fingerprint": {
+          "sqlite_master_sha256": "85ecdb11cd7f82ab7a8455a74a5107ccb5c2e48bff40dfbc43fcfcd76ff92e3f",
+          "tables": [
+            "agent_methods",
+            "agent_status",
+            "agents",
+            "alembic_version",
+            "om_meta"
+          ],
+          "user_version": 0,
+          "application_id": 1330446339,
+          "alembic_version": [
+            "0001_baseline"
+          ],
+          "om_meta": {
+            "module_id": "registry",
+            "schema_head": "0001_baseline"
+          }
+        },
+        "rerun_unchanged": true
+      },
+      "retrieve": {
+        "exit": [
+          0,
+          0
+        ],
+        "status": "ok",
+        "fingerprint": {
+          "sqlite_master_sha256": "d8cb24249d551628705435062ca7fe40f06fd4b80460c05edf8df20d2a1eb17c",
+          "tables": [
+            "alembic_version",
+            "om_meta",
+            "retrievectl_docs",
+            "retrievectl_raptor_nodes",
+            "retrievectl_runs",
+            "retrievectl_units",
+            "retrievectl_units_fts",
+            "retrievectl_units_fts_config",
+            "retrievectl_units_fts_content",
+            "retrievectl_units_fts_data",
+            "retrievectl_units_fts_docsize",
+            "retrievectl_units_fts_idx"
+          ],
+          "user_version": 0,
+          "application_id": 1330446346,
+          "alembic_version": [
+            "0002_index"
+          ],
+          "om_meta": {
+            "module_id": "retrieve",
+            "schema_head": "0002_index"
+          }
+        },
+        "rerun_unchanged": true
+      },
+      "secret": {
+        "exit": [
+          0,
+          0
+        ],
+        "status": "ok",
+        "fingerprint": {
+          "sqlite_master_sha256": "b3ee13a81fa86f596633f3f8c2a6c11258312d3349dce9aa7cc06fcf25c792a8",
+          "tables": [
+            "alembic_version",
+            "om_meta",
+            "secrets"
+          ],
+          "user_version": 0,
+          "application_id": 1330446342,
+          "alembic_version": [
+            "0001_baseline"
+          ],
+          "om_meta": {
+            "module_id": "secret",
+            "schema_head": "0001_baseline"
+          }
+        },
+        "rerun_unchanged": true
+      },
+      "session": {
+        "exit": [
+          0,
+          0
+        ],
+        "status": "ok",
+        "fingerprint": {
+          "sqlite_master_sha256": "805d471a38943397757a9be80c5fb715254a505e9bd6f8f4d9a9cb1a5010fc2a",
+          "tables": [
+            "alembic_version",
+            "compression_checkpoints",
+            "cron_jobs",
+            "cron_runs",
+            "cron_scheduler_control",
+            "cron_scope_state",
+            "events",
+            "message_refs",
+            "om_meta",
+            "prompt_contexts",
+            "run_records",
+            "seed_bundles",
+            "session_events",
+            "session_snapshots",
+            "session_summaries",
+            "session_turn_leases",
+            "sessions",
+            "summaries",
+            "summary_deltas",
+            "turns",
+            "working_state"
+          ],
+          "user_version": 0,
+          "application_id": 1330446337,
+          "alembic_version": [
+            "0005_cron_scheduler_control"
+          ],
+          "om_meta": {
+            "module_id": "session",
+            "schema_head": "0005_cron_scheduler_control"
+          }
+        },
+        "rerun_unchanged": true
+      },
+      "skill": {
+        "exit": [
+          0,
+          0
+        ],
+        "status": "ok",
+        "fingerprint": {
+          "sqlite_master_sha256": "7bbe8389a39adf17aca1c29fd7300887a71c704a35e79f8241584c55e94205bd",
+          "tables": [
+            "alembic_version",
+            "om_meta",
+            "skill_index",
+            "skill_proposal_reviews",
+            "skill_proposals",
+            "skill_runs",
+            "skill_suggestion_audit",
+            "skill_version_admissions",
+            "skill_versions",
+            "skill_workflow_observations",
+            "skills"
+          ],
+          "user_version": 0,
+          "application_id": 1330446348,
+          "alembic_version": [
+            "0007_workflow_observations"
+          ],
+          "om_meta": {
+            "module_id": "skill",
+            "schema_head": "0007_workflow_observations"
+          }
+        },
+        "rerun_unchanged": true
+      },
+      "storage": {
+        "exit": [
+          1,
+          1
+        ],
+        "status": "error",
+        "fingerprint": {
+          "sqlite_master_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "tables": [],
+          "user_version": 0,
+          "application_id": 0
+        },
+        "rerun_unchanged": true
+      },
+      "task": {
+        "exit": [
+          0,
+          0
+        ],
+        "status": "ok",
+        "fingerprint": {
+          "sqlite_master_sha256": "38f9fabd43a6c4d73e0bc6cdf33f466469bedbb7b38daa4654579aa5b6d33900",
+          "tables": [
+            "alembic_version",
+            "om_meta",
+            "pending_actions",
+            "plan_steps",
+            "plans",
+            "step_idempotency",
+            "tasks"
+          ],
+          "user_version": 0,
+          "application_id": 1330446351,
+          "alembic_version": [
+            "0001_baseline"
+          ],
+          "om_meta": {
+            "module_id": "task",
+            "schema_head": "0001_baseline"
+          }
+        },
+        "rerun_unchanged": true
+      },
+      "telemetry": {
+        "exit": [
+          0,
+          0
+        ],
+        "status": "ok",
+        "fingerprint": {
+          "sqlite_master_sha256": "2d0cc0c391d81a1eaf3e81893acf9efeb3eccd11e0e61c63eb9a1dfb57af2c15",
+          "tables": [
+            "alembic_version",
+            "events",
+            "om_meta",
+            "sqlite_sequence"
+          ],
+          "user_version": 0,
+          "application_id": 1330446343,
+          "alembic_version": [
+            "0003_debug_query_indexes"
+          ],
+          "om_meta": {
+            "module_id": "telemetry",
+            "schema_head": "0003_debug_query_indexes"
+          }
+        },
+        "rerun_unchanged": true
+      }
+    },
+    "modules_without_alembic": {
+      "brain": [
+        1,
+        1
+      ],
+      "storage": [
+        1,
+        1
+      ]
+    },
+    "stores": {
+      "session_store": {
+        "ok": true,
+        "note": "SQLiteSessionStore round-trip=True",
+        "fingerprint": {
+          "sqlite_master_sha256": "cfec4939a9b76b0e0c5edfbb321d4f7f6342d67e1cc232fa5a47d2ce35346d1a",
+          "tables": [
+            "compression_checkpoints",
+            "core_events",
+            "core_sidecar_rows",
+            "cron_jobs",
+            "cron_runs",
+            "cron_scheduler_control",
+            "cron_scope_state",
+            "events",
+            "message_refs",
+            "migrations",
+            "om_meta",
+            "prompt_contexts",
+            "run_records",
+            "seed_bundles",
+            "session_events",
+            "session_retention_holds",
+            "session_shares",
+            "session_snapshots",
+            "session_summaries",
+            "session_turn_leases",
+            "sessions",
+            "sidecar_ingest_log",
+            "summaries",
+            "summary_deltas",
+            "turns",
+            "working_state"
+          ],
+          "user_version": 0,
+          "application_id": 0,
+          "om_meta": {
+            "module_id": "session",
+            "schema_head": "0005_cron_scheduler_control"
+          },
+          "migrations": [
+            [
+              1,
+              "bootstrap_sessctl_v1"
+            ],
+            [
+              2,
+              "event_sourced_sessions_v1"
+            ],
+            [
+              3,
+              "cron_jobs_and_runs_v1"
+            ],
+            [
+              4,
+              "v1_5_continuity_and_canonical_events"
+            ],
+            [
+              5,
+              "session_continuation_lineage_index"
+            ],
+            [
+              6,
+              "session_sharing_v1"
+            ],
+            [
+              7,
+              "session_retention_v1"
+            ]
+          ]
+        },
+        "connections": [
+          2,
+          0
+        ]
+      },
+      "a2a_state_store": {
+        "ok": true,
+        "note": "SQLiteStateStore",
+        "fingerprint": {
+          "sqlite_master_sha256": "2e617d923531c8dc571a1790e30623deabdf74ab2d9d5b5d72cfb52541c7e89c",
+          "tables": [
+            "agents",
+            "idempotency_keys",
+            "jobs",
+            "om_meta"
+          ],
+          "user_version": 0,
+          "application_id": 1330446349,
+          "om_meta": {
+            "module_id": "a2a",
+            "schema_head": "0005_job_idempotency_scope"
+          }
+        },
+        "connections": [
+          1,
+          0
+        ]
+      },
+      "registry_store": {
+        "ok": true,
+        "note": "SQLiteRegistryStore",
+        "fingerprint": {
+          "sqlite_master_sha256": "5bd86d1d7f39e57765dfdba69247e0fea1b9406384f0c63fd8a0a8e8bae0681f",
+          "tables": [
+            "agent_methods",
+            "agent_status",
+            "agents",
+            "om_meta"
+          ],
+          "user_version": 0,
+          "application_id": 1330446339,
+          "om_meta": {
+            "module_id": "registry",
+            "schema_head": "0001_baseline"
+          }
+        },
+        "connections": [
+          1,
+          0
+        ]
+      },
+      "artifact_store": {
+        "ok": true,
+        "note": "SQLiteArtifactIndex",
+        "fingerprint": {
+          "sqlite_master_sha256": "c97c59956db766bf3c65c418bac4d3b6b22329488a425c742bcaa5ff30d261de",
+          "tables": [
+            "aliases",
+            "artifact_views",
+            "artifacts",
+            "om_meta",
+            "reference_edges"
+          ],
+          "user_version": 0,
+          "application_id": 1330446338,
+          "om_meta": {
+            "module_id": "artifact",
+            "schema_head": "0001_baseline"
+          }
+        },
+        "connections": [
+          1,
+          0
+        ]
+      },
+      "identity_store": {
+        "ok": true,
+        "note": "SQLiteIdentityStore",
+        "fingerprint": {
+          "sqlite_master_sha256": "b569e9bf47043bac88a463b52d4f1edc9220ead9e08cd15b7fa680034fc40af7",
+          "tables": [
+            "identity_profiles",
+            "identity_snippet_cache",
+            "om_meta"
+          ],
+          "user_version": 0,
+          "application_id": 1330446340,
+          "om_meta": {
+            "module_id": "identity",
+            "schema_head": "0001_baseline"
+          }
+        },
+        "connections": [
+          1,
+          0
+        ]
+      },
+      "policy_store": {
+        "ok": true,
+        "note": "SQLitePolicyStore",
+        "fingerprint": {
+          "sqlite_master_sha256": "c4864cb6d5c6eb0c0d4a29b6db0ad3c6788c624a0bd57f92df13c2b6f27156a4",
+          "tables": [
+            "om_meta",
+            "policy_decisions",
+            "policy_grants",
+            "policy_pending_confirmations",
+            "policy_settings"
+          ],
+          "user_version": 0,
+          "application_id": 1330446341,
+          "om_meta": {
+            "module_id": "policy",
+            "schema_head": "0002_blockchain_confirmations"
+          }
+        },
+        "connections": [
+          1,
+          0
+        ]
+      },
+      "retrieve_store": {
+        "ok": true,
+        "note": "SQLiteRetrieveStore",
+        "fingerprint": {
+          "sqlite_master_sha256": "73eccf8e8a3032fbcb1b98d89590ce9f2b5f9bfc246446139a13046329138a66",
+          "tables": [
+            "om_meta"
+          ],
+          "user_version": 0,
+          "application_id": 1330446346,
+          "om_meta": {
+            "module_id": "retrieve",
+            "schema_head": "0002_index"
+          }
+        },
+        "connections": [
+          1,
+          0
+        ]
+      },
+      "skill_store": {
+        "ok": true,
+        "note": "SQLiteSkillStore",
+        "fingerprint": {
+          "sqlite_master_sha256": "3514e28bf70f7b3268ed66ae91fb544ba6bcac32c74d8f23202efd7dbfbd48e8",
+          "tables": [
+            "om_meta",
+            "skill_index",
+            "skill_proposal_reviews",
+            "skill_proposals",
+            "skill_runs",
+            "skill_suggestion_audit",
+            "skill_version_admissions",
+            "skill_versions",
+            "skill_workflow_observations",
+            "skills"
+          ],
+          "user_version": 0,
+          "application_id": 1330446348,
+          "om_meta": {
+            "module_id": "skill",
+            "schema_head": "0007_workflow_observations"
+          }
+        },
+        "connections": [
+          1,
+          0
+        ]
+      },
+      "task_store": {
+        "ok": true,
+        "note": "SQLiteTaskStore",
+        "fingerprint": {
+          "sqlite_master_sha256": "57b9b5d4c5792b81a03ac4754f6c6ed96199dacedf14ae99e72a52dbf140cf4a",
+          "tables": [
+            "om_meta",
+            "pending_actions",
+            "plan_steps",
+            "plans",
+            "step_idempotency",
+            "tasks"
+          ],
+          "user_version": 0,
+          "application_id": 1330446351,
+          "om_meta": {
+            "module_id": "task",
+            "schema_head": "0001_baseline"
+          }
+        },
+        "connections": [
+          1,
+          0
+        ]
+      },
+      "telemetry_store": {
+        "ok": true,
+        "note": "SQLiteTelemetryStore",
+        "fingerprint": {
+          "sqlite_master_sha256": "79beed2e03ca55b35604e8fdc3a0bcd4a437d2432135760efde979388a98861a",
+          "tables": [
+            "events",
+            "om_meta",
+            "sqlite_sequence"
+          ],
+          "user_version": 0,
+          "application_id": 1330446343,
+          "om_meta": {
+            "module_id": "telemetry",
+            "schema_head": "0003_debug_query_indexes"
+          }
+        },
+        "connections": [
+          1,
+          0
+        ]
+      },
+      "controlplane_store": {
+        "ok": true,
+        "note": "SQLiteControlPlaneStore",
+        "fingerprint": {
+          "sqlite_master_sha256": "0b727521e78a8747418d2a4d0149bc759838155f4c644c81b6dce6f370c8afab",
+          "tables": [
+            "cp_audit_events",
+            "cp_channel_subjects",
+            "cp_chat_bindings",
+            "cp_inbound_messages",
+            "cp_inbox",
+            "cp_migrations",
+            "cp_outbound_messages",
+            "cp_outbox",
+            "cp_pair_attempts",
+            "cp_pair_tokens",
+            "cp_pairings",
+            "cp_pending_clarify",
+            "cp_principals",
+            "cp_rate_limits",
+            "cp_session_agents",
+            "cp_sessions",
+            "cp_users",
+            "om_meta",
+            "sqlite_sequence"
+          ],
+          "user_version": 0,
+          "application_id": 1330446344,
+          "om_meta": {
+            "module_id": "controlplane",
+            "schema_head": "0007_storage_index_audit_v1"
+          }
+        },
+        "connections": [
+          1,
+          0
+        ]
+      },
+      "compress_store": {
+        "ok": true,
+        "note": "SQLiteTelemetryStore",
+        "fingerprint": {
+          "sqlite_master_sha256": "406ac86705abb09a335f57d0b561c3c3a45f892870ca877272246c9b99386edb",
+          "tables": [
+            "compression_failures",
+            "compression_runs",
+            "dropped_reasons",
+            "om_meta",
+            "sqlite_sequence"
+          ],
+          "user_version": 0,
+          "application_id": 1330446350,
+          "om_meta": {
+            "module_id": "compress",
+            "schema_head": "0001_baseline"
+          }
+        },
+        "connections": [
+          1,
+          0
+        ]
+      },
+      "memory_store": {
+        "ok": true,
+        "note": "SQLiteMemoryStore round-trip=True",
+        "fingerprint": {
+          "sqlite_master_sha256": "8bd5c7a86807b0c87e5177627027b4cc464d8deb5dc4ba08915c3264b8db9dab",
+          "tables": [
+            "memory_candidates",
+            "memory_capture_bundle_receipts",
+            "memory_entities",
+            "memory_fts",
+            "memory_fts_config",
+            "memory_fts_content",
+            "memory_fts_data",
+            "memory_fts_docsize",
+            "memory_fts_idx",
+            "memory_records",
+            "memory_relations",
+            "memory_tier_transitions",
+            "migrations",
+            "om_meta"
+          ],
+          "user_version": 0,
+          "application_id": 1330446347,
+          "om_meta": {
+            "module_id": "memory",
+            "schema_head": "0004_namespace"
+          },
+          "migrations": [
+            [
+              1,
+              "v1_baseline"
+            ],
+            [
+              2,
+              "v2_candidate_meta"
+            ],
+            [
+              3,
+              "v3_record_last_hit"
+            ],
+            [
+              4,
+              "v4_record_supersession_reason"
+            ],
+            [
+              5,
+              "v5_record_tiering"
+            ],
+            [
+              6,
+              "v6_record_delete_audit"
+            ],
+            [
+              7,
+              "v7_record_bitemporal"
+            ],
+            [
+              8,
+              "v8_record_goal_tag"
+            ],
+            [
+              9,
+              "v9_record_namespace"
+            ],
+            [
+              10,
+              "v10_capture_bundle_receipts"
+            ]
+          ]
+        },
+        "connections": [
+          3,
+          0
+        ]
+      },
+      "a2a_audit_store": {
+        "ok": true,
+        "note": "SQLiteAuditStore round-trip=True",
+        "fingerprint": null,
+        "connections": [
+          2,
+          0
+        ]
+      }
+    },
+    "store_connections_left_open": {}
+  },
+  "commands": [
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "a2a.db",
+        "--module",
+        "a2a",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"a2a\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "a2a.db",
+        "--module",
+        "a2a",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"a2a\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "artifact.db",
+        "--module",
+        "artifact",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"artifact\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "artifact.db",
+        "--module",
+        "artifact",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"artifact\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "authoring.db",
+        "--module",
+        "authoring",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"authoring\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "authoring.db",
+        "--module",
+        "authoring",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"authoring\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "brain.db",
+        "--module",
+        "brain",
+        "--json"
+      ],
+      "exit": 1,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"brain\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.\"\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "brain.db",
+        "--module",
+        "brain",
+        "--json"
+      ],
+      "exit": 1,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"brain\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.\"\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "commerce.db",
+        "--module",
+        "commerce",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"commerce\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "commerce.db",
+        "--module",
+        "commerce",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"commerce\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "compress.db",
+        "--module",
+        "compress",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "compress.db",
+        "--module",
+        "compress",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "controlplane.db",
+        "--module",
+        "controlplane",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"controlplane\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "controlplane.db",
+        "--module",
+        "controlplane",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"controlplane\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "controlplane_telegram.db",
+        "--module",
+        "controlplane_telegram",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"controlplane_telegram\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "controlplane_telegram.db",
+        "--module",
+        "controlplane_telegram",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"controlplane_telegram\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "identity.db",
+        "--module",
+        "identity",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"identity\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "identity.db",
+        "--module",
+        "identity",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"identity\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "memory.db",
+        "--module",
+        "memory",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"memory\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "memory.db",
+        "--module",
+        "memory",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"memory\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "policy.db",
+        "--module",
+        "policy",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"policy\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "policy.db",
+        "--module",
+        "policy",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"policy\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "registry.db",
+        "--module",
+        "registry",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"registry\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "registry.db",
+        "--module",
+        "registry",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"registry\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "retrieve.db",
+        "--module",
+        "retrieve",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"retrieve\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "retrieve.db",
+        "--module",
+        "retrieve",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"retrieve\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "secret.db",
+        "--module",
+        "secret",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"secret\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "secret.db",
+        "--module",
+        "secret",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"secret\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "session.db",
+        "--module",
+        "session",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"session\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "session.db",
+        "--module",
+        "session",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"session\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "skill.db",
+        "--module",
+        "skill",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"skill\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "skill.db",
+        "--module",
+        "skill",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"skill\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "storage.db",
+        "--module",
+        "storage",
+        "--json"
+      ],
+      "exit": 1,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"storage\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.\"\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "storage.db",
+        "--module",
+        "storage",
+        "--json"
+      ],
+      "exit": 1,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"storage\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic configuration missing. Provide alembic_ini_path or alembic_script_location.\"\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "task.db",
+        "--module",
+        "task",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"task\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "task.db",
+        "--module",
+        "task",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"task\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "telemetry.db",
+        "--module",
+        "telemetry",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"telemetry\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--sqlite",
+        "telemetry.db",
+        "--module",
+        "telemetry",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"telemetry\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n",
+      "stderr": "",
+      "cwd_left": []
+    }
+  ]
+}

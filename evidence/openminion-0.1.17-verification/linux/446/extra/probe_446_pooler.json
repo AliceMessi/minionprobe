@@ -1,0 +1,610 @@
+{
+  "banner": {
+    "probe": "probe_446_pooler",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.17",
+    "python": "3.12.16",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<WORK>/empty",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "server": "PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+    "pgbouncer": [
+      "PgBouncer 1.22.0"
+    ]
+  },
+  "summary": {
+    "passed": 12,
+    "failed": 0,
+    "total": 12
+  },
+  "checks": [
+    {
+      "check": "pooler (PgBouncer defaults, transaction pooling): a connection with options=-c search_path is rejected (\"unsupported startup parameter in options: search_path\"), so the memory, registry and A2A audit stores cannot connect; the database is unchanged",
+      "pass": true,
+      "observed": {
+        "plain": "OperationalError: (psycopg.OperationalError) connection failed: connection to server at \"127.0.0.1\", port 6433 failed: FATAL: unsupported startup parameter in options: search_path (Background on this  ...",
+        "stores": {
+          "memory_store": "OperationalError: (psycopg.OperationalError) connection failed: connection to server at \"127.0.0.1\", port 6433 failed: FATAL: unsupported startup parameter in options: search_path (Background on this  ...",
+          "registry_store": "OperationalError: (psycopg.OperationalError) connection failed: connection to server at \"127.0.0.1\", port 6433 failed: FATAL: unsupported startup parameter in options: search_path (Background on this  ...",
+          "a2a_audit_store": "OperationalError: (psycopg.OperationalError) connection failed: connection to server at \"127.0.0.1\", port 6433 failed: FATAL: unsupported startup parameter in options: search_path (Background on this  ..."
+        }
+      }
+    },
+    {
+      "check": "pooler (defaults): runtime storage (configured URL unchanged) starts through PgBouncer at v15",
+      "pass": true,
+      "observed": [
+        true,
+        "15"
+      ]
+    },
+    {
+      "check": "pooler (defaults): `openminion storage migrate --backend postgres` through PgBouncer exits 0 with every module ok in public__<id> at its head, and a rerun exits 0",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "statuses": {
+          "secret": "ok",
+          "session": "ok",
+          "identity": "ok",
+          "registry": "ok",
+          "task": "ok",
+          "skill": "ok",
+          "policy": "ok",
+          "compress": "ok",
+          "retrieve": "ok",
+          "artifact": "ok",
+          "a2a": "ok",
+          "memory": "ok",
+          "controlplane": "ok",
+          "telemetry": "ok"
+        }
+      }
+    },
+    {
+      "check": "pooler (defaults): pointed at the server directly, every module store opens",
+      "pass": true,
+      "observed": {
+        "memory_store": true,
+        "a2a_audit_store": true,
+        "a2a_state_store": true,
+        "session_store": true,
+        "controlplane_store": true,
+        "telemetry_store": true,
+        "registry_store": true,
+        "artifact_store": true,
+        "identity_store": true,
+        "policy_store": true,
+        "retrieve_store": true,
+        "skill_store": true,
+        "task_store": true,
+        "compress_store": true
+      }
+    },
+    {
+      "check": "pooler (ignore_startup_parameters = options): the connection is accepted but keeps search_path '\"$user\", public'; the memory, registry and A2A audit stores are refused before any write with the landing message (\"did not apply the URL's options parameter\", \"Connect module stores directly\", \"Nothing was written\"); the database is unchanged",
+      "pass": true,
+      "observed": {
+        "plain": [
+          true,
+          "\"$user\", public"
+        ],
+        "stores": {
+          "memory_store": "SchemaOwnershipError: A connection for PostgreSQL schema \"public__memory\" started with search_path '\"$user\", public': the server or a proxy (a transaction pooler such as PgBouncer) did not apply the URL's options parameter. Connect module stores directly or through a pooler that passes options. Noth ...",
+          "registry_store": "SchemaOwnershipError: A connection for PostgreSQL schema \"public__registry\" started with search_path '\"$user\", public': the server or a proxy (a transaction pooler such as PgBouncer) did not apply the URL's options parameter. Connect module stores directly or through a pooler that passes options. No ...",
+          "a2a_audit_store": "SchemaOwnershipError: A connection for PostgreSQL schema \"public__a2a\" started with search_path '\"$user\", public': the server or a proxy (a transaction pooler such as PgBouncer) did not apply the URL's options parameter. Connect module stores directly or through a pooler that passes options. Nothing ..."
+        }
+      }
+    },
+    {
+      "check": "pooler (ignore_startup_parameters = options): runtime storage (configured URL unchanged) starts through PgBouncer at v15",
+      "pass": true,
+      "observed": [
+        true,
+        "15"
+      ]
+    },
+    {
+      "check": "pooler (ignore_startup_parameters = options): `openminion storage migrate --backend postgres` through PgBouncer exits 0 with every module ok in public__<id> at its head, and a rerun exits 0",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "statuses": {
+          "secret": "ok",
+          "session": "ok",
+          "identity": "ok",
+          "registry": "ok",
+          "task": "ok",
+          "skill": "ok",
+          "policy": "ok",
+          "compress": "ok",
+          "retrieve": "ok",
+          "artifact": "ok",
+          "a2a": "ok",
+          "memory": "ok",
+          "controlplane": "ok",
+          "telemetry": "ok"
+        }
+      }
+    },
+    {
+      "check": "pooler (ignore_startup_parameters = options): pointed at the server directly, every module store opens",
+      "pass": true,
+      "observed": {
+        "memory_store": true,
+        "a2a_audit_store": true,
+        "a2a_state_store": true,
+        "session_store": true,
+        "controlplane_store": true,
+        "telemetry_store": true,
+        "registry_store": true,
+        "artifact_store": true,
+        "identity_store": true,
+        "policy_store": true,
+        "retrieve_store": true,
+        "skill_store": true,
+        "task_store": true,
+        "compress_store": true
+      }
+    },
+    {
+      "check": "pooler (track_extra_parameters = search_path): the connection is accepted but keeps search_path '\"$user\", public'; the memory, registry and A2A audit stores are refused before any write with the landing message (\"did not apply the URL's options parameter\", \"Connect module stores directly\", \"Nothing was written\"); the database is unchanged",
+      "pass": true,
+      "observed": {
+        "plain": [
+          true,
+          "\"$user\", public"
+        ],
+        "stores": {
+          "memory_store": "SchemaOwnershipError: A connection for PostgreSQL schema \"public__memory\" started with search_path '\"$user\", public': the server or a proxy (a transaction pooler such as PgBouncer) did not apply the URL's options parameter. Connect module stores directly or through a pooler that passes options. Noth ...",
+          "registry_store": "SchemaOwnershipError: A connection for PostgreSQL schema \"public__registry\" started with search_path '\"$user\", public': the server or a proxy (a transaction pooler such as PgBouncer) did not apply the URL's options parameter. Connect module stores directly or through a pooler that passes options. No ...",
+          "a2a_audit_store": "SchemaOwnershipError: A connection for PostgreSQL schema \"public__a2a\" started with search_path '\"$user\", public': the server or a proxy (a transaction pooler such as PgBouncer) did not apply the URL's options parameter. Connect module stores directly or through a pooler that passes options. Nothing ..."
+        }
+      }
+    },
+    {
+      "check": "pooler (track_extra_parameters = search_path): runtime storage (configured URL unchanged) starts through PgBouncer at v15",
+      "pass": true,
+      "observed": [
+        true,
+        "15"
+      ]
+    },
+    {
+      "check": "pooler (track_extra_parameters = search_path): `openminion storage migrate --backend postgres` through PgBouncer exits 0 with every module ok in public__<id> at its head, and a rerun exits 0",
+      "pass": true,
+      "observed": {
+        "exit": 0,
+        "statuses": {
+          "secret": "ok",
+          "session": "ok",
+          "identity": "ok",
+          "registry": "ok",
+          "task": "ok",
+          "skill": "ok",
+          "policy": "ok",
+          "compress": "ok",
+          "retrieve": "ok",
+          "artifact": "ok",
+          "a2a": "ok",
+          "memory": "ok",
+          "controlplane": "ok",
+          "telemetry": "ok"
+        }
+      }
+    },
+    {
+      "check": "pooler (track_extra_parameters = search_path): pointed at the server directly, every module store opens",
+      "pass": true,
+      "observed": {
+        "memory_store": true,
+        "a2a_audit_store": true,
+        "a2a_state_store": true,
+        "session_store": true,
+        "controlplane_store": true,
+        "telemetry_store": true,
+        "registry_store": true,
+        "artifact_store": true,
+        "identity_store": true,
+        "policy_store": true,
+        "retrieve_store": true,
+        "skill_store": true,
+        "task_store": true,
+        "compress_store": true
+      }
+    }
+  ],
+  "results": {
+    "defaults": {
+      "plain": [
+        false,
+        "OperationalError: (psycopg.OperationalError) connection failed: connection to server at \"127.0.0.1\", port 6433 failed: FATAL: unsupported startup parameter in options: search_path (Background on this error at: https://sqlalche.me/e/21/e3q8)"
+      ],
+      "stores": {
+        "memory_store": [
+          false,
+          "OperationalError: (psycopg.OperationalError) connection failed: connection to server at \"127.0.0.1\", port 6433 failed: FATAL: unsupported startup parameter in options: search_path (Background on this error at: https://sqlalche.me/e/21/e3q8)"
+        ],
+        "registry_store": [
+          false,
+          "OperationalError: (psycopg.OperationalError) connection failed: connection to server at \"127.0.0.1\", port 6433 failed: FATAL: unsupported startup parameter in options: search_path (Background on this error at: https://sqlalche.me/e/21/e3q8)"
+        ],
+        "a2a_audit_store": [
+          false,
+          "OperationalError: (psycopg.OperationalError) connection failed: connection to server at \"127.0.0.1\", port 6433 failed: FATAL: unsupported startup parameter in options: search_path (Background on this error at: https://sqlalche.me/e/21/e3q8)"
+        ]
+      },
+      "unchanged_after_stores": true,
+      "runtime": [
+        true,
+        "15"
+      ],
+      "migrate": {
+        "exit": 0,
+        "statuses": {
+          "secret": "ok",
+          "session": "ok",
+          "identity": "ok",
+          "registry": "ok",
+          "task": "ok",
+          "skill": "ok",
+          "policy": "ok",
+          "compress": "ok",
+          "retrieve": "ok",
+          "artifact": "ok",
+          "a2a": "ok",
+          "memory": "ok",
+          "controlplane": "ok",
+          "telemetry": "ok"
+        }
+      },
+      "rerun": 0,
+      "schemas": [
+        "public",
+        "public__a2a",
+        "public__artifact",
+        "public__compress",
+        "public__controlplane",
+        "public__identity",
+        "public__memory",
+        "public__policy",
+        "public__registry",
+        "public__retrieve",
+        "public__secret",
+        "public__session",
+        "public__skill",
+        "public__task",
+        "public__telemetry"
+      ],
+      "direct_stores": {
+        "memory_store": true,
+        "a2a_audit_store": true,
+        "a2a_state_store": true,
+        "session_store": true,
+        "controlplane_store": true,
+        "telemetry_store": true,
+        "registry_store": true,
+        "artifact_store": true,
+        "identity_store": true,
+        "policy_store": true,
+        "retrieve_store": true,
+        "skill_store": true,
+        "task_store": true,
+        "compress_store": true
+      },
+      "module_ledgers": {
+        "secret": true,
+        "session": true,
+        "identity": true,
+        "registry": true,
+        "task": true,
+        "skill": true,
+        "policy": true,
+        "compress": true,
+        "retrieve": true,
+        "artifact": true,
+        "a2a": true,
+        "memory": true,
+        "controlplane": true,
+        "telemetry": true
+      },
+      "pgbouncer_log": "2026-11-05 05:00:56.033 UTC [3656] WARNING C-0x5624f237ab70: (nodb)/(nouser)@127.0.0.1:49504 pooler error: unsupported startup parameter in options: search_path\n2026-11-05 05:00:56.077 UTC [3656] WARNING C-0x5624f237ab70: (nodb)/(nouser)@127.0.0.1:49518 unsupported startup parameter in options: search_path=\"public__a2a\"\n2026-11-05 05:00:56.077 UTC [3656] LOG C-0x5624f237ab70: (nodb)/(nouser)@127.0.0.1:49518 closing because: unsupported startup parameter in options: search_path (age=0s)\n2026-11-05 05:00:56.077 UTC [3656] WARNING C-0x5624f237ab70: (nodb)/(nouser)@127.0.0.1:49518 pooler error: unsupported startup parameter in options: search_path"
+    },
+    "ignore_startup_parameters = options": {
+      "plain": [
+        true,
+        "\"$user\", public"
+      ],
+      "stores": {
+        "memory_store": [
+          false,
+          "SchemaOwnershipError: A connection for PostgreSQL schema \"public__memory\" started with search_path '\"$user\", public': the server or a proxy (a transaction pooler such as PgBouncer) did not apply the URL's options parameter. Connect module stores directly or through a pooler that passes options. Nothing was written. OpenMinion does not move, repair or restamp existing tables."
+        ],
+        "registry_store": [
+          false,
+          "SchemaOwnershipError: A connection for PostgreSQL schema \"public__registry\" started with search_path '\"$user\", public': the server or a proxy (a transaction pooler such as PgBouncer) did not apply the URL's options parameter. Connect module stores directly or through a pooler that passes options. Nothing was written. OpenMinion does not move, repair or restamp existing tables."
+        ],
+        "a2a_audit_store": [
+          false,
+          "SchemaOwnershipError: A connection for PostgreSQL schema \"public__a2a\" started with search_path '\"$user\", public': the server or a proxy (a transaction pooler such as PgBouncer) did not apply the URL's options parameter. Connect module stores directly or through a pooler that passes options. Nothing was written. OpenMinion does not move, repair or restamp existing tables."
+        ]
+      },
+      "unchanged_after_stores": true,
+      "runtime": [
+        true,
+        "15"
+      ],
+      "migrate": {
+        "exit": 0,
+        "statuses": {
+          "secret": "ok",
+          "session": "ok",
+          "identity": "ok",
+          "registry": "ok",
+          "task": "ok",
+          "skill": "ok",
+          "policy": "ok",
+          "compress": "ok",
+          "retrieve": "ok",
+          "artifact": "ok",
+          "a2a": "ok",
+          "memory": "ok",
+          "controlplane": "ok",
+          "telemetry": "ok"
+        }
+      },
+      "rerun": 0,
+      "schemas": [
+        "public",
+        "public__a2a",
+        "public__artifact",
+        "public__compress",
+        "public__controlplane",
+        "public__identity",
+        "public__memory",
+        "public__policy",
+        "public__registry",
+        "public__retrieve",
+        "public__secret",
+        "public__session",
+        "public__skill",
+        "public__task",
+        "public__telemetry"
+      ],
+      "direct_stores": {
+        "memory_store": true,
+        "a2a_audit_store": true,
+        "a2a_state_store": true,
+        "session_store": true,
+        "controlplane_store": true,
+        "telemetry_store": true,
+        "registry_store": true,
+        "artifact_store": true,
+        "identity_store": true,
+        "policy_store": true,
+        "retrieve_store": true,
+        "skill_store": true,
+        "task_store": true,
+        "compress_store": true
+      },
+      "module_ledgers": {
+        "secret": true,
+        "session": true,
+        "identity": true,
+        "registry": true,
+        "task": true,
+        "skill": true,
+        "policy": true,
+        "compress": true,
+        "retrieve": true,
+        "artifact": true,
+        "a2a": true,
+        "memory": true,
+        "controlplane": true,
+        "telemetry": true
+      },
+      "pgbouncer_log": ""
+    },
+    "track_extra_parameters = search_path": {
+      "plain": [
+        true,
+        "\"$user\", public"
+      ],
+      "stores": {
+        "memory_store": [
+          false,
+          "SchemaOwnershipError: A connection for PostgreSQL schema \"public__memory\" started with search_path '\"$user\", public': the server or a proxy (a transaction pooler such as PgBouncer) did not apply the URL's options parameter. Connect module stores directly or through a pooler that passes options. Nothing was written. OpenMinion does not move, repair or restamp existing tables."
+        ],
+        "registry_store": [
+          false,
+          "SchemaOwnershipError: A connection for PostgreSQL schema \"public__registry\" started with search_path '\"$user\", public': the server or a proxy (a transaction pooler such as PgBouncer) did not apply the URL's options parameter. Connect module stores directly or through a pooler that passes options. Nothing was written. OpenMinion does not move, repair or restamp existing tables."
+        ],
+        "a2a_audit_store": [
+          false,
+          "SchemaOwnershipError: A connection for PostgreSQL schema \"public__a2a\" started with search_path '\"$user\", public': the server or a proxy (a transaction pooler such as PgBouncer) did not apply the URL's options parameter. Connect module stores directly or through a pooler that passes options. Nothing was written. OpenMinion does not move, repair or restamp existing tables."
+        ]
+      },
+      "unchanged_after_stores": true,
+      "runtime": [
+        true,
+        "15"
+      ],
+      "migrate": {
+        "exit": 0,
+        "statuses": {
+          "secret": "ok",
+          "session": "ok",
+          "identity": "ok",
+          "registry": "ok",
+          "task": "ok",
+          "skill": "ok",
+          "policy": "ok",
+          "compress": "ok",
+          "retrieve": "ok",
+          "artifact": "ok",
+          "a2a": "ok",
+          "memory": "ok",
+          "controlplane": "ok",
+          "telemetry": "ok"
+        }
+      },
+      "rerun": 0,
+      "schemas": [
+        "public",
+        "public__a2a",
+        "public__artifact",
+        "public__compress",
+        "public__controlplane",
+        "public__identity",
+        "public__memory",
+        "public__policy",
+        "public__registry",
+        "public__retrieve",
+        "public__secret",
+        "public__session",
+        "public__skill",
+        "public__task",
+        "public__telemetry"
+      ],
+      "direct_stores": {
+        "memory_store": true,
+        "a2a_audit_store": true,
+        "a2a_state_store": true,
+        "session_store": true,
+        "controlplane_store": true,
+        "telemetry_store": true,
+        "registry_store": true,
+        "artifact_store": true,
+        "identity_store": true,
+        "policy_store": true,
+        "retrieve_store": true,
+        "skill_store": true,
+        "task_store": true,
+        "compress_store": true
+      },
+      "module_ledgers": {
+        "secret": true,
+        "session": true,
+        "identity": true,
+        "registry": true,
+        "task": true,
+        "skill": true,
+        "policy": true,
+        "compress": true,
+        "retrieve": true,
+        "artifact": true,
+        "a2a": true,
+        "memory": true,
+        "controlplane": true,
+        "telemetry": true
+      },
+      "pgbouncer_log": ""
+    }
+  },
+  "commands": [
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--backend",
+        "postgres",
+        "--postgres-url",
+        "postgresql+psycopg://postgres:%2A%2A%2A@<host>:6433/<db>",
+        "--json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "cwd_left": [],
+      "seconds": 2.86,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"storage\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"controlplane_telegram\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"authoring\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"brain\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"commerce\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"session\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"artifact\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"registry\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"identity\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"policy\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"secret\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"telemetry\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"controlplane\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"retrieve\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"memory\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"skill\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"a2a\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"task\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n"
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--backend",
+        "postgres",
+        "--postgres-url",
+        "postgresql+psycopg://postgres:%2A%2A%2A@<host>:6433/<db>",
+        "--json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "cwd_left": [],
+      "seconds": 2.08,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"storage\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"controlplane_telegram\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"authoring\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"brain\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"commerce\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"session\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"artifact\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"registry\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"identity\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"policy\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"secret\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"telemetry\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"controlplane\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"retrieve\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"memory\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"skill\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"a2a\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"task\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n"
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--backend",
+        "postgres",
+        "--postgres-url",
+        "postgresql+psycopg://postgres:%2A%2A%2A@<host>:6433/<db>",
+        "--json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "cwd_left": [],
+      "seconds": 2.63,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"storage\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"controlplane_telegram\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"authoring\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"brain\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"commerce\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"session\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"artifact\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"registry\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"identity\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"policy\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"secret\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"telemetry\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"controlplane\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"retrieve\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"memory\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"skill\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"a2a\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"task\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n"
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--backend",
+        "postgres",
+        "--postgres-url",
+        "postgresql+psycopg://postgres:%2A%2A%2A@<host>:6433/<db>",
+        "--json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "cwd_left": [],
+      "seconds": 1.85,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"storage\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"controlplane_telegram\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"authoring\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"brain\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"commerce\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"session\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"artifact\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"registry\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"identity\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"policy\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"secret\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"telemetry\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"controlplane\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"retrieve\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"memory\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"skill\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"a2a\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"task\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n"
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--backend",
+        "postgres",
+        "--postgres-url",
+        "postgresql+psycopg://postgres:%2A%2A%2A@<host>:6433/<db>",
+        "--json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "cwd_left": [],
+      "seconds": 2.26,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"storage\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"controlplane_telegram\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"authoring\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"brain\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"commerce\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"session\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"artifact\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"registry\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"identity\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"policy\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"secret\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"telemetry\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"controlplane\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"retrieve\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"memory\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"skill\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"a2a\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"task\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n"
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--backend",
+        "postgres",
+        "--postgres-url",
+        "postgresql+psycopg://postgres:%2A%2A%2A@<host>:6433/<db>",
+        "--json"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "cwd_left": [],
+      "seconds": 1.8,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"storage\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"controlplane_telegram\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"authoring\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"brain\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"commerce\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"session\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"artifact\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"registry\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"identity\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"policy\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"secret\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"telemetry\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"controlplane\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"retrieve\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"memory\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"skill\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"a2a\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"task\",\n      \"status\": \"ok\",\n      \"success\": true\n    }\n  ]\n}\n"
+    }
+  ]
+}

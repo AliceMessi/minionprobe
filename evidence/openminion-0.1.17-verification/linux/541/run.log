@@ -1,0 +1,55 @@
+Using Python 3.12.16 environment at: <VENV0116>
+Using Python 3.12.16 environment at: <VENV>
+Using Python 3.12.16 environment at: <VENV>
+provenance: version 0.1.17, on PyPI: 1, wheel sha256 match: 1
+provenance 0.1.16: wheel sha256 match: 1
+=== probe_541_0116
+exit=1
+case doc-example: 0.9 s, error=AttributeError: 'AgentRunResult' object has no attribute 'thread_id'
+FAIL item 1: Agent.run returns the thread id (AgentRunResult.thread_id = metadata['thread_id'], non-blank) for a turn whose memory.write call waits; agent.run('yes', thread_id=first.thread_id) resumes that thread in the same session (resume_thread / explicit_thread_requested) and the waiting call ru
+FAIL item 2: thread_id omitted: the payload the SDK sends is unchanged (inbound_metadata holds only the delivery flag; the reply's payload equals the first one but for the message), the reply keeps the default routing (fork_thread / settled_without_resume, a new thread) and the waiting call does not
+FAIL item 2: thread_id empty: the payload the SDK sends is unchanged (inbound_metadata holds only the delivery flag; the reply's payload equals the first one but for the message), the reply keeps the default routing (fork_thread / settled_without_resume, a new thread) and the waiting call does not r
+FAIL item 2: thread_id blank: the payload the SDK sends is unchanged (inbound_metadata holds only the delivery flag; the reply's payload equals the first one but for the message), the reply keeps the default routing (fork_thread / settled_without_resume, a new thread) and the waiting call does not r
+FAIL item 2: AgentRunResult positional construction stays compatible: the fields are the 0.1.16 fields in their order with thread_id appended last; nine positional values keep their meaning (thread_id None), a tenth sets thread_id; a returned result's metadata is the turn's metadata dict, with threa
+FAIL item 3: two calls wait in one session, each on its own thread; answering the second thread runs only its call (ARGS2), then answering the first runs only ARGS1; each reply resumes the thread it names | observed={'case_error': None, 'fact_records': [], 'extra': {}, 'calls': [{'label': 'first wai
+FAIL item 3: a different session cannot execute the owner's pending call: the owner's thread sent with session 'other-session' (which has its own waiting call) or with 'new-session', and the other session's thread sent with the owner's session, each run nothing (the routing resumes the named thread 
+FAIL item 3: a different agent cannot execute the owner's pending call: 'helper' in the owner's session is refused (TurnRequestError: the session belongs to agent 'openminion'); in its own session the owner's thread runs nothing; the owner's own reply then runs the call once | observed={'case_error'
+FAIL item 4: cb-waiting-approve: on an explicit thread the approval callback decides for the call waiting there ('yes' is sent): it is asked once with the call's arguments and returns True; the call runs once | observed={'case_error': None, 'fact_records': [], 'extra': {'approvals': []}, 'calls': [{
+FAIL item 4: cb-waiting-deny: on an explicit thread the approval callback decides for the call waiting there ('yes' is sent): it is asked once with the call's arguments and returns False; the call does not run (reply 'Confirmation denied. The action was not run.') | observed={'case_error': None, 'fa
+FAIL item 4: cb-new-approve: on an explicit thread the approval callback decides for a new call made on the thread of an earlier settled turn: it is asked once with the call's arguments and returns True; the call runs once | observed={'case_error': None, 'fact_records': [], 'extra': {'approvals': []
+FAIL item 4: cb-new-deny: on an explicit thread the approval callback decides for a new call made on the thread of an earlier settled turn: it is asked once with the call's arguments and returns False; the call does not run (reply 'Confirmation denied. The action was not run.') | observed={'case_err
+FAIL item 4: a 'no' reply on the thread denies the waiting call (reply 'Confirmation denied. The action was not run.'); a later 'yes' on the thread is stale and runs nothing | observed={'case_error': None, 'fact_records': [], 'extra': {}, 'calls': [{'label': 'first wait (ARGS1)', 'error': None, 'run
+FAIL item 4: an already-cancelled reply ('yes' on the thread with cancel_event set before the call) does not execute the waiting call (only whether the call runs is asserted, not how the cancelled turn ends; the approval/cancellation race #527 is not covered) | observed={'case_error': None, 'fact_re
+FAIL item 5: run_stream('yes', thread_id=...) sends the selected thread (inbound_metadata.thread_id), resumes it and returns it; on_delta gets the progress while the turn runs: tool_started before the handler ran and tool_completed after it, and status events on both sides; the call runs once; a sta
+FAIL item 6: the published SDK example (docs/runtime-surfaces.md at v0.1.17, the block added by #546), executed as written from the installed package: `first` waits (respond_kind policy_confirmation_prompt), so the example sends agent.run('yes', thread_id=first.thread_id); `answer` resumes first's t
+FAIL item 6: ordinary SDK calls without thread_id are unchanged: plain Agent().run and run_stream and a forced-tool run with session_id and timeout_seconds complete, send only the delivery flag in inbound_metadata, start a thread of their own (fork_thread) and return it as result.thread_id; APIRunti
+SUMMARY passed=1 failed=17 total=18
+=== probe_541
+exit=0
+SUMMARY passed=20 failed=0 total=20
+empty dir after probes: 0 entries
+PASS typing: probe_541_sdk_consumer_valid.py: no issues
+PASS typing: probe_541_typing_example.py: no issues
+PASS typing: probe_541_sdk_consumer_invalid.py: exit 1, its one expected error
+PASS typing: probe_541_typing_invalid_thread.py: exit 1, its one expected error
+SUMMARY typing failures=0
+typing exit=0
+CONTROL typing: probe_541_sdk_consumer_valid.py: exit 1, 7 errors: Expression is of type "Any", not "str | None"  [assert-type]|"AgentRunResult[Review]" has no attribute "thread_id"  [attr-defined]|Expression is of type "Any", not "str | None"  [assert-type]|
+CONTROL typing: probe_541_typing_example.py: exit 1, 12 errors: Unexpected keyword argument "thread_id" for "run" of "Agent"  [call-arg]|"AgentRunResult[str]" has no attribute "thread_id"  [attr-defined]|Expression is of type "Any", not "str | None"  [assert-type]|
+PASS typing: probe_541_sdk_consumer_invalid.py: exit 1, its one expected error
+CONTROL typing: probe_541_typing_invalid_thread.py: exit 1, 1 errors: Unexpected keyword argument "thread_id" for "run" of "Agent"  [call-arg]|
+SUMMARY typing failures=0
+typing 0.1.16 exit=0
+empty dir after: 0 entries
+openminion[postgres]==0.1.17
+Name: openminion
+Version: 0.1.17
+Location: <VENV>/lib/python3.12/site-packages
+Requires: aiosqlite, alembic, cryptography, httpx, jsonschema, platformdirs, prompt-toolkit, psutil, pydantic, pyyaml, rich, send2trash, sophiagraph, typer, tzdata
+Required-by:
+Linux runnervm7aw5e 7.0.0-1017-azure #17~24.04.1-Ubuntu SMP PREEMPT Thu Sep 24 18:46:57 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+PRETTY_NAME="Ubuntu 24.04.5 LTS"
+VERSION_ID="24.04"
+python 3.12.16 sqlite 3.45.1
+PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+<VENV>/lib/python3.12/site-packages/openminion/__init__.py 0.1.17

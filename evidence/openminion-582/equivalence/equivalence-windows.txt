@@ -1,0 +1,141 @@
+base a754ed20ee5a49eff4178ea4e920cc851c57f50f
+head 7f646e6603d614a7336151d75ee45ebbcaa9872d
+python 3.13.5
+
+== tests/_memory_evidence_scenarios.py
+   ast without docstrings identical: True (sha256[:16] base 659e265530beb8be, head 659e265530beb8be)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: "Memory retention and purge on items that carry evidence, for SQLite and PostgreSQL (#400).\n\nEach case seeds three items that its step removes:\n- ``artifact-ref``: one evidence ref to an artifact;\n- ``capture-evidence``: the evidence entry that ``apply_capture_bundle`` writes\n  on captured candidates and that promotion copies to the record;\n- ``no-evidence``: no evidence.\n\nIt runs the step on the store itself, not through ``AuditedMemoryStore``\n(#392), and returns the step's result, each item's state afterwards and the\nartifact ref removals that the store's artifactctl received. The expected\noutcome is the same on both backends.\n"
+     new: 'Memory retention and purge on items with evidence, for SQLite and PostgreSQL.\n\nEach case seeds ``artifact-ref`` (one evidence ref to an artifact),\n``capture-evidence`` (the evidence entry ``apply_capture_bundle`` writes and\npromotion copies to the record) and ``no-evidence``, then runs its step on the\nstore itself, not through ``AuditedMemoryStore``. The expected outcome is the\nsame on both backends.\n'
+
+== tests/_memory_retention_scenarios.py
+   ast without docstrings identical: True (sha256[:16] base ea407c509bf3e0ea, head ea407c509bf3e0ea)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: 'Memory retention scenarios shared by the SQLite and PostgreSQL tests (#392).\n\nThe runtime session lifecycle hands the four retention helpers its\n``AuditedMemoryStore``. Each helper scenario seeds records into a store, runs\nthe helper on that store or on an audited wrapper around it, and checks the\nrecords and the audit sink. The SDK scenario runs two echo turns of one\nsession on a runtime whose memory store is seeded when the runtime creates it.\n'
+     new: 'Memory retention scenarios shared by the SQLite and PostgreSQL tests.\n\nThe runtime session lifecycle hands the retention helpers its\n``AuditedMemoryStore``, so each helper scenario runs on a store or on an audited\nwrapper around it.\n'
+
+== tests/_runtime_storage_backend_scenarios.py
+   ast without docstrings identical: True (sha256[:16] base f6b8789c10c79f46, head f6b8789c10c79f46)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: "Runtime start, room path and wrapper on either runtime storage backend (#437).\n\nThe SQLite tests and the PostgreSQL tests build the same echo-agent runtime\nhome and differ only in the `storage` section. The contract:\n\n- `APIRuntime` starts and closes with either record backend;\n- `storage_connection`, and the compatibility wrapper's `storage`, are the\n  SQLite handle of the runtime record store, and `None` for other backends;\n- `openminion room create` writes the room through `runtime.sessions`, so the\n  room and its participant rows are in the configured record store.\n"
+     new: "Runtime start, room and wrapper scenarios shared by the SQLite and PostgreSQL tests.\n\nBoth build the same echo-agent runtime home and differ only in its `storage`\nsection. `storage_connection` and the wrapper's `storage` are the SQLite handle\nof the record store, and `None` for other backends.\n"
+
+== tests/api/runtime/test_failed_start_cleanup.py
+   ast without docstrings identical: True (sha256[:16] base 7279e41731eb3e6c, head 7279e41731eb3e6c)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: 'A failed `APIRuntime` start closes what it built, at the owner that built it (#447).\n\nEach case makes one step of a SQLite runtime start fail, by injecting an error\nor with a configuration that fails, while automatic garbage collection is off.\nRight after the exception, before any collection, it checks that:\n\n- the caller gets the original exception;\n- every owner that had built something closed it through its existing close,\n  each object exactly once, and nothing else was closed;\n- no file under the runtime home is open (on Windows every file there can also\n  be renamed and deleted), and no runtime manager thread is alive.\n\nObjects that several owners use, such as the record store behind the session\nviews, the telemetry service behind the storage telemetry hook, the action\npolicy that the ops and tool authoring services use, and the retrieve service\nof the session context and memory assembly, are closed once, by their owner.\n`APIRuntime.close()` runs only once the runtime object exists.\n'
+     new: 'A failed `APIRuntime` start closes what it built, at the owner that built it.\n\nEach case fails one step of a SQLite runtime start with automatic garbage\ncollection off, so collection releases nothing. Right after the caller gets the\noriginal exception, each object an owner built is closed once by that owner and\nnothing else is closed; an object several owners use is closed by its owner. No\nfile under the runtime home is open (on Windows each can also be renamed and\ndeleted) and no runtime manager thread is alive. `APIRuntime.close()` runs only\nonce the runtime object exists.\n'
+
+== tests/api/test_freshness_continuation.py
+   ast without docstrings identical: True (sha256[:16] base d189fb2c5f047a80, head d189fb2c5f047a80)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: 'Same-turn freshness retention through the SDK (#395).\n\n`Agent(tools=[lookup_order], forced_tools=["lookup_order"])` runs "Check order\nA-104" against a scripted OpenAI-compatible provider on 127.0.0.1. The\nfreshness classifier asks for an exact date, `lookup_order` returns no dated\nfield, and the judge closes with a final answer, so the closure freshness\nguard turns that close into a continue and the turn takes a continuation step\nwith no user input. The entry requests offer only `lookup_order`, whose schema\nhas no `freshness` field, so the continuation entry carries no typed contract\nunless the script adds one.\n\nRead-only observers record the typed freshness state before and after each\n`_apply_entry_freshness` call and what each closure freshness guard checked.\n'
+     new: "Same-turn freshness retention through the SDK.\n\nA scripted OpenAI-compatible provider on 127.0.0.1 asks for an exact date and\n`lookup_order` returns no dated field, so the closure freshness guard turns the\njudge's close into a continuation step without user input. `lookup_order`'s\nschema has no `freshness` field, so the continuation entry carries no typed\ncontract unless the script adds one. The observers are read-only.\n"
+
+== tests/api/test_text_answer_freshness.py
+   ast without docstrings identical: True (sha256[:16] base 6a024f056b4e5345, head 6a024f056b4e5345)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: 'Text entry answers go through the freshness finalization (#419).\n\n`Agent(tools=[lookup_order])` runs "Check order A-104" against a scripted\nOpenAI-compatible provider on 127.0.0.1. The freshness classifier\'s answer\nsets the turn\'s typed obligations; `lookup_order` returns no dated field.\n\nWhen an entry step answers in text, the respond route ends the turn with that\ntext. It is now finalized by `final_close_message`, the owner that finalizes a\njudge\'s closing answer: an answer whose evidence meets the obligations is kept\nas it is, and one without the required evidence becomes the existing\nfreshness-failure message. On a same-turn continuation the evidence is the\nresult the turn\'s execution handed to the continuation; a result from another\nturn is not evidence. A read-only observer records each call of the existing\nverifier, `verify_freshness_answer`, made by `final_close_message` on the\nrespond route, and an entry observer records the obligations each entry step\nleaves on the turn.\n'
+     new: "Text entry answers go through the freshness finalization, `final_close_message`.\n\nA scripted OpenAI-compatible provider on 127.0.0.1 drives\n`Agent(tools=[lookup_order])`, and `lookup_order` returns no dated field. The\nobservers of `verify_freshness_answer` and of each entry step's obligations are\nread-only.\n"
+
+== tests/brain/test_freshness_entry_retention.py
+   ast without docstrings identical: True (sha256[:16] base 7f660c40d8c12f3a, head 7f660c40d8c12f3a)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: "Entry freshness on a step of the same turn (#395).\n\n`_apply_entry_freshness` runs on every entry step. A valid typed `freshness`\ncontract in the entry response replaces the turn's state; otherwise new user\ninput is classified. A step with neither, on a turn that already has a\ncontract, keeps that contract, its obligations and its diagnostics. A first\nstep with neither and no contract keeps the classifier's default for empty\ninput.\n"
+     new: '`_apply_entry_freshness` on the entry steps of one turn.'
+
+== tests/brain/test_turn_evidence_persistence.py
+   ast without docstrings identical: True (sha256[:16] base 4039f26a7de8fa74, head 4039f26a7de8fa74)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: 'Persistence of the turn evidence kept on the working state (#419).\n\nThe working state keeps the action result handed to a same-turn continuation\ntogether with the turn\'s trace id (`turn_evidence`, `turn_evidence_trace_id`).\nThe brain saves the working state with `save_state`\n(`WorkingState.model_dump(mode="json")`) and reads it back with\n`load_or_init_state` (`WorkingState.model_validate`), through the runtime\'s\nSQLite session store or the local session store. Each test runs on both.\n'
+     new: "Turn evidence on the working state survives `save_state` and `load_or_init_state`.\n\nEach test runs on the runtime's SQLite session store and on the local session\nstore.\n"
+
+== tests/memory/test_external_backend_capture.py
+   ast without docstrings identical: True (sha256[:16] base 6aef458c86b47fc6, head 6aef458c86b47fc6)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: 'Atomic capture bundles are an optional capability of external backends (#397).\n\n`BackendMemoryStoreAdapter.apply_capture_bundle` reports a backend without the\nmethod with `CaptureRecoveryUnsupportedError`, the error the memory service and\nthe terminal capture step already use for an unsupported capture. A backend\nthat implements it gets the bundle, and its errors propagate unchanged.\n\nThe SDK tests run real `Agent.run` turns (echo provider) with\n`memory.backend.provider: external`: the bundled `reference-sqlite` adapter,\nwhich has no capture method; the same adapter with the method, applied by the\nbuilt-in SQLite capture implementation; and the same adapter whose method\nfails.\n'
+     new: "Atomic capture bundles are an optional capability of external backends.\n\nA backend without `apply_capture_bundle` is reported with\n`CaptureRecoveryUnsupportedError`, the error unsupported capture already uses;\na backend's own capture errors propagate unchanged. The SDK tests run echo\nturns on the bundled `reference-sqlite` adapter.\n"
+
+== tests/memory/test_memctl_inspect_scope.py
+   ast without docstrings identical: True (sha256[:16] base f54cc1c2ce919cf6, head f54cc1c2ce919cf6)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: '`memctl inspect` with an omitted, empty, valid or invalid `--scope` (#413).\n\nEach test runs the real memctl app (`memory_cli._build_app()`, with its own\n`_get_service`) on a SQLite memory database seeded with one fact in\n`agent:a` and a keyed fact with two versions in `agent:history`.\n\n- No scope, or an empty one, inspects with the default `inspect` session and\n  agent identifiers and reports the stats for every scope, the same stats\n  `memctl stats` reports without a scope.\n- A valid scope sets the matching identifier and filters the stats.\n- An invalid non-empty scope is reported as `Error: invalid scope: ...` with\n  exit code 1, as `memctl search` and `memctl list` report one, and no\n  traceback.\n\nThe deepest-history summary (#402) does not depend on the scope.\n'
+     new: '`memctl inspect` with an omitted, empty, valid or invalid `--scope`.\n\nThe tests run the real memctl app on a SQLite memory database. The\ndeepest-history summary does not depend on the scope.\n'
+
+== tests/memory/test_memctl_service_close.py
+   ast without docstrings identical: True (sha256[:16] base 0b7fc3b6dff19096, head 0b7fc3b6dff19096)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: "memctl closes the memory service that `_get_service` creates (#403).\n\n`_get_service` builds a SQLite store, an audit sink and the service around\nthem. Inside a memctl command they are closed when the command's context\ncloses, once, whether the command succeeds or fails; outside a command the\ncaller closes the service. The cyclic collector is disabled while each test\nruns, so nothing is released by collection: the store, sink and service hold a\nreference cycle through the service's helpers.\n"
+     new: 'memctl closes the memory service that `_get_service` creates.\n\nThe cyclic collector is disabled while each test runs: the store, audit sink and\nservice hold a reference cycle, so collection must not be what closes them.\n'
+
+== tests/runtime/test_agent_explicit_thread.py
+   ast without docstrings identical: True (sha256[:16] base 0fad976f30fd207f, head 0fad976f30fd207f)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: '`Agent.run` and `Agent.run_stream` can answer a confirmation on its thread (#541).\n\nThe tests reuse the #448 harness in `test_turn_capture_authorization.py` and the\n#524 handler recorder in `test_turn_denied_call_outcome.py`: a real `APIRuntime`\nwhose agent\'s `openai` provider is a scripted OpenAI-compatible server on\n127.0.0.1. Once armed with arguments, the scripted model calls `memory_write`\nwith them. Without an approval callback that call then waits for the user\'s\nconfirmation, and the turn ends with "Policy confirmation required.". The\nrecorder lists each run of the tool\'s handler with the model\'s arguments.\n'
+     new: "`Agent.run` and `Agent.run_stream` answer a confirmation on the thread they name.\n\nA real `APIRuntime` runs against the scripted OpenAI-compatible server of\n`test_turn_capture_authorization.py` on 127.0.0.1, not a hosted model. Without\nan approval callback, the model's `memory_write` call waits for confirmation.\n"
+
+== tests/runtime/test_cron_capture_recovery.py
+   ast without docstrings identical: True (sha256[:16] base 9e084fb92fe5736b, head 9e084fb92fe5736b)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: "Consolidation cron runs recover pending capture intents, then run their turn (#420).\n\nEach test builds a real `APIRuntime` (echo provider), runs one SDK turn and\nthen a memory consolidation job through the real `CronTurnExecutor` on the\nsame runtime: its `AgentRuntimeManager`, session store, agent service, memory\nassembly, the daemon's turn request builder and the real\n`memory_capture_recovery_allowed` authorization. Recovery uses the agent\nservice's own capture candidate extractor; the tests only record its calls\nand the recovery result.\n\nThe turn leaves its capture intent pending in two ways: with the built-in\nmemory provider when its capture bundle write fails once with\n`StoreWriteError`, and with the bundled `reference-sqlite` external adapter,\nwhich has no atomic capture (`CAPTURE_RECOVERY_UNSUPPORTED`, #397). With that\nadapter recovery does not call the extractor (#449).\n\nThe `_consolidate` tests give the executor a task owner that reports every job\nas a `task.consolidate_memory` job. The `test_daemon_*` tests use no such\nstand-in (#456): `task.consolidate_memory`'s handler creates the job with the\nruntime's own task owner, and the daemon's `attach_cron_scheduler` runs it with\nits own cron store, its own `TaskManager` on the daemon's database path, its\n`CronTurnExecutor` and turn request builder and a running `CronScheduler`. So\nthe task kind the daemon reads is the one the handler stored.\n"
+     new: "Consolidation cron runs recover pending capture intents, then run their turn.\n\nThe runtime (echo provider), `CronTurnExecutor`, turn request builder and\n`memory_capture_recovery_allowed` are real; the tests only record the\nextractor's calls and the recovery results. The `_consolidate` tests give the\nexecutor a task owner that reports every job as `task.consolidate_memory`. The\n`test_daemon_*` tests use no such stand-in, so the task kind the daemon's own\n`TaskManager` reads is the one the handler stored.\n"
+
+== tests/runtime/test_turn_capture_authorization.py
+   ast without docstrings identical: True (sha256[:16] base f08dea984b55442a, head f08dea984b55442a)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: "A turn's own memory capture asks the authorization that recovery asks (#448).\n\nEach test builds a real `APIRuntime` for one agent whose `openai` provider is a\nscripted OpenAI-compatible server on 127.0.0.1. Unless a test says otherwise,\nthe agent has an identity profile (`profile.yaml` under `identity.bundle_root`)\nwith one hard constraint. SDK turns ask the agent to remember a preference; the\nprovider answers the auto fact extraction with one `user_preference` item and\nrecords the kind of every request.\n\nThe tests record the agent security policy's `memory.write` decisions and the\nmemctl bundle writes (both call the original), and read the memory store, the\nturn's capture intent and its `memory.capture.result`. Recovery runs through\nthe real `CronTurnExecutor` with the real `memory_capture_recovery_allowed`.\n"
+     new: "A turn's own memory capture asks the authorization that recovery asks.\n\n`_Provider` is a scripted OpenAI-compatible server on 127.0.0.1, not a hosted\nmodel: it answers the auto fact extraction with one `user_preference` item and\nrecords the kind of every request. Unless a test says otherwise, the agent has\nan identity profile with one hard constraint. Recovery runs through the real\n`CronTurnExecutor` with the real `memory_capture_recovery_allowed`.\n"
+
+== tests/runtime/test_turn_denied_call_outcome.py
+   ast without docstrings identical: True (sha256[:16] base b5d18a4f74541a94, head b5d18a4f74541a94)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: "A tool call that did not run stages no `tool_outcome` candidate (#524).\n\nThe tests reuse the #448 harness in `test_turn_capture_authorization.py`: a real\n`APIRuntime` for one agent whose `openai` provider is a scripted\nOpenAI-compatible server on 127.0.0.1. The scripted model calls `memory_write`\nonce, with `ARGS`, and the agent's memory policy allows the write: an identity\nprofile with `NEVER reveal secrets`, or none, unless a test says otherwise. The\ntests read `memory_candidates`, the `memory_records` row of `ARGS`, the\npolicy's `memory.write` decisions and the runs of the tool's handler.\n"
+     new: "A tool call that did not run stages no `tool_outcome` candidate.\n\nUnless a test says otherwise, the memory policy allows the model's\n`memory_write` call (an identity profile with `NEVER reveal secrets`, or none),\nso only whether the call ran decides the candidate.\n"
+
+== tests/runtime/test_turn_optional_memory_writes.py
+   ast without docstrings identical: True (sha256[:16] base f5b6032aa659c9c7, head f5b6032aa659c9c7)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: "Decision records and tool outcome candidates need the turn's memory.write answer (#496).\n\nThe tests reuse the #448 harness in `test_turn_capture_authorization.py`: a real\n`APIRuntime` for one agent whose `openai` provider is a scripted\nOpenAI-compatible server on 127.0.0.1, an identity profile with one hard\nconstraint unless a test says otherwise, and call-through recorders on the\nsecurity policy's `memory.write` decisions. They read the `decision` records in\n`memory_records`, the `tool_outcome` candidates in `memory_candidates`, and the\nevents of `write_decision_memory`.\n"
+     new: "Decision records and tool outcome candidates need the turn's memory.write answer.\n\nUnless a test says otherwise, the agent's identity profile has one hard\nconstraint.\n"
+
+== tests/storage/test_failed_construction_cleanup.py
+   ast without docstrings identical: True (sha256[:16] base 489231a9286a139d, head 489231a9286a139d)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: 'Runtime storage closes what it opened when its construction fails (#447).\n\n`StorageEngine.from_config` owns the backends it creates until it returns the\nengine, and `build_runtime_storage` owns the engine until it returns the\nruntime storage context. When a later step fails, each closes them with the\ncloses of `StorageEngine.close()`, and the caller gets the original exception.\nThe telemetry service behind the storage telemetry hook belongs to the caller\nand stays open.\n'
+     new: "Runtime storage closes what it opened when its construction fails.\n\n`StorageEngine.from_config` owns its backends until it returns the engine, and\n`build_runtime_storage` owns the engine until it returns its context. On a later\nfailure each closes them as `StorageEngine.close()` does, and the caller gets\nthe original exception. The caller's telemetry service stays open.\n"
+
+files: 17, ast mismatches: 0

@@ -1,0 +1,69 @@
+{
+  "probe": "probe_456_intents",
+  "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+  "openminion.__version__": "0.1.16",
+  "python": "3.12.11",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "sqlite3.sqlite_version": "3.50.4",
+  "cwd": "<WORK>\\empty-456",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "phase": "upgrade",
+  "guide": "<E>\\release-source\\published-docs-v0.1.17\\docs_runtime-database-upgrades.md",
+  "shell": "C:\\Program Files\\Git\\bin\\bash.exe",
+  "provider": "openai (OpenAI-compatible HTTP) -> scripted ThreadingHTTPServer on 127.0.0.1",
+  "dist_versions": {
+    "openminion": "0.1.16",
+    "sophiagraph": "0.0.12",
+    "pydantic": "2.14.2",
+    "httpx": "0.28.1",
+    "openai": null
+  }
+}
+P legacy run on the upgraded package: state=failed raised=None summary='memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory' recovery=[] steps={} new=[] turn_extractions=0 submits=0 excl=[] contexts=0
+[P] $ openminion tasks cancel 42cea476e0674cb09b59cafcf5d4394e --json
+    exit=0 8.7s
+[P] $ openminion tools run task.consolidate_memory \
+  --json '{"interval_hours": 12, "batch_limit": 8}'
+    exit=0 7.8s
+[P] $ openminion tasks list --json
+    exit=0 8.6s
+[04:15:51Z] openminion: Consolidation reviewed; nothing to change.
+[04:15:52Z] openminion: Consolidation reviewed; nothing to change.
+[04:15:53Z] openminion: Noted: tabs over spaces.
+P replacement run 1: state=finished raised=None summary='openminion: Consolidation reviewed; nothing to change.' recovery=[[1, 1, 0]] steps={'earlier': ['identity', 'authorize=True', 'capability=True', 'source', 'extract', 'bundle.store', 'bundle', 'result']} new=[{'label': 'scheduled N run 1', 'capture_state': 'excluded', 'results': 0, 'result_disposition': None}] turn_extractions=0 submits=1 excl=[True] contexts=1
+P replacement run 2: state=finished raised=None summary='openminion: Consolidation reviewed; nothing to change.' recovery=[[0, 0, 0]] steps={} new=[{'label': 'scheduled N run 2', 'capture_state': 'excluded', 'results': 0, 'result_disposition': None}] turn_extractions=0 submits=1 excl=[True] contexts=1
+P ordinary turn after the upgrade: state=None raised=None summary=None recovery=[] steps={} new=[{'label': 'ordinary-after', 'capture_state': 'pending', 'results': 1, 'result_disposition': 'succeeded'}] turn_extractions=1 submits=0 excl=[False] contexts=0
+P forged-meta turn after the upgrade: state=None raised=None summary=None recovery=[] steps={} new=[{'label': 'forged-meta-after', 'capture_state': 'pending', 'results': 1, 'result_disposition': 'succeeded'}] turn_extractions=1 submits=1 excl=[False] contexts=0
+[R] $ openminion tasks pause 7aa791ad9b754a23a37ef1582d35a4ad --json
+    exit=0 8.6s
+[R] $ openminion tools run task.consolidate_memory \
+  --json '{"interval_hours": 12, "batch_limit": 8}'
+    exit=0 8.2s
+[R] $ openminion tasks list --json
+    exit=0 9.5s
+[04:16:22Z] openminion: Consolidation reviewed; nothing to change.
+[04:16:23Z] openminion: Consolidation reviewed; nothing to change.
+R replacement run 1: state=finished raised=None summary='openminion: Consolidation reviewed; nothing to change.' recovery=[[1, 1, 0]] steps={'earlier': ['identity', 'authorize=True', 'capability=True', 'source', 'extract', 'bundle.store', 'bundle', 'result']} new=[{'label': 'scheduled NR run 1', 'capture_state': 'excluded', 'results': 0, 'result_disposition': None}] turn_extractions=0 submits=1 excl=[True] contexts=1
+R replacement run 2: state=finished raised=None summary='openminion: Consolidation reviewed; nothing to change.' recovery=[[0, 0, 0]] steps={} new=[{'label': 'scheduled NR run 2', 'capture_state': 'excluded', 'results': 0, 'result_disposition': None}] turn_extractions=0 submits=1 excl=[True] contexts=1
+Q legacy run on the upgraded package: state=failed raised=None summary='memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory' recovery=[] steps={} new=[] turn_extractions=0 submits=0 excl=[] contexts=0
+[Q] $ openminion tasks cancel a18cde7c01be4f508dc9de65173e505a --json
+    exit=0 8.8s
+[Q] $ openminion tools run task.consolidate_memory \
+  --json '{"interval_hours": 12, "batch_limit": 8}'
+    exit=0 8.1s
+[Q] $ openminion tasks list --json
+    exit=0 9.8s
+[04:16:54Z] openminion: Consolidation reviewed; nothing to change.
+Q replacement run 1: state=finished raised=None summary='openminion: Consolidation reviewed; nothing to change.' recovery=[[2, 0, 2]] steps={'capture': ['identity', 'authorize=True', 'capability=False'], 'scheduled L2 run 1': ['identity', 'authorize=True', 'capability=False']} new=[{'label': 'scheduled N2 run 1', 'capture_state': 'excluded', 'results': 0, 'result_disposition': None}] turn_extractions=0 submits=1 excl=[True] contexts=1
+PASS guide. the commands come from the published guide (git blob 0f6b9c63...): `tasks cancel|pause TASK_ID --json`, the step 3 block and `tasks list --json` | observed={'git_blob': '0f6b9c63248a823abd79cf2187268d195d5cb97b', 'list': 'openminion tasks list --json', 'create': 'openminion tools run task.consolidate_memory \\\n  --json \'{"interval_hours": 12, "batch_limit": 8}\'', 'cancel': 'openminion tasks cancel TASK_ID --json', 'pause': 'openminion tasks pause TASK_ID --json', 'inline_found': True}
+PASS P. the 0.1.14 job's first run on this package fails with the guide's message: no turn is submitted, no capture recovery runs, no intent is added, and the 'earlier' pending intent is unchanged | observed={'state': 'failed', 'summary': 'memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory', 'submits': [], 'recovery': [], 'new_intents': [], 'task_before': {'state': 'active', 'kind': None, 'metadata_keys': ['last_run']}, 'task_after': {'state': 'paused', 'kind': None, 'metadata_keys': ['last_run']}, 'pending_before': ['earlier'], 'pending_after': ['earlier']}
+PASS P. the guide's `tasks cancel` (on the job its failed run paused) and the step 3 replacement, as real CLI subprocesses, leave the pending intent unchanged (same payload); the old task is cancelled, the replacement has kind memory_consolidation, and `tasks list` shows only the replacement enabled | observed={'procedure': {'stop': {'exit': 0, 'state': 'cancelled'}, 'replacement': '17b2496a6556445ebc48a86f0dfdd9da', 'replacement_exit': 0, 'replacement_runtime_source': 'inproc', 'list_exit': 0, 'list': [{'id': '17b2496a6556445ebc48a86f0dfdd9da', 'agent_id': 'openminion', 'lifecycle_state': 'active', 'enabled': True}, {'id': '42cea476e0674cb09b59cafcf5d4394e', 'agent_id': 'openminion', 'lifecycle_state': 'cancelled', 'enabled': False}]}, 'legacy_task': {'state': 'cancelled', 'kind': None, 'metadata_keys': ['last_run']}, 'new_task': {'state': 'active', 'kind': 'memory_consolidation', 'metadata_keys': ['kind']}, 'pending_after': ['earlier']}
+PASS P. the replacement's first run carries the trusted consolidation context, its own turn is 'excluded', and it recovers the earlier intent once on the capable built-in store (scanned, recovered, pending) = (1, 1, 0), with the authorization and capability steps | observed={'state': 'finished', 'submits': [{'session_id': 'consolidate:17b2496a6556445ebc48a86f0dfdd9da', 'meta_consolidation_keys': {'memory_consolidation_job': 'true', 'memory_consolidation_target_scope': 'agent:openminion', 'memory_consolidation_batch_limit': '8', 'memory_consolidation_max_iterations': '2', 'memory_consolidation_timeout_seconds': '30'}, 'meta_has_cron_job_id': True, 'trusted_task_context': {'memory_consolidation_job': 'true', 'memory_consolidation_target_scope': 'agent:openminion', 'memory_consolidation_batch_limit': '8', 'memory_consolidation_max_iterations': '2', 'memory_consolidation_timeout_seconds': '30'}}], 'new_intents': [{'label': 'scheduled N run 1', 'capture_state': 'excluded', 'results': 0, 'result_disposition': None}], 'turn_extraction_requests': 0, 'recovery': [[1, 1, 0]], 'recovery_steps_by_intent': {'earlier': ['identity', 'authorize=True', 'capability=True', 'source', 'extract', 'bundle.store', 'bundle', 'result']}}
+PASS P. the replacement's second run recovers nothing; the earlier intent has exactly one result and one receipt (recovery happened once) | observed={'recovery': [[0, 0, 0]], 'new_intents': [{'label': 'scheduled N run 2', 'capture_state': 'excluded', 'results': 0, 'result_disposition': None}], 'P_earlier_after': {'capture_state': 'pending', 'results': 1}, 'P_earlier_receipts': 1}
+PASS P. controls on the upgraded home: an ordinary SDK turn and a submit_turn whose meta carries every consolidation key and the replacement's real cron_job_id are both captured normally (capture_is_excluded False, no consolidation context, one extraction, committed result) | observed={'ordinary': {'exclusions': [{'session_id': 'ordinary-after', 'consolidation_keys': {}, 'cron_job_id_present': False, 'returned': False}], 'contexts': [], 'turn_extraction_requests': 1, 'new_intents': [{'label': 'ordinary-after', 'capture_state': 'pending', 'results': 1, 'result_disposition': 'succeeded'}]}, 'forged': {'raised': None, 'ingress': [{'session_id': 'forged-meta-after', 'inbound_metadata_consolidation_keys': {}, 'inbound_metadata_has_cron_job_id': True, 'trusted_task_context': None}], 'exclusions': [{'session_id': 'forged-meta-after', 'consolidation_keys': {}, 'cron_job_id_present': True, 'returned': False}], 'contexts': [], 'turn_extraction_requests': 1, 'new_intents': [{'label': 'forged-meta-after', 'capture_state': 'pending', 'results': 1, 'result_disposition': 'succeeded'}]}}
+PASS R. a never-run 0.1.14 job: the guide's `tasks pause` leaves it paused (and run_task_now refused), the replacement is the only enabled consolidation task, and the pending intent is unchanged | observed={'procedure': {'stop': {'exit': 0, 'state': 'paused'}, 'replacement': '862515c32ce94b2aa17863667c33682a', 'replacement_exit': 0, 'replacement_runtime_source': 'inproc', 'list_exit': 0, 'list': [{'id': '862515c32ce94b2aa17863667c33682a', 'agent_id': 'openminion', 'lifecycle_state': 'active', 'enabled': True}, {'id': '7aa791ad9b754a23a37ef1582d35a4ad', 'agent_id': 'openminion', 'lifecycle_state': 'paused', 'enabled': False}]}, 'legacy_task': {'state': 'paused', 'kind': None, 'metadata_keys': []}, 'run_task_now': 'TaskControlError: task is not active', 'new_task': {'state': 'active', 'kind': 'memory_consolidation', 'metadata_keys': ['kind']}, 'pending': ['earlier']}
+PASS R. the replacement recovers the intent once: run 1 (1, 1, 0) with the recovery steps and an excluded own turn, run 2 (0, 0, 0); one result and one receipt | observed={'run_1': {'state': 'finished', 'recovery': [[1, 1, 0]], 'recovery_steps_by_intent': {'earlier': ['identity', 'authorize=True', 'capability=True', 'source', 'extract', 'bundle.store', 'bundle', 'result']}, 'new_intents': [{'label': 'scheduled NR run 1', 'capture_state': 'excluded', 'results': 0, 'result_disposition': None}]}, 'run_2': {'recovery': [[0, 0, 0]]}, 'earlier': {'capture_state': 'pending', 'results': 1}, 'receipts': 1}
+PASS Q. incapable store (reference-sqlite): the legacy run fails with the message, with no submit and no recovery; then `tasks cancel` and the replacement; the pending intents are unchanged through all of it | observed={'legacy_run': {'state': 'failed', 'summary': 'memory consolidation job is missing trusted task provenance; it was paused and must be recreated with task.consolidate_memory', 'submits': [], 'recovery': []}, 'procedure': {'stop': {'exit': 0, 'state': 'cancelled'}, 'replacement': 'a34749f3547b4e36b1380ccb1c0a767e', 'replacement_exit': 0, 'replacement_runtime_source': 'inproc', 'list_exit': 0, 'list': [{'id': 'a34749f3547b4e36b1380ccb1c0a767e', 'agent_id': 'openminion', 'lifecycle_state': 'active', 'enabled': True}, {'id': 'a18cde7c01be4f508dc9de65173e505a', 'agent_id': 'openminion', 'lifecycle_state': 'cancelled', 'enabled': False}]}, 'pending_before': ['capture', 'scheduled L2 run 1'], 'pending_after': ['capture', 'scheduled L2 run 1']}
+PASS Q. the replacement on the incapable store leaves unsupported work pending: it asks the store (capability False), reports every intent pending, extracts nothing, its own turn is excluded, and the pending intents are unchanged afterwards | observed={'state': 'finished', 'recovery': [[2, 0, 2]], 'recovery_steps_by_intent': {'capture': ['identity', 'authorize=True', 'capability=False'], 'scheduled L2 run 1': ['identity', 'authorize=True', 'capability=False']}, 'recovery_extraction_requests': 0, 'new_intents': [{'label': 'scheduled N2 run 1', 'capture_state': 'excluded', 'results': 0, 'result_disposition': None}]}
+SUMMARY passed=10 failed=0 total=10

@@ -1,0 +1,95 @@
+base 83d97ad33f9b34332c97ed2b2e88ef3cf68c8b6f
+head 31a1f1b82dad3ae26ada8f456fa71a49aea20b5f
+python 3.13.5
+
+== src/openminion/modules/storage/migrations/postgres_schema.py
+   ast without docstrings identical: True (sha256[:16] base 3b2e09f7a73507ec, head 3b2e09f7a73507ec)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: "PostgreSQL schema selection for runtime storage and module stores (#446).\n\nRuntime storage and every module used to write into the one schema the configured URL selects, so\nthey shared ``alembic_version`` and ``om_meta`` and adopted each other's tables through\n``CREATE TABLE IF NOT EXISTS``. Now:\n\n- runtime storage keeps that base schema, ``current_schema()`` of the configured URL;\n- each module uses its own schema, ``<base>__<module id>``;\n- a module whose history is already in the base schema keeps using it, with no move and no stamp.\n\nThe evidence is an owner's ledger together with exact tables. The ledger is the ``migrations``\nrows v1..vk for runtime storage, and for a module ``om_meta.module_id`` with its\n``alembic_version`` row (none at Alembic base), or with ``om_meta.schema_head`` for a store that\nhas no Alembic ledger.\nA table belongs to an owner when that owner's ledger is recorded in the schema and a history\nlisted for that ledger in ``postgres_histories.json`` has the table with the same columns, types,\nNOT NULL and primary key. An owner's history there is proven when every table of one listed\nhistory is present, belongs to that owner alone, and the owner has no other table there. A table\nan owner would create or read that is not proven its own is refused before any write; owners\nthat use none of the refused table names are not affected. An existing ``<base>__<module id>``\nis used only when it is empty or holds the module's proven history; the storage engine's tables\nthere must then have the exact columns this code creates.\n\nThe checks read only catalogs and ledger rows, with explicit schema names, in one READ ONLY\ntransaction.\n"
+     new: 'PostgreSQL schema selection for runtime storage and module stores.\n\nRuntime storage uses the base schema, ``current_schema()`` of the configured URL. Each module uses\n``<base>__<module id>``, or stays in the base schema when its history there is proven: its ledger\nis recorded and its tables match a history in ``postgres_histories.json`` exactly. A table an\nowner would create or read that is not proven its own is refused before any write. The checks\nread only catalogs and ledger rows, with explicit schema names, in one READ ONLY transaction.\nThe rules are in "PostgreSQL schemas per owner" in docs/runtime-database-upgrades.md.\n'
+
+== src/openminion/modules/storage/runtime/session_store/metadata_strings.py
+   ast without docstrings identical: True (sha256[:16] base db595850c7d1b977, head db595850c7d1b977)
+   ast with docstrings identical: False
+   docstrings changed: 3
+   - <module>
+     old: 'String members of each runtime session\'s metadata (#369).\n\n`list_sessions(metadata_filter=...)` on PostgreSQL selects the sessions whose\nstored metadata has a top-level member with the filter key whose value is a\nstring equal to the filter value. PostgreSQL cannot parse every document\n`metadata_json` stores (`json.dumps` writes NaN and Infinity, and escapes a\nNUL or a lone surrogate), so the store keeps those members in\n`session_metadata_strings`, one row per member, written in the same\ntransaction as the session row.\n\nThe rows come from the stored `metadata_json` read back with\n`parse_json_object`, the metadata `SessionRecord.metadata` shows. A member is\nkept only when its value is a JSON string; numbers, booleans, null, objects\nand arrays get no row. The member name and value are stored as their JSON\nstring text (`json.dumps`: ASCII, no NUL byte), so every string, including a\nNUL, a lone surrogate or non-ASCII text, is stored exactly. The PostgreSQL\nreader compares that text with `COLLATE "C"`, which is a byte comparison;\n`entry_digest` only lets an index find the candidate rows, so a long name or\nvalue adds no index size limit and two entries with one digest still compare\nin full. SQLite keeps its `json_extract` reader; the rows are maintained there\ntoo, so both backends store the same facts.\n'
+     new: "Rows of `session_metadata_strings`: the top-level string members of session metadata.\n\nPostgreSQL metadata filters read these rows because PostgreSQL cannot parse every\ndocument `metadata_json` stores (NaN, Infinity, an escaped NUL or lone surrogate).\nThe rows are written in the session row's transaction on both backends. Filter\nsemantics per backend: docs/runtime-database-upgrades.md.\n"
+   - encode_member
+     old: 'Return the stored form of a member name or string value: its JSON text.'
+     new: 'Return the stored form of a member name or string value: its JSON text.\n\n    `json.dumps` text is ASCII without a NUL byte, so NUL, lone surrogates and\n    non-ASCII text are stored exactly.\n    '
+   - metadata_string_match
+     old: 'Return the PostgreSQL condition for one filter and its parameters.'
+     new: 'Return the PostgreSQL condition for one filter and its parameters.\n\n    `COLLATE "C"` compares the JSON texts byte for byte, whatever the database\n    collation; the digest only selects candidate rows.\n    '
+
+== src/openminion/modules/storage/runtime/session_store/run_facts.py
+   ast without docstrings identical: True (sha256[:16] base 756b699d6939d9ae, head 756b699d6939d9ae)
+   ast with docstrings identical: False
+   docstrings changed: 3
+   - <module>
+     old: "Run-status facts of each runtime session event (#352).\n\nThe run-status readers in `openminion.modules.task.run` reduce a session's\nevents by a few values of each event's payload. The store keeps those values\nin `event_run_facts`, one row per event, written in the same transaction as\nthe event, so the readers aggregate them in SQL without parsing\n`payload_json`. Postgres and SQLite do not parse every payload `json.loads`\nreads (NaN, Infinity, an escaped NUL).\n\nThe facts come from the payload as the readers see it: the stored\n`payload_json` read back with `row_to_event`. New events and the runtime\nmigration 13 backfill both use `event_run_facts`. An id is stored as its JSON\nstring (`encode_key`), which is ASCII without NUL, so equality is exact on\nboth backends; the readers order runs by the decoded id. The run key is\nindexed through a fixed-length digest, so the index adds no length limit to\nrun ids.\n"
+     new: "Run-status facts of each runtime session event, one `event_run_facts` row each.\n\nThe run-status readers in `openminion.modules.task.run` aggregate these rows in\nSQL instead of parsing `payload_json`, which Postgres and SQLite cannot always\nparse (NaN, Infinity, an escaped NUL). The rows are written in the event's\ntransaction from the payload as the readers see it (`row_to_event`).\n"
+   - encode_key
+     old: 'Return the stored key of an id: its JSON string, or "" for an empty id.'
+     new: 'Return the stored key of an id: its JSON string, or "" for an empty id.\n\n    JSON text is ASCII without NUL, so equality is exact on both backends; the\n    readers order runs by the decoded id.\n    '
+   - key_digest
+     old: 'Return the indexed digest of a key: 16 hex characters, or "" for none.'
+     new: 'Return the indexed digest of a key: 16 hex characters, or "" for none.\n\n    The fixed length keeps the index from limiting the length of run ids.\n    '
+
+== tests/_room_participant_scenarios.py
+   ast without docstrings identical: True (sha256[:16] base 4eec17b8ca9c4f5f, head 4eec17b8ca9c4f5f)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: "Room participant join-order scenarios shared by the SQLite and Postgres tests (#364).\n\nThe scenarios join participants with the participant clock patched to one\ntimestamp and the participant row ids patched so that each id sorts before the\nid of the participant that joined before it, as in the issue. The contract:\n\n- `list_participants` returns the active participants in join order;\n- a participant added again while active keeps its place and `joined_at`;\n- a participant that leaves and rejoins takes a new place, after every earlier\n  join, with the rejoin's `joined_at`;\n- an explicitly selected active agent stays selected;\n- when the active agent leaves, the earliest remaining agent join is selected.\n\nThe active-agent scenarios (#393) cover the join's activation on two\nconnections: a join makes its agent the active agent only when the room has\nnone, read and written under the session-row lock in the join's transaction.\nThe first activation a join commits stays until an explicit selection or a\nleave changes it, and a join, selection or leave on another connection waits\nfor that commit, then applies as it would on its own.\n\nThe selection scenarios (#495) cover `set_active_agent` and a leave of the\nagent it selects, on two connections: the selection reads the agent's\nmembership after taking the session-row lock and writes the active agent in\nthe same transaction. A leave during a selection waits for its commit, finds\nthe agent active and runs its fallback; a selection during a leave waits for\nthe leave to commit and is refused.\n"
+     new: "Room participant scenarios shared by the SQLite and Postgres tests.\n\nJoins run with the participant clock patched to one timestamp and the row ids\npatched so that each id sorts before the id of the earlier join, so neither\n`joined_at` nor the id gives the join order. A join, selection or leave reads\nand writes the active agent under the session-row lock in its own transaction;\nthe two-connection scenarios hold one of them there and check that the other\nconnection's call waits for its commit.\n"
+
+== tests/_run_status_scenarios.py
+   ast without docstrings identical: True (sha256[:16] base 1e301031f977cb5f, head 1e301031f977cb5f)
+   ast with docstrings identical: False
+   docstrings changed: 3
+   - check_nonstandard_probe_cases
+     old: 'The cases of the third #372 review (`probe_372_nonstandard.py`).\n\n    An earlier error, then a later run event with the value; `dev` reports\n    these results on both backends.\n    '
+     new: "NaN, Infinity and NUL payload values after an earlier error.\n\n    Both backends report what the readers' Python normalization reads from the\n    later run event.\n    "
+   - check_review_cases
+     old: 'The four cases of the #372 review, each in a session of its own.'
+     new: 'Run id, state and thread ids are stripped; a blank error keeps the earlier one.'
+   - check_token_text_ids
+     old: 'Ids that look like JSON tokens keep their exact text (second #372 review).\n\n    Each id is a run, conversation and thread id, written with the ordinary\n    `append_run_state_event` arguments; "trace: NaN" and "trace: 1e999" must\n    stay two runs.\n    '
+     new: 'Ids that look like JSON tokens keep their exact text.\n\n    Each id is a run, conversation and thread id, written with the ordinary\n    `append_run_state_event` arguments; "trace: NaN" and "trace: 1e999" must\n    stay two runs.\n    '
+
+== tests/_session_metadata_filter_scenarios.py
+   ast without docstrings identical: True (sha256[:16] base 93cab845a62a63cf, head 93cab845a62a63cf)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: 'Session metadata filter scenarios shared by the SQLite and PostgreSQL tests (#369).\n\n`SessionStore.list_sessions(metadata_filter=...)` selects the sessions whose\nmetadata holds each filter value, as a JSON string, at the filter key. The\nscenarios check that contract on a runtime `SessionStore`, and through the two\ncallers that pass a filter: ACP `session/list` (`surface`) and Focus directory\nsessions (`working_dir`).\n\npytest does not rewrite the assertions of this module, so each check compares\none result with its expectation and prints both on failure.\n'
+     new: 'Session metadata filter scenarios shared by the SQLite and PostgreSQL tests.\n\npytest does not rewrite the assertions of this module, so each check compares\none result with its expectation and prints both on failure.\n'
+
+== tests/_session_metadata_strings_scenarios.py
+   ast without docstrings identical: True (sha256[:16] base 01592723704ed420, head 01592723704ed420)
+   ast with docstrings identical: False
+   docstrings changed: 1
+   - <module>
+     old: 'Session metadata string rows, shared by the SQLite and PostgreSQL tests (#369).\n\n`session_metadata_strings` keeps, for each session, the top-level members of\nits stored metadata whose value is a string (see\n`session_store/metadata_strings.py`). These scenarios check that every session\nwrite keeps the rows equal to the ones derived from the stored\n`metadata_json`, that a failed write leaves both unchanged, that runtime\nmigration 15 backfills existing history exactly, and that the PostgreSQL\nfilter reads the rows as a literal, bounded top-level string match.\n\npytest does not rewrite the assertions of this module, so each check compares\none result with its expectation and prints both on failure.\n'
+     new: 'Session metadata string row scenarios shared by the SQLite and PostgreSQL tests.\n\npytest does not rewrite the assertions of this module, so each check compares\none result with its expectation and prints both on failure.\n'
+
+== tests/integration/test_postgres_module_schemas.py
+   ast without docstrings identical: True (sha256[:16] base 0d7d3fa9ceea5e52, head 0d7d3fa9ceea5e52)
+   ast with docstrings identical: False
+   docstrings changed: 2
+   - <module>
+     old: "PostgreSQL schema per owner (#446), against a real server.\n\nRuntime storage keeps the configured URL's schema (here `public` of a new\ndatabase per test); each module uses `public__<module id>`; a module whose\nlisted history is already in `public` stays there. Every refusal is checked\nto write nothing: a snapshot of every schema's tables (columns, nullability,\nrow counts and an md5 of all rows), indexes, functions, triggers and sequence\nvalues is the same before and after. Views, constraints other than those\nindexes, column defaults and privileges are not part of the snapshot.\n\nLegacy layouts are built the way earlier code wrote them: a module's Alembic\nchain upgraded on a connection to `public`, the memory store on an engine for\n`public`, and runtime storage's own `migrate_record_store` without the start's\ncheck. Only public entry points are imported at module level, so the same file\nruns on code from before #446.\n"
+     new: 'PostgreSQL schema per owner against a real server, in a new database per test.\n\nEvery refusal is checked to write nothing by comparing `_snapshot` before and\nafter. Only public entry points are imported at module level, so the file also\nruns on code that predates per-owner schemas.\n'
+   - _snapshot
+     old: 'Every non-system schema: tables, columns, keys, rows, indexes, routines, sequences.'
+     new: 'Every non-system schema: tables, columns, keys, rows, indexes, routines, sequences.\n\n    Views, constraints other than indexes, column defaults and privileges are not\n    compared.\n    '
+
+== tests/storage/test_postgres_schema.py
+   ast without docstrings identical: True (sha256[:16] base fef5d87b3a353e03, head fef5d87b3a353e03)
+   ast with docstrings identical: True
+   docstrings changed: 0
+
+files: 9, ast mismatches: 0

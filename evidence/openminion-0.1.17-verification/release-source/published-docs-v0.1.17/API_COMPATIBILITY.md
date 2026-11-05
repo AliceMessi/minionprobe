@@ -1,0 +1,260 @@
+# OpenMinion API Compatibility
+
+Status: active
+Last updated: 2026-10-14
+
+Purpose: record the supported public import roots and entrypoint compatibility
+posture for `openminion`.
+
+## Public Python import roots
+
+### Root package
+
+`openminion` is the primary public Python import root.
+
+Current documented root exports:
+
+1. `APIRuntime`
+2. `Agent`
+3. `AgentOutputValidationError`
+4. `AgentRunResult`
+5. `Handoff`
+6. `MemoryBundle`
+7. `OpenMinionConfig`
+8. `ProviderError`
+9. `subagent`
+10. `tool`
+11. `__version__`
+12. `TurnTimeoutError`
+
+These are defined in `src/openminion/__init__.py`.
+
+### API package
+
+`openminion.api` is also public for explicit runtime/API usage.
+
+Current documented exports:
+
+1. `APIRuntime`
+2. `Agent`
+3. `AgentOutputValidationError`
+4. `AgentRunResult`
+5. `Handoff`
+6. `ProviderError`
+7. `RuntimeTurnHandle`
+8. `ToolCallSummary`
+9. `TurnChunk`
+10. `TurnError`
+11. `TurnResponse`
+12. `TurnTelemetry`
+13. `dispatch_request`
+14. `subagent`
+15. `TurnTimeoutError`
+
+These are defined in `src/openminion/api/__init__.py`.
+
+`Agent.run_stream()` remains the synchronous `Agent` call with a progress
+callback. Applications that need an iterator, cancellation, or streamed
+approval resolution use `APIRuntime.submit_turn()` and its
+`RuntimeTurnHandle`. The handle exposes typed `TurnChunk` iteration, typed
+`TurnResponse` resolution, cancellation, and approval decisions without a
+second SDK runtime.
+
+`Agent.run()` and `Agent.run_stream()` accept optional runtime-owned timeout,
+approval-callback, and cancellation inputs. `AgentRunResult` includes the
+canonical result ID plus copied metadata and stats. Structured Pydantic output
+should be exact JSON; during `0.1.x`, one schema-valid JSON object wrapped in
+provider prose remains accepted for compatibility.
+
+Unreleased: `Agent.run()` and `Agent.run_stream()` also accept an optional
+keyword-only `thread_id`. A non-blank value is sent as the turn's
+`inbound_metadata["thread_id"]`, so the runtime resumes that thread, for
+example to answer a waiting confirmation; omitted or blank, the request is
+unchanged. `AgentRunResult.thread_id` is the returned metadata's `thread_id`,
+stripped, or `None`. It is the last dataclass field, so positional
+construction keeps its meaning.
+
+### Provider failures
+
+After the configured retry budget is exhausted, `Agent.run()` and
+`Agent.run_stream()` raise the public `ProviderError` for recognized provider
+failures, including connection errors, authentication failures, rate limits,
+and provider request timeouts. The exception retains `code`, `message`, and
+`details`; provider request correlation is retained when available. This corrects
+0.1.4 behavior that could return an error message as a completed answer.
+Provider failure is reported before structured-output validation. Successful
+`AgentRunResult` values are unchanged. Submitted-turn streaming and HTTP callers
+continue to use their existing runtime error envelopes.
+
+```python
+from openminion import ProviderError
+
+try:
+    result = agent.run("Hello")
+except ProviderError as error:
+    print(error.code, error.message)
+```
+
+### Turn deadlines and approval decisions (0.1.5)
+
+`TurnTimeoutError` is the existing turn-deadline exception, now exported from
+`openminion` and `openminion.api` as well as `openminion.api.turns`. It is distinct
+from a provider request timeout reported by `ProviderError`. Its `__since__`
+entry is `0.1.5`. The SDK error-handling example catches both errors.
+
+Turn cancellation propagates through nested worker calls. After cancellation,
+the runtime starts no further provider or tool work and does not append a late
+assistant answer. Provider connect/read timeouts use the remaining turn budget.
+A synchronous tool already executing cannot be forcibly stopped or its external
+side effects undone; its late result cannot continue the cancelled turn.
+
+`RuntimeTurnHandle.resolve_approval()` accepts `allow_once` and `deny`, with the
+existing case/whitespace normalization. Invalid decisions now raise `ValueError`
+listing those choices and leave the request pending for correction. A stale or
+unknown approval ID still returns `False`. This API does not accept session or
+permanent grants.
+
+Functional `tool(fn, **options)` now preserves the same options as
+`@tool(**options)`. Explicit SDK handoffs are exposed through temporary family
+profiles; exposure does not waive policy confirmation. MCP approval risk levels
+must be `low`, `medium`, or `high`; invalid values now raise `ConfigError` during
+configuration loading instead of silently never matching.
+
+## Public CLI/operator entrypoints
+
+The following package-owned console scripts are part of the documented operator
+surface:
+
+1. `openminion`
+2. `telemetryctl`
+3. `opsctl`
+4. `openminiond`
+5. `openminion-tool`
+6. `identityctl`
+7. `openminion-controlplane`
+8. `runtimectl`
+9. `brainctl`
+10. `memctl`
+11. `sessctl`
+12. `contextctl`
+13. `ctxctl`
+14. `agentregctl`
+15. `artifactctl`
+16. `openminion-controlplane-telegram`
+17. `openminion-controlplane-slack`
+18. `skill`
+19. `skillctl`
+20. `a2actl`
+21. `rlmctl`
+22. `retrievectl`
+23. `policyctl`
+
+The script names are defined in `pyproject.toml`.
+
+`memctl list` and `memctl search` additively support the eight canonical
+SophiaGraph namespace ID options. Existing scope-only invocations remain part
+of the compatibility surface. Request details are documented in
+`docs/memory-namespace-queries.md`.
+
+The local HTTP API also exposes `POST /memory/records/list` and
+`POST /memory/records/search`. These are operator query surfaces, not a
+multi-tenant authentication or RBAC promise.
+
+Remote active-work inspection uses the existing durable owners:
+
+1. `GET /sessions/{session_id}/events` returns structural persisted session
+   events after an optional `after_id` cursor without exposing event payloads.
+2. `GET /sessions/{session_id}/messages` remains the persisted message and
+   artifact-reference projection.
+3. Task responses include session, event, message, turn-input, and live-stream
+   links only when their required identifiers are present in task metadata.
+4. `POST /v1/approvals/resume` applies an explicit typed approval decision;
+   deny decisions do not create a grant.
+
+The HTTP server requires `runtime.ipc_token` when bound to a non-loopback host,
+including when it is created through the Python server factory. Requests use
+the existing `X-IPC-Token` header. Loopback development remains usable without
+a token.
+
+Remote use means placing this API behind an operator-owned trusted tunnel. The
+package does not provide a hosted relay, TLS termination, or push service.
+Persisted event polling resumes after the last returned `next_after_id` across
+process restarts. Active-turn SSE reattachment works only while that turn and
+process remain active; queued turn input is likewise process-local and does not
+claim in-flight steering after a restart.
+
+Delegated Sophiagraph access is an additive internal integration surface.
+`SubagentRunContext.memory_posture` accepts the closed values `none` and
+`read_only_bounded`; serialized string compatibility is retained. The
+OpenMinion policy store remains authoritative for issue, use, expiry, and
+revocation. Untrusted delegated callers never receive a raw Sophiagraph store.
+This surface requires the package baseline `sophiagraph>=0.0.10`, which
+contains the public `sophiagraph.access` import root and the namespace contracts
+used by the current runtime.
+
+Memory portability and model compatibility should consume public Sophiagraph
+facades such as `sophiagraph.portability` and `sophiagraph.models`. The
+Sophiagraph 0.x transition window keeps `_SCOPE_PATTERN` as a compatibility
+alias, but new OpenMinion code should prefer `SCOPE_PATTERN`.
+
+MCP server publication uses
+`openminion.tools.mcp.server.build_runtime_published_tools()` for supported
+runtime-backed catalogs. `build_contract_fixture_published_tools()` is only for
+wire-shape tests, and `build_default_published_tools()` is a deprecated
+compatibility alias for that fixture catalog.
+
+## Non-promises
+
+These import areas are real package owners, but they are not blanket public
+stability promises:
+
+1. `openminion.modules.*`
+2. `openminion.services.*`
+3. `openminion.tools.*`
+
+Compatibility for those trees is narrower and should be documented surface by
+surface instead of assumed from importability.
+
+## Compatibility posture
+
+Current project stage: `0.1.x` public preview. The `0.1.x` compatibility
+contract is active.
+
+Current public package line: the value of
+`openminion.base.version.OPENMINION_VERSION`.
+
+Compatibility expectations for the documented public surface:
+
+1. root exports should change additively by preference,
+2. removals or renames should be called out explicitly in release notes,
+3. when feasible, package-level compatibility shims should be preferred over
+   silent breakage,
+4. internal tree moves do not by themselves create a public breaking change
+   unless they affect a documented public symbol or command.
+
+## 0.1.x compatibility contract
+
+`0.1.0` is the first broadly usable source and CLI milestone. It is not a
+`1.0` stability promise and does not certify Desktop binary distribution.
+
+Within the `0.1.x` line:
+
+1. documented root exports under `openminion` and `openminion.api` are not
+   removed or renamed in a patch release,
+2. documented console-script names and command paths are not removed or
+   renamed in a patch release,
+3. additions should remain backward compatible and new arguments should have
+   defaults that preserve existing documented calls,
+4. unavoidable breaking changes move to a later minor line and are called out
+   in release notes and this file, and
+5. fixes may correct behavior that contradicted the documented contract; the
+   correction and migration impact must be stated in release notes.
+
+The SDK no longer silently ignores decorated-tool or handoff registration when
+an injected runtime lacks the canonical `ToolRegistry`, and it no longer
+guesses noncanonical `text` or `reply` result keys. Both cases now fail at the
+owning boundary. String tool names and canonical `body` results are unchanged.
+
+The non-promises above remain internal in `0.1.x`. Long-duration autonomy,
+provider-specific quality, signed native packaging, and public Desktop update
+acceptance remain separately certified claims.

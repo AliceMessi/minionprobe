@@ -1,0 +1,126 @@
+head: 31a1f1b8 test(storage): trim storage scenario commentary
+dev:  83d97ad3 fix(cli): preserve one-shot session selection (#599)
+CPython 3.11.17 SQLite 3.45.1; PRETTY_NAME="Ubuntu 24.04.5 LTS"
+ruff: ruff 0.15.22
+OPENMINION_TEST_POSTGRES_URL set: yes
+
+== git diff --stat 83d97ad33f9b34332c97ed2b2e88ef3cf68c8b6f HEAD
+ docs/runtime-database-upgrades.md                  |  6 +--
+ .../modules/storage/migrations/postgres_schema.py  | 45 ++++---------------
+ .../runtime/session_store/metadata_strings.py      | 39 +++++++---------
+ .../storage/runtime/session_store/run_facts.py     | 33 +++++++-------
+ tests/_room_participant_scenarios.py               | 34 ++++----------
+ tests/_run_status_scenarios.py                     | 10 ++---
+ tests/_session_metadata_filter_scenarios.py        |  8 +---
+ tests/_session_metadata_strings_scenarios.py       | 10 +----
+ tests/integration/test_postgres_module_schemas.py  | 52 +++++-----------------
+ tests/storage/test_postgres_schema.py              |  7 +--
+ 10 files changed, 71 insertions(+), 173 deletions(-)
+
+== AST equivalence, docstrings stripped (dev vs head)
+base 83d97ad33f9b34332c97ed2b2e88ef3cf68c8b6f
+head 31a1f1b82dad3ae26ada8f456fa71a49aea20b5f
+python 3.11.17
+== src/openminion/modules/storage/migrations/postgres_schema.py
+   ast without docstrings identical: True (sha256[:16] base 4b7ffd6d0340f1e0, head 4b7ffd6d0340f1e0)
+   ast with docstrings identical: False
+   docstrings changed: 1
+== src/openminion/modules/storage/runtime/session_store/metadata_strings.py
+   ast without docstrings identical: True (sha256[:16] base b9424d2fcbbd3a38, head b9424d2fcbbd3a38)
+   ast with docstrings identical: False
+   docstrings changed: 3
+== src/openminion/modules/storage/runtime/session_store/run_facts.py
+   ast without docstrings identical: True (sha256[:16] base eb6e0f5d16ca7be0, head eb6e0f5d16ca7be0)
+   ast with docstrings identical: False
+   docstrings changed: 3
+== tests/_room_participant_scenarios.py
+   ast without docstrings identical: True (sha256[:16] base 46e9057f77906f42, head 46e9057f77906f42)
+   ast with docstrings identical: False
+   docstrings changed: 1
+== tests/_run_status_scenarios.py
+   ast without docstrings identical: True (sha256[:16] base 4275215529e44d7e, head 4275215529e44d7e)
+   ast with docstrings identical: False
+   docstrings changed: 3
+== tests/_session_metadata_filter_scenarios.py
+   ast without docstrings identical: True (sha256[:16] base c3e8d401d298a19f, head c3e8d401d298a19f)
+   ast with docstrings identical: False
+   docstrings changed: 1
+== tests/_session_metadata_strings_scenarios.py
+   ast without docstrings identical: True (sha256[:16] base be2666bead365dc8, head be2666bead365dc8)
+   ast with docstrings identical: False
+   docstrings changed: 1
+== tests/integration/test_postgres_module_schemas.py
+   ast without docstrings identical: True (sha256[:16] base 99031772f4ca3059, head 99031772f4ca3059)
+   ast with docstrings identical: False
+   docstrings changed: 2
+== tests/storage/test_postgres_schema.py
+   ast without docstrings identical: True (sha256[:16] base daac23599b9e62c6, head daac23599b9e62c6)
+   ast with docstrings identical: True
+   docstrings changed: 0
+files: 9, ast mismatches: 0
+
+== syntax: py_compile of the affected files
+py_compile ok (9 files)
+
+== ruff check <affected>
+All checks passed!
+
+== ruff format --check <affected>
+9 files already formatted
+
+== collected test ids, dev vs head
+head ids: 281, dev ids: 281, sha256 head 70d350ee255b5b41, dev 70d350ee255b5b41
+collected ids identical
+tree back at head: 0 paths differ
+
+== [head] pytest <focused> (OPENMINION_TEST_POSTGRES_URL set, so the postgres-marked ones run too)
+281 passed in 93.89s (0:01:33)
+
+== [head] upstream postgres-memory-retrieval job, its command list from .github/workflows/ci.yml
+$ python -m pytest -q -m postgres tests/memory/test_memory_postgres_conformance.py
+19 passed in 2.50s
+$ python -m pytest -q -m postgres tests/memory/test_memory_search_quality.py::test_postgres_lexical_score_contributes_to_semantic_order
+1 passed in 0.37s
+$ python -m pytest -q -m postgres tests/memory/test_gc_evidence_postgres.py
+7 passed in 1.24s
+$ python -m pytest -q -m postgres tests/skill/test_skill_postgres_conformance.py
+6 passed, 6 deselected in 0.98s
+$ python -m pytest -q -m postgres tests/integration/test_runtime_storage_postgres.py
+55 passed in 42.52s
+$ python -m pytest -q -m postgres tests/integration/test_runtime_memory_postgres.py
+8 passed in 4.49s
+$ python -m pytest -q -m postgres tests/integration/test_storage_migrate_report_postgres.py
+2 passed in 0.43s
+$ python -m pytest -q -m postgres tests/integration/test_module_baselines_postgres.py
+13 passed in 5.13s
+$ python -m pytest -q -m postgres tests/memory/test_gc_postgres.py
+13 passed in 2.51s
+$ python -m pytest -q -m postgres tests/integration/test_postgres_module_schemas.py
+32 passed in 33.55s
+
+== ruff check .
+All checks passed!
+
+== make format-check
+<RUNNER_CHECKOUT>/.venv/bin/python3.11 -m ruff format --check "<RUNNER_CHECKOUT>"
+5197 files already formatted
+make format-check exit: 0
+
+== make lint
+[coo-10] clean — webhook secret-required contract preserved
+Skipping workspace browser tool-family contract validator (not present in standalone checkout).
+make typecheck
+make[1]: Entering directory '<RUNNER_CHECKOUT>'
+cd "<RUNNER_CHECKOUT>" && <RUNNER_CHECKOUT>/.venv/bin/python3.11 -m scripts.validate.mypy_error_budget
+[tcr] mypy whole-tree ratchet
+[tcr] current total: 4298; baseline total: 4298
+[tcr] historical floor total: 4019
+[tcr] reset debt total: 279
+[tcr] api: 76 / 76 | monthly quota -50 | next target <= 26 | headroom 0
+[tcr] cli: 308 / 308 | monthly quota -50 | next target <= 258 | headroom 0
+[tcr] modules: 3341 / 3341 | monthly quota -50 | next target <= 3291 | headroom 0
+[tcr] root: 1 / 1 | monthly quota -50 | next target <= 0 | headroom 0
+[tcr] services: 353 / 353 | monthly quota -50 | next target <= 303 | headroom 0
+[tcr] tools: 219 / 219 | monthly quota -50 | next target <= 169 | headroom 0
+make[1]: Leaving directory '<RUNNER_CHECKOUT>'
+make lint exit: 0

@@ -1,0 +1,3488 @@
+{
+  "info": {
+    "probe": "probe_541",
+    "openminion.__file__": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+    "openminion.__version__": "0.1.16",
+    "python": "3.12.11",
+    "platform": "Windows-11-10.0.22631-SP0",
+    "sqlite3.sqlite_version": "3.50.4",
+    "cwd": "<WORK>\\empty-541",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "provider": "openai (OpenAI-compatible HTTP) -> scripted ThreadingHTTPServer on 127.0.0.1 (local stub)",
+    "dist_versions": {
+      "openminion": "0.1.16",
+      "pydantic": "2.14.2"
+    },
+    "doc": {
+      "name": "docs_runtime-surfaces.md",
+      "git_blob": "358abd591836c787495953d888d1a10d23508711",
+      "sha256": "60f7c37ad7ebcb00adbd0366f0467d65a4e47cdd932b0c067e125b7b4676240b"
+    },
+    "baseline": null
+  },
+  "summary": {
+    "passed": 1,
+    "failed": 17,
+    "total": 18
+  },
+  "all_pass": false,
+  "checks": [
+    {
+      "check": "environment: openminion 0.1.16 imported from site-packages in isolated mode; the provider is the scripted local stub on 127.0.0.1; the example file is the published docs/runtime-surfaces.md (git blob 358abd59...)",
+      "pass": true,
+      "observed": {
+        "version": "0.1.16",
+        "file": "<VENV>\\Lib\\site-packages\\openminion\\__init__.py",
+        "python": "3.12.11",
+        "platform": "Windows-11-10.0.22631-SP0",
+        "sqlite": "3.50.4",
+        "dist_versions": {
+          "openminion": "0.1.16",
+          "pydantic": "2.14.2"
+        },
+        "doc": {
+          "name": "docs_runtime-surfaces.md",
+          "git_blob": "358abd591836c787495953d888d1a10d23508711",
+          "sha256": "60f7c37ad7ebcb00adbd0366f0467d65a4e47cdd932b0c067e125b7b4676240b"
+        },
+        "hosts": [
+          "127.0.0.1"
+        ]
+      }
+    },
+    {
+      "check": "item 1: Agent.run returns the thread id (AgentRunResult.thread_id = metadata['thread_id'], non-blank) for a turn whose memory.write call waits; agent.run('yes', thread_id=first.thread_id) resumes that thread in the same session (resume_thread / explicit_thread_requested) and the waiting call runs exactly once, with the model's arguments, writing fact:editor_font; a stale second 'yes' on the thread is resumed but runs nothing",
+      "pass": false,
+      "observed": {
+        "case_error": null,
+        "fact_records": [],
+        "extra": {},
+        "calls": [
+          {
+            "label": "first: agent.run(MSG1), no callback",
+            "error": null,
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "c984c2189305431fbe8280d6d911a64c",
+            "result_thread_id": "<no attribute>",
+            "thread_id": "c984c2189305431fbe8280d6d911a64c:4a2e3f95972948c9b849f657d102eceb",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": [
+              {
+                "caller_handles_delivery": "true"
+              }
+            ]
+          },
+          {
+            "label": "answer: agent.run('yes', thread_id=first.thread_id)",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          },
+          {
+            "label": "stale: agent.run('yes', thread_id=first.thread_id) again",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 2: thread_id omitted: the payload the SDK sends is unchanged (inbound_metadata holds only the delivery flag; the reply's payload equals the first one but for the message), the reply keeps the default routing (fork_thread / settled_without_resume, a new thread) and the waiting call does not run",
+      "pass": false,
+      "observed": {
+        "case_error": null,
+        "fact_records": [],
+        "extra": {},
+        "calls": [
+          {
+            "label": "first: agent.run(MSG1)",
+            "error": null,
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "8f247956d04c4195b2af36328a7b7d71",
+            "result_thread_id": "<no attribute>",
+            "thread_id": "8f247956d04c4195b2af36328a7b7d71:e4eac469985d4a338b5dfd62f9fe3570",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": [
+              {
+                "caller_handles_delivery": "true"
+              }
+            ]
+          },
+          {
+            "label": "reply: agent.run('yes')",
+            "error": null,
+            "run_state": "completed",
+            "text": "openminion: Done.",
+            "session_id": "8f247956d04c4195b2af36328a7b7d71",
+            "result_thread_id": "<no attribute>",
+            "thread_id": "8f247956d04c4195b2af36328a7b7d71:06fa55a03c8941d9876287cf40722ca9",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "assistant",
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": [
+              {
+                "caller_handles_delivery": "true"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 2: thread_id empty: the payload the SDK sends is unchanged (inbound_metadata holds only the delivery flag; the reply's payload equals the first one but for the message), the reply keeps the default routing (fork_thread / settled_without_resume, a new thread) and the waiting call does not run",
+      "pass": false,
+      "observed": {
+        "case_error": null,
+        "fact_records": [],
+        "extra": {},
+        "calls": [
+          {
+            "label": "first: agent.run(MSG1)",
+            "error": null,
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "ca0f04ebb3e44c68b8f5c33b1dc81ab9",
+            "result_thread_id": "<no attribute>",
+            "thread_id": "ca0f04ebb3e44c68b8f5c33b1dc81ab9:89d9a38a8ee14ba9a0497e723ed1929a",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": [
+              {
+                "caller_handles_delivery": "true"
+              }
+            ]
+          },
+          {
+            "label": "reply: agent.run('yes', thread_id='')",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 2: thread_id blank: the payload the SDK sends is unchanged (inbound_metadata holds only the delivery flag; the reply's payload equals the first one but for the message), the reply keeps the default routing (fork_thread / settled_without_resume, a new thread) and the waiting call does not run",
+      "pass": false,
+      "observed": {
+        "case_error": null,
+        "fact_records": [],
+        "extra": {},
+        "calls": [
+          {
+            "label": "first: agent.run(MSG1)",
+            "error": null,
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "8a9d2af66a8a4fa7bc94ea8ee6b1ade2",
+            "result_thread_id": "<no attribute>",
+            "thread_id": "8a9d2af66a8a4fa7bc94ea8ee6b1ade2:daa1e2e5ff944085a5789786a3ee741f",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": [
+              {
+                "caller_handles_delivery": "true"
+              }
+            ]
+          },
+          {
+            "label": "reply: agent.run('yes', thread_id='  ')",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 2: AgentRunResult positional construction stays compatible: the fields are the 0.1.16 fields in their order with thread_id appended last; nine positional values keep their meaning (thread_id None), a tenth sets thread_id; a returned result's metadata is the turn's metadata dict, with thread_id equal to result.thread_id",
+      "pass": false,
+      "observed": {
+        "fields": [
+          "output",
+          "text",
+          "raw",
+          "run_id",
+          "run_state",
+          "session_id",
+          "id",
+          "metadata",
+          "stats"
+        ],
+        "positional": {
+          "9 positional (pre-0.1.17 fields)": {
+            "output": "out",
+            "text": "text",
+            "raw": {
+              "raw": 1
+            },
+            "run_id": "run-1",
+            "run_state": "completed",
+            "session_id": "sess-1",
+            "id": "id-1",
+            "metadata": {
+              "thread_id": "t-1"
+            },
+            "stats": {
+              "llm_calls": 1
+            }
+          },
+          "10 positional": "TypeError: AgentRunResult.__init__() takes from 4 to 10 positional arguments but 11 were given"
+        },
+        "first_metadata_keys": [
+          "agent",
+          "authenticity_mode",
+          "authenticity_status",
+          "authenticity_verified",
+          "brain_status",
+          "brain_working_status",
+          "elapsed_ms",
+          "execution_id",
+          "finish_reason",
+          "identity_agent_id",
+          "identity_budget_max_tokens",
+          "identity_budget_used_tokens",
+          "identity_llm_policy_ref",
+          "identity_llm_policy_ref_enforced",
+          "identity_llm_policy_ref_warning",
+          "identity_profile_revision",
+          "identity_profile_version",
+          "identity_purpose",
+          "identity_render_version",
+          "inference_steps",
+          "invocation_id",
+          "invocation_scope",
+          "lab_required",
+          "llm_call_counts_by_purpose",
+          "llm_calls_count",
+          "max_single_call_input_tokens",
+          "max_single_call_output_tokens",
+          "max_single_call_total_tokens",
+          "memory_capsule_envelope_limit_chars",
+          "memory_capture_bundle_result",
+          "memory_capture_output_count",
+          "memory_capture_state",
+          "memory_context_reason",
+          "memory_context_record_count",
+          "memory_context_status",
+          "memory_enabled",
+          "memory_envelope_limit_chars",
+          "memory_envelope_truncated",
+          "memory_envelope_truncation_reasons",
+          "memory_envelope_version",
+          "memory_lane",
+          "model",
+          "pending_confirmation_command_id",
+          "persisted_inbound_message_id",
+          "persisted_outbound_message_id",
+          "prior_context_present",
+          "provider",
+          "request_id",
+          "respond_kind",
+          "run_id",
+          "run_state",
+          "run_stats_json",
+          "session_history_available",
+          "session_id",
+          "telemetry_recorded",
+          "terminal_capture_intent_receipt",
+          "thread_decision_action",
+          "thread_decision_reason",
+          "thread_id",
+          "thread_state_before",
+          "thread_state_qualifier",
+          "tool_calls_count",
+          "tool_loop_max_steps",
+          "tool_loop_termination_reason",
+          "total_input_tokens_used",
+          "total_output_tokens_used",
+          "total_tokens_used",
+          "turn_duration_ms"
+        ]
+      }
+    },
+    {
+      "check": "item 3: two calls wait in one session, each on its own thread; answering the second thread runs only its call (ARGS2), then answering the first runs only ARGS1; each reply resumes the thread it names",
+      "pass": false,
+      "observed": {
+        "case_error": null,
+        "fact_records": [],
+        "extra": {},
+        "calls": [
+          {
+            "label": "first wait (ARGS1)",
+            "error": null,
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "804aee0da6b047268f4b94a3e7980993",
+            "result_thread_id": "<no attribute>",
+            "thread_id": "804aee0da6b047268f4b94a3e7980993:44cf008bdfa546f9a38be708ddb36763",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": [
+              {
+                "caller_handles_delivery": "true"
+              }
+            ]
+          },
+          {
+            "label": "second wait (ARGS2), same session",
+            "error": null,
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "804aee0da6b047268f4b94a3e7980993",
+            "result_thread_id": "<no attribute>",
+            "thread_id": "804aee0da6b047268f4b94a3e7980993:4984d05380564009952cc3b44979efcc",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-5",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": [
+              {
+                "caller_handles_delivery": "true"
+              }
+            ]
+          },
+          {
+            "label": "answer the second thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          },
+          {
+            "label": "answer the first thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 3: a different session cannot execute the owner's pending call: the owner's thread sent with session 'other-session' (which has its own waiting call) or with 'new-session', and the other session's thread sent with the owner's session, each run nothing (the routing resumes the named thread inside the caller's session, where no call waits on it); each session's own reply then runs its own call once",
+      "pass": false,
+      "observed": {
+        "case_error": null,
+        "fact_records": [],
+        "extra": {
+          "owner_session": "ecda9be5ce03476d90c586c960c19349"
+        },
+        "calls": [
+          {
+            "label": "owner session wait (ARGS1)",
+            "error": null,
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "ecda9be5ce03476d90c586c960c19349",
+            "result_thread_id": "<no attribute>",
+            "thread_id": "ecda9be5ce03476d90c586c960c19349:5028eab714fd4e4db913feeabbc3357d",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": [
+              {
+                "caller_handles_delivery": "true"
+              }
+            ]
+          },
+          {
+            "label": "other-session wait (ARGS2)",
+            "error": null,
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "other-session",
+            "result_thread_id": "<no attribute>",
+            "thread_id": "other-session:7bcb2890362244b8a5dc872c29cf5700",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-5",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": [
+              {
+                "caller_handles_delivery": "true"
+              }
+            ]
+          },
+          {
+            "label": "crossed: other-session + owner's thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          },
+          {
+            "label": "crossed: new-session + owner's thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          },
+          {
+            "label": "crossed: owner's session + other-session's thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          },
+          {
+            "label": "own: owner's session + owner's thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          },
+          {
+            "label": "own: other-session + its thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 3: a different agent cannot execute the owner's pending call: 'helper' in the owner's session is refused (TurnRequestError: the session belongs to agent 'openminion'); in its own session the owner's thread runs nothing; the owner's own reply then runs the call once",
+      "pass": false,
+      "observed": {
+        "case_error": null,
+        "fact_records": [],
+        "extra": {
+          "owner_session": "4e16ac08c34641d281a9b5883d8cda33",
+          "helper_session": "e5aaa9edd7ae45e19c6fe884ab5a2e89"
+        },
+        "calls": [
+          {
+            "label": "owner wait (ARGS1)",
+            "error": null,
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "4e16ac08c34641d281a9b5883d8cda33",
+            "result_thread_id": "<no attribute>",
+            "thread_id": "4e16ac08c34641d281a9b5883d8cda33:1795b53640124d4d812eac021745b594",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": [
+              {
+                "caller_handles_delivery": "true"
+              }
+            ]
+          },
+          {
+            "label": "helper in the owner's session with the owner's thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          },
+          {
+            "label": "helper in its own session with the owner's thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          },
+          {
+            "label": "owner answers its thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 4: cb-waiting-approve: on an explicit thread the approval callback decides for the call waiting there ('yes' is sent): it is asked once with the call's arguments and returns True; the call runs once",
+      "pass": false,
+      "observed": {
+        "case_error": null,
+        "fact_records": [],
+        "extra": {
+          "approvals": []
+        },
+        "calls": [
+          {
+            "label": "first wait (ARGS1)",
+            "error": null,
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "2f3cf0912b2b418f8781b5acb210c1f9",
+            "result_thread_id": "<no attribute>",
+            "thread_id": "2f3cf0912b2b418f8781b5acb210c1f9:a470d4b87c37497f9cee84f9b82c205e",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": [
+              {
+                "caller_handles_delivery": "true"
+              }
+            ]
+          },
+          {
+            "label": "'yes' on its thread with a callback that returns True",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 4: cb-waiting-deny: on an explicit thread the approval callback decides for the call waiting there ('yes' is sent): it is asked once with the call's arguments and returns False; the call does not run (reply 'Confirmation denied. The action was not run.')",
+      "pass": false,
+      "observed": {
+        "case_error": null,
+        "fact_records": [],
+        "extra": {
+          "approvals": []
+        },
+        "calls": [
+          {
+            "label": "first wait (ARGS1)",
+            "error": null,
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "19d4e9edf9734cb0ad66771426a86e36",
+            "result_thread_id": "<no attribute>",
+            "thread_id": "19d4e9edf9734cb0ad66771426a86e36:c2c0e78ab0d24abd9e772ff2250ff517",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": [
+              {
+                "caller_handles_delivery": "true"
+              }
+            ]
+          },
+          {
+            "label": "'yes' on its thread with a callback that returns False",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 4: cb-new-approve: on an explicit thread the approval callback decides for a new call made on the thread of an earlier settled turn: it is asked once with the call's arguments and returns True; the call runs once",
+      "pass": false,
+      "observed": {
+        "case_error": null,
+        "fact_records": [],
+        "extra": {
+          "approvals": []
+        },
+        "calls": [
+          {
+            "label": "settled turn: agent.run('Hello.')",
+            "error": null,
+            "run_state": "completed",
+            "text": "openminion: Done.",
+            "session_id": "659f10a6499e4287a05b4b2f93973e4f",
+            "result_thread_id": "<no attribute>",
+            "thread_id": "659f10a6499e4287a05b4b2f93973e4f:8716758acfd4440380b3f0ceb6d833d9",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "assistant",
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": [
+              {
+                "caller_handles_delivery": "true"
+              }
+            ]
+          },
+          {
+            "label": "new call (ARGS2) on that thread with a callback that returns True",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 4: cb-new-deny: on an explicit thread the approval callback decides for a new call made on the thread of an earlier settled turn: it is asked once with the call's arguments and returns False; the call does not run (reply 'Confirmation denied. The action was not run.')",
+      "pass": false,
+      "observed": {
+        "case_error": null,
+        "fact_records": [],
+        "extra": {
+          "approvals": []
+        },
+        "calls": [
+          {
+            "label": "settled turn: agent.run('Hello.')",
+            "error": null,
+            "run_state": "completed",
+            "text": "openminion: Done.",
+            "session_id": "11f80ad9c4a345838db5c73f787bfacd",
+            "result_thread_id": "<no attribute>",
+            "thread_id": "11f80ad9c4a345838db5c73f787bfacd:5456b10b8feb412b86e4b926f869e830",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "assistant",
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": [
+              {
+                "caller_handles_delivery": "true"
+              }
+            ]
+          },
+          {
+            "label": "new call (ARGS2) on that thread with a callback that returns False",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 4: a 'no' reply on the thread denies the waiting call (reply 'Confirmation denied. The action was not run.'); a later 'yes' on the thread is stale and runs nothing",
+      "pass": false,
+      "observed": {
+        "case_error": null,
+        "fact_records": [],
+        "extra": {},
+        "calls": [
+          {
+            "label": "first wait (ARGS1)",
+            "error": null,
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "8f79c7c33dda4d8694b34352a342ded5",
+            "result_thread_id": "<no attribute>",
+            "thread_id": "8f79c7c33dda4d8694b34352a342ded5:cc9022a1a61945299b0f30e7ff6a424b",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": [
+              {
+                "caller_handles_delivery": "true"
+              }
+            ]
+          },
+          {
+            "label": "'no' on its thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          },
+          {
+            "label": "later 'yes' on its thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 4: an already-cancelled reply ('yes' on the thread with cancel_event set before the call) does not execute the waiting call (only whether the call runs is asserted, not how the cancelled turn ends; the approval/cancellation race #527 is not covered)",
+      "pass": false,
+      "observed": {
+        "case_error": null,
+        "fact_records": [],
+        "extra": {},
+        "calls": [
+          {
+            "label": "first wait (ARGS1)",
+            "error": null,
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "06c089ea74234cdfb133d1dc262f70cd",
+            "result_thread_id": "<no attribute>",
+            "thread_id": "06c089ea74234cdfb133d1dc262f70cd:71a9e47b05484101b56a8c9886e3fa6a",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": [
+              {
+                "caller_handles_delivery": "true"
+              }
+            ]
+          },
+          {
+            "label": "'yes' on its thread with cancel_event already set",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          }
+        ]
+      }
+    },
+    {
+      "check": "item 5: run_stream('yes', thread_id=...) sends the selected thread (inbound_metadata.thread_id), resumes it and returns it; on_delta gets the progress while the turn runs: tool_started before the handler ran and tool_completed after it, and status events on both sides; the call runs once; a stale run_stream on the thread streams progress but runs nothing and has no tool event",
+      "pass": false,
+      "observed": {
+        "calls": [
+          {
+            "label": "first wait (ARGS1)",
+            "error": null,
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "9e9370e9d69949f4a0deeaad99aafe2a",
+            "result_thread_id": "<no attribute>",
+            "thread_id": "9e9370e9d69949f4a0deeaad99aafe2a:a5b4b6b7f59b4492a41d3b100dbf5f3b",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": [
+              {
+                "caller_handles_delivery": "true"
+              }
+            ]
+          },
+          {
+            "label": "run_stream('yes', thread_id=...)",
+            "error": "TypeError: Agent.run_stream() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          },
+          {
+            "label": "stale run_stream('yes', thread_id=...)",
+            "error": "TypeError: Agent.run_stream() got an unexpected keyword argument 'thread_id'",
+            "run_state": null,
+            "text": null,
+            "session_id": null,
+            "result_thread_id": null,
+            "thread_id": null,
+            "thread_decision_action": null,
+            "thread_decision_reason": null,
+            "respond_kind": null,
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": []
+          }
+        ],
+        "stream": {
+          "tool_events": [],
+          "status_event_handler_runs": [],
+          "events": 0,
+          "event_types": [],
+          "stale_events": 0,
+          "stale_tool_events": []
+        }
+      }
+    },
+    {
+      "check": "item 6: the published SDK example (docs/runtime-surfaces.md at v0.1.17, the block added by #546), executed as written from the installed package: `first` waits (respond_kind policy_confirmation_prompt), so the example sends agent.run('yes', thread_id=first.thread_id); `answer` resumes first's thread and the waiting call runs once with the model's arguments",
+      "pass": false,
+      "observed": {
+        "example": "first = agent.run(\"Remember that I write code in Iosevka 14.\")\nif first.metadata.get(\"respond_kind\") == \"policy_confirmation_prompt\":\n    # Answer the confirmation on the thread that is waiting for it.\n    answer = agent.run(\"yes\", thread_id=first.thread_id)\n",
+        "result": {},
+        "case_error": "AttributeError: 'AgentRunResult' object has no attribute 'thread_id'"
+      }
+    },
+    {
+      "check": "item 6: ordinary SDK calls without thread_id are unchanged: plain Agent().run and run_stream and a forced-tool run with session_id and timeout_seconds complete, send only the delivery flag in inbound_metadata, start a thread of their own (fork_thread) and return it as result.thread_id; APIRuntime.submit_turn streams TurnChunk items and returns a TurnResponse (the ci.yml installed-wheel check)",
+      "pass": false,
+      "observed": {
+        "calls": [
+          {
+            "label": "plain Agent().run('Hello.')",
+            "error": null,
+            "run_state": "completed",
+            "text": "openminion: Done.",
+            "session_id": "eda4eeedcc464514b078858c66c1b51f",
+            "result_thread_id": "<no attribute>",
+            "thread_id": "eda4eeedcc464514b078858c66c1b51f:ed9d7242259b4e7fa6ceaf36100d51e9",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "assistant",
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": [
+              {
+                "caller_handles_delivery": "true"
+              }
+            ]
+          },
+          {
+            "label": "plain Agent().run_stream('Hello.')",
+            "error": null,
+            "run_state": "completed",
+            "text": "openminion: Done.",
+            "session_id": "eda4eeedcc464514b078858c66c1b51f",
+            "result_thread_id": "<no attribute>",
+            "thread_id": "eda4eeedcc464514b078858c66c1b51f:f94aceea66784cbfab22300a66aec810",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "assistant",
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": [
+              {
+                "caller_handles_delivery": "true"
+              }
+            ]
+          },
+          {
+            "label": "forced-tool agent.run('Hello.') with session_id and timeout_seconds",
+            "error": null,
+            "run_state": "completed",
+            "text": "openminion: Done.",
+            "session_id": "ordinary-session",
+            "result_thread_id": "<no attribute>",
+            "thread_id": "ordinary-session:96782f4da9f1428eb6338065aa96b28a",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "assistant",
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "inbound_metadata": [
+              {
+                "caller_handles_delivery": "true"
+              }
+            ]
+          }
+        ],
+        "extra": {
+          "submit_turn": {
+            "handle_is_RuntimeTurnHandle": true,
+            "chunks": 12,
+            "all_TurnChunk": true,
+            "result_is_TurnResponse": true
+          }
+        }
+      }
+    }
+  ],
+  "observed": {
+    "cases": {
+      "resume": {
+        "extra": {},
+        "calls": [
+          {
+            "label": "first: agent.run(MSG1), no callback",
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "c984c2189305431fbe8280d6d911a64c",
+            "run_id": "6af4385734a14f03b4ce21bbf40969bd",
+            "result_thread_id": "<no attribute>",
+            "metadata_keys": [
+              "agent",
+              "authenticity_mode",
+              "authenticity_status",
+              "authenticity_verified",
+              "brain_status",
+              "brain_working_status",
+              "elapsed_ms",
+              "execution_id",
+              "finish_reason",
+              "identity_agent_id",
+              "identity_budget_max_tokens",
+              "identity_budget_used_tokens",
+              "identity_llm_policy_ref",
+              "identity_llm_policy_ref_enforced",
+              "identity_llm_policy_ref_warning",
+              "identity_profile_revision",
+              "identity_profile_version",
+              "identity_purpose",
+              "identity_render_version",
+              "inference_steps",
+              "invocation_id",
+              "invocation_scope",
+              "lab_required",
+              "llm_call_counts_by_purpose",
+              "llm_calls_count",
+              "max_single_call_input_tokens",
+              "max_single_call_output_tokens",
+              "max_single_call_total_tokens",
+              "memory_capsule_envelope_limit_chars",
+              "memory_capture_bundle_result",
+              "memory_capture_output_count",
+              "memory_capture_state",
+              "memory_context_reason",
+              "memory_context_record_count",
+              "memory_context_status",
+              "memory_enabled",
+              "memory_envelope_limit_chars",
+              "memory_envelope_truncated",
+              "memory_envelope_truncation_reasons",
+              "memory_envelope_version",
+              "memory_lane",
+              "model",
+              "pending_confirmation_command_id",
+              "persisted_inbound_message_id",
+              "persisted_outbound_message_id",
+              "prior_context_present",
+              "provider",
+              "request_id",
+              "respond_kind",
+              "run_id",
+              "run_state",
+              "run_stats_json",
+              "session_history_available",
+              "session_id",
+              "telemetry_recorded",
+              "terminal_capture_intent_receipt",
+              "thread_decision_action",
+              "thread_decision_reason",
+              "thread_id",
+              "thread_state_before",
+              "thread_state_qualifier",
+              "tool_calls_count",
+              "tool_loop_max_steps",
+              "tool_loop_termination_reason",
+              "total_input_tokens_used",
+              "total_output_tokens_used",
+              "total_tokens_used",
+              "turn_duration_ms"
+            ],
+            "thread_id": "c984c2189305431fbe8280d6d911a64c:4a2e3f95972948c9b849f657d102eceb",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": [
+              {
+                "message": "Remember that I write code in Iosevka 14.",
+                "session_id": "c984c2189305431fbe8280d6d911a64c",
+                "deliver": false,
+                "inbound_metadata": {
+                  "caller_handles_delivery": "true"
+                },
+                "forced_tools": [
+                  "memory.write"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "answer: agent.run('yes', thread_id=first.thread_id)",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          },
+          {
+            "label": "stale: agent.run('yes', thread_id=first.thread_id) again",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          }
+        ],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "fact_records": [],
+        "seconds": 3.1
+      },
+      "default-omitted": {
+        "extra": {},
+        "calls": [
+          {
+            "label": "first: agent.run(MSG1)",
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "8f247956d04c4195b2af36328a7b7d71",
+            "run_id": "85335c4a43ca4934add9b4e4af29e1bb",
+            "result_thread_id": "<no attribute>",
+            "metadata_keys": [
+              "agent",
+              "authenticity_mode",
+              "authenticity_status",
+              "authenticity_verified",
+              "brain_status",
+              "brain_working_status",
+              "elapsed_ms",
+              "execution_id",
+              "finish_reason",
+              "identity_agent_id",
+              "identity_budget_max_tokens",
+              "identity_budget_used_tokens",
+              "identity_llm_policy_ref",
+              "identity_llm_policy_ref_enforced",
+              "identity_llm_policy_ref_warning",
+              "identity_profile_revision",
+              "identity_profile_version",
+              "identity_purpose",
+              "identity_render_version",
+              "inference_steps",
+              "invocation_id",
+              "invocation_scope",
+              "lab_required",
+              "llm_call_counts_by_purpose",
+              "llm_calls_count",
+              "max_single_call_input_tokens",
+              "max_single_call_output_tokens",
+              "max_single_call_total_tokens",
+              "memory_capsule_envelope_limit_chars",
+              "memory_capture_bundle_result",
+              "memory_capture_output_count",
+              "memory_capture_state",
+              "memory_context_reason",
+              "memory_context_record_count",
+              "memory_context_status",
+              "memory_enabled",
+              "memory_envelope_limit_chars",
+              "memory_envelope_truncated",
+              "memory_envelope_truncation_reasons",
+              "memory_envelope_version",
+              "memory_lane",
+              "model",
+              "pending_confirmation_command_id",
+              "persisted_inbound_message_id",
+              "persisted_outbound_message_id",
+              "prior_context_present",
+              "provider",
+              "request_id",
+              "respond_kind",
+              "run_id",
+              "run_state",
+              "run_stats_json",
+              "session_history_available",
+              "session_id",
+              "telemetry_recorded",
+              "terminal_capture_intent_receipt",
+              "thread_decision_action",
+              "thread_decision_reason",
+              "thread_id",
+              "thread_state_before",
+              "thread_state_qualifier",
+              "tool_calls_count",
+              "tool_loop_max_steps",
+              "tool_loop_termination_reason",
+              "total_input_tokens_used",
+              "total_output_tokens_used",
+              "total_tokens_used",
+              "turn_duration_ms"
+            ],
+            "thread_id": "8f247956d04c4195b2af36328a7b7d71:e4eac469985d4a338b5dfd62f9fe3570",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": [
+              {
+                "message": "Remember that I write code in Iosevka 14.",
+                "session_id": "8f247956d04c4195b2af36328a7b7d71",
+                "deliver": false,
+                "inbound_metadata": {
+                  "caller_handles_delivery": "true"
+                },
+                "forced_tools": [
+                  "memory.write"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "reply: agent.run('yes')",
+            "run_state": "completed",
+            "text": "openminion: Done.",
+            "session_id": "8f247956d04c4195b2af36328a7b7d71",
+            "run_id": "0044b6319fd44da8aea7910c2892bb94",
+            "result_thread_id": "<no attribute>",
+            "metadata_keys": [
+              "agent",
+              "authenticity_mode",
+              "authenticity_status",
+              "authenticity_verified",
+              "brain_status",
+              "brain_working_status",
+              "elapsed_ms",
+              "execution_id",
+              "finish_reason",
+              "identity_agent_id",
+              "identity_budget_max_tokens",
+              "identity_budget_used_tokens",
+              "identity_llm_policy_ref",
+              "identity_llm_policy_ref_enforced",
+              "identity_llm_policy_ref_warning",
+              "identity_profile_revision",
+              "identity_profile_version",
+              "identity_purpose",
+              "identity_render_version",
+              "inference_steps",
+              "invocation_id",
+              "invocation_scope",
+              "lab_required",
+              "llm_call_counts_by_purpose",
+              "llm_calls_count",
+              "max_single_call_input_tokens",
+              "max_single_call_output_tokens",
+              "max_single_call_total_tokens",
+              "memory_capsule_envelope_limit_chars",
+              "memory_capture_bundle_result",
+              "memory_capture_output_count",
+              "memory_capture_state",
+              "memory_context_reason",
+              "memory_context_record_count",
+              "memory_context_status",
+              "memory_enabled",
+              "memory_envelope_limit_chars",
+              "memory_envelope_truncated",
+              "memory_envelope_truncation_reasons",
+              "memory_envelope_version",
+              "memory_lane",
+              "model",
+              "persisted_inbound_message_id",
+              "persisted_outbound_message_id",
+              "prior_context_present",
+              "provider",
+              "request_id",
+              "respond_kind",
+              "run_id",
+              "run_state",
+              "run_stats_json",
+              "session_history_available",
+              "session_id",
+              "telemetry_recorded",
+              "terminal_capture_intent_receipt",
+              "thread_decision_action",
+              "thread_decision_reason",
+              "thread_id",
+              "thread_state_before",
+              "thread_state_qualifier",
+              "tool_calls_count",
+              "tool_loop_max_steps",
+              "tool_loop_termination_reason",
+              "total_input_tokens_used",
+              "total_output_tokens_used",
+              "total_tokens_used",
+              "turn_duration_ms"
+            ],
+            "thread_id": "8f247956d04c4195b2af36328a7b7d71:06fa55a03c8941d9876287cf40722ca9",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "assistant",
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": [
+              {
+                "message": "yes",
+                "session_id": "8f247956d04c4195b2af36328a7b7d71",
+                "deliver": false,
+                "inbound_metadata": {
+                  "caller_handles_delivery": "true"
+                },
+                "forced_tools": [
+                  "memory.write"
+                ]
+              }
+            ]
+          }
+        ],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "fact_records": [],
+        "seconds": 2.9
+      },
+      "default-empty": {
+        "extra": {},
+        "calls": [
+          {
+            "label": "first: agent.run(MSG1)",
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "ca0f04ebb3e44c68b8f5c33b1dc81ab9",
+            "run_id": "210f2db4477d42a999d98e909f1276e1",
+            "result_thread_id": "<no attribute>",
+            "metadata_keys": [
+              "agent",
+              "authenticity_mode",
+              "authenticity_status",
+              "authenticity_verified",
+              "brain_status",
+              "brain_working_status",
+              "elapsed_ms",
+              "execution_id",
+              "finish_reason",
+              "identity_agent_id",
+              "identity_budget_max_tokens",
+              "identity_budget_used_tokens",
+              "identity_llm_policy_ref",
+              "identity_llm_policy_ref_enforced",
+              "identity_llm_policy_ref_warning",
+              "identity_profile_revision",
+              "identity_profile_version",
+              "identity_purpose",
+              "identity_render_version",
+              "inference_steps",
+              "invocation_id",
+              "invocation_scope",
+              "lab_required",
+              "llm_call_counts_by_purpose",
+              "llm_calls_count",
+              "max_single_call_input_tokens",
+              "max_single_call_output_tokens",
+              "max_single_call_total_tokens",
+              "memory_capsule_envelope_limit_chars",
+              "memory_capture_bundle_result",
+              "memory_capture_output_count",
+              "memory_capture_state",
+              "memory_context_reason",
+              "memory_context_record_count",
+              "memory_context_status",
+              "memory_enabled",
+              "memory_envelope_limit_chars",
+              "memory_envelope_truncated",
+              "memory_envelope_truncation_reasons",
+              "memory_envelope_version",
+              "memory_lane",
+              "model",
+              "pending_confirmation_command_id",
+              "persisted_inbound_message_id",
+              "persisted_outbound_message_id",
+              "prior_context_present",
+              "provider",
+              "request_id",
+              "respond_kind",
+              "run_id",
+              "run_state",
+              "run_stats_json",
+              "session_history_available",
+              "session_id",
+              "telemetry_recorded",
+              "terminal_capture_intent_receipt",
+              "thread_decision_action",
+              "thread_decision_reason",
+              "thread_id",
+              "thread_state_before",
+              "thread_state_qualifier",
+              "tool_calls_count",
+              "tool_loop_max_steps",
+              "tool_loop_termination_reason",
+              "total_input_tokens_used",
+              "total_output_tokens_used",
+              "total_tokens_used",
+              "turn_duration_ms"
+            ],
+            "thread_id": "ca0f04ebb3e44c68b8f5c33b1dc81ab9:89d9a38a8ee14ba9a0497e723ed1929a",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": [
+              {
+                "message": "Remember that I write code in Iosevka 14.",
+                "session_id": "ca0f04ebb3e44c68b8f5c33b1dc81ab9",
+                "deliver": false,
+                "inbound_metadata": {
+                  "caller_handles_delivery": "true"
+                },
+                "forced_tools": [
+                  "memory.write"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "reply: agent.run('yes', thread_id='')",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          }
+        ],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "fact_records": [],
+        "seconds": 2.5
+      },
+      "default-blank": {
+        "extra": {},
+        "calls": [
+          {
+            "label": "first: agent.run(MSG1)",
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "8a9d2af66a8a4fa7bc94ea8ee6b1ade2",
+            "run_id": "270d7a1a41be4145b4aec6a18e8ee75a",
+            "result_thread_id": "<no attribute>",
+            "metadata_keys": [
+              "agent",
+              "authenticity_mode",
+              "authenticity_status",
+              "authenticity_verified",
+              "brain_status",
+              "brain_working_status",
+              "elapsed_ms",
+              "execution_id",
+              "finish_reason",
+              "identity_agent_id",
+              "identity_budget_max_tokens",
+              "identity_budget_used_tokens",
+              "identity_llm_policy_ref",
+              "identity_llm_policy_ref_enforced",
+              "identity_llm_policy_ref_warning",
+              "identity_profile_revision",
+              "identity_profile_version",
+              "identity_purpose",
+              "identity_render_version",
+              "inference_steps",
+              "invocation_id",
+              "invocation_scope",
+              "lab_required",
+              "llm_call_counts_by_purpose",
+              "llm_calls_count",
+              "max_single_call_input_tokens",
+              "max_single_call_output_tokens",
+              "max_single_call_total_tokens",
+              "memory_capsule_envelope_limit_chars",
+              "memory_capture_bundle_result",
+              "memory_capture_output_count",
+              "memory_capture_state",
+              "memory_context_reason",
+              "memory_context_record_count",
+              "memory_context_status",
+              "memory_enabled",
+              "memory_envelope_limit_chars",
+              "memory_envelope_truncated",
+              "memory_envelope_truncation_reasons",
+              "memory_envelope_version",
+              "memory_lane",
+              "model",
+              "pending_confirmation_command_id",
+              "persisted_inbound_message_id",
+              "persisted_outbound_message_id",
+              "prior_context_present",
+              "provider",
+              "request_id",
+              "respond_kind",
+              "run_id",
+              "run_state",
+              "run_stats_json",
+              "session_history_available",
+              "session_id",
+              "telemetry_recorded",
+              "terminal_capture_intent_receipt",
+              "thread_decision_action",
+              "thread_decision_reason",
+              "thread_id",
+              "thread_state_before",
+              "thread_state_qualifier",
+              "tool_calls_count",
+              "tool_loop_max_steps",
+              "tool_loop_termination_reason",
+              "total_input_tokens_used",
+              "total_output_tokens_used",
+              "total_tokens_used",
+              "turn_duration_ms"
+            ],
+            "thread_id": "8a9d2af66a8a4fa7bc94ea8ee6b1ade2:daa1e2e5ff944085a5789786a3ee741f",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": [
+              {
+                "message": "Remember that I write code in Iosevka 14.",
+                "session_id": "8a9d2af66a8a4fa7bc94ea8ee6b1ade2",
+                "deliver": false,
+                "inbound_metadata": {
+                  "caller_handles_delivery": "true"
+                },
+                "forced_tools": [
+                  "memory.write"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "reply: agent.run('yes', thread_id='  ')",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          }
+        ],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "fact_records": [],
+        "seconds": 1.9
+      },
+      "two-threads": {
+        "extra": {},
+        "calls": [
+          {
+            "label": "first wait (ARGS1)",
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "804aee0da6b047268f4b94a3e7980993",
+            "run_id": "0f44785e1f934ca5ba842428c243dbef",
+            "result_thread_id": "<no attribute>",
+            "metadata_keys": [
+              "agent",
+              "authenticity_mode",
+              "authenticity_status",
+              "authenticity_verified",
+              "brain_status",
+              "brain_working_status",
+              "elapsed_ms",
+              "execution_id",
+              "finish_reason",
+              "identity_agent_id",
+              "identity_budget_max_tokens",
+              "identity_budget_used_tokens",
+              "identity_llm_policy_ref",
+              "identity_llm_policy_ref_enforced",
+              "identity_llm_policy_ref_warning",
+              "identity_profile_revision",
+              "identity_profile_version",
+              "identity_purpose",
+              "identity_render_version",
+              "inference_steps",
+              "invocation_id",
+              "invocation_scope",
+              "lab_required",
+              "llm_call_counts_by_purpose",
+              "llm_calls_count",
+              "max_single_call_input_tokens",
+              "max_single_call_output_tokens",
+              "max_single_call_total_tokens",
+              "memory_capsule_envelope_limit_chars",
+              "memory_capture_bundle_result",
+              "memory_capture_output_count",
+              "memory_capture_state",
+              "memory_context_reason",
+              "memory_context_record_count",
+              "memory_context_status",
+              "memory_enabled",
+              "memory_envelope_limit_chars",
+              "memory_envelope_truncated",
+              "memory_envelope_truncation_reasons",
+              "memory_envelope_version",
+              "memory_lane",
+              "model",
+              "pending_confirmation_command_id",
+              "persisted_inbound_message_id",
+              "persisted_outbound_message_id",
+              "prior_context_present",
+              "provider",
+              "request_id",
+              "respond_kind",
+              "run_id",
+              "run_state",
+              "run_stats_json",
+              "session_history_available",
+              "session_id",
+              "telemetry_recorded",
+              "terminal_capture_intent_receipt",
+              "thread_decision_action",
+              "thread_decision_reason",
+              "thread_id",
+              "thread_state_before",
+              "thread_state_qualifier",
+              "tool_calls_count",
+              "tool_loop_max_steps",
+              "tool_loop_termination_reason",
+              "total_input_tokens_used",
+              "total_output_tokens_used",
+              "total_tokens_used",
+              "turn_duration_ms"
+            ],
+            "thread_id": "804aee0da6b047268f4b94a3e7980993:44cf008bdfa546f9a38be708ddb36763",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": [
+              {
+                "message": "Remember that I write code in Iosevka 14.",
+                "session_id": "804aee0da6b047268f4b94a3e7980993",
+                "deliver": false,
+                "inbound_metadata": {
+                  "caller_handles_delivery": "true"
+                },
+                "forced_tools": [
+                  "memory.write"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "second wait (ARGS2), same session",
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "804aee0da6b047268f4b94a3e7980993",
+            "run_id": "8e37e3fd87a0413e9900f9cb1d524740",
+            "result_thread_id": "<no attribute>",
+            "metadata_keys": [
+              "agent",
+              "authenticity_mode",
+              "authenticity_status",
+              "authenticity_verified",
+              "brain_status",
+              "brain_working_status",
+              "elapsed_ms",
+              "execution_id",
+              "finish_reason",
+              "identity_agent_id",
+              "identity_budget_max_tokens",
+              "identity_budget_used_tokens",
+              "identity_llm_policy_ref",
+              "identity_llm_policy_ref_enforced",
+              "identity_llm_policy_ref_warning",
+              "identity_profile_revision",
+              "identity_profile_version",
+              "identity_purpose",
+              "identity_render_version",
+              "inference_steps",
+              "invocation_id",
+              "invocation_scope",
+              "lab_required",
+              "llm_call_counts_by_purpose",
+              "llm_calls_count",
+              "max_single_call_input_tokens",
+              "max_single_call_output_tokens",
+              "max_single_call_total_tokens",
+              "memory_capsule_envelope_limit_chars",
+              "memory_capture_bundle_result",
+              "memory_capture_output_count",
+              "memory_capture_state",
+              "memory_context_reason",
+              "memory_context_record_count",
+              "memory_context_status",
+              "memory_enabled",
+              "memory_envelope_limit_chars",
+              "memory_envelope_truncated",
+              "memory_envelope_truncation_reasons",
+              "memory_envelope_version",
+              "memory_lane",
+              "model",
+              "pending_confirmation_command_id",
+              "persisted_inbound_message_id",
+              "persisted_outbound_message_id",
+              "prior_context_present",
+              "provider",
+              "request_id",
+              "respond_kind",
+              "run_id",
+              "run_state",
+              "run_stats_json",
+              "session_history_available",
+              "session_id",
+              "telemetry_recorded",
+              "terminal_capture_intent_receipt",
+              "thread_decision_action",
+              "thread_decision_reason",
+              "thread_id",
+              "thread_state_before",
+              "thread_state_qualifier",
+              "tool_calls_count",
+              "tool_loop_max_steps",
+              "tool_loop_termination_reason",
+              "total_input_tokens_used",
+              "total_output_tokens_used",
+              "total_tokens_used",
+              "turn_duration_ms"
+            ],
+            "thread_id": "804aee0da6b047268f4b94a3e7980993:4984d05380564009952cc3b44979efcc",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-5",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": [
+              {
+                "message": "Remember that I prefer a light editor theme.",
+                "session_id": "804aee0da6b047268f4b94a3e7980993",
+                "deliver": false,
+                "inbound_metadata": {
+                  "caller_handles_delivery": "true"
+                },
+                "forced_tools": [
+                  "memory.write"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "answer the second thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          },
+          {
+            "label": "answer the first thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          }
+        ],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "fact_records": [],
+        "seconds": 2.7
+      },
+      "other-session": {
+        "extra": {
+          "owner_session": "ecda9be5ce03476d90c586c960c19349"
+        },
+        "calls": [
+          {
+            "label": "owner session wait (ARGS1)",
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "ecda9be5ce03476d90c586c960c19349",
+            "run_id": "9fd610e7a7a84649939496f5f73ec9e9",
+            "result_thread_id": "<no attribute>",
+            "metadata_keys": [
+              "agent",
+              "authenticity_mode",
+              "authenticity_status",
+              "authenticity_verified",
+              "brain_status",
+              "brain_working_status",
+              "elapsed_ms",
+              "execution_id",
+              "finish_reason",
+              "identity_agent_id",
+              "identity_budget_max_tokens",
+              "identity_budget_used_tokens",
+              "identity_llm_policy_ref",
+              "identity_llm_policy_ref_enforced",
+              "identity_llm_policy_ref_warning",
+              "identity_profile_revision",
+              "identity_profile_version",
+              "identity_purpose",
+              "identity_render_version",
+              "inference_steps",
+              "invocation_id",
+              "invocation_scope",
+              "lab_required",
+              "llm_call_counts_by_purpose",
+              "llm_calls_count",
+              "max_single_call_input_tokens",
+              "max_single_call_output_tokens",
+              "max_single_call_total_tokens",
+              "memory_capsule_envelope_limit_chars",
+              "memory_capture_bundle_result",
+              "memory_capture_output_count",
+              "memory_capture_state",
+              "memory_context_reason",
+              "memory_context_record_count",
+              "memory_context_status",
+              "memory_enabled",
+              "memory_envelope_limit_chars",
+              "memory_envelope_truncated",
+              "memory_envelope_truncation_reasons",
+              "memory_envelope_version",
+              "memory_lane",
+              "model",
+              "pending_confirmation_command_id",
+              "persisted_inbound_message_id",
+              "persisted_outbound_message_id",
+              "prior_context_present",
+              "provider",
+              "request_id",
+              "respond_kind",
+              "run_id",
+              "run_state",
+              "run_stats_json",
+              "session_history_available",
+              "session_id",
+              "telemetry_recorded",
+              "terminal_capture_intent_receipt",
+              "thread_decision_action",
+              "thread_decision_reason",
+              "thread_id",
+              "thread_state_before",
+              "thread_state_qualifier",
+              "tool_calls_count",
+              "tool_loop_max_steps",
+              "tool_loop_termination_reason",
+              "total_input_tokens_used",
+              "total_output_tokens_used",
+              "total_tokens_used",
+              "turn_duration_ms"
+            ],
+            "thread_id": "ecda9be5ce03476d90c586c960c19349:5028eab714fd4e4db913feeabbc3357d",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": [
+              {
+                "message": "Remember that I write code in Iosevka 14.",
+                "session_id": "ecda9be5ce03476d90c586c960c19349",
+                "deliver": false,
+                "inbound_metadata": {
+                  "caller_handles_delivery": "true"
+                },
+                "forced_tools": [
+                  "memory.write"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "other-session wait (ARGS2)",
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "other-session",
+            "run_id": "37a56a61bf544f3ab140f968f9192203",
+            "result_thread_id": "<no attribute>",
+            "metadata_keys": [
+              "agent",
+              "authenticity_mode",
+              "authenticity_status",
+              "authenticity_verified",
+              "brain_status",
+              "brain_working_status",
+              "elapsed_ms",
+              "execution_id",
+              "finish_reason",
+              "identity_agent_id",
+              "identity_budget_max_tokens",
+              "identity_budget_used_tokens",
+              "identity_llm_policy_ref",
+              "identity_llm_policy_ref_enforced",
+              "identity_llm_policy_ref_warning",
+              "identity_profile_revision",
+              "identity_profile_version",
+              "identity_purpose",
+              "identity_render_version",
+              "inference_steps",
+              "invocation_id",
+              "invocation_scope",
+              "lab_required",
+              "llm_call_counts_by_purpose",
+              "llm_calls_count",
+              "max_single_call_input_tokens",
+              "max_single_call_output_tokens",
+              "max_single_call_total_tokens",
+              "memory_capsule_envelope_limit_chars",
+              "memory_capture_bundle_result",
+              "memory_capture_output_count",
+              "memory_capture_state",
+              "memory_context_reason",
+              "memory_context_record_count",
+              "memory_context_status",
+              "memory_enabled",
+              "memory_envelope_limit_chars",
+              "memory_envelope_truncated",
+              "memory_envelope_truncation_reasons",
+              "memory_envelope_version",
+              "memory_lane",
+              "model",
+              "pending_confirmation_command_id",
+              "persisted_inbound_message_id",
+              "persisted_outbound_message_id",
+              "prior_context_present",
+              "provider",
+              "request_id",
+              "respond_kind",
+              "run_id",
+              "run_state",
+              "run_stats_json",
+              "session_history_available",
+              "session_id",
+              "telemetry_recorded",
+              "terminal_capture_intent_receipt",
+              "thread_decision_action",
+              "thread_decision_reason",
+              "thread_id",
+              "thread_state_before",
+              "thread_state_qualifier",
+              "tool_calls_count",
+              "tool_loop_max_steps",
+              "tool_loop_termination_reason",
+              "total_input_tokens_used",
+              "total_output_tokens_used",
+              "total_tokens_used",
+              "turn_duration_ms"
+            ],
+            "thread_id": "other-session:7bcb2890362244b8a5dc872c29cf5700",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-5",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": [
+              {
+                "message": "Remember that I prefer a light editor theme.",
+                "session_id": "other-session",
+                "deliver": false,
+                "inbound_metadata": {
+                  "caller_handles_delivery": "true"
+                },
+                "forced_tools": [
+                  "memory.write"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "crossed: other-session + owner's thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          },
+          {
+            "label": "crossed: new-session + owner's thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          },
+          {
+            "label": "crossed: owner's session + other-session's thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          },
+          {
+            "label": "own: owner's session + owner's thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          },
+          {
+            "label": "own: other-session + its thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          }
+        ],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "fact_records": [],
+        "seconds": 3.1
+      },
+      "other-agent": {
+        "extra": {
+          "owner_session": "4e16ac08c34641d281a9b5883d8cda33",
+          "helper_session": "e5aaa9edd7ae45e19c6fe884ab5a2e89"
+        },
+        "calls": [
+          {
+            "label": "owner wait (ARGS1)",
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "4e16ac08c34641d281a9b5883d8cda33",
+            "run_id": "2b3bf0a7df4048f790e68c7bdbd82358",
+            "result_thread_id": "<no attribute>",
+            "metadata_keys": [
+              "agent",
+              "authenticity_mode",
+              "authenticity_status",
+              "authenticity_verified",
+              "brain_status",
+              "brain_working_status",
+              "elapsed_ms",
+              "execution_id",
+              "finish_reason",
+              "identity_agent_id",
+              "identity_budget_max_tokens",
+              "identity_budget_used_tokens",
+              "identity_llm_policy_ref",
+              "identity_llm_policy_ref_enforced",
+              "identity_llm_policy_ref_warning",
+              "identity_profile_revision",
+              "identity_profile_version",
+              "identity_purpose",
+              "identity_render_version",
+              "inference_steps",
+              "invocation_id",
+              "invocation_scope",
+              "lab_required",
+              "llm_call_counts_by_purpose",
+              "llm_calls_count",
+              "max_single_call_input_tokens",
+              "max_single_call_output_tokens",
+              "max_single_call_total_tokens",
+              "memory_capsule_envelope_limit_chars",
+              "memory_capture_bundle_result",
+              "memory_capture_output_count",
+              "memory_capture_state",
+              "memory_context_reason",
+              "memory_context_record_count",
+              "memory_context_status",
+              "memory_enabled",
+              "memory_envelope_limit_chars",
+              "memory_envelope_truncated",
+              "memory_envelope_truncation_reasons",
+              "memory_envelope_version",
+              "memory_lane",
+              "model",
+              "pending_confirmation_command_id",
+              "persisted_inbound_message_id",
+              "persisted_outbound_message_id",
+              "prior_context_present",
+              "provider",
+              "request_id",
+              "respond_kind",
+              "run_id",
+              "run_state",
+              "run_stats_json",
+              "session_history_available",
+              "session_id",
+              "telemetry_recorded",
+              "terminal_capture_intent_receipt",
+              "thread_decision_action",
+              "thread_decision_reason",
+              "thread_id",
+              "thread_state_before",
+              "thread_state_qualifier",
+              "tool_calls_count",
+              "tool_loop_max_steps",
+              "tool_loop_termination_reason",
+              "total_input_tokens_used",
+              "total_output_tokens_used",
+              "total_tokens_used",
+              "turn_duration_ms"
+            ],
+            "thread_id": "4e16ac08c34641d281a9b5883d8cda33:1795b53640124d4d812eac021745b594",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": [
+              {
+                "message": "Remember that I write code in Iosevka 14.",
+                "session_id": "4e16ac08c34641d281a9b5883d8cda33",
+                "deliver": false,
+                "inbound_metadata": {
+                  "caller_handles_delivery": "true"
+                },
+                "agent_id": "openminion",
+                "forced_tools": [
+                  "memory.write"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "helper in the owner's session with the owner's thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          },
+          {
+            "label": "helper in its own session with the owner's thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          },
+          {
+            "label": "owner answers its thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          }
+        ],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "fact_records": [],
+        "seconds": 1.9
+      },
+      "cb-waiting-approve": {
+        "extra": {
+          "approvals": []
+        },
+        "calls": [
+          {
+            "label": "first wait (ARGS1)",
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "2f3cf0912b2b418f8781b5acb210c1f9",
+            "run_id": "77e1738b830a43efabd58d92e4fbe4c8",
+            "result_thread_id": "<no attribute>",
+            "metadata_keys": [
+              "agent",
+              "authenticity_mode",
+              "authenticity_status",
+              "authenticity_verified",
+              "brain_status",
+              "brain_working_status",
+              "elapsed_ms",
+              "execution_id",
+              "finish_reason",
+              "identity_agent_id",
+              "identity_budget_max_tokens",
+              "identity_budget_used_tokens",
+              "identity_llm_policy_ref",
+              "identity_llm_policy_ref_enforced",
+              "identity_llm_policy_ref_warning",
+              "identity_profile_revision",
+              "identity_profile_version",
+              "identity_purpose",
+              "identity_render_version",
+              "inference_steps",
+              "invocation_id",
+              "invocation_scope",
+              "lab_required",
+              "llm_call_counts_by_purpose",
+              "llm_calls_count",
+              "max_single_call_input_tokens",
+              "max_single_call_output_tokens",
+              "max_single_call_total_tokens",
+              "memory_capsule_envelope_limit_chars",
+              "memory_capture_bundle_result",
+              "memory_capture_output_count",
+              "memory_capture_state",
+              "memory_context_reason",
+              "memory_context_record_count",
+              "memory_context_status",
+              "memory_enabled",
+              "memory_envelope_limit_chars",
+              "memory_envelope_truncated",
+              "memory_envelope_truncation_reasons",
+              "memory_envelope_version",
+              "memory_lane",
+              "model",
+              "pending_confirmation_command_id",
+              "persisted_inbound_message_id",
+              "persisted_outbound_message_id",
+              "prior_context_present",
+              "provider",
+              "request_id",
+              "respond_kind",
+              "run_id",
+              "run_state",
+              "run_stats_json",
+              "session_history_available",
+              "session_id",
+              "telemetry_recorded",
+              "terminal_capture_intent_receipt",
+              "thread_decision_action",
+              "thread_decision_reason",
+              "thread_id",
+              "thread_state_before",
+              "thread_state_qualifier",
+              "tool_calls_count",
+              "tool_loop_max_steps",
+              "tool_loop_termination_reason",
+              "total_input_tokens_used",
+              "total_output_tokens_used",
+              "total_tokens_used",
+              "turn_duration_ms"
+            ],
+            "thread_id": "2f3cf0912b2b418f8781b5acb210c1f9:a470d4b87c37497f9cee84f9b82c205e",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": [
+              {
+                "message": "Remember that I write code in Iosevka 14.",
+                "session_id": "2f3cf0912b2b418f8781b5acb210c1f9",
+                "deliver": false,
+                "inbound_metadata": {
+                  "caller_handles_delivery": "true"
+                },
+                "forced_tools": [
+                  "memory.write"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "'yes' on its thread with a callback that returns True",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          }
+        ],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "fact_records": [],
+        "seconds": 2.1
+      },
+      "cb-waiting-deny": {
+        "extra": {
+          "approvals": []
+        },
+        "calls": [
+          {
+            "label": "first wait (ARGS1)",
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "19d4e9edf9734cb0ad66771426a86e36",
+            "run_id": "f06a17fa5b464130b555e2c17d4a2109",
+            "result_thread_id": "<no attribute>",
+            "metadata_keys": [
+              "agent",
+              "authenticity_mode",
+              "authenticity_status",
+              "authenticity_verified",
+              "brain_status",
+              "brain_working_status",
+              "elapsed_ms",
+              "execution_id",
+              "finish_reason",
+              "identity_agent_id",
+              "identity_budget_max_tokens",
+              "identity_budget_used_tokens",
+              "identity_llm_policy_ref",
+              "identity_llm_policy_ref_enforced",
+              "identity_llm_policy_ref_warning",
+              "identity_profile_revision",
+              "identity_profile_version",
+              "identity_purpose",
+              "identity_render_version",
+              "inference_steps",
+              "invocation_id",
+              "invocation_scope",
+              "lab_required",
+              "llm_call_counts_by_purpose",
+              "llm_calls_count",
+              "max_single_call_input_tokens",
+              "max_single_call_output_tokens",
+              "max_single_call_total_tokens",
+              "memory_capsule_envelope_limit_chars",
+              "memory_capture_bundle_result",
+              "memory_capture_output_count",
+              "memory_capture_state",
+              "memory_context_reason",
+              "memory_context_record_count",
+              "memory_context_status",
+              "memory_enabled",
+              "memory_envelope_limit_chars",
+              "memory_envelope_truncated",
+              "memory_envelope_truncation_reasons",
+              "memory_envelope_version",
+              "memory_lane",
+              "model",
+              "pending_confirmation_command_id",
+              "persisted_inbound_message_id",
+              "persisted_outbound_message_id",
+              "prior_context_present",
+              "provider",
+              "request_id",
+              "respond_kind",
+              "run_id",
+              "run_state",
+              "run_stats_json",
+              "session_history_available",
+              "session_id",
+              "telemetry_recorded",
+              "terminal_capture_intent_receipt",
+              "thread_decision_action",
+              "thread_decision_reason",
+              "thread_id",
+              "thread_state_before",
+              "thread_state_qualifier",
+              "tool_calls_count",
+              "tool_loop_max_steps",
+              "tool_loop_termination_reason",
+              "total_input_tokens_used",
+              "total_output_tokens_used",
+              "total_tokens_used",
+              "turn_duration_ms"
+            ],
+            "thread_id": "19d4e9edf9734cb0ad66771426a86e36:c2c0e78ab0d24abd9e772ff2250ff517",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": [
+              {
+                "message": "Remember that I write code in Iosevka 14.",
+                "session_id": "19d4e9edf9734cb0ad66771426a86e36",
+                "deliver": false,
+                "inbound_metadata": {
+                  "caller_handles_delivery": "true"
+                },
+                "forced_tools": [
+                  "memory.write"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "'yes' on its thread with a callback that returns False",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          }
+        ],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "fact_records": [],
+        "seconds": 2.0
+      },
+      "cb-new-approve": {
+        "extra": {
+          "approvals": []
+        },
+        "calls": [
+          {
+            "label": "settled turn: agent.run('Hello.')",
+            "run_state": "completed",
+            "text": "openminion: Done.",
+            "session_id": "659f10a6499e4287a05b4b2f93973e4f",
+            "run_id": "591307549d3a48b0a17ef7f8912f14fa",
+            "result_thread_id": "<no attribute>",
+            "metadata_keys": [
+              "agent",
+              "authenticity_mode",
+              "authenticity_status",
+              "authenticity_verified",
+              "brain_status",
+              "brain_working_status",
+              "elapsed_ms",
+              "execution_id",
+              "finish_reason",
+              "identity_agent_id",
+              "identity_budget_max_tokens",
+              "identity_budget_used_tokens",
+              "identity_llm_policy_ref",
+              "identity_llm_policy_ref_enforced",
+              "identity_llm_policy_ref_warning",
+              "identity_profile_revision",
+              "identity_profile_version",
+              "identity_purpose",
+              "identity_render_version",
+              "inference_steps",
+              "invocation_id",
+              "invocation_scope",
+              "lab_required",
+              "llm_call_counts_by_purpose",
+              "llm_calls_count",
+              "max_single_call_input_tokens",
+              "max_single_call_output_tokens",
+              "max_single_call_total_tokens",
+              "memory_capsule_envelope_limit_chars",
+              "memory_capture_bundle_result",
+              "memory_capture_output_count",
+              "memory_capture_state",
+              "memory_context_reason",
+              "memory_context_record_count",
+              "memory_context_status",
+              "memory_enabled",
+              "memory_envelope_limit_chars",
+              "memory_envelope_truncated",
+              "memory_envelope_truncation_reasons",
+              "memory_envelope_version",
+              "memory_lane",
+              "model",
+              "persisted_inbound_message_id",
+              "persisted_outbound_message_id",
+              "prior_context_present",
+              "provider",
+              "request_id",
+              "respond_kind",
+              "run_id",
+              "run_state",
+              "run_stats_json",
+              "session_history_available",
+              "session_id",
+              "telemetry_recorded",
+              "terminal_capture_intent_receipt",
+              "thread_decision_action",
+              "thread_decision_reason",
+              "thread_id",
+              "thread_state_before",
+              "thread_state_qualifier",
+              "tool_calls_count",
+              "tool_loop_max_steps",
+              "tool_loop_termination_reason",
+              "total_input_tokens_used",
+              "total_output_tokens_used",
+              "total_tokens_used",
+              "turn_duration_ms"
+            ],
+            "thread_id": "659f10a6499e4287a05b4b2f93973e4f:8716758acfd4440380b3f0ceb6d833d9",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "assistant",
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": [
+              {
+                "message": "Hello.",
+                "session_id": "659f10a6499e4287a05b4b2f93973e4f",
+                "deliver": false,
+                "inbound_metadata": {
+                  "caller_handles_delivery": "true"
+                },
+                "forced_tools": [
+                  "memory.write"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "new call (ARGS2) on that thread with a callback that returns True",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          }
+        ],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "fact_records": [],
+        "seconds": 1.8
+      },
+      "cb-new-deny": {
+        "extra": {
+          "approvals": []
+        },
+        "calls": [
+          {
+            "label": "settled turn: agent.run('Hello.')",
+            "run_state": "completed",
+            "text": "openminion: Done.",
+            "session_id": "11f80ad9c4a345838db5c73f787bfacd",
+            "run_id": "793733587f0e4a85aef43da48ca97d97",
+            "result_thread_id": "<no attribute>",
+            "metadata_keys": [
+              "agent",
+              "authenticity_mode",
+              "authenticity_status",
+              "authenticity_verified",
+              "brain_status",
+              "brain_working_status",
+              "elapsed_ms",
+              "execution_id",
+              "finish_reason",
+              "identity_agent_id",
+              "identity_budget_max_tokens",
+              "identity_budget_used_tokens",
+              "identity_llm_policy_ref",
+              "identity_llm_policy_ref_enforced",
+              "identity_llm_policy_ref_warning",
+              "identity_profile_revision",
+              "identity_profile_version",
+              "identity_purpose",
+              "identity_render_version",
+              "inference_steps",
+              "invocation_id",
+              "invocation_scope",
+              "lab_required",
+              "llm_call_counts_by_purpose",
+              "llm_calls_count",
+              "max_single_call_input_tokens",
+              "max_single_call_output_tokens",
+              "max_single_call_total_tokens",
+              "memory_capsule_envelope_limit_chars",
+              "memory_capture_bundle_result",
+              "memory_capture_output_count",
+              "memory_capture_state",
+              "memory_context_reason",
+              "memory_context_record_count",
+              "memory_context_status",
+              "memory_enabled",
+              "memory_envelope_limit_chars",
+              "memory_envelope_truncated",
+              "memory_envelope_truncation_reasons",
+              "memory_envelope_version",
+              "memory_lane",
+              "model",
+              "persisted_inbound_message_id",
+              "persisted_outbound_message_id",
+              "prior_context_present",
+              "provider",
+              "request_id",
+              "respond_kind",
+              "run_id",
+              "run_state",
+              "run_stats_json",
+              "session_history_available",
+              "session_id",
+              "telemetry_recorded",
+              "terminal_capture_intent_receipt",
+              "thread_decision_action",
+              "thread_decision_reason",
+              "thread_id",
+              "thread_state_before",
+              "thread_state_qualifier",
+              "tool_calls_count",
+              "tool_loop_max_steps",
+              "tool_loop_termination_reason",
+              "total_input_tokens_used",
+              "total_output_tokens_used",
+              "total_tokens_used",
+              "turn_duration_ms"
+            ],
+            "thread_id": "11f80ad9c4a345838db5c73f787bfacd:5456b10b8feb412b86e4b926f869e830",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "assistant",
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": [
+              {
+                "message": "Hello.",
+                "session_id": "11f80ad9c4a345838db5c73f787bfacd",
+                "deliver": false,
+                "inbound_metadata": {
+                  "caller_handles_delivery": "true"
+                },
+                "forced_tools": [
+                  "memory.write"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "new call (ARGS2) on that thread with a callback that returns False",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          }
+        ],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "fact_records": [],
+        "seconds": 1.9
+      },
+      "deny-reply": {
+        "extra": {},
+        "calls": [
+          {
+            "label": "first wait (ARGS1)",
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "8f79c7c33dda4d8694b34352a342ded5",
+            "run_id": "de039fc7467c49e0adc0cbcf5b5237df",
+            "result_thread_id": "<no attribute>",
+            "metadata_keys": [
+              "agent",
+              "authenticity_mode",
+              "authenticity_status",
+              "authenticity_verified",
+              "brain_status",
+              "brain_working_status",
+              "elapsed_ms",
+              "execution_id",
+              "finish_reason",
+              "identity_agent_id",
+              "identity_budget_max_tokens",
+              "identity_budget_used_tokens",
+              "identity_llm_policy_ref",
+              "identity_llm_policy_ref_enforced",
+              "identity_llm_policy_ref_warning",
+              "identity_profile_revision",
+              "identity_profile_version",
+              "identity_purpose",
+              "identity_render_version",
+              "inference_steps",
+              "invocation_id",
+              "invocation_scope",
+              "lab_required",
+              "llm_call_counts_by_purpose",
+              "llm_calls_count",
+              "max_single_call_input_tokens",
+              "max_single_call_output_tokens",
+              "max_single_call_total_tokens",
+              "memory_capsule_envelope_limit_chars",
+              "memory_capture_bundle_result",
+              "memory_capture_output_count",
+              "memory_capture_state",
+              "memory_context_reason",
+              "memory_context_record_count",
+              "memory_context_status",
+              "memory_enabled",
+              "memory_envelope_limit_chars",
+              "memory_envelope_truncated",
+              "memory_envelope_truncation_reasons",
+              "memory_envelope_version",
+              "memory_lane",
+              "model",
+              "pending_confirmation_command_id",
+              "persisted_inbound_message_id",
+              "persisted_outbound_message_id",
+              "prior_context_present",
+              "provider",
+              "request_id",
+              "respond_kind",
+              "run_id",
+              "run_state",
+              "run_stats_json",
+              "session_history_available",
+              "session_id",
+              "telemetry_recorded",
+              "terminal_capture_intent_receipt",
+              "thread_decision_action",
+              "thread_decision_reason",
+              "thread_id",
+              "thread_state_before",
+              "thread_state_qualifier",
+              "tool_calls_count",
+              "tool_loop_max_steps",
+              "tool_loop_termination_reason",
+              "total_input_tokens_used",
+              "total_output_tokens_used",
+              "total_tokens_used",
+              "turn_duration_ms"
+            ],
+            "thread_id": "8f79c7c33dda4d8694b34352a342ded5:cc9022a1a61945299b0f30e7ff6a424b",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": [
+              {
+                "message": "Remember that I write code in Iosevka 14.",
+                "session_id": "8f79c7c33dda4d8694b34352a342ded5",
+                "deliver": false,
+                "inbound_metadata": {
+                  "caller_handles_delivery": "true"
+                },
+                "forced_tools": [
+                  "memory.write"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "'no' on its thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          },
+          {
+            "label": "later 'yes' on its thread",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          }
+        ],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "fact_records": [],
+        "seconds": 2.1
+      },
+      "pre-cancelled": {
+        "extra": {},
+        "calls": [
+          {
+            "label": "first wait (ARGS1)",
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "06c089ea74234cdfb133d1dc262f70cd",
+            "run_id": "19dd2b30c9274e59b242ae62a97cc59e",
+            "result_thread_id": "<no attribute>",
+            "metadata_keys": [
+              "agent",
+              "authenticity_mode",
+              "authenticity_status",
+              "authenticity_verified",
+              "brain_status",
+              "brain_working_status",
+              "elapsed_ms",
+              "execution_id",
+              "finish_reason",
+              "identity_agent_id",
+              "identity_budget_max_tokens",
+              "identity_budget_used_tokens",
+              "identity_llm_policy_ref",
+              "identity_llm_policy_ref_enforced",
+              "identity_llm_policy_ref_warning",
+              "identity_profile_revision",
+              "identity_profile_version",
+              "identity_purpose",
+              "identity_render_version",
+              "inference_steps",
+              "invocation_id",
+              "invocation_scope",
+              "lab_required",
+              "llm_call_counts_by_purpose",
+              "llm_calls_count",
+              "max_single_call_input_tokens",
+              "max_single_call_output_tokens",
+              "max_single_call_total_tokens",
+              "memory_capsule_envelope_limit_chars",
+              "memory_capture_bundle_result",
+              "memory_capture_output_count",
+              "memory_capture_state",
+              "memory_context_reason",
+              "memory_context_record_count",
+              "memory_context_status",
+              "memory_enabled",
+              "memory_envelope_limit_chars",
+              "memory_envelope_truncated",
+              "memory_envelope_truncation_reasons",
+              "memory_envelope_version",
+              "memory_lane",
+              "model",
+              "pending_confirmation_command_id",
+              "persisted_inbound_message_id",
+              "persisted_outbound_message_id",
+              "prior_context_present",
+              "provider",
+              "request_id",
+              "respond_kind",
+              "run_id",
+              "run_state",
+              "run_stats_json",
+              "session_history_available",
+              "session_id",
+              "telemetry_recorded",
+              "terminal_capture_intent_receipt",
+              "thread_decision_action",
+              "thread_decision_reason",
+              "thread_id",
+              "thread_state_before",
+              "thread_state_qualifier",
+              "tool_calls_count",
+              "tool_loop_max_steps",
+              "tool_loop_termination_reason",
+              "total_input_tokens_used",
+              "total_output_tokens_used",
+              "total_tokens_used",
+              "turn_duration_ms"
+            ],
+            "thread_id": "06c089ea74234cdfb133d1dc262f70cd:71a9e47b05484101b56a8c9886e3fa6a",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": [
+              {
+                "message": "Remember that I write code in Iosevka 14.",
+                "session_id": "06c089ea74234cdfb133d1dc262f70cd",
+                "deliver": false,
+                "inbound_metadata": {
+                  "caller_handles_delivery": "true"
+                },
+                "forced_tools": [
+                  "memory.write"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "'yes' on its thread with cancel_event already set",
+            "error": "TypeError: Agent.run() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          }
+        ],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "fact_records": [],
+        "seconds": 2.0
+      },
+      "stream": {
+        "extra": {
+          "tool_events": [],
+          "status_event_handler_runs": [],
+          "events": 0,
+          "event_types": [],
+          "stale_events": 0,
+          "stale_tool_events": []
+        },
+        "calls": [
+          {
+            "label": "first wait (ARGS1)",
+            "run_state": "completed",
+            "text": "openminion: Policy confirmation required.\nmemory.write\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes o",
+            "session_id": "9e9370e9d69949f4a0deeaad99aafe2a",
+            "run_id": "7ba24ae9c61c4314942a7e4ef40025ea",
+            "result_thread_id": "<no attribute>",
+            "metadata_keys": [
+              "agent",
+              "authenticity_mode",
+              "authenticity_status",
+              "authenticity_verified",
+              "brain_status",
+              "brain_working_status",
+              "elapsed_ms",
+              "execution_id",
+              "finish_reason",
+              "identity_agent_id",
+              "identity_budget_max_tokens",
+              "identity_budget_used_tokens",
+              "identity_llm_policy_ref",
+              "identity_llm_policy_ref_enforced",
+              "identity_llm_policy_ref_warning",
+              "identity_profile_revision",
+              "identity_profile_version",
+              "identity_purpose",
+              "identity_render_version",
+              "inference_steps",
+              "invocation_id",
+              "invocation_scope",
+              "lab_required",
+              "llm_call_counts_by_purpose",
+              "llm_calls_count",
+              "max_single_call_input_tokens",
+              "max_single_call_output_tokens",
+              "max_single_call_total_tokens",
+              "memory_capsule_envelope_limit_chars",
+              "memory_capture_bundle_result",
+              "memory_capture_output_count",
+              "memory_capture_state",
+              "memory_context_reason",
+              "memory_context_record_count",
+              "memory_context_status",
+              "memory_enabled",
+              "memory_envelope_limit_chars",
+              "memory_envelope_truncated",
+              "memory_envelope_truncation_reasons",
+              "memory_envelope_version",
+              "memory_lane",
+              "model",
+              "pending_confirmation_command_id",
+              "persisted_inbound_message_id",
+              "persisted_outbound_message_id",
+              "prior_context_present",
+              "provider",
+              "request_id",
+              "respond_kind",
+              "run_id",
+              "run_state",
+              "run_stats_json",
+              "session_history_available",
+              "session_id",
+              "telemetry_recorded",
+              "terminal_capture_intent_receipt",
+              "thread_decision_action",
+              "thread_decision_reason",
+              "thread_id",
+              "thread_state_before",
+              "thread_state_qualifier",
+              "tool_calls_count",
+              "tool_loop_max_steps",
+              "tool_loop_termination_reason",
+              "total_input_tokens_used",
+              "total_output_tokens_used",
+              "total_tokens_used",
+              "turn_duration_ms"
+            ],
+            "thread_id": "9e9370e9d69949f4a0deeaad99aafe2a:a5b4b6b7f59b4492a41d3b100dbf5f3b",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "policy_confirmation_prompt",
+            "pending_confirmation_command_id": "call-memory_write-1",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": [
+              {
+                "message": "Remember that I write code in Iosevka 14.",
+                "session_id": "9e9370e9d69949f4a0deeaad99aafe2a",
+                "deliver": false,
+                "inbound_metadata": {
+                  "caller_handles_delivery": "true"
+                },
+                "forced_tools": [
+                  "memory.write"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "run_stream('yes', thread_id=...)",
+            "error": "TypeError: Agent.run_stream() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          },
+          {
+            "label": "stale run_stream('yes', thread_id=...)",
+            "error": "TypeError: Agent.run_stream() got an unexpected keyword argument 'thread_id'",
+            "error_type": "TypeError",
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": []
+          }
+        ],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "fact_records": [],
+        "seconds": 2.0
+      },
+      "doc-example": {
+        "case_error": "AttributeError: 'AgentRunResult' object has no attribute 'thread_id'",
+        "case_error_frames": [
+          "probe_541.py:183 wrap",
+          "probe_541.py:332 _doc",
+          "runtime-surfaces.md example:4 <module>"
+        ],
+        "calls": [],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "fact_records": [],
+        "seconds": 2.0
+      },
+      "ordinary": {
+        "extra": {
+          "submit_turn": {
+            "handle_is_RuntimeTurnHandle": true,
+            "chunks": 12,
+            "all_TurnChunk": true,
+            "result_is_TurnResponse": true
+          }
+        },
+        "calls": [
+          {
+            "label": "plain Agent().run('Hello.')",
+            "run_state": "completed",
+            "text": "openminion: Done.",
+            "session_id": "eda4eeedcc464514b078858c66c1b51f",
+            "run_id": "706f5c5dc61f473c9eab56f9c3a883b8",
+            "result_thread_id": "<no attribute>",
+            "metadata_keys": [
+              "agent",
+              "authenticity_mode",
+              "authenticity_status",
+              "authenticity_verified",
+              "brain_status",
+              "brain_working_status",
+              "elapsed_ms",
+              "execution_id",
+              "finish_reason",
+              "identity_agent_id",
+              "identity_budget_max_tokens",
+              "identity_budget_used_tokens",
+              "identity_llm_policy_ref",
+              "identity_llm_policy_ref_enforced",
+              "identity_llm_policy_ref_warning",
+              "identity_profile_revision",
+              "identity_profile_version",
+              "identity_purpose",
+              "identity_render_version",
+              "inference_steps",
+              "invocation_id",
+              "invocation_scope",
+              "lab_required",
+              "llm_call_counts_by_purpose",
+              "llm_calls_count",
+              "max_single_call_input_tokens",
+              "max_single_call_output_tokens",
+              "max_single_call_total_tokens",
+              "memory_capsule_envelope_limit_chars",
+              "memory_capture_bundle_result",
+              "memory_capture_output_count",
+              "memory_capture_state",
+              "memory_context_reason",
+              "memory_context_record_count",
+              "memory_context_status",
+              "memory_enabled",
+              "memory_envelope_limit_chars",
+              "memory_envelope_truncated",
+              "memory_envelope_truncation_reasons",
+              "memory_envelope_version",
+              "memory_lane",
+              "model",
+              "persisted_inbound_message_id",
+              "persisted_outbound_message_id",
+              "prior_context_present",
+              "provider",
+              "request_id",
+              "respond_kind",
+              "run_id",
+              "run_state",
+              "run_stats_json",
+              "session_history_available",
+              "session_id",
+              "telemetry_recorded",
+              "terminal_capture_intent_receipt",
+              "thread_decision_action",
+              "thread_decision_reason",
+              "thread_id",
+              "thread_state_before",
+              "thread_state_qualifier",
+              "tool_calls_count",
+              "tool_loop_max_steps",
+              "tool_loop_termination_reason",
+              "total_input_tokens_used",
+              "total_output_tokens_used",
+              "total_tokens_used",
+              "turn_duration_ms"
+            ],
+            "thread_id": "eda4eeedcc464514b078858c66c1b51f:ed9d7242259b4e7fa6ceaf36100d51e9",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "assistant",
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": [
+              {
+                "message": "Hello.",
+                "session_id": "eda4eeedcc464514b078858c66c1b51f",
+                "deliver": false,
+                "inbound_metadata": {
+                  "caller_handles_delivery": "true"
+                }
+              }
+            ]
+          },
+          {
+            "label": "plain Agent().run_stream('Hello.')",
+            "run_state": "completed",
+            "text": "openminion: Done.",
+            "session_id": "eda4eeedcc464514b078858c66c1b51f",
+            "run_id": "fb58932c7aa1402889d411a78811d12b",
+            "result_thread_id": "<no attribute>",
+            "metadata_keys": [
+              "agent",
+              "authenticity_mode",
+              "authenticity_status",
+              "authenticity_verified",
+              "brain_status",
+              "brain_working_status",
+              "elapsed_ms",
+              "execution_id",
+              "finish_reason",
+              "identity_agent_id",
+              "identity_budget_max_tokens",
+              "identity_budget_used_tokens",
+              "identity_llm_policy_ref",
+              "identity_llm_policy_ref_enforced",
+              "identity_llm_policy_ref_warning",
+              "identity_profile_revision",
+              "identity_profile_version",
+              "identity_purpose",
+              "identity_render_version",
+              "inference_steps",
+              "invocation_id",
+              "invocation_scope",
+              "lab_required",
+              "llm_call_counts_by_purpose",
+              "llm_calls_count",
+              "max_single_call_input_tokens",
+              "max_single_call_output_tokens",
+              "max_single_call_total_tokens",
+              "memory_capsule_envelope_limit_chars",
+              "memory_capture_bundle_result",
+              "memory_capture_output_count",
+              "memory_capture_state",
+              "memory_context_reason",
+              "memory_context_record_count",
+              "memory_context_status",
+              "memory_enabled",
+              "memory_envelope_limit_chars",
+              "memory_envelope_truncated",
+              "memory_envelope_truncation_reasons",
+              "memory_envelope_version",
+              "memory_lane",
+              "model",
+              "persisted_inbound_message_id",
+              "persisted_outbound_message_id",
+              "prior_context_present",
+              "provider",
+              "request_id",
+              "respond_kind",
+              "run_id",
+              "run_state",
+              "run_stats_json",
+              "session_history_available",
+              "session_id",
+              "telemetry_recorded",
+              "terminal_capture_intent_receipt",
+              "thread_decision_action",
+              "thread_decision_reason",
+              "thread_id",
+              "thread_state_before",
+              "thread_state_qualifier",
+              "tool_calls_count",
+              "tool_loop_max_steps",
+              "tool_loop_termination_reason",
+              "total_input_tokens_used",
+              "total_output_tokens_used",
+              "total_tokens_used",
+              "turn_duration_ms"
+            ],
+            "thread_id": "eda4eeedcc464514b078858c66c1b51f:f94aceea66784cbfab22300a66aec810",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "assistant",
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": [
+              {
+                "message": "Hello.",
+                "session_id": "eda4eeedcc464514b078858c66c1b51f",
+                "deliver": false,
+                "inbound_metadata": {
+                  "caller_handles_delivery": "true"
+                }
+              }
+            ]
+          },
+          {
+            "label": "forced-tool agent.run('Hello.') with session_id and timeout_seconds",
+            "run_state": "completed",
+            "text": "openminion: Done.",
+            "session_id": "ordinary-session",
+            "run_id": "02d9f2e08cf341329e3bf6a4f7fb51c3",
+            "result_thread_id": "<no attribute>",
+            "metadata_keys": [
+              "agent",
+              "authenticity_mode",
+              "authenticity_status",
+              "authenticity_verified",
+              "brain_status",
+              "brain_working_status",
+              "elapsed_ms",
+              "execution_id",
+              "finish_reason",
+              "identity_agent_id",
+              "identity_budget_max_tokens",
+              "identity_budget_used_tokens",
+              "identity_llm_policy_ref",
+              "identity_llm_policy_ref_enforced",
+              "identity_llm_policy_ref_warning",
+              "identity_profile_revision",
+              "identity_profile_version",
+              "identity_purpose",
+              "identity_render_version",
+              "inference_steps",
+              "invocation_id",
+              "invocation_scope",
+              "lab_required",
+              "llm_call_counts_by_purpose",
+              "llm_calls_count",
+              "max_single_call_input_tokens",
+              "max_single_call_output_tokens",
+              "max_single_call_total_tokens",
+              "memory_capsule_envelope_limit_chars",
+              "memory_capture_bundle_result",
+              "memory_capture_output_count",
+              "memory_capture_state",
+              "memory_context_reason",
+              "memory_context_record_count",
+              "memory_context_status",
+              "memory_enabled",
+              "memory_envelope_limit_chars",
+              "memory_envelope_truncated",
+              "memory_envelope_truncation_reasons",
+              "memory_envelope_version",
+              "memory_lane",
+              "model",
+              "persisted_inbound_message_id",
+              "persisted_outbound_message_id",
+              "prior_context_present",
+              "provider",
+              "request_id",
+              "respond_kind",
+              "run_id",
+              "run_state",
+              "run_stats_json",
+              "session_history_available",
+              "session_id",
+              "telemetry_recorded",
+              "terminal_capture_intent_receipt",
+              "thread_decision_action",
+              "thread_decision_reason",
+              "thread_id",
+              "thread_state_before",
+              "thread_state_qualifier",
+              "tool_calls_count",
+              "tool_loop_max_steps",
+              "tool_loop_termination_reason",
+              "total_input_tokens_used",
+              "total_output_tokens_used",
+              "total_tokens_used",
+              "turn_duration_ms"
+            ],
+            "thread_id": "ordinary-session:96782f4da9f1428eb6338065aa96b28a",
+            "thread_decision_action": "fork_thread",
+            "thread_decision_reason": "settled_without_resume",
+            "respond_kind": "assistant",
+            "pending_confirmation_command_id": null,
+            "handler_runs": [],
+            "handler_runs_total": 0,
+            "payloads": [
+              {
+                "message": "Hello.",
+                "session_id": "ordinary-session",
+                "deliver": false,
+                "inbound_metadata": {
+                  "caller_handles_delivery": "true"
+                },
+                "forced_tools": [
+                  "memory.write"
+                ],
+                "timeout_seconds": 60
+              }
+            ]
+          }
+        ],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "fact_records": [],
+        "seconds": 6.8
+      }
+    },
+    "agent_run_result_fields": [
+      "output",
+      "text",
+      "raw",
+      "run_id",
+      "run_state",
+      "session_id",
+      "id",
+      "metadata",
+      "stats"
+    ],
+    "positional": {
+      "9 positional (pre-0.1.17 fields)": {
+        "output": "out",
+        "text": "text",
+        "raw": {
+          "raw": 1
+        },
+        "run_id": "run-1",
+        "run_state": "completed",
+        "session_id": "sess-1",
+        "id": "id-1",
+        "metadata": {
+          "thread_id": "t-1"
+        },
+        "stats": {
+          "llm_calls": 1
+        }
+      },
+      "10 positional": "TypeError: AgentRunResult.__init__() takes from 4 to 10 positional arguments but 11 were given"
+    },
+    "doc_example": "first = agent.run(\"Remember that I write code in Iosevka 14.\")\nif first.metadata.get(\"respond_kind\") == \"policy_confirmation_prompt\":\n    # Answer the confirmation on the thread that is waiting for it.\n    answer = agent.run(\"yes\", thread_id=first.thread_id)\n"
+  }
+}

@@ -1,0 +1,230 @@
+# OpenMinion Runtime Surfaces
+
+Status: active
+Last updated: 2026-10-06
+
+Purpose: give developers one package-local map of the public `openminion`
+surfaces and when to use each one.
+
+## Primary surfaces
+
+### 1. Interactive CLI
+
+Use:
+
+1. `openminion`
+2. `python -m openminion`
+
+Best for:
+
+1. interactive local operator use,
+2. tool-using conversational work,
+3. terminal-first workflows.
+
+Notes:
+
+1. the default invocation launches the sole interactive terminal renderer on a TTY,
+2. piped input executes one request without mounting an interactive renderer,
+3. legacy `focus`, `chat`, `tui`, and `dashboard` command names are retired and rejected,
+4. startup creates a fresh session unless `--session <id>` is provided,
+5. `openminion room` creates and manages local human-agent room sessions; use
+   the returned room ID with `--session` to enter that room in the interactive
+   CLI.
+
+### 2. Python library API
+
+Use:
+
+1. `import openminion`
+2. `from openminion import Agent, ProviderError, tool`
+3. `from openminion.api import APIRuntime, Agent, RuntimeTurnHandle, TurnChunk, TurnResponse`
+
+Best for:
+
+1. embedding OpenMinion into Python applications,
+2. direct runtime composition,
+3. explicit turn execution from code,
+4. typed tool/handoff integration.
+
+`Agent` owns an isolated session by default. Pass `session_id` to the
+constructor or to `run()` when an application already owns the continuity key.
+Pass `config_path` for a project-owned config and `agent_id` to select a
+configured profile. Agent calls return their result to Python without console
+delivery, and `AgentRunResult.session_id` exposes the resolved continuity key.
+`Agent` also supports `with Agent(...) as agent:` for deterministic cleanup.
+`tools=None` keeps the configured default tool exposure; `tools=[]` disables
+application and orchestration tools for the turn. Explicit `handoffs` add their
+transfer tools to the list. Forced tool requests do not override an empty
+allowlist. Internal structured-output schemas may still be used for runtime
+reasoning; they cannot dispatch application tools.
+Its `run_stream()` method is a synchronous turn with a progress callback. For
+iterator streaming, cancellation, or explicit approval resolution, call
+`APIRuntime.submit_turn()` and use the returned `RuntimeTurnHandle`.
+`examples/sdk/submitted_stream.py` shows that lifecycle using public imports.
+
+`Agent.run()` and callback-progress `run_stream()` accept optional
+`timeout_seconds`, `approval_callback`, and `cancel_event` controls already
+owned by runtime ingress. Their results expose the canonical result ID,
+metadata, and stats alongside the existing output and continuity fields.
+Action-policy confirmations reach `approval_callback` before tool execution.
+Returning true grants that invocation once; false or a callback failure prevents
+execution. Without a callback, the interactive confirmation flow remains in
+place. Submitted turns deliver the same request through approval stream events.
+
+In that flow the turn ends with `respond_kind` `policy_confirmation_prompt` in
+its metadata, and the call waits on the turn's thread. A later `run()` without
+a thread starts a new thread, so it does not answer the confirmation. To answer
+it, pass the earlier result's `thread_id` to `run()` or `run_stream()`: the
+runtime then resumes that thread. Omitted or blank, `thread_id` changes
+nothing. A thread id from another session does not answer that session's
+confirmation, and with `approval_callback` the callback still decides.
+
+```python
+first = agent.run("Remember that I write code in Iosevka 14.")
+if first.metadata.get("respond_kind") == "policy_confirmation_prompt":
+    # Answer the confirmation on the thread that is waiting for it.
+    answer = agent.run("yes", thread_id=first.thread_id)
+```
+
+Stable exported root symbols are recorded in `API_COMPATIBILITY.md`.
+Advanced turn lifecycle types are exported from `openminion.api` rather than
+added to the root package.
+
+### 3. API runtime / server surface
+
+Use:
+
+1. `openminion.api.APIRuntime`
+2. `openminion.api.dispatch_request`
+
+Best for:
+
+1. local HTTP-serving integration,
+2. request/response adaptation,
+3. runtime composition that should stay outside the interactive CLI.
+
+### 4. Companion operator CLIs
+
+Use when you need narrower subsystem control:
+
+1. `telemetryctl`
+2. `opsctl`
+3. `openminiond`
+4. `openminion-tool`
+5. `identityctl`
+6. `openminion-controlplane`
+7. `runtimectl`
+8. `brainctl`
+9. `memctl`
+10. `sessctl`
+11. `contextctl` / `ctxctl`
+12. `agentregctl`
+13. `artifactctl`
+14. `openminion-controlplane-telegram`
+15. `openminion-controlplane-slack`
+16. `skill` / `skillctl`
+17. `a2actl`
+18. `rlmctl`
+19. `retrievectl`
+20. `policyctl`
+
+Best for:
+
+1. deterministic operator workflows,
+2. subsystem inspection,
+3. explicit local maintenance flows.
+
+### 5. Visual graph inspection
+
+Use:
+
+1. `openminion graph status`
+2. `openminion graph view --current`
+3. `openminion graph view --brain third --provider <name>`
+4. `/graph` inside the interactive CLI for copyable viewer commands
+
+Best for:
+
+1. checking whether the visual graph lens is ready before opening it,
+2. opening the current second-brain memory graph in the shared GraphFakos viewer,
+3. opening configured third-brain provider graphs when they expose a viewer
+   envelope or a PragmaGraph snapshot,
+4. inspecting nodes, relationships, provenance, citations, and provider status,
+5. embedding a provider-neutral graph lens in a host app without importing
+   OpenMinion internals.
+
+Notes:
+
+1. install `openminion[viewer]` to include GraphFakos and PragmaGraph snapshot
+   support,
+2. the visual surface is a lens over current graph state, not a memory backend
+   or graph indexer,
+3. `openminion graph status --json` reports GraphFakos availability, the
+   second-brain memory database path, active third-brain providers, visual
+   readiness, diagnostic codes, empty-memory guidance, and suggested next
+   commands,
+4. `openminion graph view --dry-run --json` builds the selected graph and
+   returns counts, filters, facets, provider details, empty-state metadata, and
+   a viewer-manifest summary without starting the local browser viewer,
+5. `openminion graph view --html-out viewer.html` writes a static visual page
+   for inspection or sharing,
+6. `openminion graph view --current --agent <id>` and
+   `openminion graph view --current --session <id>` narrow the second-brain
+   view to one memory scope,
+7. `openminion graph view --current --node-kind fact`, `--edge-kind`, `--tag`,
+   `--source`, `--min-score`, and `--evidence-filter` expose GraphFakos viewer
+   filters from the OpenMinion CLI,
+8. served local viewers route workbench forms through GraphFakos'
+   provider-neutral action handler, while the current Sophiagraph second-brain
+   lens returns explicit unsupported/provider-owned statuses for durable writes,
+9. served second-brain viewers can stream GraphFakos live `snapshot_reset`
+   patches through the local `/api/live` event stream when Sophiagraph memory
+   changes; static HTML and JSON probes refresh by rerunning the same viewer
+   command,
+10. see `docs/graph-viewer.md` and `examples/graph-viewer/` for a copyable
+   third-brain provider envelope.
+
+### 6. ACP and published MCP
+
+Use `openminion acp` for a local Agent Client Protocol connection. ACP sends
+assistant text plus tool-call lifecycle updates (`in_progress`, `completed`,
+or `failed`). Tool arguments and tool output are not copied into those progress
+updates; approvals continue through ACP's permission request.
+
+When `runtime.mcp_publish` is enabled, `openminion mcp serve` publishes the
+allowed runtime tools over MCP. Published tools declare input and output
+schemas. Successful calls return the same JSON object as a text content block
+and as `structuredContent`; output that does not match the declared schema is
+returned as an MCP tool error.
+
+## Example surfaces
+
+The package-owned `examples/` tree is part of the public teaching surface:
+
+1. `examples/starter/provider.py`
+2. `examples/starter/channel.py`
+3. `examples/starter/hello.py`
+4. `examples/starter/tool.py`
+5. `examples/starter/hello.manifest.json`
+6. `examples/starter/quickstart.py`
+7. `examples/agents/hello/`
+8. `examples/skills/hello/`
+9. `examples/modules/sample/`
+
+The root `openminion` and `openminion.api` imports used by these examples are
+public package surfaces. Extension examples mirror the current scaffold output;
+their narrower deep imports are maintained teaching contracts for the pre-1.0
+line, not stability promises for the rest of their package trees.
+
+## Not blanket public
+
+Importable does not automatically mean stable public API.
+
+Treat these trees as internal/package-owned unless a narrower doc says
+otherwise:
+
+1. `openminion.modules.*`
+2. `openminion.services.*`
+3. `openminion.tools.*`
+4. `tests/`
+5. `scripts/`

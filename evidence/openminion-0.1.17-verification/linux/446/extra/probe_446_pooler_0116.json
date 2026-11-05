@@ -1,0 +1,562 @@
+{
+  "banner": {
+    "probe": "probe_446_pooler",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.16",
+    "python": "3.12.16",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<RUNNER_TEMP>/empty",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "server": "PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+    "pgbouncer": [
+      "PgBouncer 1.22.0"
+    ]
+  },
+  "summary": {
+    "passed": 0,
+    "failed": 12,
+    "total": 12
+  },
+  "checks": [
+    {
+      "check": "pooler (PgBouncer defaults, transaction pooling): a connection with options=-c search_path is rejected (\"unsupported startup parameter in options: search_path\"), so the memory, registry and A2A audit stores cannot connect; the database is unchanged",
+      "pass": false,
+      "observed": {
+        "plain": "OperationalError: (psycopg.OperationalError) connection failed: connection to server at \"127.0.0.1\", port 6433 failed: FATAL: unsupported startup parameter in options: search_path (Background on this  ...",
+        "stores": {
+          "a2a_audit_store": "RuntimeError: Alembic upgrade failed for module 'a2a': Can't locate revision identified by '0004_namespace'"
+        }
+      }
+    },
+    {
+      "check": "pooler (defaults): runtime storage (configured URL unchanged) starts through PgBouncer at v15",
+      "pass": false,
+      "observed": [
+        false,
+        "MigrationError: Migration v4 (add_vector_memory_tables) failed: (psycopg.errors.DuplicateTable) relation \"memory_records\" already exists [SQL: CREATE TABLE memory_records ( id TEXT PRIMARY KEY, session_id TEXT NOT NULL, message_id TEXT, event_id INTEGER, chunk_ref TEXT NOT NULL DEFAULT '', content TEXT NOT NULL, content_type TEXT NOT NULL DEFAULT 'text', scope TEXT NOT NULL DEFAULT 'session', agent_id TEXT NOT NULL DEFAULT '', project_id TEXT NOT NULL DEFAULT '', idempotency_key TEXT NOT NULL UNIQUE, importance INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP ) ] (Background on this error at: https://sqlalche.me/e/21/f405)"
+      ]
+    },
+    {
+      "check": "pooler (defaults): `openminion storage migrate --backend postgres` through PgBouncer exits 0 with every module ok in public__<id> at its head, and a rerun exits 0",
+      "pass": false,
+      "observed": {
+        "exit": 1,
+        "statuses": {
+          "secret": "error",
+          "session": "error",
+          "identity": "error",
+          "registry": "error",
+          "task": "error",
+          "skill": "error",
+          "policy": "error",
+          "compress": "error",
+          "retrieve": "error",
+          "artifact": "error",
+          "a2a": "error",
+          "memory": "ok",
+          "controlplane": "error",
+          "telemetry": "error"
+        }
+      }
+    },
+    {
+      "check": "pooler (defaults): pointed at the server directly, every module store opens",
+      "pass": false,
+      "observed": {
+        "memory_store": true,
+        "a2a_audit_store": false,
+        "a2a_state_store": true,
+        "session_store": false,
+        "controlplane_store": true,
+        "telemetry_store": false,
+        "registry_store": true,
+        "artifact_store": true,
+        "identity_store": true,
+        "policy_store": true,
+        "retrieve_store": true,
+        "skill_store": true,
+        "task_store": true,
+        "compress_store": true
+      }
+    },
+    {
+      "check": "pooler (ignore_startup_parameters = options): the connection is accepted but keeps search_path '\"$user\", public'; the memory, registry and A2A audit stores are refused before any write with the landing message (\"did not apply the URL's options parameter\", \"Connect module stores directly\", \"Nothing was written\"); the database is unchanged",
+      "pass": false,
+      "observed": {
+        "plain": [
+          true,
+          "\"$user\", public"
+        ],
+        "stores": {
+          "a2a_audit_store": "RuntimeError: Alembic upgrade failed for module 'a2a': Can't locate revision identified by '0004_namespace'"
+        }
+      }
+    },
+    {
+      "check": "pooler (ignore_startup_parameters = options): runtime storage (configured URL unchanged) starts through PgBouncer at v15",
+      "pass": false,
+      "observed": [
+        false,
+        "MigrationError: Migration v4 (add_vector_memory_tables) failed: (psycopg.errors.DuplicateTable) relation \"memory_records\" already exists [SQL: CREATE TABLE memory_records ( id TEXT PRIMARY KEY, session_id TEXT NOT NULL, message_id TEXT, event_id INTEGER, chunk_ref TEXT NOT NULL DEFAULT '', content TEXT NOT NULL, content_type TEXT NOT NULL DEFAULT 'text', scope TEXT NOT NULL DEFAULT 'session', agent_id TEXT NOT NULL DEFAULT '', project_id TEXT NOT NULL DEFAULT '', idempotency_key TEXT NOT NULL UNIQUE, importance INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP ) ] (Background on this error at: https://sqlalche.me/e/21/f405)"
+      ]
+    },
+    {
+      "check": "pooler (ignore_startup_parameters = options): `openminion storage migrate --backend postgres` through PgBouncer exits 0 with every module ok in public__<id> at its head, and a rerun exits 0",
+      "pass": false,
+      "observed": {
+        "exit": 1,
+        "statuses": {
+          "secret": "error",
+          "session": "error",
+          "identity": "error",
+          "registry": "error",
+          "task": "error",
+          "skill": "error",
+          "policy": "error",
+          "compress": "error",
+          "retrieve": "error",
+          "artifact": "error",
+          "a2a": "error",
+          "memory": "ok",
+          "controlplane": "error",
+          "telemetry": "error"
+        }
+      }
+    },
+    {
+      "check": "pooler (ignore_startup_parameters = options): pointed at the server directly, every module store opens",
+      "pass": false,
+      "observed": {
+        "memory_store": true,
+        "a2a_audit_store": false,
+        "a2a_state_store": true,
+        "session_store": false,
+        "controlplane_store": true,
+        "telemetry_store": false,
+        "registry_store": true,
+        "artifact_store": true,
+        "identity_store": true,
+        "policy_store": true,
+        "retrieve_store": true,
+        "skill_store": true,
+        "task_store": true,
+        "compress_store": true
+      }
+    },
+    {
+      "check": "pooler (track_extra_parameters = search_path): the connection is accepted but keeps search_path '\"$user\", public'; the memory, registry and A2A audit stores are refused before any write with the landing message (\"did not apply the URL's options parameter\", \"Connect module stores directly\", \"Nothing was written\"); the database is unchanged",
+      "pass": false,
+      "observed": {
+        "plain": [
+          true,
+          "\"$user\", public"
+        ],
+        "stores": {
+          "a2a_audit_store": "RuntimeError: Alembic upgrade failed for module 'a2a': Can't locate revision identified by '0004_namespace'"
+        }
+      }
+    },
+    {
+      "check": "pooler (track_extra_parameters = search_path): runtime storage (configured URL unchanged) starts through PgBouncer at v15",
+      "pass": false,
+      "observed": [
+        false,
+        "MigrationError: Migration v4 (add_vector_memory_tables) failed: (psycopg.errors.DuplicateTable) relation \"memory_records\" already exists [SQL: CREATE TABLE memory_records ( id TEXT PRIMARY KEY, session_id TEXT NOT NULL, message_id TEXT, event_id INTEGER, chunk_ref TEXT NOT NULL DEFAULT '', content TEXT NOT NULL, content_type TEXT NOT NULL DEFAULT 'text', scope TEXT NOT NULL DEFAULT 'session', agent_id TEXT NOT NULL DEFAULT '', project_id TEXT NOT NULL DEFAULT '', idempotency_key TEXT NOT NULL UNIQUE, importance INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP ) ] (Background on this error at: https://sqlalche.me/e/21/f405)"
+      ]
+    },
+    {
+      "check": "pooler (track_extra_parameters = search_path): `openminion storage migrate --backend postgres` through PgBouncer exits 0 with every module ok in public__<id> at its head, and a rerun exits 0",
+      "pass": false,
+      "observed": {
+        "exit": 1,
+        "statuses": {
+          "secret": "error",
+          "session": "error",
+          "identity": "error",
+          "registry": "error",
+          "task": "error",
+          "skill": "error",
+          "policy": "error",
+          "compress": "error",
+          "retrieve": "error",
+          "artifact": "error",
+          "a2a": "error",
+          "memory": "ok",
+          "controlplane": "error",
+          "telemetry": "error"
+        }
+      }
+    },
+    {
+      "check": "pooler (track_extra_parameters = search_path): pointed at the server directly, every module store opens",
+      "pass": false,
+      "observed": {
+        "memory_store": true,
+        "a2a_audit_store": false,
+        "a2a_state_store": true,
+        "session_store": false,
+        "controlplane_store": true,
+        "telemetry_store": false,
+        "registry_store": true,
+        "artifact_store": true,
+        "identity_store": true,
+        "policy_store": true,
+        "retrieve_store": true,
+        "skill_store": true,
+        "task_store": true,
+        "compress_store": true
+      }
+    }
+  ],
+  "results": {
+    "defaults": {
+      "plain": [
+        false,
+        "OperationalError: (psycopg.OperationalError) connection failed: connection to server at \"127.0.0.1\", port 6433 failed: FATAL: unsupported startup parameter in options: search_path (Background on this error at: https://sqlalche.me/e/21/e3q8)"
+      ],
+      "stores": {
+        "memory_store": [
+          true,
+          "PostgresMemoryStore"
+        ],
+        "registry_store": [
+          true,
+          "PostgresRegistryStore"
+        ],
+        "a2a_audit_store": [
+          false,
+          "RuntimeError: Alembic upgrade failed for module 'a2a': Can't locate revision identified by '0004_namespace'"
+        ]
+      },
+      "unchanged_after_stores": false,
+      "runtime": [
+        false,
+        "MigrationError: Migration v4 (add_vector_memory_tables) failed: (psycopg.errors.DuplicateTable) relation \"memory_records\" already exists [SQL: CREATE TABLE memory_records ( id TEXT PRIMARY KEY, session_id TEXT NOT NULL, message_id TEXT, event_id INTEGER, chunk_ref TEXT NOT NULL DEFAULT '', content TEXT NOT NULL, content_type TEXT NOT NULL DEFAULT 'text', scope TEXT NOT NULL DEFAULT 'session', agent_id TEXT NOT NULL DEFAULT '', project_id TEXT NOT NULL DEFAULT '', idempotency_key TEXT NOT NULL UNIQUE, importance INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP ) ] (Background on this error at: https://sqlalche.me/e/21/f405)"
+      ],
+      "migrate": {
+        "exit": 1,
+        "statuses": {
+          "secret": "error",
+          "session": "error",
+          "identity": "error",
+          "registry": "error",
+          "task": "error",
+          "skill": "error",
+          "policy": "error",
+          "compress": "error",
+          "retrieve": "error",
+          "artifact": "error",
+          "a2a": "error",
+          "memory": "ok",
+          "controlplane": "error",
+          "telemetry": "error"
+        }
+      },
+      "rerun": 1,
+      "schemas": [
+        "public"
+      ],
+      "direct_stores": {
+        "memory_store": true,
+        "a2a_audit_store": false,
+        "a2a_state_store": true,
+        "session_store": false,
+        "controlplane_store": true,
+        "telemetry_store": false,
+        "registry_store": true,
+        "artifact_store": true,
+        "identity_store": true,
+        "policy_store": true,
+        "retrieve_store": true,
+        "skill_store": true,
+        "task_store": true,
+        "compress_store": true
+      },
+      "module_ledgers": {
+        "secret": false,
+        "session": false,
+        "identity": false,
+        "registry": false,
+        "task": false,
+        "skill": false,
+        "policy": false,
+        "compress": false,
+        "retrieve": false,
+        "artifact": false,
+        "a2a": false,
+        "memory": false,
+        "controlplane": false,
+        "telemetry": false
+      },
+      "pgbouncer_log": "2026-11-05 05:02:38.155 UTC [4023] WARNING C-0x5631f6130b80: (nodb)/(nouser)@127.0.0.1:52166 unsupported startup parameter in options: search_path=\"probe_schema\"\n2026-11-05 05:02:38.155 UTC [4023] LOG C-0x5631f6130b80: (nodb)/(nouser)@127.0.0.1:52166 closing because: unsupported startup parameter in options: search_path (age=0s)\n2026-11-05 05:02:38.155 UTC [4023] WARNING C-0x5631f6130b80: (nodb)/(nouser)@127.0.0.1:52166 pooler error: unsupported startup parameter in options: search_path"
+    },
+    "ignore_startup_parameters = options": {
+      "plain": [
+        true,
+        "\"$user\", public"
+      ],
+      "stores": {
+        "memory_store": [
+          true,
+          "PostgresMemoryStore"
+        ],
+        "registry_store": [
+          true,
+          "PostgresRegistryStore"
+        ],
+        "a2a_audit_store": [
+          false,
+          "RuntimeError: Alembic upgrade failed for module 'a2a': Can't locate revision identified by '0004_namespace'"
+        ]
+      },
+      "unchanged_after_stores": false,
+      "runtime": [
+        false,
+        "MigrationError: Migration v4 (add_vector_memory_tables) failed: (psycopg.errors.DuplicateTable) relation \"memory_records\" already exists [SQL: CREATE TABLE memory_records ( id TEXT PRIMARY KEY, session_id TEXT NOT NULL, message_id TEXT, event_id INTEGER, chunk_ref TEXT NOT NULL DEFAULT '', content TEXT NOT NULL, content_type TEXT NOT NULL DEFAULT 'text', scope TEXT NOT NULL DEFAULT 'session', agent_id TEXT NOT NULL DEFAULT '', project_id TEXT NOT NULL DEFAULT '', idempotency_key TEXT NOT NULL UNIQUE, importance INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP ) ] (Background on this error at: https://sqlalche.me/e/21/f405)"
+      ],
+      "migrate": {
+        "exit": 1,
+        "statuses": {
+          "secret": "error",
+          "session": "error",
+          "identity": "error",
+          "registry": "error",
+          "task": "error",
+          "skill": "error",
+          "policy": "error",
+          "compress": "error",
+          "retrieve": "error",
+          "artifact": "error",
+          "a2a": "error",
+          "memory": "ok",
+          "controlplane": "error",
+          "telemetry": "error"
+        }
+      },
+      "rerun": 1,
+      "schemas": [
+        "public"
+      ],
+      "direct_stores": {
+        "memory_store": true,
+        "a2a_audit_store": false,
+        "a2a_state_store": true,
+        "session_store": false,
+        "controlplane_store": true,
+        "telemetry_store": false,
+        "registry_store": true,
+        "artifact_store": true,
+        "identity_store": true,
+        "policy_store": true,
+        "retrieve_store": true,
+        "skill_store": true,
+        "task_store": true,
+        "compress_store": true
+      },
+      "module_ledgers": {
+        "secret": false,
+        "session": false,
+        "identity": false,
+        "registry": false,
+        "task": false,
+        "skill": false,
+        "policy": false,
+        "compress": false,
+        "retrieve": false,
+        "artifact": false,
+        "a2a": false,
+        "memory": false,
+        "controlplane": false,
+        "telemetry": false
+      },
+      "pgbouncer_log": ""
+    },
+    "track_extra_parameters = search_path": {
+      "plain": [
+        true,
+        "\"$user\", public"
+      ],
+      "stores": {
+        "memory_store": [
+          true,
+          "PostgresMemoryStore"
+        ],
+        "registry_store": [
+          true,
+          "PostgresRegistryStore"
+        ],
+        "a2a_audit_store": [
+          false,
+          "RuntimeError: Alembic upgrade failed for module 'a2a': Can't locate revision identified by '0004_namespace'"
+        ]
+      },
+      "unchanged_after_stores": false,
+      "runtime": [
+        false,
+        "MigrationError: Migration v4 (add_vector_memory_tables) failed: (psycopg.errors.DuplicateTable) relation \"memory_records\" already exists [SQL: CREATE TABLE memory_records ( id TEXT PRIMARY KEY, session_id TEXT NOT NULL, message_id TEXT, event_id INTEGER, chunk_ref TEXT NOT NULL DEFAULT '', content TEXT NOT NULL, content_type TEXT NOT NULL DEFAULT 'text', scope TEXT NOT NULL DEFAULT 'session', agent_id TEXT NOT NULL DEFAULT '', project_id TEXT NOT NULL DEFAULT '', idempotency_key TEXT NOT NULL UNIQUE, importance INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP ) ] (Background on this error at: https://sqlalche.me/e/21/f405)"
+      ],
+      "migrate": {
+        "exit": 1,
+        "statuses": {
+          "secret": "error",
+          "session": "error",
+          "identity": "error",
+          "registry": "error",
+          "task": "error",
+          "skill": "error",
+          "policy": "error",
+          "compress": "error",
+          "retrieve": "error",
+          "artifact": "error",
+          "a2a": "error",
+          "memory": "ok",
+          "controlplane": "error",
+          "telemetry": "error"
+        }
+      },
+      "rerun": 1,
+      "schemas": [
+        "public"
+      ],
+      "direct_stores": {
+        "memory_store": true,
+        "a2a_audit_store": false,
+        "a2a_state_store": true,
+        "session_store": false,
+        "controlplane_store": true,
+        "telemetry_store": false,
+        "registry_store": true,
+        "artifact_store": true,
+        "identity_store": true,
+        "policy_store": true,
+        "retrieve_store": true,
+        "skill_store": true,
+        "task_store": true,
+        "compress_store": true
+      },
+      "module_ledgers": {
+        "secret": false,
+        "session": false,
+        "identity": false,
+        "registry": false,
+        "task": false,
+        "skill": false,
+        "policy": false,
+        "compress": false,
+        "retrieve": false,
+        "artifact": false,
+        "a2a": false,
+        "memory": false,
+        "controlplane": false,
+        "telemetry": false
+      },
+      "pgbouncer_log": ""
+    }
+  },
+  "commands": [
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--backend",
+        "postgres",
+        "--postgres-url",
+        "postgresql+psycopg://postgres:%2A%2A%2A@<host>:6433/<db>",
+        "--json"
+      ],
+      "exit": 1,
+      "stderr": "",
+      "cwd_left": [],
+      "seconds": 1.66,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"storage\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"controlplane_telegram\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"authoring\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"brain\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"commerce\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"session\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'session': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"artifact\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'artifact': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"registry\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'registry': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"identity\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'identity': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"policy\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'policy': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"secret\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'secret': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"telemetry\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'telemetry': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"controlplane\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'controlplane': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"retrieve\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'retrieve': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"memory\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"skill\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'skill': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"a2a\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'a2a': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'compress': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"task\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'task': Can't locate revision identified by '0004_namespace'\"\n    }\n  ]\n}\n"
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--backend",
+        "postgres",
+        "--postgres-url",
+        "postgresql+psycopg://postgres:%2A%2A%2A@<host>:6433/<db>",
+        "--json"
+      ],
+      "exit": 1,
+      "stderr": "",
+      "cwd_left": [],
+      "seconds": 1.85,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"storage\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"controlplane_telegram\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"authoring\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"brain\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"commerce\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"session\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'session': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"artifact\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'artifact': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"registry\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'registry': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"identity\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'identity': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"policy\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'policy': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"secret\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'secret': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"telemetry\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'telemetry': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"controlplane\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'controlplane': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"retrieve\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'retrieve': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"memory\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"skill\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'skill': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"a2a\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'a2a': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'compress': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"task\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'task': Can't locate revision identified by '0004_namespace'\"\n    }\n  ]\n}\n"
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--backend",
+        "postgres",
+        "--postgres-url",
+        "postgresql+psycopg://postgres:%2A%2A%2A@<host>:6433/<db>",
+        "--json"
+      ],
+      "exit": 1,
+      "stderr": "",
+      "cwd_left": [],
+      "seconds": 1.72,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"storage\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"controlplane_telegram\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"authoring\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"brain\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"commerce\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"session\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'session': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"artifact\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'artifact': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"registry\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'registry': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"identity\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'identity': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"policy\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'policy': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"secret\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'secret': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"telemetry\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'telemetry': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"controlplane\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'controlplane': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"retrieve\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'retrieve': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"memory\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"skill\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'skill': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"a2a\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'a2a': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'compress': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"task\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'task': Can't locate revision identified by '0004_namespace'\"\n    }\n  ]\n}\n"
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--backend",
+        "postgres",
+        "--postgres-url",
+        "postgresql+psycopg://postgres:%2A%2A%2A@<host>:6433/<db>",
+        "--json"
+      ],
+      "exit": 1,
+      "stderr": "",
+      "cwd_left": [],
+      "seconds": 1.71,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"storage\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"controlplane_telegram\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"authoring\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"brain\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"commerce\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"session\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'session': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"artifact\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'artifact': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"registry\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'registry': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"identity\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'identity': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"policy\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'policy': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"secret\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'secret': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"telemetry\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'telemetry': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"controlplane\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'controlplane': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"retrieve\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'retrieve': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"memory\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"skill\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'skill': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"a2a\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'a2a': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'compress': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"task\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'task': Can't locate revision identified by '0004_namespace'\"\n    }\n  ]\n}\n"
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--backend",
+        "postgres",
+        "--postgres-url",
+        "postgresql+psycopg://postgres:%2A%2A%2A@<host>:6433/<db>",
+        "--json"
+      ],
+      "exit": 1,
+      "stderr": "",
+      "cwd_left": [],
+      "seconds": 1.74,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"storage\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"controlplane_telegram\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"authoring\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"brain\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"commerce\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"session\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'session': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"artifact\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'artifact': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"registry\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'registry': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"identity\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'identity': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"policy\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'policy': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"secret\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'secret': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"telemetry\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'telemetry': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"controlplane\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'controlplane': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"retrieve\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'retrieve': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"memory\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"skill\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'skill': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"a2a\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'a2a': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'compress': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"task\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'task': Can't locate revision identified by '0004_namespace'\"\n    }\n  ]\n}\n"
+    },
+    {
+      "argv": [
+        "openminion",
+        "storage",
+        "migrate",
+        "--backend",
+        "postgres",
+        "--postgres-url",
+        "postgresql+psycopg://postgres:%2A%2A%2A@<host>:6433/<db>",
+        "--json"
+      ],
+      "exit": 1,
+      "stderr": "",
+      "cwd_left": [],
+      "seconds": 1.75,
+      "stdout": "{\n  \"modules\": [\n    {\n      \"module_id\": \"storage\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"controlplane_telegram\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"authoring\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"brain\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"commerce\",\n      \"status\": \"skipped\",\n      \"reason\": \"not validated for Postgres\"\n    },\n    {\n      \"module_id\": \"session\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'session': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"artifact\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'artifact': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"registry\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'registry': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"identity\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'identity': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"policy\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'policy': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"secret\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'secret': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"telemetry\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'telemetry': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"controlplane\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'controlplane': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"retrieve\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'retrieve': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"memory\",\n      \"status\": \"ok\",\n      \"success\": true\n    },\n    {\n      \"module_id\": \"skill\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'skill': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"a2a\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'a2a': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"compress\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'compress': Can't locate revision identified by '0004_namespace'\"\n    },\n    {\n      \"module_id\": \"task\",\n      \"status\": \"error\",\n      \"success\": false,\n      \"error\": \"Alembic upgrade failed for module 'task': Can't locate revision identified by '0004_namespace'\"\n    }\n  ]\n}\n"
+    }
+  ]
+}
