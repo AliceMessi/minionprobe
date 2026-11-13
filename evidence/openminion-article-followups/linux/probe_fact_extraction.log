@@ -1,0 +1,30 @@
+{
+  "probe": "probe_auto_fact_extraction",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.21",
+  "python": "3.12.3",
+  "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty-probe_fact_extraction",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "provider": "openai (OpenAI-compatible HTTP) -> scripted ThreadingHTTPServer on 127.0.0.1",
+  "dist_versions": {
+    "openminion": "0.1.21",
+    "sophiagraph": "0.0.12",
+    "pydantic": "2.14.3"
+  },
+  "openminion_direct_url": null
+}
+PASS Offline provider and no case error: every case's openai base URL is the scripted server on 127.0.0.1 | observed={'hosts': ['127.0.0.1'], 'errors': {}}
+PASS B (control, top-level brain.auto_fact_extraction.enabled=false): the turn makes no extraction request and returns the agent's reply | observed={'order': ["agent_text purposes=['decide'] tools=1", 'forced:submit_output purposes=[] tools=1', 'forced:submit_output purposes=[] tools=1'], 'text': 'openminion: PROBE-REPLY: Falcon is on track for release.', 'run_state': 'completed', 'runner_profile_auto_fact_extraction': {'enabled': False, 'model_tier': 'reflect', 'max_items_per_turn': 5, 'min_user_message_chars': 8, 'initial_confidence': 0.3, 'timeout_seconds': 20}}
+PASS D vs B: the extraction does not change the visible reply (same text with and without it) | observed={'D': 'openminion: PROBE-REPLY: Falcon is on track for release.', 'B': 'openminion: PROBE-REPLY: Falcon is on track for release.'}
+PASS D: if an extraction request is sent, it offers only submit_output and forces it (tool_choice = function submit_output), so a model cannot answer it in prose | observed=[{'index': 0, 'tools': ['submit_output'], 'tool_choice': {'type': 'function', 'function': {'name': 'submit_output'}}, 'model': 'gpt-4.1-mini', 'answer': ['{"items": []}']}]
+FAIL D (default config): the turn's first provider request is the agent's own request, not an extraction request offering only submit_output | observed={'order': ["extraction purposes=['reflect'] tools=1", "agent_text purposes=['decide'] tools=1", 'forced:submit_output purposes=[] tools=1', 'forced:submit_output purposes=[] tools=1'], 'first_request': {'kind': 'extraction', 'tools': ['submit_output'], 'tool_choice': {'type': 'function', 'function': {'name': 'submit_output'}}, 'model': 'gpt-4.1-mini', 'request_chars': 7293, 'has_agent_instructions': True, 't_recv': 0.0, 't_sent': 0.5}, 'first_agent_request_t_recv': 0.547}
+FAIL D (default config): a turn whose message holds nothing to remember makes no more provider requests than the same turn with extraction disabled (B) | observed={'D_requests': 4, 'B_requests': 3, 'D_extraction_requests': 1, 'D_extraction_answers': [['{"items": []}']], 'D_request_chars_total': 24399, 'B_request_chars_total': 17106, 'D_wall_s': 1.165, 'B_wall_s': 0.316}
+FAIL D: the extraction request does not carry the agent's instructions (they ask for tools it does not offer) | observed=[{'index': 0, 'has_agent_instructions': True, 'has_user_message': True, 'request_chars': 7293, 'system_chars': 5294, 'messages': 3, 'model': 'gpt-4.1-mini'}, {'first_agent_request': {'request_chars': 10954, 'system_chars': 8701, 'model': 'gpt-4.1-mini', 'tools': ['probe_lookup_status']}}]
+D: {"order": ["extraction purposes=['reflect'] tools=1", "agent_text purposes=['decide'] tools=1", "forced:submit_output purposes=[] tools=1", "forced:submit_output purposes=[] tools=1"], "extraction_requests": 1, "requests": 4, "text": "openminion: PROBE-REPLY: Falcon is on track for release.", "run_state": "completed", "wall_s": 1.165, "runner_profile_auto_fact_extraction": {"enabled": true, "model_tier": "reflect", "max_items_per_turn": 5, "min_user_message_chars": 8, "initial_confidence": 0.3, "timeout_seconds": 20}, "stats": {"input_tokens": 40, "output_tokens": 40, "cache_read_tokens": 0, "llm_calls": 4, "tool_calls": 0, "tool_errors": 0, "duration_ms": 1041}}
+B: {"order": ["agent_text purposes=['decide'] tools=1", "forced:submit_output purposes=[] tools=1", "forced:submit_output purposes=[] tools=1"], "extraction_requests": 0, "requests": 3, "text": "openminion: PROBE-REPLY: Falcon is on track for release.", "run_state": "completed", "wall_s": 0.316, "runner_profile_auto_fact_extraction": {"enabled": false, "model_tier": "reflect", "max_items_per_turn": 5, "min_user_message_chars": 8, "initial_confidence": 0.3, "timeout_seconds": 20}, "stats": {"input_tokens": 30, "output_tokens": 30, "cache_read_tokens": 0, "llm_calls": 3, "tool_calls": 0, "tool_errors": 0, "duration_ms": 191}}
+A: {"order": ["extraction purposes=['reflect'] tools=1", "agent_text purposes=['decide'] tools=1", "forced:submit_output purposes=[] tools=1", "forced:submit_output purposes=[] tools=1"], "extraction_requests": 1, "requests": 4, "text": "openminion: PROBE-REPLY: Falcon is on track for release.", "run_state": "completed", "wall_s": 0.763, "runner_profile_auto_fact_extraction": {"enabled": true, "model_tier": "reflect", "max_items_per_turn": 5, "min_user_message_chars": 8, "initial_confidence": 0.3, "timeout_seconds": 20}, "stats": {"input_tokens": 40, "output_tokens": 40, "cache_read_tokens": 0, "llm_calls": 4, "tool_calls": 0, "tool_errors": 0, "duration_ms": 661}}
+A (agent-level flag, info): {"note": "agents.openminion.auto_fact_extraction is not a parsed agent field; recorded only", "extraction_requests": 1, "order": ["extraction purposes=['reflect'] tools=1", "agent_text purposes=['decide'] tools=1", "forced:submit_output purposes=[] tools=1", "forced:submit_output purposes=[] tools=1"], "runner_profile_auto_fact_extraction": {"enabled": true, "model_tier": "reflect", "max_items_per_turn": 5, "min_user_message_chars": 8, "initial_confidence": 0.3, "timeout_seconds": 20}, "case_error": null}
+SUMMARY passed=4 failed=3 total=7

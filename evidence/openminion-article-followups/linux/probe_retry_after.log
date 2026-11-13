@@ -1,0 +1,53 @@
+{
+  "probe": "probe_retry_after",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.21",
+  "python": "3.12.3",
+  "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty-probe_retry_after",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "provider": "openai (OpenAI-compatible HTTP) -> scripted ThreadingHTTPServer on 127.0.0.1",
+  "dist_versions": {
+    "openminion": "0.1.21",
+    "pydantic": "2.14.3",
+    "httpx": "0.28.1"
+  },
+  "openminion_direct_url": null
+}
+PASS Offline provider and no case error: the openai base URL is the scripted server on 127.0.0.1, and the sleep recorders are installed on both retry owners | observed={'hosts': ['127.0.0.1'], 'errors': {}, 'recorders': {'flow': 'ok', 'orchestration': 'ok'}}
+FAIL A. every request that follows a 429 with `Retry-After: 2` is sent at least 2 s after it (RFC 9110 10.2.3) | observed={'early_retries': [{'request': 2, 'after_429_request': 1, 'gap_s': 0.304, 'retry_after_s': 2}, {'request': 3, 'after_429_request': 2, 'gap_s': 0.604, 'retry_after_s': 2}], 'requests': [{'n': 1, 'kind': 'decide', 'status': 429, 'retry_after_s': 2, 'at_s': 0.0, 'advertised_ready_at_s': 2.0}, {'n': 2, 'kind': 'decide', 'status': 429, 'retry_after_s': 2, 'at_s': 0.304, 'advertised_ready_at_s': 2.304}, {'n': 3, 'kind': 'decide', 'status': 200, 'at_s': 0.908}, {'n': 4, 'kind': 'freshness', 'status': 200, 'at_s': 0.918}, {'n': 5, 'kind': 'freshness', 'status': 200, 'at_s': 0.925}], 'sleeps': [{'owner': 'llm/runtime/flow.py:_call_with_retries', 'seconds': 0.3, 'at_s': 0.001}, {'owner': 'llm/runtime/flow.py:_call_with_retries', 'seconds': 0.6, 'at_s': 0.305}]}
+PASS A (control). after the first 2 limited answers the turn completes with the scripted reply (the retry path itself works) | observed={'ok': True, 'run_state': 'completed', 'text': 'openminion: Consolidation reviewed; nothing to change.'}
+FAIL B. no request is sent before the time the first 429 advertised (`Retry-After: 8`, an 8 s rate window) | observed={'requests_inside_window': 8, 'early_retries': [{'request': 2, 'after_429_request': 1, 'gap_s': 0.304, 'retry_after_s': 8}, {'request': 3, 'after_429_request': 2, 'gap_s': 0.604, 'retry_after_s': 8}, {'request': 4, 'after_429_request': 3, 'gap_s': 0.288, 'retry_after_s': 8}, {'request': 5, 'after_429_request': 4, 'gap_s': 0.304, 'retry_after_s': 7}, {'request': 6, 'after_429_request': 5, 'gap_s': 0.604, 'retry_after_s': 7}, {'request': 7, 'after_429_request': 6, 'gap_s': 0.389, 'retry_after_s': 6}, {'request': 8, 'after_429_request': 7, 'gap_s': 0.304, 'retry_after_s': 6}, {'request': 9, 'after_429_request': 8, 'gap_s': 0.604, 'retry_after_s': 6}], 'requests': [{'n': 1, 'kind': 'decide', 'status': 429, 'retry_after_s': 8, 'at_s': 0.0, 'advertised_ready_at_s': 8.0}, {'n': 2, 'kind': 'decide', 'status': 429, 'retry_after_s': 8, 'at_s': 0.304, 'advertised_ready_at_s': 8.304}, {'n': 3, 'kind': 'decide', 'status': 429, 'retry_after_s': 8, 'at_s': 0.908, 'advertised_ready_at_s': 8.908}, {'n': 4, 'kind': 'decide', 'status': 429, 'retry_after_s': 7, 'at_s': 1.196, 'advertised_ready_at_s': 8.196}, {'n': 5, 'kind': 'decide', 'status': 429, 'retry_after_s': 7, 'at_s': 1.499, 'advertised_ready_at_s': 8.499}, {'n': 6, 'kind': 'decide', 'status': 429, 'retry_after_s': 6, 'at_s': 2.103, 'advertised_ready_at_s': 8.103}, {'n': 7, 'kind': 'decide', 'status': 429, 'retry_after_s': 6, 'at_s': 2.492, 'advertised_ready_at_s': 8.492}, {'n': 8, 'kind': 'decide', 'status': 429, 'retry_after_s': 6, 'at_s': 2.796, 'advertised_ready_at_s': 8.796}, {'n': 9, 'kind': 'decide', 'status': 429, 'retry_after_s': 5, 'at_s': 3.4, 'advertised_ready_at_s': 8.4}], 'sleeps': [{'owner': 'llm/runtime/flow.py:_call_with_retries', 'seconds': 0.3, 'at_s': 0.001}, {'owner': 'llm/runtime/flow.py:_call_with_retries', 'seconds': 0.6, 'at_s': 0.305}, {'owner': 'brain/loop/orchestration.py:_BACKOFF_SLEEP', 'seconds': 0.275, 'at_s': 0.912}, {'owner': 'llm/runtime/flow.py:_call_with_retries', 'seconds': 0.3, 'at_s': 1.196}, {'owner': 'llm/runtime/flow.py:_call_with_retries', 'seconds': 0.6, 'at_s': 1.5}, {'owner': 'brain/loop/orchestration.py:_BACKOFF_SLEEP', 'seconds': 0.377, 'at_s': 2.108}, {'owner': 'llm/runtime/flow.py:_call_with_retries', 'seconds': 0.3, 'at_s': 2.493}, {'owner': 'llm/runtime/flow.py:_call_with_retries', 'seconds': 0.6, 'at_s': 2.797}]}
+FAIL B. the turn succeeds: the provider accepts calls 8 s after the first one, well inside the 120 s turn timeout | observed={'outcome': {'ok': False, 'error': {'type': 'ProviderError', 'module': 'openminion.modules.llm.providers.contracts', 'code': 'RATE_LIMITED', 'message': 'RATE_LIMITED: The configured model provider could not continue this turn because it reported a quota, billing, or rate-limit block (openai rate limited: Rate limit reached for model `fixture-model` on tokens per minute (TPM): Limit 6000, Used 5900, Requested 900. Please try again in 5s.). Please ret', 'details_retry_after': '5', 'details_status_code': 429, 'details_reason_code': 'provider_rate_limited', 'details_keys': ['provider', 'reason_code', 'retry_after', 'status_code', 'upstream_code', 'upstream_message', 'upstream_type', 'url'], 'cause_chain': [{'type': 'ProviderError', 'code': 'RATE_LIMITED', 'retry_after': '5'}, {'type': 'ProviderError', 'code': 'RATE_LIMITED', 'retry_after': '5'}, {'type': 'RuntimeError', 'code': None, 'retry_after': None}]}}, 'turn_seconds': 3.58, 'last_request_at_s': 3.4}
+PASS B (facts). if the turn fails, it fails with the typed ProviderError code RATE_LIMITED (openminion#326/#338) and the error still carries the provider's Retry-After value in details.retry_after | observed={'type': 'ProviderError', 'module': 'openminion.modules.llm.providers.contracts', 'code': 'RATE_LIMITED', 'message': 'RATE_LIMITED: The configured model provider could not continue this turn because it reported a quota, billing, or rate-limit block (openai rate limited: Rate limit reached for model `fixture-model` on tokens per minute (TPM): Limit 6000, Used 5900, Requested 900. Please try again in 5s.). Please ret', 'details_retry_after': '5', 'details_status_code': 429, 'details_reason_code': 'provider_rate_limited', 'details_keys': ['provider', 'reason_code', 'retry_after', 'status_code', 'upstream_code', 'upstream_message', 'upstream_type', 'url'], 'cause_chain': [{'type': 'ProviderError', 'code': 'RATE_LIMITED', 'retry_after': '5'}, {'type': 'ProviderError', 'code': 'RATE_LIMITED', 'retry_after': '5'}, {'type': 'RuntimeError', 'code': None, 'retry_after': None}]}
+case A requests:
+  # 1 at   0.000s  decide            429 Retry-After: 2
+  # 2 at   0.304s  decide            429 Retry-After: 2
+  # 3 at   0.908s  decide            200
+  # 4 at   0.918s  freshness         200
+  # 5 at   0.925s  freshness         200
+  sleep 0.300s at   0.001s  by llm/runtime/flow.py:_call_with_retries
+  sleep 0.600s at   0.305s  by llm/runtime/flow.py:_call_with_retries
+  outcome: {"ok": true, "run_state": "completed", "text": "openminion: Consolidation reviewed; nothing to change."}
+case B requests:
+  # 1 at   0.000s  decide            429 Retry-After: 8
+  # 2 at   0.304s  decide            429 Retry-After: 8
+  # 3 at   0.908s  decide            429 Retry-After: 8
+  # 4 at   1.196s  decide            429 Retry-After: 7
+  # 5 at   1.499s  decide            429 Retry-After: 7
+  # 6 at   2.103s  decide            429 Retry-After: 6
+  # 7 at   2.492s  decide            429 Retry-After: 6
+  # 8 at   2.796s  decide            429 Retry-After: 6
+  # 9 at   3.400s  decide            429 Retry-After: 5
+  sleep 0.300s at   0.001s  by llm/runtime/flow.py:_call_with_retries
+  sleep 0.600s at   0.305s  by llm/runtime/flow.py:_call_with_retries
+  sleep 0.275s at   0.912s  by brain/loop/orchestration.py:_BACKOFF_SLEEP
+  sleep 0.300s at   1.196s  by llm/runtime/flow.py:_call_with_retries
+  sleep 0.600s at   1.500s  by llm/runtime/flow.py:_call_with_retries
+  sleep 0.377s at   2.108s  by brain/loop/orchestration.py:_BACKOFF_SLEEP
+  sleep 0.300s at   2.493s  by llm/runtime/flow.py:_call_with_retries
+  sleep 0.600s at   2.797s  by llm/runtime/flow.py:_call_with_retries
+  outcome: {"ok": false, "error": {"type": "ProviderError", "module": "openminion.modules.llm.providers.contracts", "code": "RATE_LIMITED", "message": "RATE_LIMITED: The configured model provider could not continue this turn because it reported a quota, billing, or rate-limit block (openai rate limited: Rate limit reached for model `fixture-model` on tokens per minute (TPM): Limit 6000, Used 5900, Requested 
+SUMMARY passed=3 failed=3 total=6

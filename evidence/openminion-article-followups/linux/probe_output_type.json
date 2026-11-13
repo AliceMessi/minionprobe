@@ -1,0 +1,796 @@
+{
+  "info": {
+    "probe": "probe_output_type",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.21",
+    "python": "3.12.3",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<RUNNER_TEMP>/empty-probe_output_type",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "provider": "openai (OpenAI-compatible HTTP) -> scripted ThreadingHTTPServer on 127.0.0.1",
+    "dist_versions": {
+      "openminion": "0.1.21",
+      "sophiagraph": "0.0.12",
+      "pydantic": "2.14.3"
+    },
+    "openminion_direct_url": null
+  },
+  "summary": {
+    "passed": 5,
+    "failed": 2,
+    "total": 7
+  },
+  "all_pass": false,
+  "checks": [
+    {
+      "check": "A (defect check): a markdown-table reply raises AgentOutputValidationError carrying the raw prose and a pydantic ValidationError; no AgentRunResult (no silent text result with run_state=completed)",
+      "pass": false,
+      "observed": {
+        "returned": false,
+        "exception": "AgentOutputValidationError",
+        "message": "Reply did not validate against ZqLaunchReport: 1 validation error for ZqLaunchReport\n  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='openminion: Here is the ...|\\n\\n**Verdict: ready**', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/json_invalid",
+        "raw_text": "openminion: Here is the launch review for example.com:\n\n| check | status | evidence |\n|---|---|---|\n| title | pass | 63 characters |\n| canonical | pass | present |\n| sitemap | pass | HTTP 200 |\n| real_404 | pass | 404 |\n\n**Verdict: ready**",
+        "validation_error_is_pydantic": true
+      }
+    },
+    {
+      "check": "B (control): a schema-conforming JSON reply returns AgentRunResult.output as a validated ZqLaunchReport",
+      "pass": true,
+      "observed": {
+        "returned": true,
+        "output_type": "ZqLaunchReport",
+        "output": {
+          "site": "example.com",
+          "verdict": "ready",
+          "checks": [
+            {
+              "name": "title",
+              "status": "pass"
+            },
+            {
+              "name": "real_404",
+              "status": "pass"
+            }
+          ]
+        },
+        "text": "openminion: {\"site\": \"example.com\", \"verdict\": \"ready\", \"checks\": [{\"name\": \"title\", \"status\": \"pass\"}, {\"name\": \"real_404\", \"status\": \"pass\"}]}",
+        "run_state": "completed",
+        "run_id": "27b938b5bb394879b171d3bcd3c07021"
+      }
+    },
+    {
+      "check": "W (control, documented 0.1.x recovery): one schema-valid JSON object wrapped in prose is recovered",
+      "pass": true,
+      "observed": {
+        "returned": true,
+        "output_type": "ZqLaunchReport",
+        "output": {
+          "site": "example.com",
+          "verdict": "ready",
+          "checks": [
+            {
+              "name": "title",
+              "status": "pass"
+            },
+            {
+              "name": "real_404",
+              "status": "pass"
+            }
+          ]
+        },
+        "text": "openminion: Sure, here is the report: {\"site\": \"example.com\", \"verdict\": \"ready\", \"checks\": [{\"name\": \"title\", \"status\": \"pass\"}, {\"name\": \"real_404\", \"status\": \"pass\"}]} Let me know if you need more.",
+        "run_state": "completed",
+        "run_id": "988cd4ed2f304aa69d6a254175488c56"
+      }
+    },
+    {
+      "check": "Mechanism: the user message and the instructions reach the model in every case",
+      "pass": true,
+      "observed": {
+        "A": {
+          "main_requests": 1,
+          "response_format": [],
+          "tool_choice": [
+            "auto"
+          ],
+          "tool_names": [
+            "clarify",
+            "coding",
+            "decompose",
+            "plan",
+            "research",
+            "respond",
+            "review_diff",
+            "tool_request"
+          ],
+          "schema_markers_any_request": [],
+          "user_message_reached_model": true,
+          "instructions_reached_model": true
+        },
+        "B": {
+          "main_requests": 1,
+          "response_format": [],
+          "tool_choice": [
+            "auto"
+          ],
+          "tool_names": [
+            "clarify",
+            "coding",
+            "decompose",
+            "plan",
+            "research",
+            "respond",
+            "review_diff",
+            "tool_request"
+          ],
+          "schema_markers_any_request": [],
+          "user_message_reached_model": true,
+          "instructions_reached_model": true
+        },
+        "W": {
+          "main_requests": 1,
+          "response_format": [],
+          "tool_choice": [
+            "auto"
+          ],
+          "tool_names": [
+            "clarify",
+            "coding",
+            "decompose",
+            "plan",
+            "research",
+            "respond",
+            "review_diff",
+            "tool_request"
+          ],
+          "schema_markers_any_request": [],
+          "user_message_reached_model": true,
+          "instructions_reached_model": true
+        }
+      }
+    },
+    {
+      "check": "Mechanism (matches ANALYSIS): no main-turn request carries `response_format` or a forced `tool_choice`",
+      "pass": false,
+      "observed": {
+        "A": {
+          "response_format": [],
+          "tool_choice": [
+            "auto"
+          ]
+        },
+        "B": {
+          "response_format": [],
+          "tool_choice": [
+            "auto"
+          ]
+        },
+        "W": {
+          "response_format": [],
+          "tool_choice": [
+            "auto"
+          ]
+        }
+      }
+    },
+    {
+      "check": "Mechanism (matches ANALYSIS): no request in any case carries the output model's name or its field descriptions (the schema is never sent: not as a tool, not as response_format, not as prompt text)",
+      "pass": true,
+      "observed": {
+        "A": [],
+        "B": [],
+        "W": []
+      }
+    },
+    {
+      "check": "Offline provider and no case error: every case's openai base URL is the scripted server on 127.0.0.1",
+      "pass": true,
+      "observed": {
+        "hosts": [
+          "127.0.0.1"
+        ],
+        "errors": {}
+      }
+    }
+  ],
+  "observed": {
+    "mechanism": {
+      "A": {
+        "main_requests": 1,
+        "response_format": [],
+        "tool_choice": [
+          "auto"
+        ],
+        "tool_names": [
+          "clarify",
+          "coding",
+          "decompose",
+          "plan",
+          "research",
+          "respond",
+          "review_diff",
+          "tool_request"
+        ],
+        "schema_markers_any_request": [],
+        "user_message_reached_model": true,
+        "instructions_reached_model": true
+      },
+      "B": {
+        "main_requests": 1,
+        "response_format": [],
+        "tool_choice": [
+          "auto"
+        ],
+        "tool_names": [
+          "clarify",
+          "coding",
+          "decompose",
+          "plan",
+          "research",
+          "respond",
+          "review_diff",
+          "tool_request"
+        ],
+        "schema_markers_any_request": [],
+        "user_message_reached_model": true,
+        "instructions_reached_model": true
+      },
+      "W": {
+        "main_requests": 1,
+        "response_format": [],
+        "tool_choice": [
+          "auto"
+        ],
+        "tool_names": [
+          "clarify",
+          "coding",
+          "decompose",
+          "plan",
+          "research",
+          "respond",
+          "review_diff",
+          "tool_request"
+        ],
+        "schema_markers_any_request": [],
+        "user_message_reached_model": true,
+        "instructions_reached_model": true
+      }
+    },
+    "cases": {
+      "A": {
+        "case": "A",
+        "model_answer": "Here is the launch review for example.com:\n\n| check | status | evidence |\n|---|---|---|\n| title | pass | 63 characters |\n| canonical | pass | present |\n| sitemap | pass | HTTP 200 |\n| real_404 | pass | 404 |\n\n**Verdict: ready**",
+        "result": {
+          "returned": false,
+          "exception": "AgentOutputValidationError",
+          "message": "Reply did not validate against ZqLaunchReport: 1 validation error for ZqLaunchReport\n  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='openminion: Here is the ...|\\n\\n**Verdict: ready**', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/json_invalid",
+          "raw_text": "openminion: Here is the launch review for example.com:\n\n| check | status | evidence |\n|---|---|---|\n| title | pass | 63 characters |\n| canonical | pass | present |\n| sitemap | pass | HTTP 200 |\n| real_404 | pass | 404 |\n\n**Verdict: ready**",
+          "validation_error_is_pydantic": true
+        },
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "requests": [
+          {
+            "index": 0,
+            "role": "control (forced submit_output)",
+            "body_keys": [
+              "messages",
+              "model",
+              "tool_choice",
+              "tools"
+            ],
+            "tools": [
+              "submit_output"
+            ],
+            "tool_choice": {
+              "type": "function",
+              "function": {
+                "name": "submit_output"
+              }
+            },
+            "response_format": null,
+            "submit_output_properties": [
+              "agent_id",
+              "items",
+              "session_id"
+            ],
+            "schema_markers_found": [],
+            "user_message_present": true,
+            "instructions_present": true,
+            "kind": "extraction",
+            "reply": {
+              "items": []
+            }
+          },
+          {
+            "index": 1,
+            "role": "main turn",
+            "body_keys": [
+              "messages",
+              "model",
+              "tool_choice",
+              "tools"
+            ],
+            "tools": [
+              "tool_request",
+              "respond",
+              "coding",
+              "plan",
+              "research",
+              "decompose",
+              "clarify",
+              "review_diff"
+            ],
+            "tool_choice": "auto",
+            "response_format": null,
+            "submit_output_properties": [],
+            "schema_markers_found": [],
+            "user_message_present": true,
+            "instructions_present": true,
+            "kind": "main_text",
+            "reply": "Here is the launch review for example.com:\n\n| check | status | evidence |\n|---|---|---|\n| title | pass | 63 characters |\n| canonical | pass | present |\n| sitemap | pass | HTTP 200 |\n| real_404 | pass | 404 |\n\n**Verdict: ready**"
+          },
+          {
+            "index": 2,
+            "role": "control (forced submit_output)",
+            "body_keys": [
+              "messages",
+              "model",
+              "tool_choice",
+              "tools"
+            ],
+            "tools": [
+              "submit_output"
+            ],
+            "tool_choice": {
+              "type": "function",
+              "function": {
+                "name": "submit_output"
+              }
+            },
+            "response_format": null,
+            "submit_output_properties": [
+              "answer_mode",
+              "confidence",
+              "domain",
+              "intent",
+              "needs_exact_date",
+              "needs_live_data",
+              "needs_sources",
+              "reason",
+              "time_sensitive"
+            ],
+            "schema_markers_found": [],
+            "user_message_present": true,
+            "instructions_present": false,
+            "kind": "freshness",
+            "reply": {
+              "intent": "statement",
+              "domain": "general",
+              "time_sensitive": false,
+              "needs_live_data": false,
+              "needs_sources": false,
+              "needs_exact_date": false,
+              "answer_mode": "direct",
+              "reason": "No live data needed.",
+              "confidence": 1
+            }
+          },
+          {
+            "index": 3,
+            "role": "control (forced submit_output)",
+            "body_keys": [
+              "messages",
+              "model",
+              "tool_choice",
+              "tools"
+            ],
+            "tools": [
+              "submit_output"
+            ],
+            "tool_choice": {
+              "type": "function",
+              "function": {
+                "name": "submit_output"
+              }
+            },
+            "response_format": null,
+            "submit_output_properties": [
+              "answer_mode",
+              "confidence",
+              "domain",
+              "intent",
+              "needs_exact_date",
+              "needs_live_data",
+              "needs_sources",
+              "reason",
+              "time_sensitive"
+            ],
+            "schema_markers_found": [],
+            "user_message_present": true,
+            "instructions_present": false,
+            "kind": "freshness",
+            "reply": {
+              "intent": "statement",
+              "domain": "general",
+              "time_sensitive": false,
+              "needs_live_data": false,
+              "needs_sources": false,
+              "needs_exact_date": false,
+              "answer_mode": "direct",
+              "reason": "No live data needed.",
+              "confidence": 1
+            }
+          }
+        ]
+      },
+      "B": {
+        "case": "B",
+        "model_answer": "{\"site\": \"example.com\", \"verdict\": \"ready\", \"checks\": [{\"name\": \"title\", \"status\": \"pass\"}, {\"name\": \"real_404\", \"status\": \"pass\"}]}",
+        "result": {
+          "returned": true,
+          "output_type": "ZqLaunchReport",
+          "output": {
+            "site": "example.com",
+            "verdict": "ready",
+            "checks": [
+              {
+                "name": "title",
+                "status": "pass"
+              },
+              {
+                "name": "real_404",
+                "status": "pass"
+              }
+            ]
+          },
+          "text": "openminion: {\"site\": \"example.com\", \"verdict\": \"ready\", \"checks\": [{\"name\": \"title\", \"status\": \"pass\"}, {\"name\": \"real_404\", \"status\": \"pass\"}]}",
+          "run_state": "completed",
+          "run_id": "27b938b5bb394879b171d3bcd3c07021"
+        },
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "requests": [
+          {
+            "index": 0,
+            "role": "control (forced submit_output)",
+            "body_keys": [
+              "messages",
+              "model",
+              "tool_choice",
+              "tools"
+            ],
+            "tools": [
+              "submit_output"
+            ],
+            "tool_choice": {
+              "type": "function",
+              "function": {
+                "name": "submit_output"
+              }
+            },
+            "response_format": null,
+            "submit_output_properties": [
+              "agent_id",
+              "items",
+              "session_id"
+            ],
+            "schema_markers_found": [],
+            "user_message_present": true,
+            "instructions_present": true,
+            "kind": "extraction",
+            "reply": {
+              "items": []
+            }
+          },
+          {
+            "index": 1,
+            "role": "main turn",
+            "body_keys": [
+              "messages",
+              "model",
+              "tool_choice",
+              "tools"
+            ],
+            "tools": [
+              "tool_request",
+              "respond",
+              "coding",
+              "plan",
+              "research",
+              "decompose",
+              "clarify",
+              "review_diff"
+            ],
+            "tool_choice": "auto",
+            "response_format": null,
+            "submit_output_properties": [],
+            "schema_markers_found": [],
+            "user_message_present": true,
+            "instructions_present": true,
+            "kind": "main_text",
+            "reply": "{\"site\": \"example.com\", \"verdict\": \"ready\", \"checks\": [{\"name\": \"title\", \"status\": \"pass\"}, {\"name\": \"real_404\", \"status\": \"pass\"}]}"
+          },
+          {
+            "index": 2,
+            "role": "control (forced submit_output)",
+            "body_keys": [
+              "messages",
+              "model",
+              "tool_choice",
+              "tools"
+            ],
+            "tools": [
+              "submit_output"
+            ],
+            "tool_choice": {
+              "type": "function",
+              "function": {
+                "name": "submit_output"
+              }
+            },
+            "response_format": null,
+            "submit_output_properties": [
+              "answer_mode",
+              "confidence",
+              "domain",
+              "intent",
+              "needs_exact_date",
+              "needs_live_data",
+              "needs_sources",
+              "reason",
+              "time_sensitive"
+            ],
+            "schema_markers_found": [],
+            "user_message_present": true,
+            "instructions_present": false,
+            "kind": "freshness",
+            "reply": {
+              "intent": "statement",
+              "domain": "general",
+              "time_sensitive": false,
+              "needs_live_data": false,
+              "needs_sources": false,
+              "needs_exact_date": false,
+              "answer_mode": "direct",
+              "reason": "No live data needed.",
+              "confidence": 1
+            }
+          },
+          {
+            "index": 3,
+            "role": "control (forced submit_output)",
+            "body_keys": [
+              "messages",
+              "model",
+              "tool_choice",
+              "tools"
+            ],
+            "tools": [
+              "submit_output"
+            ],
+            "tool_choice": {
+              "type": "function",
+              "function": {
+                "name": "submit_output"
+              }
+            },
+            "response_format": null,
+            "submit_output_properties": [
+              "answer_mode",
+              "confidence",
+              "domain",
+              "intent",
+              "needs_exact_date",
+              "needs_live_data",
+              "needs_sources",
+              "reason",
+              "time_sensitive"
+            ],
+            "schema_markers_found": [],
+            "user_message_present": true,
+            "instructions_present": false,
+            "kind": "freshness",
+            "reply": {
+              "intent": "statement",
+              "domain": "general",
+              "time_sensitive": false,
+              "needs_live_data": false,
+              "needs_sources": false,
+              "needs_exact_date": false,
+              "answer_mode": "direct",
+              "reason": "No live data needed.",
+              "confidence": 1
+            }
+          }
+        ]
+      },
+      "W": {
+        "case": "W",
+        "model_answer": "Sure, here is the report: {\"site\": \"example.com\", \"verdict\": \"ready\", \"checks\": [{\"name\": \"title\", \"status\": \"pass\"}, {\"name\": \"real_404\", \"status\": \"pass\"}]} Let me know if you need more.",
+        "result": {
+          "returned": true,
+          "output_type": "ZqLaunchReport",
+          "output": {
+            "site": "example.com",
+            "verdict": "ready",
+            "checks": [
+              {
+                "name": "title",
+                "status": "pass"
+              },
+              {
+                "name": "real_404",
+                "status": "pass"
+              }
+            ]
+          },
+          "text": "openminion: Sure, here is the report: {\"site\": \"example.com\", \"verdict\": \"ready\", \"checks\": [{\"name\": \"title\", \"status\": \"pass\"}, {\"name\": \"real_404\", \"status\": \"pass\"}]} Let me know if you need more.",
+          "run_state": "completed",
+          "run_id": "988cd4ed2f304aa69d6a254175488c56"
+        },
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "requests": [
+          {
+            "index": 0,
+            "role": "control (forced submit_output)",
+            "body_keys": [
+              "messages",
+              "model",
+              "tool_choice",
+              "tools"
+            ],
+            "tools": [
+              "submit_output"
+            ],
+            "tool_choice": {
+              "type": "function",
+              "function": {
+                "name": "submit_output"
+              }
+            },
+            "response_format": null,
+            "submit_output_properties": [
+              "agent_id",
+              "items",
+              "session_id"
+            ],
+            "schema_markers_found": [],
+            "user_message_present": true,
+            "instructions_present": true,
+            "kind": "extraction",
+            "reply": {
+              "items": []
+            }
+          },
+          {
+            "index": 1,
+            "role": "main turn",
+            "body_keys": [
+              "messages",
+              "model",
+              "tool_choice",
+              "tools"
+            ],
+            "tools": [
+              "tool_request",
+              "respond",
+              "coding",
+              "plan",
+              "research",
+              "decompose",
+              "clarify",
+              "review_diff"
+            ],
+            "tool_choice": "auto",
+            "response_format": null,
+            "submit_output_properties": [],
+            "schema_markers_found": [],
+            "user_message_present": true,
+            "instructions_present": true,
+            "kind": "main_text",
+            "reply": "Sure, here is the report: {\"site\": \"example.com\", \"verdict\": \"ready\", \"checks\": [{\"name\": \"title\", \"status\": \"pass\"}, {\"name\": \"real_404\", \"status\": \"pass\"}]} Let me know if you need more."
+          },
+          {
+            "index": 2,
+            "role": "control (forced submit_output)",
+            "body_keys": [
+              "messages",
+              "model",
+              "tool_choice",
+              "tools"
+            ],
+            "tools": [
+              "submit_output"
+            ],
+            "tool_choice": {
+              "type": "function",
+              "function": {
+                "name": "submit_output"
+              }
+            },
+            "response_format": null,
+            "submit_output_properties": [
+              "answer_mode",
+              "confidence",
+              "domain",
+              "intent",
+              "needs_exact_date",
+              "needs_live_data",
+              "needs_sources",
+              "reason",
+              "time_sensitive"
+            ],
+            "schema_markers_found": [],
+            "user_message_present": true,
+            "instructions_present": false,
+            "kind": "freshness",
+            "reply": {
+              "intent": "statement",
+              "domain": "general",
+              "time_sensitive": false,
+              "needs_live_data": false,
+              "needs_sources": false,
+              "needs_exact_date": false,
+              "answer_mode": "direct",
+              "reason": "No live data needed.",
+              "confidence": 1
+            }
+          },
+          {
+            "index": 3,
+            "role": "control (forced submit_output)",
+            "body_keys": [
+              "messages",
+              "model",
+              "tool_choice",
+              "tools"
+            ],
+            "tools": [
+              "submit_output"
+            ],
+            "tool_choice": {
+              "type": "function",
+              "function": {
+                "name": "submit_output"
+              }
+            },
+            "response_format": null,
+            "submit_output_properties": [
+              "answer_mode",
+              "confidence",
+              "domain",
+              "intent",
+              "needs_exact_date",
+              "needs_live_data",
+              "needs_sources",
+              "reason",
+              "time_sensitive"
+            ],
+            "schema_markers_found": [],
+            "user_message_present": true,
+            "instructions_present": false,
+            "kind": "freshness",
+            "reply": {
+              "intent": "statement",
+              "domain": "general",
+              "time_sensitive": false,
+              "needs_live_data": false,
+              "needs_sources": false,
+              "needs_exact_date": false,
+              "answer_mode": "direct",
+              "reason": "No live data needed.",
+              "confidence": 1
+            }
+          }
+        ]
+      }
+    }
+  }
+}

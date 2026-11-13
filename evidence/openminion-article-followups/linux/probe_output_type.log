@@ -1,0 +1,27 @@
+{
+  "probe": "probe_output_type",
+  "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+  "openminion.__version__": "0.1.21",
+  "python": "3.12.3",
+  "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "sqlite3.sqlite_version": "3.45.1",
+  "cwd": "<RUNNER_TEMP>/empty-probe_output_type",
+  "imported_from_site_packages": true,
+  "isolated_mode": true,
+  "provider": "openai (OpenAI-compatible HTTP) -> scripted ThreadingHTTPServer on 127.0.0.1",
+  "dist_versions": {
+    "openminion": "0.1.21",
+    "sophiagraph": "0.0.12",
+    "pydantic": "2.14.3"
+  },
+  "openminion_direct_url": null
+}
+FAIL A (defect check): a markdown-table reply raises AgentOutputValidationError carrying the raw prose and a pydantic ValidationError; no AgentRunResult (no silent text result with run_state=completed) | observed={'returned': False, 'exception': 'AgentOutputValidationError', 'message': "Reply did not validate against ZqLaunchReport: 1 validation error for ZqLaunchReport\n  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='openminion: Here is the ...|\\n\\n**Verdict: ready**', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/json_invalid", 'raw_text': 'openminion: Here is the launch review for example.com:\n\n| check | status | evidence |\n|---|---|---|\n| title | pass | 63 characters |\n| canonical | pass | present |\n| sitemap | pass | HTTP 200 |\n| real_404 | pass | 404 |\n\n**Verdict: ready**', 'validation_error_is_pydantic': True}
+PASS B (control): a schema-conforming JSON reply returns AgentRunResult.output as a validated ZqLaunchReport | observed={'returned': True, 'output_type': 'ZqLaunchReport', 'output': {'site': 'example.com', 'verdict': 'ready', 'checks': [{'name': 'title', 'status': 'pass'}, {'name': 'real_404', 'status': 'pass'}]}, 'text': 'openminion: {"site": "example.com", "verdict": "ready", "checks": [{"name": "title", "status": "pass"}, {"name": "real_404", "status": "pass"}]}', 'run_state': 'completed', 'run_id': '27b938b5bb394879b171d3bcd3c07021'}
+PASS W (control, documented 0.1.x recovery): one schema-valid JSON object wrapped in prose is recovered | observed={'returned': True, 'output_type': 'ZqLaunchReport', 'output': {'site': 'example.com', 'verdict': 'ready', 'checks': [{'name': 'title', 'status': 'pass'}, {'name': 'real_404', 'status': 'pass'}]}, 'text': 'openminion: Sure, here is the report: {"site": "example.com", "verdict": "ready", "checks": [{"name": "title", "status": "pass"}, {"name": "real_404", "status": "pass"}]} Let me know if you need more.', 'run_state': 'completed', 'run_id': '988cd4ed2f304aa69d6a254175488c56'}
+PASS Mechanism: the user message and the instructions reach the model in every case | observed={'A': {'main_requests': 1, 'response_format': [], 'tool_choice': ['auto'], 'tool_names': ['clarify', 'coding', 'decompose', 'plan', 'research', 'respond', 'review_diff', 'tool_request'], 'schema_markers_any_request': [], 'user_message_reached_model': True, 'instructions_reached_model': True}, 'B': {'main_requests': 1, 'response_format': [], 'tool_choice': ['auto'], 'tool_names': ['clarify', 'coding', 'decompose', 'plan', 'research', 'respond', 'review_diff', 'tool_request'], 'schema_markers_any_request': [], 'user_message_reached_model': True, 'instructions_reached_model': True}, 'W': {'main_requests': 1, 'response_format': [], 'tool_choice': ['auto'], 'tool_names': ['clarify', 'coding', 'decompose', 'plan', 'research', 'respond', 'review_diff', 'tool_request'], 'schema_markers_any_request': [], 'user_message_reached_model': True, 'instructions_reached_model': True}}
+FAIL Mechanism (matches ANALYSIS): no main-turn request carries `response_format` or a forced `tool_choice` | observed={'A': {'response_format': [], 'tool_choice': ['auto']}, 'B': {'response_format': [], 'tool_choice': ['auto']}, 'W': {'response_format': [], 'tool_choice': ['auto']}}
+PASS Mechanism (matches ANALYSIS): no request in any case carries the output model's name or its field descriptions (the schema is never sent: not as a tool, not as response_format, not as prompt text) | observed={'A': [], 'B': [], 'W': []}
+PASS Offline provider and no case error: every case's openai base URL is the scripted server on 127.0.0.1 | observed={'hosts': ['127.0.0.1'], 'errors': {}}
+main-turn tools offered: {"A": ["clarify", "coding", "decompose", "plan", "research", "respond", "review_diff", "tool_request"], "B": ["clarify", "coding", "decompose", "plan", "research", "respond", "review_diff", "tool_request"], "W": ["clarify", "coding", "decompose", "plan", "research", "respond", "review_diff", "tool_request"]}
+SUMMARY passed=5 failed=2 total=7

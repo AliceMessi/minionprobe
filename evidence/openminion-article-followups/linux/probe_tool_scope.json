@@ -1,0 +1,1055 @@
+{
+  "info": {
+    "probe": "probe_min_scope_default",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.21",
+    "python": "3.12.3",
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<RUNNER_TEMP>/empty-probe_tool_scope",
+    "imported_from_site_packages": true,
+    "isolated_mode": true,
+    "provider": "openai (OpenAI-compatible HTTP) -> scripted ThreadingHTTPServer on 127.0.0.1",
+    "dist_versions": {
+      "openminion": "0.1.21",
+      "pydantic": "2.14.3"
+    },
+    "openminion_direct_url": null
+  },
+  "summary": {
+    "passed": 3,
+    "failed": 1,
+    "total": 4
+  },
+  "all_pass": false,
+  "checks": [
+    {
+      "check": "EXPECT README snippet (bare @tool lookup_order, no approval_callback, default action policy): the model's lookup_order call runs and the reply is not a policy confirmation prompt",
+      "pass": false,
+      "observed": {
+        "run_state": "completed",
+        "respond_kind": "policy_confirmation_prompt",
+        "text": "openminion: Policy confirmation required.\nlookup_order\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes or allow_once to allow once, session or allow_session to allow this tool for the session, or no or deny to cancel.",
+        "error": null,
+        "case_error": null,
+        "model_called_tool": true,
+        "tool_executions": [],
+        "approval_callback_calls": [],
+        "policy_checks": [
+          {
+            "key": "lookup_order.default",
+            "decision": "REQUIRE_CONFIRM",
+            "reason_code": "UNKNOWN_REVERSIBILITY",
+            "risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "unknown",
+              "default_confirm": true,
+              "sensitive_targets": []
+            },
+            "registered_risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "unknown",
+              "default_confirm": true,
+              "sensitive_targets": []
+            },
+            "has_config_overrides": true,
+            "mode": "enforce_safe"
+          }
+        ]
+      }
+    },
+    {
+      "check": "EXPECT Control README_FIXED (@tool(min_scope='READ_ONLY', idempotent=True), no callback): policy ALLOW / READ_ONLY_ALLOW, the tool runs, no confirmation prompt",
+      "pass": true,
+      "observed": {
+        "run_state": "completed",
+        "respond_kind": "assistant",
+        "text": "openminion: Consolidation reviewed; nothing to change.",
+        "error": null,
+        "case_error": null,
+        "model_called_tool": true,
+        "tool_executions": [
+          {
+            "tool": "lookup_order",
+            "order_id": "A-104"
+          }
+        ],
+        "approval_callback_calls": [],
+        "policy_checks": [
+          {
+            "key": "lookup_order.default",
+            "decision": "ALLOW",
+            "reason_code": "READ_ONLY_ALLOW",
+            "risk": {
+              "risk_class": "read",
+              "side_effects": "none",
+              "reversibility": "reversible",
+              "default_confirm": false,
+              "sensitive_targets": []
+            },
+            "registered_risk": {
+              "risk_class": "read",
+              "side_effects": "none",
+              "reversibility": "reversible",
+              "default_confirm": false,
+              "sensitive_targets": []
+            },
+            "has_config_overrides": true,
+            "mode": "enforce_safe"
+          }
+        ]
+      }
+    },
+    {
+      "check": "EXPECT Control READ_ONLY (min_scope='READ_ONLY', approval_callback installed): the callback is never asked and the tool runs once",
+      "pass": true,
+      "observed": {
+        "run_state": "completed",
+        "respond_kind": "assistant",
+        "text": "openminion: Consolidation reviewed; nothing to change.",
+        "error": null,
+        "case_error": null,
+        "model_called_tool": true,
+        "tool_executions": [
+          {
+            "tool": "lookup_order",
+            "order_id": "A-104"
+          }
+        ],
+        "approval_callback_calls": [],
+        "policy_checks": [
+          {
+            "key": "lookup_order.default",
+            "decision": "ALLOW",
+            "reason_code": "READ_ONLY_ALLOW",
+            "risk": {
+              "risk_class": "read",
+              "side_effects": "none",
+              "reversibility": "reversible",
+              "default_confirm": false,
+              "sensitive_targets": []
+            },
+            "registered_risk": {
+              "risk_class": "read",
+              "side_effects": "none",
+              "reversibility": "reversible",
+              "default_confirm": false,
+              "sensitive_targets": []
+            },
+            "has_config_overrides": true,
+            "mode": "enforce_safe"
+          }
+        ]
+      }
+    },
+    {
+      "check": "EXPECT Offline provider and no case error: every case's openai base URL is the scripted server on 127.0.0.1, every case's model call reached the tool, and the provider-free policy checks ran",
+      "pass": true,
+      "observed": {
+        "hosts": [
+          "127.0.0.1"
+        ],
+        "errors": {},
+        "offline_errors": {}
+      }
+    }
+  ],
+  "claims_summary": {
+    "passed": 8,
+    "failed": 0,
+    "total": 8
+  },
+  "claims": [
+    {
+      "check": "CLAIM Article observation: @tool(idempotent=True, tags=('read_only',), capabilities=('read_only','network')) without min_scope reaches approval_callback once (decl min_scope None -> family default WRITE_SAFE)",
+      "pass": true,
+      "observed": {
+        "run_state": "completed",
+        "respond_kind": "assistant",
+        "text": "openminion: Consolidation reviewed; nothing to change.",
+        "error": null,
+        "case_error": null,
+        "model_called_tool": true,
+        "tool_executions": [
+          {
+            "tool": "inspect_home",
+            "order_id": "A-104"
+          }
+        ],
+        "approval_callback_calls": [
+          {
+            "tool": "inspect_home",
+            "args": {
+              "order_id": "A-104"
+            },
+            "approval_id_set": true
+          }
+        ],
+        "policy_checks": [
+          {
+            "key": "inspect_home.default",
+            "decision": "REQUIRE_CONFIRM",
+            "reason_code": "ENFORCE_SAFE_CONFIRM",
+            "risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "reversible",
+              "default_confirm": false,
+              "sensitive_targets": []
+            },
+            "registered_risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "reversible",
+              "default_confirm": false,
+              "sensitive_targets": []
+            },
+            "has_config_overrides": true,
+            "mode": "enforce_safe"
+          },
+          {
+            "key": "inspect_home.default",
+            "decision": "ALLOW",
+            "reason_code": "EXPLICIT_ALLOW",
+            "risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "reversible",
+              "default_confirm": false,
+              "sensitive_targets": []
+            },
+            "registered_risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "reversible",
+              "default_confirm": false,
+              "sensitive_targets": []
+            },
+            "has_config_overrides": true,
+            "mode": "enforce_safe"
+          }
+        ]
+      }
+    },
+    {
+      "check": "CLAIM ARTICLE: first action-policy decision is REQUIRE_CONFIRM / ENFORCE_SAFE_CONFIRM on risk write/local/reversible with default_confirm False (idempotent -> default_confirm False is not consulted)",
+      "pass": true,
+      "observed": [
+        {
+          "key": "inspect_home.default",
+          "decision": "REQUIRE_CONFIRM",
+          "reason_code": "ENFORCE_SAFE_CONFIRM",
+          "risk": {
+            "risk_class": "write",
+            "side_effects": "local",
+            "reversibility": "reversible",
+            "default_confirm": false,
+            "sensitive_targets": []
+          },
+          "registered_risk": {
+            "risk_class": "write",
+            "side_effects": "local",
+            "reversibility": "reversible",
+            "default_confirm": false,
+            "sensitive_targets": []
+          },
+          "has_config_overrides": true,
+          "mode": "enforce_safe"
+        },
+        {
+          "key": "inspect_home.default",
+          "decision": "ALLOW",
+          "reason_code": "EXPLICIT_ALLOW",
+          "risk": {
+            "risk_class": "write",
+            "side_effects": "local",
+            "reversibility": "reversible",
+            "default_confirm": false,
+            "sensitive_targets": []
+          },
+          "registered_risk": {
+            "risk_class": "write",
+            "side_effects": "local",
+            "reversibility": "reversible",
+            "default_confirm": false,
+            "sensitive_targets": []
+          },
+          "has_config_overrides": true,
+          "mode": "enforce_safe"
+        }
+      ]
+    },
+    {
+      "check": "CLAIM ARTICLE: after the callback approves, the tool runs once",
+      "pass": true,
+      "observed": [
+        {
+          "tool": "inspect_home",
+          "order_id": "A-104"
+        }
+      ]
+    },
+    {
+      "check": "CLAIM BARE @tool with a callback: callback asked once; REQUIRE_CONFIRM / UNKNOWN_REVERSIBILITY on write/unknown (the #464 classification); the tool runs after approval",
+      "pass": true,
+      "observed": {
+        "run_state": "completed",
+        "respond_kind": "assistant",
+        "text": "openminion: Consolidation reviewed; nothing to change.",
+        "error": null,
+        "case_error": null,
+        "model_called_tool": true,
+        "tool_executions": [
+          {
+            "tool": "lookup_order",
+            "order_id": "A-104"
+          }
+        ],
+        "approval_callback_calls": [
+          {
+            "tool": "lookup_order",
+            "args": {
+              "order_id": "A-104"
+            },
+            "approval_id_set": true
+          }
+        ],
+        "policy_checks": [
+          {
+            "key": "lookup_order.default",
+            "decision": "REQUIRE_CONFIRM",
+            "reason_code": "UNKNOWN_REVERSIBILITY",
+            "risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "unknown",
+              "default_confirm": true,
+              "sensitive_targets": []
+            },
+            "registered_risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "unknown",
+              "default_confirm": true,
+              "sensitive_targets": []
+            },
+            "has_config_overrides": true,
+            "mode": "enforce_safe"
+          },
+          {
+            "key": "lookup_order.default",
+            "decision": "ALLOW",
+            "reason_code": "EXPLICIT_ALLOW",
+            "risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "unknown",
+              "default_confirm": true,
+              "sensitive_targets": []
+            },
+            "registered_risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "unknown",
+              "default_confirm": true,
+              "sensitive_targets": []
+            },
+            "has_config_overrides": true,
+            "mode": "enforce_safe"
+          }
+        ]
+      }
+    },
+    {
+      "check": "CLAIM README snippet without a callback ends at the policy prompt (respond_kind policy_confirmation_prompt or 'Policy confirmation required' in the text) and the tool never runs",
+      "pass": true,
+      "observed": {
+        "run_state": "completed",
+        "respond_kind": "policy_confirmation_prompt",
+        "text": "openminion: Policy confirmation required.\nlookup_order\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes or allow_once to allow once, session or allow_session to allow this tool for the session, or no or deny to cancel.",
+        "error": null,
+        "case_error": null,
+        "model_called_tool": true,
+        "tool_executions": [],
+        "approval_callback_calls": [],
+        "policy_checks": [
+          {
+            "key": "lookup_order.default",
+            "decision": "REQUIRE_CONFIRM",
+            "reason_code": "UNKNOWN_REVERSIBILITY",
+            "risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "unknown",
+              "default_confirm": true,
+              "sensitive_targets": []
+            },
+            "registered_risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "unknown",
+              "default_confirm": true,
+              "sensitive_targets": []
+            },
+            "has_config_overrides": true,
+            "mode": "enforce_safe"
+          }
+        ]
+      }
+    },
+    {
+      "check": "CLAIM Provider-free, default OpenMinionConfig (mode auto -> enforce_safe): ARTICLE REQUIRE_CONFIRM/ENFORCE_SAFE_CONFIRM, BARE REQUIRE_CONFIRM/UNKNOWN_REVERSIBILITY, READ_ONLY ALLOW/READ_ONLY_ALLOW",
+      "pass": true,
+      "observed": {
+        "ARTICLE@default": [
+          "REQUIRE_CONFIRM",
+          "ENFORCE_SAFE_CONFIRM"
+        ],
+        "ARTICLE_NO_TAGS@default": [
+          "REQUIRE_CONFIRM",
+          "ENFORCE_SAFE_CONFIRM"
+        ],
+        "BARE@default": [
+          "REQUIRE_CONFIRM",
+          "UNKNOWN_REVERSIBILITY"
+        ],
+        "READ_ONLY@default": [
+          "ALLOW",
+          "READ_ONLY_ALLOW"
+        ],
+        "ARTICLE@ask+allow": [
+          "ALLOW",
+          "NO_MATCHING_GRANT"
+        ],
+        "BARE@ask+allow": [
+          "REQUIRE_CONFIRM",
+          "UNKNOWN_REVERSIBILITY"
+        ],
+        "READ_ONLY@ask+allow": [
+          "ALLOW",
+          "READ_ONLY_ALLOW"
+        ]
+      }
+    },
+    {
+      "check": "CLAIM Provider-free: tags/capabilities 'read_only' change nothing (ARTICLE and ARTICLE_NO_TAGS get the same decision, reason and risk)",
+      "pass": true,
+      "observed": {
+        "ARTICLE": {
+          "decl": "ARTICLE",
+          "mode": "(default)",
+          "default_action": "(default)",
+          "config_action_policy": {
+            "mode": "auto",
+            "default_action": "require_confirm",
+            "allow_read_only_without_prompt": true
+          },
+          "spec_min_scope": "WRITE_SAFE",
+          "decision": "REQUIRE_CONFIRM",
+          "reason_code": "ENFORCE_SAFE_CONFIRM",
+          "risk": {
+            "risk_class": "write",
+            "side_effects": "local",
+            "reversibility": "reversible",
+            "default_confirm": false,
+            "sensitive_targets": []
+          }
+        },
+        "ARTICLE_NO_TAGS": {
+          "decl": "ARTICLE_NO_TAGS",
+          "mode": "(default)",
+          "default_action": "(default)",
+          "config_action_policy": {
+            "mode": "auto",
+            "default_action": "require_confirm",
+            "allow_read_only_without_prompt": true
+          },
+          "spec_min_scope": "WRITE_SAFE",
+          "decision": "REQUIRE_CONFIRM",
+          "reason_code": "ENFORCE_SAFE_CONFIRM",
+          "risk": {
+            "risk_class": "write",
+            "side_effects": "local",
+            "reversibility": "reversible",
+            "default_confirm": false,
+            "sensitive_targets": []
+          }
+        }
+      }
+    },
+    {
+      "check": "CLAIM Provider-free: idempotent only matters outside the defaults - with mode 'ask' + default_action 'allow', ARTICLE is ALLOWed while BARE still needs confirmation (UNKNOWN_REVERSIBILITY)",
+      "pass": true,
+      "observed": {
+        "ARTICLE@ask+allow": [
+          "ALLOW",
+          "NO_MATCHING_GRANT"
+        ],
+        "BARE@ask+allow": [
+          "REQUIRE_CONFIRM",
+          "UNKNOWN_REVERSIBILITY"
+        ],
+        "READ_ONLY@ask+allow": [
+          "ALLOW",
+          "READ_ONLY_ALLOW"
+        ]
+      }
+    }
+  ],
+  "observed": {
+    "cases": {
+      "ARTICLE": {
+        "case": "ARTICLE",
+        "tool_name": "inspect_home",
+        "decl": {
+          "idempotent": true,
+          "tags": [
+            "read_only"
+          ],
+          "capabilities": [
+            "read_only",
+            "network"
+          ]
+        },
+        "approval_callback": "approves",
+        "tool_decl": {
+          "name": "inspect_home",
+          "min_scope": null,
+          "idempotent": true,
+          "dangerous": false,
+          "tags": [
+            "read_only"
+          ],
+          "capabilities": [
+            "read_only",
+            "network"
+          ]
+        },
+        "family_min_scope_default": "WRITE_SAFE",
+        "action_policy_present": true,
+        "run_state": "completed",
+        "text": "openminion: Consolidation reviewed; nothing to change.",
+        "respond_kind": "assistant",
+        "model_called_tool": true,
+        "provider_requests": [
+          "extraction",
+          "tool_call",
+          "freshness",
+          "freshness",
+          "other_text",
+          "other_text",
+          "other_structured",
+          "judge",
+          "decide"
+        ],
+        "tool_names_offered": [
+          "inspect_home",
+          "submit_output"
+        ],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "tool_executions": [
+          {
+            "tool": "inspect_home",
+            "order_id": "A-104"
+          }
+        ],
+        "approval_callback_calls": [
+          {
+            "tool": "inspect_home",
+            "args": {
+              "order_id": "A-104"
+            },
+            "approval_id_set": true
+          }
+        ],
+        "policy_checks": [
+          {
+            "key": "inspect_home.default",
+            "decision": "REQUIRE_CONFIRM",
+            "reason_code": "ENFORCE_SAFE_CONFIRM",
+            "risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "reversible",
+              "default_confirm": false,
+              "sensitive_targets": []
+            },
+            "registered_risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "reversible",
+              "default_confirm": false,
+              "sensitive_targets": []
+            },
+            "has_config_overrides": true,
+            "mode": "enforce_safe"
+          },
+          {
+            "key": "inspect_home.default",
+            "decision": "ALLOW",
+            "reason_code": "EXPLICIT_ALLOW",
+            "risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "reversible",
+              "default_confirm": false,
+              "sensitive_targets": []
+            },
+            "registered_risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "reversible",
+              "default_confirm": false,
+              "sensitive_targets": []
+            },
+            "has_config_overrides": true,
+            "mode": "enforce_safe"
+          }
+        ]
+      },
+      "BARE": {
+        "case": "BARE",
+        "tool_name": "lookup_order",
+        "decl": {},
+        "approval_callback": "approves",
+        "tool_decl": {
+          "name": "lookup_order",
+          "min_scope": null,
+          "idempotent": false,
+          "dangerous": false,
+          "tags": [],
+          "capabilities": []
+        },
+        "family_min_scope_default": "WRITE_SAFE",
+        "action_policy_present": true,
+        "run_state": "completed",
+        "text": "openminion: Consolidation reviewed; nothing to change.",
+        "respond_kind": "assistant",
+        "model_called_tool": true,
+        "provider_requests": [
+          "extraction",
+          "tool_call",
+          "freshness",
+          "freshness",
+          "other_text",
+          "other_text",
+          "other_structured",
+          "judge",
+          "decide"
+        ],
+        "tool_names_offered": [
+          "lookup_order",
+          "submit_output"
+        ],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "tool_executions": [
+          {
+            "tool": "lookup_order",
+            "order_id": "A-104"
+          }
+        ],
+        "approval_callback_calls": [
+          {
+            "tool": "lookup_order",
+            "args": {
+              "order_id": "A-104"
+            },
+            "approval_id_set": true
+          }
+        ],
+        "policy_checks": [
+          {
+            "key": "lookup_order.default",
+            "decision": "REQUIRE_CONFIRM",
+            "reason_code": "UNKNOWN_REVERSIBILITY",
+            "risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "unknown",
+              "default_confirm": true,
+              "sensitive_targets": []
+            },
+            "registered_risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "unknown",
+              "default_confirm": true,
+              "sensitive_targets": []
+            },
+            "has_config_overrides": true,
+            "mode": "enforce_safe"
+          },
+          {
+            "key": "lookup_order.default",
+            "decision": "ALLOW",
+            "reason_code": "EXPLICIT_ALLOW",
+            "risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "unknown",
+              "default_confirm": true,
+              "sensitive_targets": []
+            },
+            "registered_risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "unknown",
+              "default_confirm": true,
+              "sensitive_targets": []
+            },
+            "has_config_overrides": true,
+            "mode": "enforce_safe"
+          }
+        ]
+      },
+      "READ_ONLY": {
+        "case": "READ_ONLY",
+        "tool_name": "lookup_order",
+        "decl": {
+          "min_scope": "READ_ONLY",
+          "idempotent": true
+        },
+        "approval_callback": "approves",
+        "tool_decl": {
+          "name": "lookup_order",
+          "min_scope": "READ_ONLY",
+          "idempotent": true,
+          "dangerous": false,
+          "tags": [],
+          "capabilities": []
+        },
+        "family_min_scope_default": "WRITE_SAFE",
+        "action_policy_present": true,
+        "run_state": "completed",
+        "text": "openminion: Consolidation reviewed; nothing to change.",
+        "respond_kind": "assistant",
+        "model_called_tool": true,
+        "provider_requests": [
+          "extraction",
+          "tool_call",
+          "freshness",
+          "freshness",
+          "other_text",
+          "other_text",
+          "other_structured",
+          "judge",
+          "decide"
+        ],
+        "tool_names_offered": [
+          "lookup_order",
+          "submit_output"
+        ],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "tool_executions": [
+          {
+            "tool": "lookup_order",
+            "order_id": "A-104"
+          }
+        ],
+        "approval_callback_calls": [],
+        "policy_checks": [
+          {
+            "key": "lookup_order.default",
+            "decision": "ALLOW",
+            "reason_code": "READ_ONLY_ALLOW",
+            "risk": {
+              "risk_class": "read",
+              "side_effects": "none",
+              "reversibility": "reversible",
+              "default_confirm": false,
+              "sensitive_targets": []
+            },
+            "registered_risk": {
+              "risk_class": "read",
+              "side_effects": "none",
+              "reversibility": "reversible",
+              "default_confirm": false,
+              "sensitive_targets": []
+            },
+            "has_config_overrides": true,
+            "mode": "enforce_safe"
+          }
+        ]
+      },
+      "README": {
+        "case": "README",
+        "tool_name": "lookup_order",
+        "decl": {},
+        "approval_callback": null,
+        "tool_decl": {
+          "name": "lookup_order",
+          "min_scope": null,
+          "idempotent": false,
+          "dangerous": false,
+          "tags": [],
+          "capabilities": []
+        },
+        "family_min_scope_default": "WRITE_SAFE",
+        "action_policy_present": true,
+        "run_state": "completed",
+        "text": "openminion: Policy confirmation required.\nlookup_order\nRisk: write\nSide effects: local\nReversibility: unknown\nReason: UNKNOWN_REVERSIBILITY\nChoices: allow_once, allow_session, deny\nReply exactly yes or allow_once to allow once, session or allow_session to allow this tool for the session, or no or deny to cancel.",
+        "respond_kind": "policy_confirmation_prompt",
+        "model_called_tool": true,
+        "provider_requests": [
+          "extraction",
+          "tool_call",
+          "freshness",
+          "freshness"
+        ],
+        "tool_names_offered": [
+          "lookup_order",
+          "submit_output"
+        ],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "tool_executions": [],
+        "approval_callback_calls": [],
+        "policy_checks": [
+          {
+            "key": "lookup_order.default",
+            "decision": "REQUIRE_CONFIRM",
+            "reason_code": "UNKNOWN_REVERSIBILITY",
+            "risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "unknown",
+              "default_confirm": true,
+              "sensitive_targets": []
+            },
+            "registered_risk": {
+              "risk_class": "write",
+              "side_effects": "local",
+              "reversibility": "unknown",
+              "default_confirm": true,
+              "sensitive_targets": []
+            },
+            "has_config_overrides": true,
+            "mode": "enforce_safe"
+          }
+        ]
+      },
+      "README_FIXED": {
+        "case": "README_FIXED",
+        "tool_name": "lookup_order",
+        "decl": {
+          "min_scope": "READ_ONLY",
+          "idempotent": true
+        },
+        "approval_callback": null,
+        "tool_decl": {
+          "name": "lookup_order",
+          "min_scope": "READ_ONLY",
+          "idempotent": true,
+          "dangerous": false,
+          "tags": [],
+          "capabilities": []
+        },
+        "family_min_scope_default": "WRITE_SAFE",
+        "action_policy_present": true,
+        "run_state": "completed",
+        "text": "openminion: Consolidation reviewed; nothing to change.",
+        "respond_kind": "assistant",
+        "model_called_tool": true,
+        "provider_requests": [
+          "extraction",
+          "tool_call",
+          "freshness",
+          "freshness",
+          "other_text",
+          "other_text",
+          "other_structured",
+          "judge",
+          "decide"
+        ],
+        "tool_names_offered": [
+          "lookup_order",
+          "submit_output"
+        ],
+        "provider_hosts": [
+          "127.0.0.1"
+        ],
+        "tool_executions": [
+          {
+            "tool": "lookup_order",
+            "order_id": "A-104"
+          }
+        ],
+        "approval_callback_calls": [],
+        "policy_checks": [
+          {
+            "key": "lookup_order.default",
+            "decision": "ALLOW",
+            "reason_code": "READ_ONLY_ALLOW",
+            "risk": {
+              "risk_class": "read",
+              "side_effects": "none",
+              "reversibility": "reversible",
+              "default_confirm": false,
+              "sensitive_targets": []
+            },
+            "registered_risk": {
+              "risk_class": "read",
+              "side_effects": "none",
+              "reversibility": "reversible",
+              "default_confirm": false,
+              "sensitive_targets": []
+            },
+            "has_config_overrides": true,
+            "mode": "enforce_safe"
+          }
+        ]
+      }
+    },
+    "offline_policy": {
+      "ARTICLE@default": {
+        "decl": "ARTICLE",
+        "mode": "(default)",
+        "default_action": "(default)",
+        "config_action_policy": {
+          "mode": "auto",
+          "default_action": "require_confirm",
+          "allow_read_only_without_prompt": true
+        },
+        "spec_min_scope": "WRITE_SAFE",
+        "decision": "REQUIRE_CONFIRM",
+        "reason_code": "ENFORCE_SAFE_CONFIRM",
+        "risk": {
+          "risk_class": "write",
+          "side_effects": "local",
+          "reversibility": "reversible",
+          "default_confirm": false,
+          "sensitive_targets": []
+        }
+      },
+      "ARTICLE_NO_TAGS@default": {
+        "decl": "ARTICLE_NO_TAGS",
+        "mode": "(default)",
+        "default_action": "(default)",
+        "config_action_policy": {
+          "mode": "auto",
+          "default_action": "require_confirm",
+          "allow_read_only_without_prompt": true
+        },
+        "spec_min_scope": "WRITE_SAFE",
+        "decision": "REQUIRE_CONFIRM",
+        "reason_code": "ENFORCE_SAFE_CONFIRM",
+        "risk": {
+          "risk_class": "write",
+          "side_effects": "local",
+          "reversibility": "reversible",
+          "default_confirm": false,
+          "sensitive_targets": []
+        }
+      },
+      "BARE@default": {
+        "decl": "BARE",
+        "mode": "(default)",
+        "default_action": "(default)",
+        "config_action_policy": {
+          "mode": "auto",
+          "default_action": "require_confirm",
+          "allow_read_only_without_prompt": true
+        },
+        "spec_min_scope": "WRITE_SAFE",
+        "decision": "REQUIRE_CONFIRM",
+        "reason_code": "UNKNOWN_REVERSIBILITY",
+        "risk": {
+          "risk_class": "write",
+          "side_effects": "local",
+          "reversibility": "unknown",
+          "default_confirm": true,
+          "sensitive_targets": []
+        }
+      },
+      "READ_ONLY@default": {
+        "decl": "READ_ONLY",
+        "mode": "(default)",
+        "default_action": "(default)",
+        "config_action_policy": {
+          "mode": "auto",
+          "default_action": "require_confirm",
+          "allow_read_only_without_prompt": true
+        },
+        "spec_min_scope": "READ_ONLY",
+        "decision": "ALLOW",
+        "reason_code": "READ_ONLY_ALLOW",
+        "risk": {
+          "risk_class": "read",
+          "side_effects": "none",
+          "reversibility": "reversible",
+          "default_confirm": false,
+          "sensitive_targets": []
+        }
+      },
+      "ARTICLE@ask+allow": {
+        "decl": "ARTICLE",
+        "mode": "ask",
+        "default_action": "allow",
+        "config_action_policy": {
+          "mode": "ask",
+          "default_action": "allow",
+          "allow_read_only_without_prompt": true
+        },
+        "spec_min_scope": "WRITE_SAFE",
+        "decision": "ALLOW",
+        "reason_code": "NO_MATCHING_GRANT",
+        "risk": {
+          "risk_class": "write",
+          "side_effects": "local",
+          "reversibility": "reversible",
+          "default_confirm": false,
+          "sensitive_targets": []
+        }
+      },
+      "BARE@ask+allow": {
+        "decl": "BARE",
+        "mode": "ask",
+        "default_action": "allow",
+        "config_action_policy": {
+          "mode": "ask",
+          "default_action": "allow",
+          "allow_read_only_without_prompt": true
+        },
+        "spec_min_scope": "WRITE_SAFE",
+        "decision": "REQUIRE_CONFIRM",
+        "reason_code": "UNKNOWN_REVERSIBILITY",
+        "risk": {
+          "risk_class": "write",
+          "side_effects": "local",
+          "reversibility": "unknown",
+          "default_confirm": true,
+          "sensitive_targets": []
+        }
+      },
+      "READ_ONLY@ask+allow": {
+        "decl": "READ_ONLY",
+        "mode": "ask",
+        "default_action": "allow",
+        "config_action_policy": {
+          "mode": "ask",
+          "default_action": "allow",
+          "allow_read_only_without_prompt": true
+        },
+        "spec_min_scope": "READ_ONLY",
+        "decision": "ALLOW",
+        "reason_code": "READ_ONLY_ALLOW",
+        "risk": {
+          "risk_class": "read",
+          "side_effects": "none",
+          "reversibility": "reversible",
+          "default_confirm": false,
+          "sensitive_targets": []
+        }
+      }
+    }
+  }
+}
