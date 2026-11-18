@@ -1,0 +1,404 @@
+<p align="center">
+  <img src="https://www.openminion.com/brand/openminion-logo-transparent-v1.png" alt="OpenMinion logo" width="128" />
+</p>
+
+<h1 align="center">OpenMinion</h1>
+
+<p align="center">
+  <strong>Python-first, local-first runtime for tool-using AI agents.</strong>
+</p>
+
+<p align="center">
+  <a href="https://github.com/OpenMinion/openminion">GitHub</a>
+  · <a href="https://pypi.org/project/openminion/">PyPI</a>
+  · <a href="https://www.openminion.com">Website</a>
+  · <a href="https://www.openminion.com/docs/">Docs</a>
+  · <a href="https://x.com/OpenMinion">X</a>
+</p>
+
+<p align="center">
+  <a href="https://pypi.org/project/openminion/"><img alt="PyPI" src="https://img.shields.io/pypi/v/openminion?cacheSeconds=300"></a>
+  <a href="https://pypi.org/project/openminion/"><img alt="Python" src="https://img.shields.io/pypi/pyversions/openminion?cacheSeconds=300"></a>
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-Apache--2.0-blue"></a>
+  <img alt="Status" src="https://img.shields.io/badge/status-alpha-6B7280">
+</p>
+
+OpenMinion is the public preview of a runtime for running inspectable
+agents on your own machine. One shared runtime spans CLI, Python API, HTTP API,
+and daemon-backed workflows, with durable sessions, structured tools, and
+inspectable run state built in. Long-running autonomy, live provider
+resilience, and memory/context usefulness claims remain proof-gated during the
+alpha period.
+
+## Read This First
+
+1. Read [At a Glance](#at-a-glance) to confirm the current product boundary.
+2. Follow [Install](#install) and [Quick Start](#quick-start) for one local run.
+3. Use [Runtime Surfaces](#runtime-surfaces) to choose CLI, Python, HTTP, or
+   daemon-backed operation.
+4. Read [Development](#development) before changing the runtime.
+5. Use the [documentation site](https://www.openminion.com/docs/) for the full
+   operator and contributor manual.
+
+## Trust and Brand Safety
+
+- Official GitHub: <https://github.com/OpenMinion/openminion>
+- Official website and docs: <https://www.openminion.com>
+- Official X account: <https://x.com/OpenMinion>
+
+OpenMinion has no official token, coin, NFT, airdrop, staking program,
+treasury product, or investment offering. Any claim otherwise is unauthorized
+and should be treated as a scam.
+
+## At a Glance
+
+| | |
+| --- | --- |
+| Package | `openminion` |
+| Current line | `0.1.x` public preview for the broadly usable source/CLI milestone |
+| Python | 3.11+ |
+| Best fit | Bounded local workflows, tool use, integrations, and operator-driven agents |
+| Main surfaces | CLI, Python API, local HTTP API, and daemon-backed execution |
+| State model | Local sessions, conversations, threads, runs, artifacts, and memory records |
+| Not the claim | Finished walk-away autonomy or a managed cloud control plane |
+
+OpenMinion is usable for focused local work today, but it remains under active
+development. Complex end-to-end prompts and long unsupervised tasks are still
+improving. Current 2-hour autonomy certification support is validation-only;
+full 8-hour and 24-hour real elapsed certification pilots still require an
+approved run window, provider/model access, workspace, and budgets.
+
+The [0.1.x compatibility contract](API_COMPATIBILITY.md#01x-compatibility-contract)
+covers the documented Python and CLI surface. It does not claim signed Desktop
+binaries, managed cloud service, or completed long-duration autonomy certification.
+
+## Common Commands
+
+```bash
+openminion config init
+openminion setup --list-providers
+openminion setup --list-providers --json
+openminion run "hello"
+openminion
+openminion tools list
+openminion doctor --check-turn --json
+# Optional: install "openminion[acp]" before using a local ACP client.
+openminion acp
+```
+
+Useful operator surfaces:
+
+```bash
+openminion agent ls
+openminion agent status --agent-id default
+openminion agent logs
+openminion agent inspect --agent-id default --json
+```
+
+## Install
+
+Install the current package as an isolated command-line app:
+
+```bash
+pipx install openminion
+```
+
+or, with `uv`:
+
+```bash
+uv tool install openminion
+```
+
+Installing into an existing Python environment is also supported:
+
+```bash
+python3.11 -m pip install openminion
+```
+
+For a source checkout:
+
+```bash
+git clone https://github.com/OpenMinion/openminion.git
+cd openminion
+python3.11 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e .
+```
+
+On Windows PowerShell, activate the same environment with:
+
+```powershell
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -e .
+```
+
+For isolated local data during development:
+
+```bash
+export OPENMINION_HOME="$PWD"
+export OPENMINION_DATA_ROOT="$OPENMINION_HOME/.openminion"
+```
+
+## Quick Start
+
+For a real model-backed session, start with the bare command:
+
+```bash
+openminion --version
+openminion --dir "$PWD"
+```
+
+Setup asks for a provider, model, and credential. For built-in providers,
+OpenMinion selects the API adapter automatically. For example, MiniMax remains
+the provider when it uses an OpenAI-compatible API. Press Enter at the hosted
+provider check to send one recommended test request before Focus opens; the
+request may consume a small amount of quota. Use the provider-list commands
+above for the current human-readable or machine-readable catalog.
+
+An explicit `--dir` trusts that workspace for the current process. A bare
+launch also trusts an ordinary Git worktree; another implicit directory starts
+Read only. Launching from your home directory or a filesystem root requires an
+explicit `--dir PATH`. Add another existing directory for the current process
+with repeatable `--add-dir PATH` options:
+
+```bash
+openminion --dir "$PWD" --add-dir ../shared
+```
+
+Structured file tools remain confined to the workspace, explicitly added
+directories, and configured policy roots. Host commands remain disabled when
+no sandbox is configured. `--allow-unsandboxed-exec` is an explicit opt-in:
+commands then use the OpenMinion process's OS permissions and are not confined
+to workspace roots; command policy and approvals still apply. A native local
+sandbox and approval-free command parity are not provided yet.
+
+In Focus, `/permissions` opens Read only, Ask, Workspace auto, and Full access.
+Workspace auto is intentionally narrow: only `file.write` and `file.edit` skip
+their ordinary prompt, and workspace/path enforcement remains active. Full
+access requires confirmation and does not bypass configured block/ask rules,
+selected denies, host-execution enablement, exact financial or operations
+authorization, or `project.start`. Permission posture and exact-session grants
+persist with the OpenMinion session; `/permissions grants` lists active grants and
+`/permissions revoke <grant-id>` removes one.
+
+For a durable action-policy default, put `action_policy` at the config root or
+under one agent profile. The per-agent form is:
+
+```json
+{
+  "agents": {
+    "local-coder": {
+      "provider": "openai",
+      "action_policy": {"mode": "bypass"}
+    }
+  }
+}
+```
+
+This disables ordinary action-policy prompts for that agent, but it is not a
+persistent Full access switch: Full access also sets the session tool
+permission mode. `permission_mode` is not supported inside `agents.<id>`.
+Select Full access through `/permissions` and reuse the same session, or pass
+`permission_mode` as a trusted API/request input. See
+[Getting Started](docs/getting-started.md#persistent-action-policy-defaults).
+
+When setup finishes and the interactive CLI opens, ask: `List this workspace
+using the file tools.` The default config is saved at
+`~/.openminion/agents.json`, so the next bare launch reuses it.
+
+Direct `openminion mcp ...` commands use `./.openminion/agents.json` when
+`--config` is omitted, matching the Python SDK's project-scoped default. Pass
+`--config ~/.openminion/agents.json` to manage the interactive setup config
+instead. MCP commands that change configuration report the exact `config_path`
+they wrote.
+
+For a credential-free product tour, create an explicit echo/demo config:
+
+```bash
+openminion config init --provider echo
+openminion run "hello"
+openminion status readiness
+```
+
+Demo mode exercises configuration, storage, sessions, and CLI plumbing, but it
+does not call a model or prove provider-backed task quality. Readiness reports
+label this state `demo`, not `ready`.
+
+Open the interactive CLI:
+
+```bash
+openminion --dir "$PWD"
+```
+
+Run two configured agents in one Focus room with explicit runtime roots:
+
+```bash
+runtime_root="$PWD/.openminion-room"
+config_path="$HOME/.openminion/agents.json"
+room_output="$(openminion \
+  --home-root "$runtime_root/home" \
+  --data-root "$runtime_root/data" \
+  --config "$config_path" \
+  room create \
+  --name "Review room" \
+  --human owner-local \
+  --agent writer \
+  --agent reviewer \
+  --channel console \
+  --target focus)"
+room_id="$(printf '%s\n' "$room_output" | sed -n 's/^room=//p')"
+
+openminion \
+  --home-root "$runtime_root/home" \
+  --data-root "$runtime_root/data" \
+  --config "$config_path" \
+  --agent writer \
+  --session "$room_id" \
+  --dir "$PWD"
+```
+
+Inside Focus, use `/participants` to inspect the room, `/routing broadcast` or
+`/routing sequential` to change its mode, and address one agent with
+`@reviewer`. Room mutations require the local owner; participants can post and
+observers cannot.
+
+Embed an isolated agent session from Python:
+
+```python
+from openminion import Agent, ProviderError, tool
+
+@tool(min_scope="READ_ONLY", idempotent=True)
+def lookup_order(order_id: str) -> str:
+    return f"order {order_id}: ready"
+
+try:
+    with Agent(
+        instructions="Answer briefly.",
+        tools=[lookup_order],
+        session_id="customer-42",
+    ) as agent:
+        result = agent.run("Check order A-104")
+        print(result.text, result.session_id)
+except ProviderError as exc:
+    print(f"provider failed: {exc}")
+```
+
+`lookup_order` declares itself read-only, so the default action policy runs it
+without a confirmation. Under the same policy a bare `@tool` is treated as a
+write and is confirmed first; see [Runtime surfaces](docs/runtime-surfaces.md) for how the `@tool`
+options map to approval.
+
+Pass `config_path="path/to/agents.json"` to use a project-owned config and
+`agent_id="reviewer"` to select one configured profile. For advanced runtime
+composition, construct `APIRuntime` directly and pass it as `runtime=` instead.
+
+See [`examples/starter/quickstart.py`](examples/starter/quickstart.py) for the
+complete runnable example and
+[`docs/getting-started.md`](docs/getting-started.md) for contributor bootstrap.
+
+## What OpenMinion Provides
+
+- one orchestration model across CLI, Python, HTTP, and daemon-backed paths
+- provider abstraction for local and hosted model backends
+- structured tools with model-facing contracts and policy-gated execution
+- durable local session, run, artifact, memory-record, and conversation state
+- interactive and one-shot local workflows
+- diagnostics, status, logs, inspection, and OpenTelemetry-ready traces
+- extension surfaces for tools, providers, skills, memory, and integrations
+
+## What OpenMinion Does Not Provide
+
+- finished “give it any complex task and walk away” autonomy
+- a hosted control plane or managed cloud agent service
+- provider-backed certification proof without configured provider credentials
+  and an approved run window
+- a black-box prompt wrapper that hides runtime state
+- automatic permission to perform unsafe or privileged actions
+- any cryptocurrency or investment product
+
+## Runtime Surfaces
+
+| Surface | Use it when |
+| --- | --- |
+| `openminion run` | You want one bounded local request |
+| `openminion` | You want an interactive focus session |
+| `APIRuntime` and `Agent` | You want to embed the runtime in Python |
+| Local HTTP API | You want another process to submit turns or tool requests |
+| `openminiond` | You want daemon-backed local execution |
+| Operator CLIs | You need focused session, memory, policy, runtime, or artifact control |
+
+The root package exports the supported Python facade: `APIRuntime`, `Agent`,
+`AgentOutputValidationError`, `AgentRunResult`, `Handoff`, `MemoryBundle`,
+`OpenMinionConfig`, `ProviderError`, `TurnTimeoutError`, `subagent`, `tool`, and `__version__`. See
+[`API_COMPATIBILITY.md`](API_COMPATIBILITY.md) before depending on deeper
+package internals.
+
+`Agent.run_stream()` is the synchronous callback-progress convenience API.
+For typed iterator streaming, cancellation, or streamed approval resolution,
+use `APIRuntime.submit_turn()` and the advanced contracts exported from
+`openminion.api`. See [`examples/sdk/`](examples/sdk/) for both flows.
+
+## Repository Map
+
+```text
+src/openminion/
+  api/         Public Python and HTTP runtime entrypoints
+  base/        Foundational contracts and shared primitives
+  cli/         CLI entrypoints and terminal UX
+  modules/     Feature and subsystem owners
+  services/    Cross-owner runtime orchestration
+  tools/       Tool host and tool families
+docs/          Package-local public documentation
+examples/      Runnable usage examples
+scripts/       Validation and operator utilities
+tests/         Package and integration proof
+```
+
+For owner-by-owner detail, read
+[`docs/source-tree-owner-map.md`](docs/source-tree-owner-map.md).
+
+## Development
+
+Before contributing, read [CONTRIBUTING.md](CONTRIBUTING.md) and
+[CODE_QUALITY.md](CODE_QUALITY.md).
+
+```bash
+make dev-install
+make hooks-install
+make lint
+```
+
+Use focused tests while iterating. Run `make lint` before feature sign-off;
+reserve `make check` for an intentional broader integration sweep.
+
+## Docs and Release
+
+- [`docs/README.md`](docs/README.md): package documentation map
+- [`docs/runtime-surfaces.md`](docs/runtime-surfaces.md): supported runtime
+  and library surfaces
+- [`docs/system-operations.md`](docs/system-operations.md): local operation and
+  diagnostics
+- [`docs/security-scanning.md`](docs/security-scanning.md): bounded local
+  Semgrep and Trivy audits
+- [`docs/testing-and-validation.md`](docs/testing-and-validation.md): validation
+  inventory
+- [`docs/certification-readiness-matrix.md`](docs/certification-readiness-matrix.md):
+  current proof coverage
+- [`API_COMPATIBILITY.md`](API_COMPATIBILITY.md): public import and command
+  compatibility
+- [`RELEASING.md`](RELEASING.md): release checks and publish flow
+
+Model-provider charges, hosted services, and third-party infrastructure are
+separate from the Apache-2.0 licensed runtime. Review provider terms and costs
+before enabling paid backends.
+
+## License and Brand-use Boundary
+
+- Source code license: Apache-2.0
+- Brand/trademark grant: none
+
+The license grants rights to use, modify, and redistribute the code. It does
+not grant rights to present a fork, clone, token, website, or social account as
+the official OpenMinion project or imply affiliation or endorsement.
