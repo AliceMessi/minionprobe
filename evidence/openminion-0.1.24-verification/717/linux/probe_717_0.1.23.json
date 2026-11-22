@@ -1,0 +1,1774 @@
+{
+  "banner": {
+    "probe": "probe_717",
+    "openminion.__file__": "<VENV>/lib/python3.12/site-packages/openminion/__init__.py",
+    "openminion.__version__": "0.1.23",
+    "python": "3.12.16",
+    "platform": "Linux-7.0.0-1014-aws-x86_64-with-glibc2.39",
+    "sqlite3.sqlite_version": "3.45.1",
+    "cwd": "<RUNNER_TEMP>/empty-0.1.23",
+    "imported_from_site_packages": true,
+    "isolated_mode": true
+  },
+  "checks": [
+    {
+      "check": "A1 numeric Retry-After: 2 that fits a 30 s turn deadline: the retry is sent no earlier than 2 s after the 429 (server-side gap), then succeeds; one 429 and one 200 on the primary route",
+      "pass": false,
+      "observed": {
+        "statuses": [
+          [
+            "primary-model",
+            429
+          ],
+          [
+            "primary-model",
+            200
+          ]
+        ],
+        "gap_s": [
+          0.106
+        ],
+        "response": {
+          "ok": true,
+          "provider": "openai",
+          "model": "primary-model",
+          "output_text": "primary after hint",
+          "usage": {
+            "input_tokens": 11,
+            "output_tokens": 5,
+            "total_tokens": 16
+          },
+          "error_code": null,
+          "error_details": null
+        }
+      }
+    },
+    {
+      "check": "A1 usage and attempt accounting after a hinted wait: usage is the provider's (11/5/16); attempts primary/initial/error then primary/retry/ok; telemetry request 2, error 1, retry 1, response 1",
+      "pass": true,
+      "observed": {
+        "usage": {
+          "input_tokens": 11,
+          "output_tokens": 5,
+          "total_tokens": 16
+        },
+        "attempts": [
+          {
+            "route_posture": "primary",
+            "attempt_posture": "initial",
+            "outcome": "error",
+            "error_code": "RATE_LIMITED",
+            "provider": "openai",
+            "model": "primary-model"
+          },
+          {
+            "route_posture": "primary",
+            "attempt_posture": "retry",
+            "outcome": "ok",
+            "error_code": null,
+            "provider": "openai",
+            "model": "primary-model"
+          }
+        ],
+        "operation_counts": {
+          "request": 2,
+          "http_json_post": 2,
+          "error": 1,
+          "retry": 1,
+          "response": 1
+        }
+      }
+    },
+    {
+      "check": "A2 HTTP-date Retry-After (the next whole second >= 2 s after the 429) that fits a 30 s turn deadline: the retry is not sent before that date (server wall clock) nor less than 2 s after the 429, and succeeds on the primary route with the provider's usage",
+      "pass": false,
+      "observed": {
+        "hint": "Sun, 22 Nov 2026 04:22:11 GMT",
+        "statuses": [
+          [
+            "primary-model",
+            429
+          ],
+          [
+            "primary-model",
+            200
+          ]
+        ],
+        "gap_s": [
+          0.105
+        ],
+        "resend_after_date_s": -1.896,
+        "response": {
+          "ok": true,
+          "provider": "openai",
+          "model": "primary-model",
+          "output_text": "primary after date",
+          "usage": {
+            "input_tokens": 11,
+            "output_tokens": 5,
+            "total_tokens": 16
+          },
+          "error_code": null,
+          "error_details": null
+        }
+      }
+    },
+    {
+      "check": "A3 numeric hint with no turn deadline (call outside await_with_cancel), max_retries=1: no wait and no resend; the route's RATE_LIMITED error is returned with the transport's facts unchanged",
+      "pass": false,
+      "observed": {
+        "statuses": [
+          [
+            "primary-model",
+            429
+          ],
+          [
+            "primary-model",
+            200
+          ]
+        ],
+        "elapsed_s": 0.11,
+        "response": {
+          "ok": true,
+          "provider": "openai",
+          "model": "primary-model",
+          "output_text": "must not be sent",
+          "usage": {
+            "input_tokens": 11,
+            "output_tokens": 5,
+            "total_tokens": 16
+          },
+          "error_code": null,
+          "error_details": null
+        }
+      }
+    },
+    {
+      "check": "A3 failed-attempt accounting of a refused wait: one attempt primary/initial/error (RATE_LIMITED); telemetry request 1, one HTTP POST, error 1, no retry operation",
+      "pass": false,
+      "observed": {
+        "attempts": [
+          {
+            "route_posture": "primary",
+            "attempt_posture": "initial",
+            "outcome": "error",
+            "error_code": "RATE_LIMITED",
+            "provider": "openai",
+            "model": "primary-model"
+          },
+          {
+            "route_posture": "primary",
+            "attempt_posture": "retry",
+            "outcome": "ok",
+            "error_code": null,
+            "provider": "openai",
+            "model": "primary-model"
+          }
+        ],
+        "operation_counts": {
+          "request": 2,
+          "http_json_post": 2,
+          "error": 1,
+          "retry": 1,
+          "response": 1
+        }
+      }
+    },
+    {
+      "check": "A4 numeric hint 30 s with a 5 s turn deadline, max_retries=1: refused without waiting or resending; RATE_LIMITED with the transport's facts unchanged; telemetry request 1, one HTTP POST, error 1",
+      "pass": false,
+      "observed": {
+        "statuses": [
+          [
+            "primary-model",
+            429
+          ],
+          [
+            "primary-model",
+            200
+          ]
+        ],
+        "elapsed_s": 0.11,
+        "response": {
+          "ok": true,
+          "provider": "openai",
+          "model": "primary-model",
+          "output_text": "must not be sent",
+          "usage": {
+            "input_tokens": 11,
+            "output_tokens": 5,
+            "total_tokens": 16
+          },
+          "error_code": null,
+          "error_details": null
+        },
+        "operation_counts": {
+          "request": 2,
+          "http_json_post": 2,
+          "error": 1,
+          "retry": 1,
+          "response": 1
+        }
+      }
+    },
+    {
+      "check": "A5_fallback_too_long: primary hint 30 s cannot wait (5 s deadline), fallback configured on RATE_LIMITED: no wait, the primary is not resent, the fallback answers with its own usage",
+      "pass": false,
+      "observed": {
+        "statuses": [
+          [
+            "primary-model",
+            429
+          ],
+          [
+            "primary-model",
+            200
+          ]
+        ],
+        "elapsed_s": 0.111,
+        "response": {
+          "ok": true,
+          "provider": "openai",
+          "model": "primary-model",
+          "output_text": "must not be sent",
+          "usage": {
+            "input_tokens": 11,
+            "output_tokens": 5,
+            "total_tokens": 16
+          },
+          "error_code": null,
+          "error_details": null
+        },
+        "attempts": [
+          {
+            "route_posture": "primary",
+            "attempt_posture": "initial",
+            "outcome": "error",
+            "error_code": "RATE_LIMITED",
+            "provider": "openai",
+            "model": "primary-model"
+          },
+          {
+            "route_posture": "primary",
+            "attempt_posture": "retry",
+            "outcome": "ok",
+            "error_code": null,
+            "provider": "openai",
+            "model": "primary-model"
+          }
+        ]
+      }
+    },
+    {
+      "check": "A5_fallback_no_deadline: primary hint 30 s cannot wait (no deadline), fallback configured on RATE_LIMITED: no wait, the primary is not resent, the fallback answers with its own usage",
+      "pass": false,
+      "observed": {
+        "statuses": [
+          [
+            "primary-model",
+            429
+          ],
+          [
+            "primary-model",
+            200
+          ]
+        ],
+        "elapsed_s": 0.11,
+        "response": {
+          "ok": true,
+          "provider": "openai",
+          "model": "primary-model",
+          "output_text": "must not be sent",
+          "usage": {
+            "input_tokens": 11,
+            "output_tokens": 5,
+            "total_tokens": 16
+          },
+          "error_code": null,
+          "error_details": null
+        },
+        "attempts": [
+          {
+            "route_posture": "primary",
+            "attempt_posture": "initial",
+            "outcome": "error",
+            "error_code": "RATE_LIMITED",
+            "provider": "openai",
+            "model": "primary-model"
+          },
+          {
+            "route_posture": "primary",
+            "attempt_posture": "retry",
+            "outcome": "ok",
+            "error_code": null,
+            "provider": "openai",
+            "model": "primary-model"
+          }
+        ]
+      }
+    },
+    {
+      "check": "A6 fallback configured only on PROVIDER_ERROR: a refused RATE_LIMITED wait does not reach the fallback; the primary's error and facts are returned",
+      "pass": false,
+      "observed": {
+        "statuses": [
+          [
+            "primary-model",
+            429
+          ],
+          [
+            "primary-model",
+            200
+          ]
+        ],
+        "response": {
+          "ok": true,
+          "provider": "openai",
+          "model": "fixture-model",
+          "output_text": "Consolidation reviewed; nothing to change.",
+          "usage": {
+            "input_tokens": 10,
+            "output_tokens": 10,
+            "total_tokens": 20
+          },
+          "error_code": null,
+          "error_details": null
+        }
+      }
+    },
+    {
+      "check": "A7 hint 2 s fits a 30 s deadline with a RATE_LIMITED fallback configured: the primary is retried after the hint and answers; the fallback receives no request",
+      "pass": false,
+      "observed": {
+        "statuses": [
+          [
+            "primary-model",
+            429
+          ],
+          [
+            "primary-model",
+            200
+          ]
+        ],
+        "gap_s": [
+          0.105
+        ],
+        "response": {
+          "ok": true,
+          "provider": "openai",
+          "model": "primary-model",
+          "output_text": "primary after hint",
+          "usage": {
+            "input_tokens": 11,
+            "output_tokens": 5,
+            "total_tokens": 16
+          },
+          "error_code": null,
+          "error_details": null
+        }
+      }
+    },
+    {
+      "check": "A8 hint 5 s that fits a 30 s deadline, turn cancelled 0.5 s in: the hinted wait stops (the call raises within 1.5 s) and no retry request is sent",
+      "pass": false,
+      "observed": {
+        "statuses": [
+          [
+            "primary-model",
+            429
+          ],
+          [
+            "primary-model",
+            200
+          ]
+        ],
+        "elapsed_s": 0.11,
+        "exception": null,
+        "response": {
+          "ok": true,
+          "provider": "openai",
+          "model": "primary-model",
+          "output_text": "must not be sent",
+          "usage": {
+            "input_tokens": 11,
+            "output_tokens": 5,
+            "total_tokens": 16
+          },
+          "error_code": null,
+          "error_details": null
+        }
+      }
+    },
+    {
+      "check": "A9_zero: Retry-After '0' (no future delay), no deadline: ordinary backoff (300 ms) is kept, the retry is sent and succeeds",
+      "pass": true,
+      "observed": {
+        "statuses": [
+          [
+            "primary-model",
+            429
+          ],
+          [
+            "primary-model",
+            200
+          ]
+        ],
+        "gap_s": [
+          0.306
+        ],
+        "response": {
+          "ok": true,
+          "provider": "openai",
+          "model": "primary-model",
+          "output_text": "after backoff",
+          "usage": {
+            "input_tokens": 11,
+            "output_tokens": 5,
+            "total_tokens": 16
+          },
+          "error_code": null,
+          "error_details": null
+        }
+      }
+    },
+    {
+      "check": "A9_past_date: Retry-After 'Sun, 22 Nov 2026 03:22:11 GMT' (no future delay), no deadline: ordinary backoff (300 ms) is kept, the retry is sent and succeeds",
+      "pass": true,
+      "observed": {
+        "statuses": [
+          [
+            "primary-model",
+            429
+          ],
+          [
+            "primary-model",
+            200
+          ]
+        ],
+        "gap_s": [
+          0.306
+        ],
+        "response": {
+          "ok": true,
+          "provider": "openai",
+          "model": "primary-model",
+          "output_text": "after backoff",
+          "usage": {
+            "input_tokens": 11,
+            "output_tokens": 5,
+            "total_tokens": 16
+          },
+          "error_code": null,
+          "error_details": null
+        }
+      }
+    },
+    {
+      "check": "A9_malformed: Retry-After 'soon' (no future delay), no deadline: ordinary backoff (300 ms) is kept, the retry is sent and succeeds",
+      "pass": true,
+      "observed": {
+        "statuses": [
+          [
+            "primary-model",
+            429
+          ],
+          [
+            "primary-model",
+            200
+          ]
+        ],
+        "gap_s": [
+          0.319
+        ],
+        "response": {
+          "ok": true,
+          "provider": "openai",
+          "model": "primary-model",
+          "output_text": "after backoff",
+          "usage": {
+            "input_tokens": 11,
+            "output_tokens": 5,
+            "total_tokens": 16
+          },
+          "error_code": null,
+          "error_details": null
+        }
+      }
+    },
+    {
+      "check": "A9_missing: Retry-After None (no future delay), no deadline: ordinary backoff (300 ms) is kept, the retry is sent and succeeds",
+      "pass": true,
+      "observed": {
+        "statuses": [
+          [
+            "primary-model",
+            429
+          ],
+          [
+            "primary-model",
+            200
+          ]
+        ],
+        "gap_s": [
+          0.305
+        ],
+        "response": {
+          "ok": true,
+          "provider": "openai",
+          "model": "primary-model",
+          "output_text": "after backoff",
+          "usage": {
+            "input_tokens": 11,
+            "output_tokens": 5,
+            "total_tokens": 16
+          },
+          "error_code": null,
+          "error_details": null
+        }
+      }
+    },
+    {
+      "check": "B1 runtime turn (Agent.run, timeout 60 s), first decide request answered 429 Retry-After: 2: the runtime resends it no earlier than 2 s later and the turn completes with a reply",
+      "pass": false,
+      "observed": {
+        "decide": [
+          [
+            429,
+            0.275
+          ],
+          [
+            200,
+            0.579
+          ]
+        ],
+        "gap_s": 0.304,
+        "reply": "openminion: Consolidation reviewed; nothing to change.",
+        "exception": null,
+        "elapsed_s": 0.635
+      }
+    },
+    {
+      "check": "B2 runtime turn, first decide request answered 429 with an HTTP-date Retry-After (the next whole second >= 2 s ahead): resent not before that date nor less than 2 s later, and the turn completes with a reply",
+      "pass": false,
+      "observed": {
+        "hint": "Sun, 22 Nov 2026 04:22:19 GMT",
+        "decide": [
+          [
+            429,
+            0.154
+          ],
+          [
+            200,
+            0.458
+          ]
+        ],
+        "gap_s": 0.304,
+        "resend_after_date_s": -1.94,
+        "reply": "openminion: Consolidation reviewed; nothing to change.",
+        "exception": null
+      }
+    },
+    {
+      "check": "B3 runtime turn (timeout 30 s), every decide request answered 429 Retry-After: 600: one decide request only (no inner retry, no entry-loop resend before the hint), the turn ends promptly with the provider's RATE_LIMITED error carrying its message and request ID",
+      "pass": false,
+      "observed": {
+        "decide": [
+          [
+            429,
+            0.148
+          ],
+          [
+            429,
+            0.452
+          ],
+          [
+            429,
+            1.056
+          ],
+          [
+            429,
+            1.283
+          ],
+          [
+            429,
+            1.587
+          ],
+          [
+            429,
+            2.191
+          ],
+          [
+            429,
+            2.68
+          ],
+          [
+            429,
+            2.984
+          ],
+          [
+            429,
+            3.588
+          ]
+        ],
+        "exception": "ProviderError: RATE_LIMITED: The configured model provider could not continue this turn because it reported a quota, billing, or rate-limit block (openai rate limited: Rate limit reached for probe-717 requests per minute.). Please retry shortly or check the provider quota/billing state and try again. Provider request ID: req-probe-717-9.",
+        "elapsed_s": 3.597
+      }
+    },
+    {
+      "check": "Offline and error-free: every provider is the stub on 127.0.0.1 and no case raised outside the call under test",
+      "pass": true,
+      "observed": {
+        "hosts": [
+          "127.0.0.1"
+        ],
+        "errors": {}
+      }
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 13,
+    "total": 19
+  },
+  "cases": {
+    "A1_numeric_fits": {
+      "case": "A1",
+      "timeout_s": 30,
+      "max_retries": 1,
+      "backoff_ms": 100,
+      "fallback_on": null,
+      "elapsed_s": 0.13,
+      "requests": [
+        {
+          "index": 0,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 429,
+          "wall": 1795321328.8771415,
+          "retry_after": "2",
+          "hint_epoch": null,
+          "t_rel": 0.02
+        },
+        {
+          "index": 1,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 200,
+          "wall": 1795321328.983129,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.126
+        }
+      ],
+      "attempts": [
+        {
+          "route_posture": "primary",
+          "attempt_posture": "initial",
+          "outcome": "error",
+          "error_code": "RATE_LIMITED",
+          "provider": "openai",
+          "model": "primary-model"
+        },
+        {
+          "route_posture": "primary",
+          "attempt_posture": "retry",
+          "outcome": "ok",
+          "error_code": null,
+          "provider": "openai",
+          "model": "primary-model"
+        }
+      ],
+      "operation_counts": {
+        "request": 2,
+        "http_json_post": 2,
+        "error": 1,
+        "retry": 1,
+        "response": 1
+      },
+      "exception": null,
+      "response": {
+        "ok": true,
+        "provider": "openai",
+        "model": "primary-model",
+        "output_text": "primary after hint",
+        "usage": {
+          "input_tokens": 11,
+          "output_tokens": 5,
+          "total_tokens": 16
+        },
+        "error_code": null,
+        "error_details": null
+      }
+    },
+    "A2_http_date_fits": {
+      "case": "A2",
+      "timeout_s": 30,
+      "max_retries": 1,
+      "backoff_ms": 100,
+      "fallback_on": null,
+      "elapsed_s": 0.11,
+      "requests": [
+        {
+          "index": 0,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 429,
+          "wall": 1795321328.9988055,
+          "retry_after": "Sun, 22 Nov 2026 04:22:11 GMT",
+          "hint_epoch": 1795321331.0,
+          "t_rel": 0.003
+        },
+        {
+          "index": 1,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 200,
+          "wall": 1795321329.104258,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.108
+        }
+      ],
+      "attempts": [
+        {
+          "route_posture": "primary",
+          "attempt_posture": "initial",
+          "outcome": "error",
+          "error_code": "RATE_LIMITED",
+          "provider": "openai",
+          "model": "primary-model"
+        },
+        {
+          "route_posture": "primary",
+          "attempt_posture": "retry",
+          "outcome": "ok",
+          "error_code": null,
+          "provider": "openai",
+          "model": "primary-model"
+        }
+      ],
+      "operation_counts": {
+        "request": 2,
+        "http_json_post": 2,
+        "error": 1,
+        "retry": 1,
+        "response": 1
+      },
+      "exception": null,
+      "response": {
+        "ok": true,
+        "provider": "openai",
+        "model": "primary-model",
+        "output_text": "primary after date",
+        "usage": {
+          "input_tokens": 11,
+          "output_tokens": 5,
+          "total_tokens": 16
+        },
+        "error_code": null,
+        "error_details": null
+      }
+    },
+    "A3_no_deadline": {
+      "case": "A3",
+      "timeout_s": null,
+      "max_retries": 1,
+      "backoff_ms": 100,
+      "fallback_on": null,
+      "elapsed_s": 0.11,
+      "requests": [
+        {
+          "index": 0,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 429,
+          "wall": 1795321329.1174648,
+          "retry_after": "2",
+          "hint_epoch": null,
+          "t_rel": 0.003
+        },
+        {
+          "index": 1,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 200,
+          "wall": 1795321329.2230463,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.108
+        }
+      ],
+      "attempts": [
+        {
+          "route_posture": "primary",
+          "attempt_posture": "initial",
+          "outcome": "error",
+          "error_code": "RATE_LIMITED",
+          "provider": "openai",
+          "model": "primary-model"
+        },
+        {
+          "route_posture": "primary",
+          "attempt_posture": "retry",
+          "outcome": "ok",
+          "error_code": null,
+          "provider": "openai",
+          "model": "primary-model"
+        }
+      ],
+      "operation_counts": {
+        "request": 2,
+        "http_json_post": 2,
+        "error": 1,
+        "retry": 1,
+        "response": 1
+      },
+      "exception": null,
+      "response": {
+        "ok": true,
+        "provider": "openai",
+        "model": "primary-model",
+        "output_text": "must not be sent",
+        "usage": {
+          "input_tokens": 11,
+          "output_tokens": 5,
+          "total_tokens": 16
+        },
+        "error_code": null,
+        "error_details": null
+      }
+    },
+    "A4_too_long": {
+      "case": "A4",
+      "timeout_s": 5,
+      "max_retries": 1,
+      "backoff_ms": 100,
+      "fallback_on": null,
+      "elapsed_s": 0.11,
+      "requests": [
+        {
+          "index": 0,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 429,
+          "wall": 1795321329.2366366,
+          "retry_after": "30",
+          "hint_epoch": null,
+          "t_rel": 0.003
+        },
+        {
+          "index": 1,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 200,
+          "wall": 1795321329.3418684,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.108
+        }
+      ],
+      "attempts": [
+        {
+          "route_posture": "primary",
+          "attempt_posture": "initial",
+          "outcome": "error",
+          "error_code": "RATE_LIMITED",
+          "provider": "openai",
+          "model": "primary-model"
+        },
+        {
+          "route_posture": "primary",
+          "attempt_posture": "retry",
+          "outcome": "ok",
+          "error_code": null,
+          "provider": "openai",
+          "model": "primary-model"
+        }
+      ],
+      "operation_counts": {
+        "request": 2,
+        "http_json_post": 2,
+        "error": 1,
+        "retry": 1,
+        "response": 1
+      },
+      "exception": null,
+      "response": {
+        "ok": true,
+        "provider": "openai",
+        "model": "primary-model",
+        "output_text": "must not be sent",
+        "usage": {
+          "input_tokens": 11,
+          "output_tokens": 5,
+          "total_tokens": 16
+        },
+        "error_code": null,
+        "error_details": null
+      }
+    },
+    "A5_fallback_too_long": {
+      "case": "A5_fallback_too_long",
+      "timeout_s": 5.0,
+      "max_retries": 1,
+      "backoff_ms": 100,
+      "fallback_on": [
+        "RATE_LIMITED"
+      ],
+      "elapsed_s": 0.111,
+      "requests": [
+        {
+          "index": 0,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 429,
+          "wall": 1795321329.3549006,
+          "retry_after": "30",
+          "hint_epoch": null,
+          "t_rel": 0.003
+        },
+        {
+          "index": 1,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 200,
+          "wall": 1795321329.4606645,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.109
+        }
+      ],
+      "attempts": [
+        {
+          "route_posture": "primary",
+          "attempt_posture": "initial",
+          "outcome": "error",
+          "error_code": "RATE_LIMITED",
+          "provider": "openai",
+          "model": "primary-model"
+        },
+        {
+          "route_posture": "primary",
+          "attempt_posture": "retry",
+          "outcome": "ok",
+          "error_code": null,
+          "provider": "openai",
+          "model": "primary-model"
+        }
+      ],
+      "operation_counts": {
+        "request": 2,
+        "http_json_post": 2,
+        "error": 1,
+        "retry": 1,
+        "response": 1
+      },
+      "exception": null,
+      "response": {
+        "ok": true,
+        "provider": "openai",
+        "model": "primary-model",
+        "output_text": "must not be sent",
+        "usage": {
+          "input_tokens": 11,
+          "output_tokens": 5,
+          "total_tokens": 16
+        },
+        "error_code": null,
+        "error_details": null
+      }
+    },
+    "A5_fallback_no_deadline": {
+      "case": "A5_fallback_no_deadline",
+      "timeout_s": null,
+      "max_retries": 1,
+      "backoff_ms": 100,
+      "fallback_on": [
+        "RATE_LIMITED"
+      ],
+      "elapsed_s": 0.11,
+      "requests": [
+        {
+          "index": 0,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 429,
+          "wall": 1795321329.4744747,
+          "retry_after": "30",
+          "hint_epoch": null,
+          "t_rel": 0.003
+        },
+        {
+          "index": 1,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 200,
+          "wall": 1795321329.580014,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.108
+        }
+      ],
+      "attempts": [
+        {
+          "route_posture": "primary",
+          "attempt_posture": "initial",
+          "outcome": "error",
+          "error_code": "RATE_LIMITED",
+          "provider": "openai",
+          "model": "primary-model"
+        },
+        {
+          "route_posture": "primary",
+          "attempt_posture": "retry",
+          "outcome": "ok",
+          "error_code": null,
+          "provider": "openai",
+          "model": "primary-model"
+        }
+      ],
+      "operation_counts": {
+        "request": 2,
+        "http_json_post": 2,
+        "error": 1,
+        "retry": 1,
+        "response": 1
+      },
+      "exception": null,
+      "response": {
+        "ok": true,
+        "provider": "openai",
+        "model": "primary-model",
+        "output_text": "must not be sent",
+        "usage": {
+          "input_tokens": 11,
+          "output_tokens": 5,
+          "total_tokens": 16
+        },
+        "error_code": null,
+        "error_details": null
+      }
+    },
+    "A6_fallback_filter": {
+      "case": "A6",
+      "timeout_s": null,
+      "max_retries": 1,
+      "backoff_ms": 100,
+      "fallback_on": [
+        "PROVIDER_ERROR"
+      ],
+      "elapsed_s": 0.11,
+      "requests": [
+        {
+          "index": 0,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 429,
+          "wall": 1795321329.5932627,
+          "retry_after": "30",
+          "hint_epoch": null,
+          "t_rel": 0.003
+        },
+        {
+          "index": 1,
+          "model": "primary-model",
+          "kind": "other_text",
+          "status": 200,
+          "wall": 1795321329.6986744,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.108
+        }
+      ],
+      "attempts": [
+        {
+          "route_posture": "primary",
+          "attempt_posture": "initial",
+          "outcome": "error",
+          "error_code": "RATE_LIMITED",
+          "provider": "openai",
+          "model": "primary-model"
+        },
+        {
+          "route_posture": "primary",
+          "attempt_posture": "retry",
+          "outcome": "ok",
+          "error_code": null,
+          "provider": "openai",
+          "model": "primary-model"
+        }
+      ],
+      "operation_counts": {
+        "request": 2,
+        "http_json_post": 2,
+        "error": 1,
+        "retry": 1,
+        "response": 1
+      },
+      "exception": null,
+      "response": {
+        "ok": true,
+        "provider": "openai",
+        "model": "fixture-model",
+        "output_text": "Consolidation reviewed; nothing to change.",
+        "usage": {
+          "input_tokens": 10,
+          "output_tokens": 10,
+          "total_tokens": 20
+        },
+        "error_code": null,
+        "error_details": null
+      }
+    },
+    "A7_fit_before_fallback": {
+      "case": "A7",
+      "timeout_s": 30,
+      "max_retries": 1,
+      "backoff_ms": 100,
+      "fallback_on": [
+        "RATE_LIMITED"
+      ],
+      "elapsed_s": 0.11,
+      "requests": [
+        {
+          "index": 0,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 429,
+          "wall": 1795321329.7114484,
+          "retry_after": "2",
+          "hint_epoch": null,
+          "t_rel": 0.003
+        },
+        {
+          "index": 1,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 200,
+          "wall": 1795321329.8169997,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.108
+        }
+      ],
+      "attempts": [
+        {
+          "route_posture": "primary",
+          "attempt_posture": "initial",
+          "outcome": "error",
+          "error_code": "RATE_LIMITED",
+          "provider": "openai",
+          "model": "primary-model"
+        },
+        {
+          "route_posture": "primary",
+          "attempt_posture": "retry",
+          "outcome": "ok",
+          "error_code": null,
+          "provider": "openai",
+          "model": "primary-model"
+        }
+      ],
+      "operation_counts": {
+        "request": 2,
+        "http_json_post": 2,
+        "error": 1,
+        "retry": 1,
+        "response": 1
+      },
+      "exception": null,
+      "response": {
+        "ok": true,
+        "provider": "openai",
+        "model": "primary-model",
+        "output_text": "primary after hint",
+        "usage": {
+          "input_tokens": 11,
+          "output_tokens": 5,
+          "total_tokens": 16
+        },
+        "error_code": null,
+        "error_details": null
+      }
+    },
+    "A8_cancel_during_wait": {
+      "case": "A8",
+      "timeout_s": 30,
+      "max_retries": 1,
+      "backoff_ms": 100,
+      "fallback_on": null,
+      "elapsed_s": 0.11,
+      "requests": [
+        {
+          "index": 0,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 429,
+          "wall": 1795321329.8300707,
+          "retry_after": "5",
+          "hint_epoch": null,
+          "t_rel": 0.003
+        },
+        {
+          "index": 1,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 200,
+          "wall": 1795321329.9352405,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.108
+        }
+      ],
+      "attempts": [
+        {
+          "route_posture": "primary",
+          "attempt_posture": "initial",
+          "outcome": "error",
+          "error_code": "RATE_LIMITED",
+          "provider": "openai",
+          "model": "primary-model"
+        },
+        {
+          "route_posture": "primary",
+          "attempt_posture": "retry",
+          "outcome": "ok",
+          "error_code": null,
+          "provider": "openai",
+          "model": "primary-model"
+        }
+      ],
+      "operation_counts": {
+        "request": 2,
+        "http_json_post": 2,
+        "error": 1,
+        "retry": 1,
+        "response": 1
+      },
+      "exception": null,
+      "response": {
+        "ok": true,
+        "provider": "openai",
+        "model": "primary-model",
+        "output_text": "must not be sent",
+        "usage": {
+          "input_tokens": 11,
+          "output_tokens": 5,
+          "total_tokens": 16
+        },
+        "error_code": null,
+        "error_details": null
+      }
+    },
+    "A9_zero": {
+      "case": "A9_zero",
+      "timeout_s": null,
+      "max_retries": 1,
+      "backoff_ms": 300,
+      "fallback_on": null,
+      "elapsed_s": 0.311,
+      "requests": [
+        {
+          "index": 0,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 429,
+          "wall": 1795321330.3399158,
+          "retry_after": "0",
+          "hint_epoch": null,
+          "t_rel": 0.003
+        },
+        {
+          "index": 1,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 200,
+          "wall": 1795321330.6457157,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.309
+        }
+      ],
+      "attempts": [
+        {
+          "route_posture": "primary",
+          "attempt_posture": "initial",
+          "outcome": "error",
+          "error_code": "RATE_LIMITED",
+          "provider": "openai",
+          "model": "primary-model"
+        },
+        {
+          "route_posture": "primary",
+          "attempt_posture": "retry",
+          "outcome": "ok",
+          "error_code": null,
+          "provider": "openai",
+          "model": "primary-model"
+        }
+      ],
+      "operation_counts": {
+        "request": 2,
+        "http_json_post": 2,
+        "error": 1,
+        "retry": 1,
+        "response": 1
+      },
+      "exception": null,
+      "response": {
+        "ok": true,
+        "provider": "openai",
+        "model": "primary-model",
+        "output_text": "after backoff",
+        "usage": {
+          "input_tokens": 11,
+          "output_tokens": 5,
+          "total_tokens": 16
+        },
+        "error_code": null,
+        "error_details": null
+      }
+    },
+    "A9_past_date": {
+      "case": "A9_past_date",
+      "timeout_s": null,
+      "max_retries": 1,
+      "backoff_ms": 300,
+      "fallback_on": null,
+      "elapsed_s": 0.311,
+      "requests": [
+        {
+          "index": 0,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 429,
+          "wall": 1795321330.6585894,
+          "retry_after": "Sun, 22 Nov 2026 03:22:11 GMT",
+          "hint_epoch": null,
+          "t_rel": 0.003
+        },
+        {
+          "index": 1,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 200,
+          "wall": 1795321330.9645278,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.309
+        }
+      ],
+      "attempts": [
+        {
+          "route_posture": "primary",
+          "attempt_posture": "initial",
+          "outcome": "error",
+          "error_code": "RATE_LIMITED",
+          "provider": "openai",
+          "model": "primary-model"
+        },
+        {
+          "route_posture": "primary",
+          "attempt_posture": "retry",
+          "outcome": "ok",
+          "error_code": null,
+          "provider": "openai",
+          "model": "primary-model"
+        }
+      ],
+      "operation_counts": {
+        "request": 2,
+        "http_json_post": 2,
+        "error": 1,
+        "retry": 1,
+        "response": 1
+      },
+      "exception": null,
+      "response": {
+        "ok": true,
+        "provider": "openai",
+        "model": "primary-model",
+        "output_text": "after backoff",
+        "usage": {
+          "input_tokens": 11,
+          "output_tokens": 5,
+          "total_tokens": 16
+        },
+        "error_code": null,
+        "error_details": null
+      }
+    },
+    "A9_malformed": {
+      "case": "A9_malformed",
+      "timeout_s": null,
+      "max_retries": 1,
+      "backoff_ms": 300,
+      "fallback_on": null,
+      "elapsed_s": 0.325,
+      "requests": [
+        {
+          "index": 0,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 429,
+          "wall": 1795321330.977463,
+          "retry_after": "soon",
+          "hint_epoch": null,
+          "t_rel": 0.003
+        },
+        {
+          "index": 1,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 200,
+          "wall": 1795321331.2971117,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.322
+        }
+      ],
+      "attempts": [
+        {
+          "route_posture": "primary",
+          "attempt_posture": "initial",
+          "outcome": "error",
+          "error_code": "RATE_LIMITED",
+          "provider": "openai",
+          "model": "primary-model"
+        },
+        {
+          "route_posture": "primary",
+          "attempt_posture": "retry",
+          "outcome": "ok",
+          "error_code": null,
+          "provider": "openai",
+          "model": "primary-model"
+        }
+      ],
+      "operation_counts": {
+        "request": 2,
+        "http_json_post": 2,
+        "error": 1,
+        "retry": 1,
+        "response": 1
+      },
+      "exception": null,
+      "response": {
+        "ok": true,
+        "provider": "openai",
+        "model": "primary-model",
+        "output_text": "after backoff",
+        "usage": {
+          "input_tokens": 11,
+          "output_tokens": 5,
+          "total_tokens": 16
+        },
+        "error_code": null,
+        "error_details": null
+      }
+    },
+    "A9_missing": {
+      "case": "A9_missing",
+      "timeout_s": null,
+      "max_retries": 1,
+      "backoff_ms": 300,
+      "fallback_on": null,
+      "elapsed_s": 0.311,
+      "requests": [
+        {
+          "index": 0,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 429,
+          "wall": 1795321331.3098567,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.003
+        },
+        {
+          "index": 1,
+          "model": "primary-model",
+          "kind": "scripted",
+          "status": 200,
+          "wall": 1795321331.6153028,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.308
+        }
+      ],
+      "attempts": [
+        {
+          "route_posture": "primary",
+          "attempt_posture": "initial",
+          "outcome": "error",
+          "error_code": "RATE_LIMITED",
+          "provider": "openai",
+          "model": "primary-model"
+        },
+        {
+          "route_posture": "primary",
+          "attempt_posture": "retry",
+          "outcome": "ok",
+          "error_code": null,
+          "provider": "openai",
+          "model": "primary-model"
+        }
+      ],
+      "operation_counts": {
+        "request": 2,
+        "http_json_post": 2,
+        "error": 1,
+        "retry": 1,
+        "response": 1
+      },
+      "exception": null,
+      "response": {
+        "ok": true,
+        "provider": "openai",
+        "model": "primary-model",
+        "output_text": "after backoff",
+        "usage": {
+          "input_tokens": 11,
+          "output_tokens": 5,
+          "total_tokens": 16
+        },
+        "error_code": null,
+        "error_details": null
+      }
+    },
+    "B1_turn_numeric_fits": {
+      "case": "B1",
+      "hint": "2",
+      "timeout_seconds": 60,
+      "limited_decide_requests": 1,
+      "reply": "openminion: Consolidation reviewed; nothing to change.",
+      "exception": null,
+      "elapsed_s": 0.635,
+      "requests": [
+        {
+          "index": 0,
+          "model": "gpt-4.1-mini",
+          "kind": "extraction",
+          "status": 200,
+          "wall": 1795321336.0305877,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.224
+        },
+        {
+          "index": 1,
+          "model": "gpt-4.1-mini",
+          "kind": "decide",
+          "status": 429,
+          "wall": 1795321336.081775,
+          "retry_after": "2",
+          "hint_epoch": null,
+          "t_rel": 0.275
+        },
+        {
+          "index": 2,
+          "model": "gpt-4.1-mini",
+          "kind": "decide",
+          "status": 200,
+          "wall": 1795321336.385507,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.579
+        },
+        {
+          "index": 3,
+          "model": "gpt-4.1-mini",
+          "kind": "freshness",
+          "status": 200,
+          "wall": 1795321336.395409,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.588
+        },
+        {
+          "index": 4,
+          "model": "gpt-4.1-mini",
+          "kind": "freshness",
+          "status": 200,
+          "wall": 1795321336.4030209,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.596
+        }
+      ]
+    },
+    "B2_turn_http_date_fits": {
+      "case": "B2",
+      "hint": "date+2",
+      "timeout_seconds": 60,
+      "limited_decide_requests": 1,
+      "reply": "openminion: Consolidation reviewed; nothing to change.",
+      "exception": null,
+      "elapsed_s": 0.513,
+      "requests": [
+        {
+          "index": 0,
+          "model": "gpt-4.1-mini",
+          "kind": "extraction",
+          "status": 200,
+          "wall": 1795321336.7096913,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.107
+        },
+        {
+          "index": 1,
+          "model": "gpt-4.1-mini",
+          "kind": "decide",
+          "status": 429,
+          "wall": 1795321336.7567525,
+          "retry_after": "Sun, 22 Nov 2026 04:22:19 GMT",
+          "hint_epoch": 1795321339.0,
+          "t_rel": 0.154
+        },
+        {
+          "index": 2,
+          "model": "gpt-4.1-mini",
+          "kind": "decide",
+          "status": 200,
+          "wall": 1795321337.0604885,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.458
+        },
+        {
+          "index": 3,
+          "model": "gpt-4.1-mini",
+          "kind": "freshness",
+          "status": 200,
+          "wall": 1795321337.0707014,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.468
+        },
+        {
+          "index": 4,
+          "model": "gpt-4.1-mini",
+          "kind": "freshness",
+          "status": 200,
+          "wall": 1795321337.0784414,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.476
+        }
+      ]
+    },
+    "B3_turn_too_long": {
+      "case": "B3",
+      "hint": "600",
+      "timeout_seconds": 30,
+      "limited_decide_requests": 99,
+      "reply": null,
+      "exception": "ProviderError: RATE_LIMITED: The configured model provider could not continue this turn because it reported a quota, billing, or rate-limit block (openai rate limited: Rate limit reached for probe-717 requests per minute.). Please retry shortly or check the provider quota/billing state and try again. Provider request ID: req-probe-717-9.",
+      "elapsed_s": 3.597,
+      "requests": [
+        {
+          "index": 0,
+          "model": "gpt-4.1-mini",
+          "kind": "extraction",
+          "status": 200,
+          "wall": 1795321337.3702068,
+          "retry_after": null,
+          "hint_epoch": null,
+          "t_rel": 0.102
+        },
+        {
+          "index": 1,
+          "model": "gpt-4.1-mini",
+          "kind": "decide",
+          "status": 429,
+          "wall": 1795321337.416115,
+          "retry_after": "600",
+          "hint_epoch": null,
+          "t_rel": 0.148
+        },
+        {
+          "index": 2,
+          "model": "gpt-4.1-mini",
+          "kind": "decide",
+          "status": 429,
+          "wall": 1795321337.719786,
+          "retry_after": "600",
+          "hint_epoch": null,
+          "t_rel": 0.452
+        },
+        {
+          "index": 3,
+          "model": "gpt-4.1-mini",
+          "kind": "decide",
+          "status": 429,
+          "wall": 1795321338.3236718,
+          "retry_after": "600",
+          "hint_epoch": null,
+          "t_rel": 1.056
+        },
+        {
+          "index": 4,
+          "model": "gpt-4.1-mini",
+          "kind": "decide",
+          "status": 429,
+          "wall": 1795321338.5514379,
+          "retry_after": "600",
+          "hint_epoch": null,
+          "t_rel": 1.283
+        },
+        {
+          "index": 5,
+          "model": "gpt-4.1-mini",
+          "kind": "decide",
+          "status": 429,
+          "wall": 1795321338.8553376,
+          "retry_after": "600",
+          "hint_epoch": null,
+          "t_rel": 1.587
+        },
+        {
+          "index": 6,
+          "model": "gpt-4.1-mini",
+          "kind": "decide",
+          "status": 429,
+          "wall": 1795321339.4593577,
+          "retry_after": "600",
+          "hint_epoch": null,
+          "t_rel": 2.191
+        },
+        {
+          "index": 7,
+          "model": "gpt-4.1-mini",
+          "kind": "decide",
+          "status": 429,
+          "wall": 1795321339.948343,
+          "retry_after": "600",
+          "hint_epoch": null,
+          "t_rel": 2.68
+        },
+        {
+          "index": 8,
+          "model": "gpt-4.1-mini",
+          "kind": "decide",
+          "status": 429,
+          "wall": 1795321340.2520485,
+          "retry_after": "600",
+          "hint_epoch": null,
+          "t_rel": 2.984
+        },
+        {
+          "index": 9,
+          "model": "gpt-4.1-mini",
+          "kind": "decide",
+          "status": 429,
+          "wall": 1795321340.8560154,
+          "retry_after": "600",
+          "hint_epoch": null,
+          "t_rel": 3.588
+        }
+      ]
+    }
+  },
+  "errors": {}
+}
